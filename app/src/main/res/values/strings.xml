@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">IFTTT SDK Demo</string>
+    <string name="user_id_hint">User id</string>
+    <string name="service_key">IFTTT-Service-Key</string>
+    <string name="start">Start</string>
+    <string name="email">Email (Optional)</string>
+    <string name="empty_user_id">User id cannot be empty</string>
+    <string name="sign_in">Sign in</string>
+    <string name="user_auth_error">User authentication failed.</string>
+    <string name="login_uri_error">Fetch login URI failed.</string>
+    <string name="disable">Disable</string>
+    <string name="enable">Enable</string>
+    <string name="turn_on">Turn on</string>
+    <string name="configure">Configure</string>
+</resources>

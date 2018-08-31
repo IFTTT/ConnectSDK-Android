@@ -1,0 +1,32 @@
+{
+  "type": "applet",
+  "id": "aVxGRrtD",
+  "name": "Tweet your Instagrams as native photos on Twitter",
+  "description": "Instagram photos will show up in your Twitter feed as a full image rather than a link",
+  "published_at": "2017-02-16T11:10:43-08:00",
+  "enabled_count": 644429,
+  "user_status": null,
+  "last_run_at": null,
+  "services": [
+    {
+      "service_id": "twitter",
+      "service_name": "Twitter",
+      "is_primary": false,
+      "monochrome_icon_url": "https://assets.ifttt.com/images/channels/2/icons/monochrome_regular.png",
+      "color_icon_url": "https://assets.ifttt.com/images/channels/2/icons/on_color_regular.png",
+      "brand_color": "#00abec",
+      "url": "https://ifttt.com/twitter"
+    },
+    {
+      "service_id": "instagram",
+      "service_name": "Instagram",
+      "is_primary": true,
+      "monochrome_icon_url": "https://assets.ifttt.com/images/channels/28/icons/monochrome_regular.png",
+      "color_icon_url": "https://assets.ifttt.com/images/channels/28/icons/on_color_regular.png",
+      "brand_color": "#e4405f",
+      "url": "https://ifttt.com/instagram"
+    }
+  ],
+  "url": "https://ifttt.com/applets/aVxGRrtD",
+  "embedded_url": "https://ifttt.com/embed/instagram/applets/aVxGRrtD"
+}
