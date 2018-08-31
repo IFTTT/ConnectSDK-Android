@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ifttt_connect_to">Connect %1$s</string>
+    <string name="ifttt_reconnect_to">Reconnect %1$s</string>
+    <string name="ifttt_connect">Connect</string>
+    <string name="ifttt_email">Email</string>
+    <string name="ifttt_about_title">IFTTT connects %1$s to %2$s</string>
+    <string name="ifttt_more_about_ifttt">Learn more</string>
+    <string name="ifttt_powered_by_ifttt">WORKS WITH IFTTT</string>
+    <string name="ifttt_about_1">Unlock new features when your favorite things work together</string>
+    <string name="ifttt_about_2">Control which services access your data and how they use it</string>
+    <string name="ifttt_about_3">Protect and monitor your data</string>
+    <string name="ifttt_about_4">Unplug any time</string>
+    <string name="ifttt_creating_account">Creating account…</string>
+    <string name="ifttt_continue_to">Going to %1$s</string>
+    <string name="ifttt_connected">Connected</string>
+    <string name="ifttt_connecting_account">Connecting…</string>
+    <string name="ifttt_connection_off">Disconnect</string>
+    <string name="ifttt_sign_in_to_ifttt_or_create_new_account"><![CDATA[You are creating or using your IFTTT account subject to <a href=\"https://ifttt.com/terms\">Terms</a> & <a href=\"https://ifttt.com/privacy\">Privacy Policy</a>.]]></string>
+    <string name="ifttt_all_set">You\'re all set. Manage connection with IFTTT</string>
+    <string name="ifttt_slide_to_turn_off">Slide to disconnect</string>
+    <string name="ifttt_verifying">Verifying…</string>
+    <string name="ifttt_enter_valid_email">Please enter a valid email address</string>
+    <string name="terms_and_privacy"><![CDATA[By using this connection you agree to our <a href=\"https://ifttt.com/terms\">Privacy & Terms</a>.]]></string>
+    <string name="disconnecting">Disconnecting…</string>
+    <string name="ifttt_authorize_with">Secured with IFTTT Learn more</string>
+    <string name="ifttt_manage_connection">Manage this Connection</string>
+    <string name="ifttt_no_activity_to_open">Could not find an app to open this link.</string>
+    <string name="ifttt_loading">Loading…</string>
+    <string name="ifttt_error_fetching_connection"><![CDATA[Make sure your phone has internet connection. <u>Retry</u>]]></string>
+    <string name="ifttt_new_account_with">New IFTTT account for %1$s</string>
+</resources>

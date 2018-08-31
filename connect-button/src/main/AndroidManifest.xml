@@ -1,0 +1,7 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.ifttt.connect">
+    <application>
+        <activity android:name=".ui.AboutIftttActivity"
+            android:theme="@style/AboutIfttt"/>
+    </application>
+</manifest>
