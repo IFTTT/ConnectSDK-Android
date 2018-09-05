@@ -24,7 +24,7 @@ internal object LoginUrlJsonAdapter {
             when (index) {
                 -1 -> jsonReader.skipValue()
                 0 -> loginUrl = jsonReader.nextString()
-                else -> throw IllegalStateException("Unknown index: " + index)
+                else -> throw IllegalStateException("Unknown index: $index")
             }
         }
 

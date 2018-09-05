@@ -1,8 +1,7 @@
 package com.ifttt;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import java.io.IOException;
+import javax.annotation.Nullable;
 import okhttp3.Interceptor;
 import okhttp3.Response;
 
@@ -17,7 +16,7 @@ final class TokenInterceptor implements Interceptor {
     }
 
     @Override
-    public Response intercept(@NonNull Chain chain) throws IOException {
+    public Response intercept(Chain chain) throws IOException {
         if (token != null) {
             return chain.proceed(chain.request().newBuilder().addHeader("Authorization", "Bearer " + token).build());
         }

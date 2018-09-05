@@ -11,9 +11,13 @@ internal class ExampleAppTokenInterceptor : Interceptor {
         this.exampleAppToken = exampleAppToken
     }
 
-    @Throws(IOException::class) override fun intercept(chain: Interceptor.Chain): Response {
+    @Throws(IOException::class)
+    override fun intercept(chain: Interceptor.Chain): Response {
         return if (exampleAppToken != null) {
-            chain.proceed(chain.request().newBuilder().addHeader("Authorization", "Bearer " + exampleAppToken!!).build())
-        } else chain.proceed(chain.request())
+            chain.proceed(chain.request().newBuilder()
+                    .addHeader("Authorization", "Bearer ${exampleAppToken!!}").build())
+        } else {
+            chain.proceed(chain.request())
+        }
     }
 }

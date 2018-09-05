@@ -1,16 +1,16 @@
 package com.ifttt;
 
-import android.support.annotation.NonNull;
 import com.ifttt.api.AppletConfigApi;
 import com.ifttt.api.AppletsApi;
 import com.ifttt.api.PendingResult;
 import com.ifttt.api.UserApi;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
-import com.squareup.moshi.Rfc3339DateJsonAdapter;
+import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import javax.annotation.Nullable;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.moshi.MoshiConverterFactory;
@@ -24,11 +24,10 @@ import retrofit2.converter.moshi.MoshiConverterFactory;
  * To start, call {@link #getInstance()} to get the singleton instance of this class. Once you have the instance, call
  * the following methods to access the APIs you want to use:
  * <ul>
- *     <li>{@link #appletConfigApi()}: APIs for enabling and disabling an Applet.</li>
- *     <li>{@link #appletsApi()}: APIs for listing Applets or a single Applet from a service.</li>
- *     <li>{@link #userApi()}: API for retrieving IFTTT service and account information for the authenticated user.</li>
+ * <li>{@link #appletConfigApi()}: APIs for enabling and disabling an Applet.</li>
+ * <li>{@link #appletsApi()}: APIs for listing Applets or a single Applet from a service.</li>
+ * <li>{@link #userApi()}: API for retrieving IFTTT service and account information for the authenticated user.</li>
  * </ul>
- *
  */
 public final class IftttApiClient {
 
@@ -99,7 +98,7 @@ public final class IftttApiClient {
      *
      * @param userToken User token string for IFTTT API.
      */
-    public void setUserToken(@NonNull String userToken) {
+    public void setUserToken(String userToken) {
         tokenInterceptor.setToken(userToken);
     }
 
@@ -115,7 +114,7 @@ public final class IftttApiClient {
      *
      * @param inviteCode Invite code string.
      */
-    public void setInviteCode(@NonNull String inviteCode) {
+    public void setInviteCode(String inviteCode) {
         inviteCodeInterceptor.setInviteCode(inviteCode);
     }
 
@@ -144,8 +143,8 @@ public final class IftttApiClient {
             this.errorResponseJsonAdapter = errorResponseJsonAdapter;
         }
 
-        public PendingResult<List<Applet>> listApplets(final String serviceId, final Platform platform,
-                final Order order) {
+        public PendingResult<List<Applet>> listApplets(String serviceId, @Nullable Platform platform,
+                @Nullable Order order) {
             return new ApiPendingResult<>(retrofitAppletsApi.listApplets(serviceId, platform, order),
                     errorResponseJsonAdapter);
         }

@@ -10,7 +10,8 @@ import java.io.IOException
 
 internal object TokenJsonAdapter {
 
-    @JsonQualifier annotation class Token
+    @JsonQualifier
+    annotation class Token
 
     private val options = Options.of("token")
 
@@ -23,10 +24,14 @@ internal object TokenJsonAdapter {
         jsonReader.beginObject()
         while (jsonReader.hasNext()) {
             val index = jsonReader.selectName(options)
-            when (index) {
-                -1 -> jsonReader.skipValue()
-                0 -> userToken = if (jsonReader.peek() == JsonReader.Token.NULL) null else jsonReader.nextString()
-                else -> throw IllegalStateException("Unknown index: " + index)
+            if (index == 0) {
+                userToken = if (jsonReader.peek() == JsonReader.Token.STRING) {
+                    jsonReader.nextString()
+                } else {
+                    null
+                }
+            } else {
+                jsonReader.skipValue()
             }
         }
 

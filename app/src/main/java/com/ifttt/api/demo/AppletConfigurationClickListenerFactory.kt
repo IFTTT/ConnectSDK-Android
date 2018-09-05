@@ -1,9 +1,9 @@
 package com.ifttt.api.demo
 
 import android.net.Uri
-import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.Toast
+import androidx.recyclerview.widget.RecyclerView
 import com.ifttt.api.demo.api.ApiHelper
 import com.ifttt.api.demo.customtabs.CustomTabsHelper
 import com.ifttt.api.demo.customtabs.Fallback

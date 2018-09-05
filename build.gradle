@@ -31,7 +31,6 @@ task clean(type: Delete) {
 ext {
     okHttpVersion = '3.9.0'
     retrofitVersion = '2.3.0'
-    moshiVersion = '1.5.0'
-    supportLibVersion = '26.1.0'
+    moshiVersion = '1.6.0'
     truthVersion = '0.34'
 }

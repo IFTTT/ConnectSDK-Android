@@ -1,6 +1,5 @@
 package com.ifttt.api;
 
-import android.support.annotation.NonNull;
 import com.ifttt.ErrorResponse;
 import retrofit2.Call;
 
@@ -11,8 +10,8 @@ import retrofit2.Call;
 public interface PendingResult<T> {
 
     interface ResultCallback<T> {
-        void onSuccess(@NonNull T result);
-        void onFailure(@NonNull ErrorResponse errorResponse);
+        void onSuccess(T result);
+        void onFailure(ErrorResponse errorResponse);
     }
 
     /**

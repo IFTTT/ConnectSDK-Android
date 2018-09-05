@@ -1,7 +1,5 @@
 package com.ifttt.api.demo
 
-import android.support.v7.widget.CardView
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,6 +7,8 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.cardview.widget.CardView
+import androidx.recyclerview.widget.RecyclerView
 import com.ifttt.IftttApiClient
 import com.ifttt.api.PendingResult
 import com.ifttt.api.demo.api.ApiHelper
@@ -32,7 +32,7 @@ class AppletAdapter(private val applets: MutableList<Applet>,
 
         // Using primary service to brand the Applet.
         holder.root.setCardBackgroundColor(primaryService.brandColor)
-        Picasso.with(holder.itemView.context).load(primaryService.colorIconUrl).into(holder.iconView)
+        Picasso.get().load(primaryService.colorIconUrl).into(holder.iconView)
 
         holder.turnOnButton.setOnClickListener(clickListenerFactory.newOnClickListener(applets, holder))
 

@@ -2,9 +2,9 @@ package com.ifttt;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.Nullable;
 import com.ifttt.api.UserApi;
 import com.squareup.moshi.Json;
+import javax.annotation.Nullable;
 
 /**
  * Data structure for a user from {@link UserApi#user()}.
@@ -24,8 +24,8 @@ public final class User implements Parcelable {
         none,
 
         /**
-         *  A request that includes an Authorization header containing a user-specific token that IFTTT has issued to
-         *  your service.
+         * A request that includes an Authorization header containing a user-specific token that IFTTT has issued to
+         * your service.
          */
         user
     }

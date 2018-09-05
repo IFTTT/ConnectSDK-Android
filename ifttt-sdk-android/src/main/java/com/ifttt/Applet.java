@@ -3,11 +3,10 @@ package com.ifttt;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.CheckResult;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.CheckResult;
 import java.util.Date;
 import java.util.List;
+import javax.annotation.Nullable;
 
 /**
  * Data structure for an Applet.
@@ -112,8 +111,7 @@ public final class Applet implements Parcelable {
      * @param inviteCode Optional service invite code.
      */
     @CheckResult
-    public Uri getEmbedUri(@NonNull String redirectUri, @NonNull String userId, @Nullable String email,
-            @Nullable String inviteCode) {
+    public Uri getEmbedUri(String redirectUri, String userId, @Nullable String email, @Nullable String inviteCode) {
         Uri.Builder builder = Uri.parse(embeddedUrl)
                 .buildUpon()
                 .appendQueryParameter("user_id", userId)

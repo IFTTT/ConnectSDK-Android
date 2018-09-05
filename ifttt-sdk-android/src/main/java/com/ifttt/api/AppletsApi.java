@@ -1,8 +1,8 @@
 package com.ifttt.api;
 
-import android.support.annotation.Nullable;
 import com.ifttt.Applet;
 import java.util.List;
+import javax.annotation.Nullable;
 
 /**
  * API endpoints for showing Applets, currently including showing a list of Applets for a service and showing a single
