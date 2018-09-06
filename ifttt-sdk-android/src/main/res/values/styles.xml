@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AboutIfttt">
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+    <style name="AboutIfttt.Description">
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="AboutIfttt.Title">
+        <item name="android:textSize">26sp</item>
+    </style>
+</resources>

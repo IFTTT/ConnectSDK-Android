@@ -1,9 +1,7 @@
 package com.ifttt;
 
-import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
-import androidx.annotation.CheckResult;
 import java.util.Date;
 import java.util.List;
 import javax.annotation.Nullable;
@@ -11,13 +9,13 @@ import javax.annotation.Nullable;
 /**
  * Data structure for an Applet.
  */
+@FieldAreNonnullByDefault
 public final class Applet implements Parcelable {
 
     /**
-     * User status for an Applet. If the API calls are user authenticated through {@link
-     * IftttApiClient#setUserToken(String)},
-     * the Applet status will be one of {@link Status#enabled}, {@link Status#disabled} and {@link
-     * Status#never_enabled}.
+     * User status for an Applet. If the API calls are user authenticated, the Applet status will be one of
+     * {@link Status#enabled}, {@link Status#disabled} and {@link Status#never_enabled}.
+     *
      * For unauthenticated calls or user cannot be found, the Applet status will always be {@link Status#unknown}.
      */
     public enum Status {
@@ -61,9 +59,9 @@ public final class Applet implements Parcelable {
     public final String url;
     public final List<Service> services;
 
-    private final String embeddedUrl;
+    public final String embeddedUrl;
 
-    private Service primaryService;
+    @Nullable private Service primaryService;
 
     public Applet(String id, String name, String description, Status status, @Nullable Date publishedAt,
             int enabledCount, @Nullable Date lastRunAt, String url, String embeddedUrl, List<Service> services) {
@@ -98,37 +96,6 @@ public final class Applet implements Parcelable {
         }
 
         return primaryService;
-    }
-
-    /**
-     * Generate a URL for configuring this Applet on web view. The URL can include an optional user email, and an
-     * option invite code for the service.
-     *
-     * @param redirectUri Redirect url that the client of the library is going to use to capture web view redirects,
-     * once the configuration is completed.
-     * @param userId The current user's identifier on your service that will be used when they connect to IFTTT.
-     * @param email User email address.
-     * @param inviteCode Optional service invite code.
-     */
-    @CheckResult
-    public Uri getEmbedUri(String redirectUri, String userId, @Nullable String email, @Nullable String inviteCode) {
-        Uri.Builder builder = Uri.parse(embeddedUrl)
-                .buildUpon()
-                .appendQueryParameter("user_id", userId)
-                .appendQueryParameter("redirect_uri", redirectUri)
-                .appendQueryParameter("ifttt_sdk_version", BuildConfig.VERSION_NAME)
-                .appendQueryParameter("ifttt_sdk_platform", "android")
-                .appendQueryParameter("ifttt_sdk_anonymous_id", IftttApiClient.ANONYMOUS_ID);
-
-        if (email != null) {
-            builder.appendQueryParameter("email", email);
-        }
-
-        if (inviteCode != null) {
-            builder.appendQueryParameter("invite_code", inviteCode);
-        }
-
-        return builder.build();
     }
 
     protected Applet(Parcel in) {

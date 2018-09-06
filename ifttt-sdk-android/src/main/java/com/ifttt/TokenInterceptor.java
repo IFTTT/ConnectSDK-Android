@@ -11,15 +11,24 @@ import okhttp3.Response;
 final class TokenInterceptor implements Interceptor {
     @Nullable private String token;
 
-    void setToken(@Nullable String token) {
+    TokenInterceptor(@Nullable String token) {
         this.token = token;
+    }
+
+    void setToken(String token) {
+        this.token = token;
+    }
+
+    boolean isUserAuthenticated() {
+        return token != null;
     }
 
     @Override
     public Response intercept(Chain chain) throws IOException {
-        if (token != null) {
-            return chain.proceed(chain.request().newBuilder().addHeader("Authorization", "Bearer " + token).build());
+        if (token == null) {
+            return chain.proceed(chain.request());
         }
-        return chain.proceed(chain.request());
+
+        return chain.proceed(chain.request().newBuilder().addHeader("Authorization", "Bearer " + token).build());
     }
 }

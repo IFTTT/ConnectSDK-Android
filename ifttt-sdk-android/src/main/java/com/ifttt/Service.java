@@ -7,6 +7,7 @@ import com.squareup.moshi.Json;
 /**
  * Data structure for a service.
  */
+@FieldAreNonnullByDefault
 public final class Service implements Parcelable {
     @Json(name = "service_id") public final String id;
     @Json(name = "service_name") public final String name;

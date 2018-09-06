@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="connect_text_padding_horizontal">76dp</dimen>
+    <dimen name="ifttt_icon_image_size">30dp</dimen>
+    <dimen name="ifttt_start_image_width">10dp</dimen>
+    <dimen name="ifttt_start_image_height">17dp</dimen>
+    <dimen name="ifttt_icon_margin">4dp</dimen>
+    <dimen name="ifttt_icon_elevation">8dp</dimen>
+    <dimen name="ifttt_check_mark_size">40dp</dimen>
+    <dimen name="ifttt_about_drawable_padding">16dp</dimen>
+    <dimen name="connect_button_height">60dp</dimen>
+    <dimen name="connect_button_radius">30dp</dimen>
+    <dimen name="ifttt_about_button_radius">18sp</dimen>
+    <dimen name="ifttt_about_button_height">34sp</dimen>
+</resources>

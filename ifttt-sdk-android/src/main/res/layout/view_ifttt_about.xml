@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black"
+    android:orientation="vertical">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="48dp"
+            android:layout_marginStart="48dp"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/ifttt_logo_view"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_marginTop="?actionBarSize"/>
+
+            <TextView
+                android:id="@+id/ifttt_about_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/ifttt_about_title"
+                android:layout_marginTop="32dp"
+                android:textAppearance="@style/AboutIfttt.Title"/>
+
+            <TextView
+                android:id="@+id/ifttt_about_1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:drawablePadding="@dimen/ifttt_about_drawable_padding"
+                android:drawableStart="@drawable/ic_ifttt_about_1"
+                android:text="@string/ifttt_about_1"
+                android:lineSpacingMultiplier="1.2"
+                android:textAppearance="@style/AboutIfttt.Description"/>
+
+            <TextView
+                android:id="@+id/ifttt_about_2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:drawablePadding="@dimen/ifttt_about_drawable_padding"
+                android:drawableStart="@drawable/ic_ifttt_about_2"
+                android:text="@string/ifttt_about_2"
+                android:lineSpacingMultiplier="1.2"
+                android:textAppearance="@style/AboutIfttt.Description"/>
+
+            <TextView
+                android:id="@+id/ifttt_about_3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:drawablePadding="@dimen/ifttt_about_drawable_padding"
+                android:drawableStart="@drawable/ic_ifttt_about_3"
+                android:text="@string/ifttt_about_3"
+                android:lineSpacingMultiplier="1.2"
+                android:textAppearance="@style/AboutIfttt.Description"/>
+
+            <TextView
+                android:id="@+id/ifttt_more_about_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="32dp"
+                android:layout_marginTop="48dp"
+                android:background="@drawable/ifttt_about_button_background"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:text="@string/ifttt_more_about_ifttt"
+                android:textAllCaps="false"
+                android:gravity="center"
+                android:textColor="@android:color/white"
+                android:textSize="18sp"/>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?actionBarSize"
+        app:navigationIcon="@drawable/ic_close_black_24dp"/>
+
+</FrameLayout>

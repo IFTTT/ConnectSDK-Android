@@ -10,7 +10,9 @@ import retrofit2.Call;
 public interface PendingResult<T> {
 
     interface ResultCallback<T> {
+
         void onSuccess(T result);
+
         void onFailure(ErrorResponse errorResponse);
     }
 
@@ -19,7 +21,10 @@ public interface PendingResult<T> {
      * have, e.g. synchronous execution.
      */
     Call<T> getCall();
+
     void execute(ResultCallback<T> callback);
+
     void cancel();
+
     boolean isCanceled();
 }
