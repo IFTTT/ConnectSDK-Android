@@ -36,6 +36,7 @@ dependencies {
     implementation "com.squareup.moshi:moshi:$moshiVersion"
     implementation "com.squareup.moshi:moshi-adapters:$moshiVersion"
     implementation 'androidx.annotation:annotation:1.0.0-rc02'
+    implementation 'androidx.browser:browser:1.0.0-rc02'
 
     implementation 'com.google.code.findbugs:jsr305:3.0.2'
 
@@ -161,5 +162,3 @@ bintray {
         }
     }
 }
-
-
