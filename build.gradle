@@ -29,8 +29,8 @@ task clean(type: Delete) {
 }
 
 ext {
-    okHttpVersion = '3.9.0'
-    retrofitVersion = '2.3.0'
+    okHttpVersion = '3.11.0'
+    retrofitVersion = '2.4.0'
     moshiVersion = '1.6.0'
-    truthVersion = '0.34'
+    truthVersion = '0.42'
 }
