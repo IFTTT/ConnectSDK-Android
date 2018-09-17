@@ -3,21 +3,21 @@ package com.ifttt.api.demo
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
+import com.ifttt.Applet
+import com.ifttt.ErrorResponse
 import com.ifttt.IftttApiClient
 import com.ifttt.api.PendingResult
 import com.ifttt.api.demo.api.ApiHelper
 import com.ifttt.api.demo.api.ApiHelper.fetchIftttToken
-import com.ifttt.Applet
-import com.ifttt.ErrorResponse
 
 class MainActivity : AppCompatActivity() {
 
@@ -110,15 +110,9 @@ class MainActivity : AppCompatActivity() {
             // In case at this point your app doesn't have IFTTT token, you want to fetch the token again before
             // refreshing the UI. This is to make sure the IFTTT token is attached to IftttApiClient and the Applets
             // retrieved have user status.
-            fetchIftttToken({ token ->
-                if (token != null) {
-                    iftttApiClient.setUserToken(token)
-                }
-                renderUi()
-            }, {
-                Snackbar.make(findViewById<View>(android.R.id.content), R.string.user_auth_error,
-                        Snackbar.LENGTH_LONG).show()
-            })
+            iftttApiClient.getResultFromIntent(
+                    { fetchIftttToken({ token -> it.onTokenRetrieved(token) }, { /* No-op */ }) }, intent,
+                    { renderUi() })
         }
     }
 
