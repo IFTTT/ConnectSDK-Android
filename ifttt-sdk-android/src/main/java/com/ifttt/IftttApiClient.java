@@ -1,5 +1,6 @@
 package com.ifttt;
 
+import android.content.Intent;
 import com.ifttt.api.AppletConfigApi;
 import com.ifttt.api.AppletsApi;
 import com.ifttt.api.PendingResult;
@@ -30,6 +31,17 @@ import retrofit2.converter.moshi.MoshiConverterFactory;
  * </ul>
  */
 public final class IftttApiClient {
+
+    /**
+     * Interface for retrieving Applet authentication result from the web view or IFTTT app.
+     */
+    public interface AppletAuthenticationResultCallback {
+
+        /**
+         * @param result
+         */
+        void onResult(AppletAuthenticationResult result);
+    }
 
     static final String ANONYMOUS_ID = UUID.randomUUID().toString();
 
@@ -123,6 +135,20 @@ public final class IftttApiClient {
      */
     public void clearInviteCode() {
         inviteCodeInterceptor.setInviteCode(null);
+    }
+
+
+    public void getResultFromIntent(UserTokenProvider userTokenProvider, Intent intent,
+            AppletAuthenticationResultCallback callback) {
+
+        userTokenProvider.getUserToken(token -> {
+            if (token != null) {
+                tokenInterceptor.setToken(token);
+            }
+
+            // TODO: Parse result from deep link intent.
+            callback.onResult(new AppletAuthenticationResult(false));
+        });
     }
 
     public static IftttApiClient getInstance() {
