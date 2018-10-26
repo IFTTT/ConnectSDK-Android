@@ -68,9 +68,4 @@ final class ApiPendingResult<T> implements PendingResult<T> {
     public void cancel() {
         originalCall.cancel();
     }
-
-    @Override
-    public boolean isCanceled() {
-        return originalCall.isCanceled();
-    }
 }

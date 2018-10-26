@@ -9,10 +9,23 @@ import retrofit2.Call;
  */
 public interface PendingResult<T> {
 
+    /**
+     * Callback interface for the API call results.
+     */
     interface ResultCallback<T> {
 
+        /**
+         * Called when the API call was successful.
+         *
+         * @param result API response object.
+         */
         void onSuccess(T result);
 
+        /**
+         * Called when the API call was failed.
+         *
+         * @param errorResponse Formatted error responses from the API call.
+         */
         void onFailure(ErrorResponse errorResponse);
     }
 
@@ -22,9 +35,15 @@ public interface PendingResult<T> {
      */
     Call<T> getCall();
 
+    /**
+     * Execute the API call, and subscribe to its response.
+     *
+     * @param callback Callback that provides API call response status and response.
+     */
     void execute(ResultCallback<T> callback);
 
+    /**
+     * Cancel the ongoing API call.
+     */
     void cancel();
-
-    boolean isCanceled();
 }

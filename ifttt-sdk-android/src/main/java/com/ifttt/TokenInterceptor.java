@@ -6,7 +6,7 @@ import okhttp3.Interceptor;
 import okhttp3.Response;
 
 /**
- * OkHttp {@link Interceptor} for setting and clearing user authentication header.
+ * {@link Interceptor} for setting user authentication header.
  */
 final class TokenInterceptor implements Interceptor {
     @Nullable private String token;

@@ -4,6 +4,9 @@ import java.io.IOException;
 import okhttp3.Interceptor;
 import okhttp3.Response;
 
+/**
+ * Interceptor that adds common headers in the API call to IFTTT API.
+ */
 final class SdkInfoInterceptor implements Interceptor {
 
     @Override

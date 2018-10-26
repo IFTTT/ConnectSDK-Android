@@ -10,7 +10,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 /**
- * Moshi JSON adapter for single Applet object from {@link IftttApi#showApplet(String)}.
+ * JSON adapter for single Applet object from {@link IftttApi#showApplet(String)}.
  */
 final class AppletJsonAdapter {
 

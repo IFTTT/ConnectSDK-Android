@@ -14,8 +14,10 @@ import retrofit2.Retrofit;
 import retrofit2.converter.moshi.MoshiConverterFactory;
 
 /**
- * Main class of the IFTTT API. There is a singleton instance provided in this class to do all API calls to
- * IFTTT API.
+ * A wrapper class for IFTTT API. It exposes the API wrapper {@link IftttApi}, as well as providing a way to set the
+ * user token.
+ *
+ * You can use a {@link Builder} to get an instance of IftttApiClient.
  */
 public final class IftttApiClient {
 
@@ -32,29 +34,56 @@ public final class IftttApiClient {
                 errorResponseJsonAdapter);
     }
 
+    /**
+     * @return Instance of the IFTTT API wrapper. You can use the instance to make various API calls.
+     */
     public IftttApi api() {
         return iftttApi;
     }
 
+    /**
+     * @return The invite code that is set through {@link Builder#setInviteCode(String)}.
+     */
     @Nullable
     public String getInviteCode() {
         return inviteCode;
     }
 
+    /**
+     * Pass in a non-null String as the user token. A user token may be used to make API calls to IFTTT API, so that
+     * the response will contain user-specific information.
+     *
+     * After setting the user token, the same IftttApiClient will start using it in all of the subsequent API calls.
+     *
+     * @param userToken A user token String, cannot be null.
+     */
     @MainThread
     public void setUserToken(String userToken) {
         tokenInterceptor.setToken(userToken);
     }
 
+    /**
+     * @return true if this instance of IftttApiClient has a user token, or false otherwise.
+     */
     @MainThread
     @CheckReturnValue
     public boolean isUserAuthenticated() {
         return tokenInterceptor.isUserAuthenticated();
     }
 
+    /**
+     * Builder class to get an {@link IftttApiClient} instance.
+     */
     public static final class Builder {
+
         @Nullable private String inviteCode;
 
+        /**
+         * Pass in a non-null String as the invite code for accessing an IFTTT service that has not yet published. You
+         * may find this value on https://platform.ifttt.com.
+         *
+         * @param inviteCode An invite code String, cannot be null.
+         */
         public Builder setInviteCode(String inviteCode) {
             this.inviteCode = inviteCode;
             return this;
