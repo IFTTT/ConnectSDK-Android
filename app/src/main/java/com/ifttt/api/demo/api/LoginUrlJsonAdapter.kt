@@ -27,6 +27,7 @@ internal object LoginUrlJsonAdapter {
                 else -> throw IllegalStateException("Unknown index: $index")
             }
         }
+        jsonReader.endObject()
 
         if (loginUrl == null) {
             throw IllegalStateException("Login url is not presented in the response.")

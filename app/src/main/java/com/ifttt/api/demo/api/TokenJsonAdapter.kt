@@ -34,6 +34,7 @@ internal object TokenJsonAdapter {
                 jsonReader.skipValue()
             }
         }
+        jsonReader.endObject()
 
         return userToken
     }

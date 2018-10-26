@@ -1,9 +1,8 @@
 <resources>
     <string name="app_name">IFTTT SDK Demo</string>
     <string name="user_id_hint">User id</string>
-    <string name="service_key">IFTTT-Service-Key</string>
+    <string name="email_hint">Email</string>
     <string name="start">Start</string>
-    <string name="email">Email (Optional)</string>
     <string name="empty_user_id">User id cannot be empty</string>
     <string name="sign_in">Sign in</string>
     <string name="user_auth_error">User authentication failed.</string>

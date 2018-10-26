@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ifttt_email_background_color">#EEEEEE</color>
+    <color name="ifttt_email_hint_text_color">#CBCBCB</color>
+    <color name="ifttt_progress_background_color">#414141</color>
+    <color name="ifttt_background_touch_color">#666666</color>
+    <color name="ifttt_progress_circle_color">#41FFFFFF</color>
+    <color name="ifttt_about_button_color">#222222</color>
+    <color name="ifttt_about_button_pressed_color">#666666</color>
+</resources>

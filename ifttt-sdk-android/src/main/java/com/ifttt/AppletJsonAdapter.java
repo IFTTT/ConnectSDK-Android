@@ -1,15 +1,16 @@
 package com.ifttt;
 
-import com.ifttt.api.AppletsApi;
+import com.ifttt.api.IftttApi;
 import com.squareup.moshi.FromJson;
 import com.squareup.moshi.JsonWriter;
 import com.squareup.moshi.ToJson;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import javax.annotation.Nullable;
 
 /**
- * Moshi JSON adapter for single Applet object from {@link AppletsApi#showApplet(String, String)}.
+ * Moshi JSON adapter for single Applet object from {@link IftttApi#showApplet(String)}.
  */
 final class AppletJsonAdapter {
 
@@ -36,7 +37,7 @@ final class AppletJsonAdapter {
         final String id;
         final String name;
         final String description;
-        final String user_status;
+        @Nullable final String user_status;
         final Date published_at;
         final int enabled_count;
         final Date last_run_at;
@@ -44,8 +45,8 @@ final class AppletJsonAdapter {
         final String embedded_url;
         final List<Service> services;
 
-        AppletJson(String id, String name, String description, String user_status, Date published_at, int enabled_count,
-                Date last_run_at, String url, String embedded_url, List<Service> services) {
+        AppletJson(String id, String name, String description, @Nullable String user_status, Date published_at,
+                int enabled_count, Date last_run_at, String url, String embedded_url, List<Service> services) {
             this.id = id;
             this.name = name;
             this.description = description;

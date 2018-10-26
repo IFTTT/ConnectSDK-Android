@@ -1,23 +1,14 @@
 package com.ifttt;
 
-import com.ifttt.api.AppletsApi.Order;
-import com.ifttt.api.AppletsApi.Platform;
-import java.util.List;
-import javax.annotation.Nullable;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
-import retrofit2.http.Query;
 
 /**
  * Retrofit interface for showing Applets.
  */
 interface RetrofitAppletsApi {
 
-    @GET("/v1/services/{service_id}/applets")
-    Call<List<Applet>> listApplets(@Path("service_id") String serviceId, @Nullable @Query("platform") Platform platform,
-            @Nullable @Query("order") Order order);
-
-    @GET("/v1/services/{service_id}/applets/{applet_id}")
-    Call<Applet> showApplet(@Path("service_id") String serviceId, @Path("applet_id") String appletId);
+    @GET("/v2/applets/{applet_id}")
+    Call<Applet> showApplet(@Path("applet_id") String appletId);
 }

@@ -11,7 +11,8 @@ import retrofit2.Response;
  * Implementation of the Retrofit {@link Call} wrapper.
  */
 final class ApiPendingResult<T> implements PendingResult<T> {
-    private static final ErrorResponse UNEXPECTED_ERROR = new ErrorResponse("exception", "Unexpected error");
+
+    private static final ErrorResponse UNEXPECTED_ERROR_RESPONSE = new ErrorResponse("exception", "Unexpected error");
 
     private final Call<T> originalCall;
     private final JsonAdapter<ErrorResponse> errorResponseJsonAdapter;
@@ -35,13 +36,13 @@ final class ApiPendingResult<T> implements PendingResult<T> {
                     try {
                         ErrorResponse errorResponse = errorResponseJsonAdapter.fromJson(response.errorBody().source());
                         if (errorResponse == null) {
-                            callback.onFailure(UNEXPECTED_ERROR);
+                            callback.onFailure(UNEXPECTED_ERROR_RESPONSE);
                             return;
                         }
 
                         callback.onFailure(errorResponse);
                     } catch (IOException e) {
-                        callback.onFailure(UNEXPECTED_ERROR);
+                        callback.onFailure(UNEXPECTED_ERROR_RESPONSE);
                     }
 
                     return;
@@ -49,7 +50,7 @@ final class ApiPendingResult<T> implements PendingResult<T> {
 
                 T result = response.body();
                 if (result == null) {
-                    callback.onFailure(UNEXPECTED_ERROR);
+                    callback.onFailure(UNEXPECTED_ERROR_RESPONSE);
                     return;
                 }
 
@@ -58,7 +59,7 @@ final class ApiPendingResult<T> implements PendingResult<T> {
 
             @Override
             public void onFailure(Call<T> call, Throwable t) {
-                callback.onFailure(UNEXPECTED_ERROR);
+                callback.onFailure(UNEXPECTED_ERROR_RESPONSE);
             }
         });
     }

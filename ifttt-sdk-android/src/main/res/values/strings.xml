@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ifttt_connect_to">Connect %1$s</string>
+    <string name="ifttt_connect">Connect</string>
+    <string name="ifttt_email">Email</string>
+    <string name="ifttt_about_title">This connection is powered by IFTTT</string>
+    <string name="ifttt_more_about_ifttt">Learn more</string>
+    <string name="ifttt_powered_by_ifttt">Powered by IFTTT</string>
+    <string name="ifttt_about_1">Your favorite things work together in new ways</string>
+    <string name="ifttt_about_2">Control how apps and devices access your data</string>
+    <string name="ifttt_about_3">Protect and monitor your online data</string>
+    <string name="ifttt_validating_email">Validating your email…</string>
+    <string name="ifttt_creating_account">Creating account…</string>
+    <string name="ifttt_sign_in_to">Sign in to %1$s</string>
+    <string name="ifttt_sign_in">Sign in</string>
+    <string name="ifttt_connected">Connected</string>
+    <string name="ifttt_connecting_account">Connecting account…</string>
+    <string name="ifttt_applet_off">Off</string>
+    <string name="ifttt_sign_in_to_ifttt_or_create_new_account">Sign in to IFTTT or create a new account</string>
+    <string name="ifttt_using_email">Using %1$s\n <u>Use a different email</u></string>
+    <string name="ifttt_connect_services_description">Sign in to connect %1$s with %2$s</string>
+    <string name="ifttt_all_set">You\'re all set. Manage connection with IFTTT</string>
+    <string name="slide_to_turn_off">Slide to disconnect</string>
+    <string name="ifttt_signing_in_to_ifttt">Signing in to IFTTT</string>
+</resources>

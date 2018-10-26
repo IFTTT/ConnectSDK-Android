@@ -5,21 +5,21 @@ apply plugin: 'com.github.dcendents.android-maven'
 
 android {
     compileSdkVersion 28
-    buildToolsVersion "28.0.2"
+    buildToolsVersion '28.0.3'
 
 
     defaultConfig {
-        minSdkVersion 15
+        minSdkVersion 19
         targetSdkVersion 28
         versionCode 1
-        versionName "0.0.1"
+        versionName "2.0.0-alpha1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -35,8 +35,8 @@ dependencies {
     implementation "com.squareup.retrofit2:converter-moshi:$retrofitVersion"
     implementation "com.squareup.moshi:moshi:$moshiVersion"
     implementation "com.squareup.moshi:moshi-adapters:$moshiVersion"
-    implementation 'androidx.annotation:annotation:1.0.0-rc02'
-    implementation 'androidx.browser:browser:1.0.0-rc02'
+    implementation 'androidx.browser:browser:1.0.0'
+    implementation 'androidx.appcompat:appcompat:1.0.0'
 
     implementation 'com.google.code.findbugs:jsr305:3.0.2'
 
@@ -87,8 +87,7 @@ install {
                 licenses {
                     license {
                         name licenseName
-                        url licenseUrl
-                    }
+                        url licenseUrl }
                 }
                 developers {
                     developer {

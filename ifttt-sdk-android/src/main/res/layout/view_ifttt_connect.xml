@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/connect_button_height"
+        android:clipChildren="false"
+        android:clipToPadding="false">
+
+        <FrameLayout
+            android:id="@+id/ifttt_toggle"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipChildren="false"
+            android:clipToPadding="false">
+
+            <EditText
+                android:id="@+id/ifttt_email"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:background="@android:color/transparent"
+                android:hint="@string/ifttt_email"
+                android:inputType="textEmailAddress"
+                android:paddingEnd="76dp"
+                android:paddingStart="16dp"
+                android:textColor="@android:color/black"
+                android:textColorHint="@color/ifttt_email_hint_text_color"
+                android:visibility="gone"/>
+
+            <TextView
+                android:id="@+id/connect_with_ifttt"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:lines="1"
+                android:paddingBottom="8dp"
+                android:paddingEnd="@dimen/connect_text_padding_horizontal"
+                android:paddingStart="@dimen/connect_text_padding_horizontal"
+                android:paddingTop="8dp"
+                android:textColor="@android:color/white"
+                app:autoSizeMaxTextSize="20sp"
+                app:autoSizeTextType="uniform"/>
+
+            <ImageButton
+                android:id="@+id/ifttt_icon"
+                android:layout_width="@dimen/connect_button_height"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:background="@null"
+                android:elevation="@dimen/ifttt_icon_elevation"
+                android:scaleType="centerInside"/>
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/ifttt_progress_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha="0">
+
+            <TextView
+                android:id="@+id/ifttt_progress_text"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:alpha="0"
+                android:lines="1"
+                android:paddingEnd="60dp"
+                android:paddingStart="60dp"
+                android:textColor="@android:color/white"
+                app:autoSizeMaxTextSize="20sp"
+                app:autoSizeTextType="uniform"/>
+
+            <ImageView
+                android:id="@+id/ifttt_progress_check_mark"
+                android:layout_width="64dp"
+                android:layout_height="52dp"
+                android:layout_gravity="center"
+                android:scaleType="centerInside"/>
+
+            <ImageView
+                android:id="@+id/ifttt_progress_service_icon"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:layout_margin="@dimen/ifttt_icon_margin"
+                android:padding="8dp"
+                android:scaleType="centerInside"/>
+
+        </FrameLayout>
+
+    </FrameLayout>
+
+    <TextSwitcher
+        android:id="@+id/ifttt_helper_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16sp"/>
+
+</merge>

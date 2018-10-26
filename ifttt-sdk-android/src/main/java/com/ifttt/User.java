@@ -2,7 +2,6 @@ package com.ifttt;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import com.ifttt.api.UserApi;
 import com.squareup.moshi.Json;
 import javax.annotation.Nullable;
 
