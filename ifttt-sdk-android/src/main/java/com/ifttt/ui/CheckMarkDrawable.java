@@ -13,12 +13,13 @@ import android.graphics.PathMeasure;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 import javax.annotation.Nullable;
 
 final class CheckMarkDrawable extends Drawable {
 
-    private static final SmoothInterpolator INTERPOLATOR = new SmoothInterpolator();
+    private static final Interpolator INTERPOLATOR = input -> (float) (Math.pow((input - 1), 5) + 1);
     private static final long ANIM_CIRCLE_DURATION = 800L;
     private static final long ANIM_CHECK_MARK_DURATION = 600L;
     private static final long ANIM_SCALE_DURATION = 400L;

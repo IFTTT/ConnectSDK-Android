@@ -69,8 +69,10 @@ public final class AuthenticationResult implements Parcelable {
             }
 
             return new AuthenticationResult(ServiceConnection, serviceId);
+        } else if ("complete".equals(nextStepParam)) {
+            return new AuthenticationResult(Complete, null);
         }
 
-        return new AuthenticationResult(Complete, null);
+        return new AuthenticationResult(Unknown, null);
     }
 }
