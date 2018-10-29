@@ -34,6 +34,7 @@ import android.widget.TextSwitcher;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.core.view.ViewCompat;
 import androidx.customview.widget.ViewDragHelper;
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
@@ -107,7 +108,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
     }
 
     private static final ErrorResponse EMPTY_EMAIL = new ErrorResponse("email_missing", "Email cannot be empty");
-    private static final ErrorResponse CANCENED_FLOW = new ErrorResponse("canceled", "Authentication canceled");
+    private static final ErrorResponse CANCELED_AUTH = new ErrorResponse("canceled", "Authentication canceled");
     private static final ErrorResponse UNKNOWN_STATE = new ErrorResponse("unknown_state", "Cannot verify Button state");
 
     // Max length for the main text in the button. If the text plus service name is longer than this, we will only
@@ -164,6 +165,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
     // Spannable text that replaces the text "IFTTT" with IFTTT logo.
     private final SpannableString poweredByIfttt;
     private final CharSequence manageApplets;
+    private final Drawable iftttLogo;
 
     private final EditText emailEdt;
     private final TextView connectStateTxt;
@@ -245,7 +247,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
 
         // Initialize SpannableString that replaces text with logo, using the current TextView in the TextSwitcher as
         // measurement, the CharSequence will only be used there.
-        Drawable iftttLogo = ContextCompat.getDrawable(getContext(), R.drawable.ifttt_logo);
+        iftttLogo = ContextCompat.getDrawable(getContext(), R.drawable.ifttt_logo);
         poweredByIfttt = new SpannableString(replaceKeyWithImage((TextView) helperTxt.getCurrentView(),
                 getResources().getString(R.string.ifttt_powered_by_ifttt), "IFTTT", iftttLogo));
         poweredByIfttt.setSpan(new AvenirTypefaceSpan(boldTypeface), 0, poweredByIfttt.length(),
@@ -256,7 +258,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
 
         helperTxt.setOnClickListener(v -> getContext().startActivity(IftttAboutActivity.intent(context, applet)));
 
-        buttonRoot = findViewById(R.id.ifttt_toggle);
+        buttonRoot = findViewById(R.id.ifttt_toggle_root);
 
         progressRoot = findViewById(R.id.ifttt_progress_container);
         ProgressBackgroundDrawable progressRootBg = new ProgressBackgroundDrawable();
@@ -353,6 +355,36 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         buttonApiHelper = new ButtonApiHelper(iftttApiClient, redirectUrl, oAuthTokenProvider, getLifecycle());
         isUserAuthenticated = iftttApiClient.isUserAuthenticated();
         emailEdt.setText(email);
+    }
+
+    /**
+     * If the button is used in a dark background, set this flag to true so that the button can adapt the UI.
+     *
+     * @param onDarkBackground True if the button is used in a dark background, false otherwise.
+     */
+    public void setOnDarkBackground(boolean onDarkBackground) {
+        View buttonRoot = findViewById(R.id.ifttt_button_root);
+        TextView currentHelperTextView = (TextView) helperTxt.getCurrentView();
+        TextView nextHelperTextView = (TextView) helperTxt.getNextView();
+        if (onDarkBackground) {
+            // Add a border.
+            int buttonBorderSize = getResources().getDimensionPixelSize(R.dimen.ifttt_button_border_width);
+            buttonRoot.setBackgroundResource(R.drawable.ifttt_button_border);
+            buttonRoot.setPadding(buttonBorderSize, buttonBorderSize, buttonBorderSize, buttonBorderSize);
+
+            // Set helper text to white.
+            currentHelperTextView.setTextColor(Color.WHITE);
+            nextHelperTextView.setTextColor(Color.WHITE);
+
+            // Tint the Logo Drawable within the text.
+            DrawableCompat.setTint(DrawableCompat.wrap(iftttLogo), Color.WHITE);
+        } else {
+            buttonRoot.setBackground(null);
+            buttonRoot.setPadding(0, 0, 0, 0);
+            currentHelperTextView.setTextColor(Color.BLACK);
+            nextHelperTextView.setTextColor(Color.BLACK);
+            DrawableCompat.setTint(DrawableCompat.wrap(iftttLogo), Color.BLACK);
+        }
     }
 
     /**
@@ -994,7 +1026,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             @Override
             public void onActivityResumed(Activity activity) {
                 if (activity == context) {
-                    recordError(CANCENED_FLOW);
+                    recordError(CANCELED_AUTH);
                     activity.getApplication().unregisterActivityLifecycleCallbacks(this);
                     activityLifecycleCallbacks = null;
                 }
