@@ -18,6 +18,7 @@ public final class AuthenticationResultTest {
 
         assertThat(result.nextStep).isEqualTo(AuthenticationResult.NextStep.ServiceConnection);
         assertThat(result.serviceId).isEqualTo("service");
+        assertThat(result.errorType).isNull();
     }
 
     @Test
@@ -27,6 +28,7 @@ public final class AuthenticationResultTest {
 
         assertThat(result.nextStep).isEqualTo(AuthenticationResult.NextStep.Unknown);
         assertThat(result.serviceId).isNull();
+        assertThat(result.errorType).isNull();
     }
 
     @Test
@@ -36,6 +38,7 @@ public final class AuthenticationResultTest {
 
         assertThat(result.nextStep).isEqualTo(AuthenticationResult.NextStep.Complete);
         assertThat(result.serviceId).isNull();
+        assertThat(result.errorType).isNull();
     }
 
     @Test
@@ -45,5 +48,16 @@ public final class AuthenticationResultTest {
 
         assertThat(result.nextStep).isEqualTo(AuthenticationResult.NextStep.Unknown);
         assertThat(result.serviceId).isNull();
+        assertThat(result.errorType).isNull();
+    }
+
+    @Test
+    public void fromError() {
+        Intent intent = new Intent().setData(Uri.parse("test://url?next_step=error&error_type=account_creation"));
+        AuthenticationResult result = AuthenticationResult.fromIntent(intent);
+
+        assertThat(result.nextStep).isEqualTo(AuthenticationResult.NextStep.Error);
+        assertThat(result.serviceId).isNull();
+        assertThat(result.errorType).isEqualTo("account_creation");
     }
 }
