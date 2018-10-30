@@ -4,4 +4,5 @@
 
     <size android:height="@dimen/connect_button_height"/>
     <corners android:radius="@dimen/connect_button_radius"/>
+    <solid android:color="@android:color/black" />
 </shape>

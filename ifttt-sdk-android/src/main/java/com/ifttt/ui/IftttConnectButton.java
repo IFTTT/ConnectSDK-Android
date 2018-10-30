@@ -51,6 +51,8 @@ import com.ifttt.api.PendingResult.ResultCallback;
 import javax.annotation.Nullable;
 
 import static android.graphics.Color.BLACK;
+import static android.os.Build.VERSION.SDK_INT;
+import static android.os.Build.VERSION_CODES.KITKAT;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 import static androidx.lifecycle.Lifecycle.State.CREATED;
@@ -64,6 +66,8 @@ import static com.ifttt.ui.ButtonUiHelper.buildStateListButtonBackground;
 import static com.ifttt.ui.ButtonUiHelper.getDarkerColor;
 import static com.ifttt.ui.ButtonUiHelper.getTextTransitionAnimator;
 import static com.ifttt.ui.ButtonUiHelper.replaceKeyWithImage;
+import static com.ifttt.ui.ButtonUiHelper.setProgressBackgroundColor;
+import static com.ifttt.ui.ButtonUiHelper.setProgressBackgroundProgress;
 import static com.ifttt.ui.ButtonUiHelper.setTextSwitcherText;
 import static com.ifttt.ui.IftttConnectButton.ButtonState.CreateAccount;
 import static com.ifttt.ui.IftttConnectButton.ButtonState.Enabled;
@@ -261,9 +265,13 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         buttonRoot = findViewById(R.id.ifttt_toggle_root);
 
         progressRoot = findViewById(R.id.ifttt_progress_container);
-        ProgressBackgroundDrawable progressRootBg = new ProgressBackgroundDrawable();
-        progressRootBg.setColor(ContextCompat.getColor(context, R.color.ifttt_progress_background_color), BLACK);
-        progressRoot.setBackground(progressRootBg);
+        if (SDK_INT >= KITKAT) {
+            // Only use ProgressBackgroundDrawable on Android 19 or above.
+            ProgressBackgroundDrawable progressRootBg = new ProgressBackgroundDrawable();
+            progressRootBg.setColor(ContextCompat.getColor(getContext(), R.color.ifttt_progress_background_color),
+                    BLACK);
+            progressRoot.setBackground(progressRootBg);
+        }
 
         progressTxt = findViewById(R.id.ifttt_progress_text);
         progressTxt.setTypeface(boldTypeface);
@@ -502,7 +510,11 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
 
             @Override
             public void onAnimationEnd(Animator animation) {
-                setTextSwitcherText(helperTxt, poweredByIfttt);
+                if (applet.status == enabled) {
+                    setTextSwitcherText(helperTxt, manageApplets);
+                } else {
+                    setTextSwitcherText(helperTxt, poweredByIfttt);
+                }
             }
         });
         fadeInButtonRoot.start();
@@ -510,7 +522,6 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         final Context context = getContext();
         if (applet.status != Applet.Status.enabled) {
             recordState(Initial);
-            buttonRoot.setBackground(buildButtonBackground(context, BLACK));
 
             String signInText = getResources().getString(R.string.ifttt_connect_to, worksWithService.name);
             if (signInText.length() > MAX_LENGTH) {
@@ -519,7 +530,6 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                 connectStateTxt.setText(signInText);
             }
 
-            setTextSwitcherText(helperTxt, poweredByIfttt);
             helperTxt.setClickable(true);
             iconDragHelperCallback.setDragEnabled(false);
         } else {
@@ -536,7 +546,6 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             float progress = 1f;
             setConnectTextState(progress, enabledText, disabledText);
 
-            setTextSwitcherText(helperTxt, manageApplets);
             helperTxt.setOnClickListener(v -> buttonApiHelper.redirectToPlayStore(context));
         }
 
@@ -572,7 +581,10 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         lp.gravity = applet.status == enabled ? Gravity.END : Gravity.START;
         iconImg.setLayoutParams(lp);
 
-        if (applet.status == enabled) {
+        if (SDK_INT < KITKAT) {
+            // On Jelly Bean, the click events on the button will only take users out to the browser.
+            buttonRoot.setOnClickListener(v -> buttonApiHelper.redirectToWebCompat(context, applet));
+        } else if (applet.status == enabled) {
             buttonRoot.setOnClickListener(
                     v -> setTextSwitcherText(helperTxt, getResources().getString(R.string.slide_to_turn_off)));
         } else {
@@ -676,10 +688,8 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
 
         ValueAnimator showProgress = ValueAnimator.ofFloat(0f, 0.5f).setDuration(ANIM_DURATION_LONG);
         showProgress.setInterpolator(LINEAR_INTERPOLATOR);
-        showProgress.addUpdateListener(animation -> {
-            float progress = (float) animation.getAnimatedValue();
-            ((ProgressBackgroundDrawable) progressRoot.getBackground()).setProgress(progress);
-        });
+        showProgress.addUpdateListener(animation -> setProgressBackgroundProgress(progressRoot.getBackground(),
+                (float) animation.getAnimatedValue()));
 
         ObjectAnimator fadeInProgressContainer = ObjectAnimator.ofFloat(progressRoot, "alpha", 0f, 1f);
         fadeInProgressContainer.addListener(new AnimatorListenerAdapter() {
@@ -739,10 +749,9 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
     }
 
     private Animator getCompleteEmailValidationAnimator() {
-        ValueAnimator.AnimatorUpdateListener updateListener = animation -> {
-            float progress = (float) animation.getAnimatedValue();
-            ((ProgressBackgroundDrawable) progressRoot.getBackground()).setProgress(progress);
-        };
+        ValueAnimator.AnimatorUpdateListener updateListener =
+                animation -> setProgressBackgroundProgress(progressRoot.getBackground(),
+                        (float) animation.getAnimatedValue());
 
         ValueAnimator complete = ValueAnimator.ofFloat(0.5f, 1f).setDuration(ANIM_DURATION_LONG);
         complete.setInterpolator(LINEAR_INTERPOLATOR);
@@ -887,7 +896,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         set.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {
-                ((ProgressBackgroundDrawable) progressRoot.getBackground()).setColor(worksWithService.brandColor,
+                setProgressBackgroundColor(progressRoot.getBackground(), worksWithService.brandColor,
                         worksWithService.brandColor);
             }
         });
@@ -916,9 +925,8 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         });
 
         ValueAnimator completeProgress = ValueAnimator.ofFloat(0f, 1f);
-        completeProgress.addUpdateListener(
-                animation -> ((ProgressBackgroundDrawable) progressRoot.getBackground()).setProgress(
-                        (Float) animation.getAnimatedValue()));
+        completeProgress.addUpdateListener(animation -> setProgressBackgroundProgress(progressRoot.getBackground(),
+                (float) animation.getAnimatedValue()));
         completeProgress.setDuration(ANIM_DURATION_LONG);
         completeProgress.setInterpolator(EASE_INTERPOLATOR);
 
@@ -947,9 +955,8 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         set.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {
-                ProgressBackgroundDrawable progressContainerBg =
-                        (ProgressBackgroundDrawable) progressRoot.getBackground();
-                progressContainerBg.setColor(worksWithService.brandColor, getDarkerColor(worksWithService.brandColor));
+                setProgressBackgroundColor(progressRoot.getBackground(), worksWithService.brandColor,
+                        getDarkerColor(worksWithService.brandColor));
                 ImageLoader.get()
                         .load(IftttConnectButton.this, worksWithService.monochromeIconUrl, iconSize, bitmap -> {
                             if (bitmap != null) {

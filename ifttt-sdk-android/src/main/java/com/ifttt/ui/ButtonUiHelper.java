@@ -9,9 +9,12 @@ import android.content.res.ColorStateList;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.RippleDrawable;
+import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.StateListDrawable;
+import android.graphics.drawable.shapes.RoundRectShape;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -20,6 +23,7 @@ import android.util.Patterns;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
 import androidx.annotation.ColorInt;
+import androidx.annotation.FloatRange;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
@@ -28,6 +32,7 @@ import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 
 import static android.os.Build.VERSION.SDK_INT;
+import static android.os.Build.VERSION_CODES.KITKAT;
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
 
 final class ButtonUiHelper {
@@ -124,10 +129,13 @@ final class ButtonUiHelper {
 
     @CheckReturnValue
     static Drawable buildStateListButtonBackground(Context context, @ColorInt int color, @ColorInt int touchColor) {
-        Drawable content = ContextCompat.getDrawable(context, R.drawable.background_button).mutate();
-        Drawable mask = ContextCompat.getDrawable(context, R.drawable.background_button).mutate();
-        DrawableCompat.setTint(DrawableCompat.wrap(content), color);
-        DrawableCompat.setTint(DrawableCompat.wrap(mask), touchColor);
+        Drawable content = ContextCompat.getDrawable(context, R.drawable.background_button);
+        float radius = context.getResources().getDimension(R.dimen.connect_button_radius);
+        ShapeDrawable mask = new ShapeDrawable(
+                new RoundRectShape(new float[] { radius, radius, radius, radius, radius, radius, radius, radius }, null,
+                        null));
+        mask.getPaint().setColor(touchColor);
+        content.setColorFilter(color, PorterDuff.Mode.SRC_IN);
         if (SDK_INT >= LOLLIPOP) {
             return new RippleDrawable(new ColorStateList(new int[][] { {} }, new int[] { touchColor }), content, mask);
         }
@@ -161,6 +169,36 @@ final class ButtonUiHelper {
         }
 
         textSwitcher.setText(text);
+    }
+
+    static void setProgressBackgroundProgress(@Nullable Drawable drawable,
+            @FloatRange(from = 0.0f, to = 1.0f) float progress) {
+        if (SDK_INT <= KITKAT) {
+            // No-op for older Android versions, the ProgressBackgroundDrawable needs Path.Op to render the effect,
+            // and it is not available until 19.
+            return;
+        }
+
+        if (!(drawable instanceof ProgressBackgroundDrawable)) {
+            return;
+        }
+
+        ((ProgressBackgroundDrawable) drawable).setProgress(progress);
+    }
+
+    static void setProgressBackgroundColor(@Nullable Drawable drawable, @ColorInt int primaryColor,
+            @ColorInt int progressColor) {
+        if (SDK_INT <= KITKAT) {
+            // No-op for older Android versions, the ProgressBackgroundDrawable needs Path.Op to render the effect,
+            // and it is not available until 19.
+            return;
+        }
+
+        if (!(drawable instanceof ProgressBackgroundDrawable)) {
+            return;
+        }
+
+        ((ProgressBackgroundDrawable) drawable).setColor(primaryColor, progressColor);
     }
 
     private ButtonUiHelper() {
