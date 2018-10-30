@@ -32,5 +32,4 @@ ext {
     okHttpVersion = '3.11.0'
     retrofitVersion = '2.4.0'
     moshiVersion = '1.6.0'
-    truthVersion = '0.42'
 }

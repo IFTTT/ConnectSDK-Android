@@ -141,7 +141,7 @@ final class ButtonApiHelper {
         return builder.build();
     }
 
-    public static boolean hasActivityToLaunch(Context context, Intent intent) {
+    private static boolean hasActivityToLaunch(Context context, Intent intent) {
         PackageManager packageManager = context.getPackageManager();
         return !packageManager.queryIntentActivities(intent, 0).isEmpty();
     }

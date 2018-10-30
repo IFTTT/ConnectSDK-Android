@@ -16,20 +16,23 @@ import static com.ifttt.AuthenticationResult.NextStep.Unknown;
 public final class AuthenticationResult implements Parcelable {
 
     public enum NextStep {
-        ServiceConnection, Complete, Unknown
+        ServiceConnection, Complete, Unknown, Error
     }
 
     public final NextStep nextStep;
     @Nullable public final String serviceId;
+    @Nullable public final String errorType;
 
-    private AuthenticationResult(NextStep nextStep, @Nullable String serviceId) {
+    private AuthenticationResult(NextStep nextStep, @Nullable String serviceId, @Nullable String errorType) {
         this.nextStep = nextStep;
         this.serviceId = serviceId;
+        this.errorType = errorType;
     }
 
     protected AuthenticationResult(Parcel in) {
         serviceId = in.readString();
         nextStep = (NextStep) in.readSerializable();
+        errorType = in.readString();
     }
 
     public static final Creator<AuthenticationResult> CREATOR = new Creator<AuthenticationResult>() {
@@ -58,19 +61,24 @@ public final class AuthenticationResult implements Parcelable {
     public static AuthenticationResult fromIntent(Intent intent) {
         Uri data = intent.getData();
         if (data == null) {
-            return new AuthenticationResult(Unknown, null);
+            return new AuthenticationResult(Unknown, null, null);
         }
 
         String nextStepParam = data.getQueryParameter("next_step");
         if ("service_connection".equals(nextStepParam)) {
             String serviceId = data.getQueryParameter("service_id");
             if (serviceId == null || serviceId.length() == 0) {
-                return new AuthenticationResult(Unknown, null);
+                return new AuthenticationResult(Unknown, null, null);
             }
 
-            return new AuthenticationResult(ServiceConnection, serviceId);
+            return new AuthenticationResult(ServiceConnection, serviceId, null);
+        } else if ("complete".equals(nextStepParam)) {
+            return new AuthenticationResult(Complete, null, null);
+        } else if ("error".equals(nextStepParam)) {
+            String errorType = data.getQueryParameter("error_type");
+            return new AuthenticationResult(NextStep.Error, null, errorType);
         }
 
-        return new AuthenticationResult(Complete, null);
+        return new AuthenticationResult(Unknown, null, null);
     }
 }

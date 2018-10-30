@@ -28,9 +28,12 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    testOptions.unitTests.includeAndroidResources = true
 }
 
 dependencies {
+    implementation "com.squareup.okhttp3:okhttp:$okHttpVersion"
     implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
     implementation "com.squareup.retrofit2:converter-moshi:$retrofitVersion"
     implementation "com.squareup.moshi:moshi:$moshiVersion"
@@ -41,7 +44,8 @@ dependencies {
     implementation 'com.google.code.findbugs:jsr305:3.0.2'
 
     testImplementation 'junit:junit:4.12'
-    testImplementation "com.google.truth:truth:$truthVersion"
+    testImplementation "com.google.truth:truth:0.42"
+    testImplementation 'org.robolectric:robolectric:4.0'
     testImplementation "com.squareup.retrofit2:retrofit-mock:$retrofitVersion"
 }
 
