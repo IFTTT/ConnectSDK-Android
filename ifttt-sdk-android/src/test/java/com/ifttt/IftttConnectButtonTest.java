@@ -73,6 +73,5 @@ public final class IftttConnectButtonTest {
 
         TextSwitcher helperText = button.findViewById(R.id.ifttt_helper_text);
         assertThat(helperText.getCurrentView()).isInstanceOf(TextView.class);
-        assertThat(((TextView) helperText.getCurrentView()).getText().toString()).isEqualTo("Powered by IFTTT");
     }
 }
