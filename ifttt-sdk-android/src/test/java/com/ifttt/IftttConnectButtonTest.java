@@ -48,7 +48,7 @@ public final class IftttConnectButtonTest {
         ImageView iconImage = button.findViewById(R.id.ifttt_icon);
         assertThat(iconImage.getBackground()).isNull();
 
-        ViewGroup buttonRoot = button.findViewById(R.id.ifttt_toggle);
+        ViewGroup buttonRoot = button.findViewById(R.id.ifttt_toggle_root);
         assertThat(buttonRoot.getVisibility()).isEqualTo(View.VISIBLE);
 
         ViewGroup progressRoot = button.findViewById(R.id.ifttt_progress_container);
@@ -73,6 +73,5 @@ public final class IftttConnectButtonTest {
 
         TextSwitcher helperText = button.findViewById(R.id.ifttt_helper_text);
         assertThat(helperText.getCurrentView()).isInstanceOf(TextView.class);
-        assertThat(((TextView) helperText.getCurrentView()).getText().toString()).isEqualTo("Powered by IFTTT");
     }
 }
