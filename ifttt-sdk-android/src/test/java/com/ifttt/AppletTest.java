@@ -7,6 +7,7 @@ import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter;
 import java.io.InputStream;
 import java.util.Date;
 import okio.Okio;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -14,7 +15,7 @@ import org.junit.runners.JUnit4;
 import static com.google.common.truth.Truth.assertThat;
 
 @RunWith(JUnit4.class)
-public class AppletTest {
+public final class AppletTest {
 
     private final Moshi moshi = new Moshi.Builder().add(Date.class, new Rfc3339DateJsonAdapter().nullSafe())
             .add(new TestHexColorJsonAdapter())
@@ -22,15 +23,24 @@ public class AppletTest {
             .build();
     private final JsonAdapter<Applet> adapter = moshi.adapter(Applet.class);
 
-    @Test
-    public void testAppletDeserialization() throws Exception {
+    private Applet applet;
+
+    @Before
+    public void setUp() throws Exception {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("applet.json");
         JsonReader jsonReader = JsonReader.of(Okio.buffer(Okio.source(inputStream)));
-        Applet applet = adapter.fromJson(jsonReader);
+        applet = adapter.fromJson(jsonReader);
+    }
 
-        assertThat(applet).isNotNull();
+    @Test
+    public void testAppletDeserialization() throws Exception {
         assertThat(applet.status).isNotNull();
         assertThat(applet.status).isEqualTo(Applet.Status.unknown);
+    }
+
+    @Test
+    public void testPrimaryService() {
+        assertThat(applet.getPrimaryService()).isNotNull();
         assertThat(applet.getPrimaryService().id).isEqualTo("instagram");
     }
 }

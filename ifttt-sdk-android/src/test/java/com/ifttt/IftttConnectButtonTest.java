@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import okio.Okio;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
@@ -32,10 +33,15 @@ public final class IftttConnectButtonTest {
             .build();
     private final JsonAdapter<Applet> adapter = moshi.adapter(Applet.class);
 
+    private IftttConnectButton button;
+
+    @Before
+    public void setUp() throws Exception {
+        button = new IftttConnectButton(activity);
+    }
+
     @Test
     public void initButton() {
-        IftttConnectButton button = new IftttConnectButton(activity);
-
         TextView connectText = button.findViewById(R.id.connect_with_ifttt);
         assertThat(connectText.getText()).isEqualTo("");
 
@@ -60,7 +66,6 @@ public final class IftttConnectButtonTest {
         JsonReader jsonReader = JsonReader.of(Okio.buffer(Okio.source(inputStream)));
         Applet applet = adapter.fromJson(jsonReader);
 
-        IftttConnectButton button = new IftttConnectButton(activity);
         button.setApplet(applet);
 
         TextView connectText = button.findViewById(R.id.connect_with_ifttt);
