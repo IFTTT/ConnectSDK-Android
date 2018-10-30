@@ -10,10 +10,13 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.PathShape;
 import android.graphics.drawable.shapes.RoundRectShape;
+import android.os.Build;
 import androidx.annotation.ColorInt;
 import androidx.annotation.FloatRange;
+import androidx.annotation.RequiresApi;
 import javax.annotation.Nullable;
 
+@RequiresApi(Build.VERSION_CODES.KITKAT)
 final class ProgressBackgroundDrawable extends Drawable {
 
     private final Path progressPath = new Path();

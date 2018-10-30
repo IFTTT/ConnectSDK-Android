@@ -1,9 +1,11 @@
 package com.ifttt.ui;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import androidx.browser.customtabs.CustomTabsIntent;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
@@ -64,11 +66,15 @@ final class ButtonApiHelper {
         });
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+    void redirectToWebCompat(Context context, Applet applet) {
+        CustomTabsIntent intent = new CustomTabsIntent.Builder().build();
+        intent.launchUrl(context, Uri.parse(applet.embeddedUrl));
+    }
+
     void redirectToWeb(Context context, Applet applet, String email, ButtonState buttonState) {
         Uri uri = getEmbedUri(applet, buttonState, redirectUri, email, opaqueToken, inviteCode);
-        CustomTabsIntent intent =
-                new CustomTabsIntent.Builder().setToolbarColor(applet.getPrimaryService().brandColor).build();
-
+        CustomTabsIntent intent = new CustomTabsIntent.Builder().build();
         intent.launchUrl(context, uri);
     }
 
