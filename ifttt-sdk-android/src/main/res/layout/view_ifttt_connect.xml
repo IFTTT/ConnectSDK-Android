@@ -3,13 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <FrameLayout
+        android:id="@+id/ifttt_button_root"
         android:layout_width="match_parent"
         android:layout_height="@dimen/connect_button_height"
         android:clipChildren="false"
         android:clipToPadding="false">
 
         <FrameLayout
-            android:id="@+id/ifttt_toggle"
+            android:id="@+id/ifttt_toggle_root"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipChildren="false"
