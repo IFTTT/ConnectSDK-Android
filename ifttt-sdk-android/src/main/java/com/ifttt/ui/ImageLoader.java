@@ -2,7 +2,6 @@ package com.ifttt.ui;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.LruCache;
@@ -56,7 +55,7 @@ final class ImageLoader {
     private ImageLoader() {
     }
 
-    void load(LifecycleOwner lifecycleOwner, String url, int imageSize, OnBitmapLoadedListener listener) {
+    void load(LifecycleOwner lifecycleOwner, String url, OnBitmapLoadedListener listener) {
         Bitmap cached = cache.get(url);
         if (cached != null) {
             listener.onComplete(cached);
@@ -82,15 +81,13 @@ final class ImageLoader {
                 InputStream inputStream = response.body().byteStream();
                 Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
 
-                Bitmap resized = resize(bitmap, imageSize, imageSize);
-
-                cache.put(url, resized);
-                handler.post(() -> listener.onComplete(resized));
+                cache.put(url, bitmap);
+                handler.post(() -> listener.onComplete(bitmap));
             }
         });
     }
 
-    void fetch(Lifecycle lifecycle, String url, int imageSize) {
+    void fetch(Lifecycle lifecycle, String url) {
         Bitmap cached = cache.get(url);
         if (cached != null) {
             // Cache hit, skip fetching image.
@@ -115,28 +112,9 @@ final class ImageLoader {
 
                 InputStream inputStream = response.body().byteStream();
                 Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-
-                Bitmap resized = resize(bitmap, imageSize, imageSize);
-
-                cache.put(url, resized);
+                cache.put(url, bitmap);
             }
         });
-    }
-
-    private Bitmap resize(Bitmap src, int targetWidth, int targetHeight) {
-        Matrix matrix = new Matrix();
-        int width = src.getWidth();
-        int height = src.getHeight();
-        float scaledWidth = targetWidth / (float) width;
-        float scaledHeight = targetHeight / (float) height;
-        matrix.postScale(scaledWidth, scaledHeight);
-
-        Bitmap resized = Bitmap.createBitmap(src, 0, 0, width, height, matrix, false);
-        if (resized != src) {
-            src.recycle();
-        }
-
-        return resized;
     }
 
     interface OnBitmapLoadedListener {

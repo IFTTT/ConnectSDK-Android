@@ -7,4 +7,5 @@
     <color name="ifttt_progress_circle_color">#41FFFFFF</color>
     <color name="ifttt_about_button_color">#222222</color>
     <color name="ifttt_about_button_pressed_color">#666666</color>
+    <color name="ifttt_start_icon_background_gray">#999999</color>
 </resources>

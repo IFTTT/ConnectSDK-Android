@@ -32,14 +32,17 @@ final class StartIconDrawable extends Drawable {
     private final int initialBackgroundSize;
     private final int startIconWidth;
     private final int startIconHeight;
+    private final int startIconBackgroundColor;
 
-    StartIconDrawable(Context context, Drawable serviceIcon, int iconSize, int initialBackgroundSize) {
+    StartIconDrawable(Context context, Drawable serviceIcon, int iconSize, int initialBackgroundSize,
+            @ColorInt int startIconBackgroundColor) {
         this.serviceIcon = serviceIcon;
         this.startIcon = ContextCompat.getDrawable(context, R.drawable.ic_start_arrow);
         startIconWidth = context.getResources().getDimensionPixelSize(R.dimen.ifttt_start_image_width);
         startIconHeight = context.getResources().getDimensionPixelSize(R.dimen.ifttt_start_image_height);
         this.iconSize = iconSize;
         this.initialBackgroundSize = initialBackgroundSize;
+        this.startIconBackgroundColor = startIconBackgroundColor;
 
         this.startIcon.setAlpha(0);
         this.serviceIcon.setAlpha(255);
@@ -128,7 +131,7 @@ final class StartIconDrawable extends Drawable {
                     radius, radius, rounded, rounded, rounded, rounded, radius, radius
             }, null, null));
 
-            Integer color = (Integer) EVALUATOR.evaluate(progress, backgroundColor, BLACK);
+            Integer color = (Integer) EVALUATOR.evaluate(progress, backgroundColor, startIconBackgroundColor);
             background.getPaint().setColor(color);
 
             float animatedSize = (float) animation.getAnimatedValue();
