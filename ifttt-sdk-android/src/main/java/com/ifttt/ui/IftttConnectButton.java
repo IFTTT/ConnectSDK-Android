@@ -111,7 +111,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         Enabled
     }
 
-    private static final ErrorResponse EMPTY_EMAIL = new ErrorResponse("email_missing", "Email cannot be empty");
+    private static final ErrorResponse INVALID_EMAIL = new ErrorResponse("invalid_email", "Invalid email address");
     private static final ErrorResponse CANCELED_AUTH = new ErrorResponse("canceled", "Authentication canceled");
     private static final ErrorResponse UNKNOWN_STATE = new ErrorResponse("unknown_state", "Cannot verify Button state");
 
@@ -808,8 +808,10 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         OnClickListener startAuthOnClickListener = v -> {
             if (ButtonUiHelper.isEmailInvalid(emailEdt.getText())) {
                 if (buttonStateChangeListener != null) {
-                    buttonStateChangeListener.onError(EMPTY_EMAIL);
+                    buttonStateChangeListener.onError(INVALID_EMAIL);
                 }
+
+                setTextSwitcherText(helperTxt, getResources().getString(R.string.ifttt_enter_valid_email));
                 return;
             }
 
@@ -823,6 +825,8 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
 
             String email = emailEdt.getText().toString();
             buttonApiHelper.prepareAuthentication(email);
+
+            setTextSwitcherText(helperTxt, poweredByIfttt);
         };
 
         // Only enable the OnClickListener after the animation has completed.
