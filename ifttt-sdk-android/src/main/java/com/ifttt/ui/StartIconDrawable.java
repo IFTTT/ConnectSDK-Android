@@ -56,7 +56,7 @@ final class StartIconDrawable extends Drawable {
             startIcon.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
         }
 
-        borderColor = ContextCompat.getColor(context, R.color.ifttt_progress_circle_color);
+        borderColor = ContextCompat.getColor(context, R.color.ifttt_semi_transparent_white);
         borderWidth = context.getResources().getDimensionPixelSize(R.dimen.ifttt_button_border_width);
 
         this.startIcon.setAlpha(0);
