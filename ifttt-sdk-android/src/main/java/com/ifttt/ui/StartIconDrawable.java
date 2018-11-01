@@ -44,7 +44,7 @@ final class StartIconDrawable extends Drawable {
         this.iconSize = iconSize;
         this.initialBackgroundSize = initialBackgroundSize;
         this.startIconBackgroundColor =
-                onDarkBackground ? ContextCompat.getColor(context, R.color.ifttt_start_icon_background_gray)
+                onDarkBackground ? ContextCompat.getColor(context, R.color.ifttt_start_icon_background_on_dark)
                         : Color.BLACK;
         if (onDarkBackground) {
             startIcon.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
