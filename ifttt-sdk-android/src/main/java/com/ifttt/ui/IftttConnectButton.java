@@ -560,11 +560,8 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         ImageLoader.get().load(this, worksWithService.monochromeIconUrl, bitmap -> {
             BitmapDrawable serviceIcon = new BitmapDrawable(getResources(), bitmap);
             int iconBackgroundMargin = getResources().getDimensionPixelSize(R.dimen.ifttt_icon_margin);
-            int startIconBackgroundColor =
-                    onDarkBackground ? ContextCompat.getColor(getContext(), R.color.ifttt_start_icon_background_gray)
-                            : Color.BLACK;
             StartIconDrawable drawable = new StartIconDrawable(context, serviceIcon, iconSize,
-                    iconImg.getHeight() - iconBackgroundMargin * 2, startIconBackgroundColor);
+                    iconImg.getHeight() - iconBackgroundMargin * 2, onDarkBackground);
 
             ObjectAnimator fadeInIconImg = ObjectAnimator.ofFloat(iconImg, "alpha", 0f, 1f);
             fadeInIconImg.addListener(new AnimatorListenerAdapter() {
@@ -866,12 +863,9 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
 
         ImageLoader.get().load(this, service.monochromeIconUrl, bitmap -> {
             int iconBackgroundMargin = getResources().getDimensionPixelSize(R.dimen.ifttt_icon_margin);
-            int startIconBackgroundColor =
-                    onDarkBackground ? ContextCompat.getColor(getContext(), R.color.ifttt_start_icon_background_gray)
-                            : Color.BLACK;
             BitmapDrawable serviceIcon = new BitmapDrawable(getResources(), bitmap);
             StartIconDrawable drawable = new StartIconDrawable(getContext(), serviceIcon, iconSize,
-                    iconImg.getHeight() - iconBackgroundMargin * 2, startIconBackgroundColor);
+                    iconImg.getHeight() - iconBackgroundMargin * 2, onDarkBackground);
             drawable.setBackgroundColor(service.brandColor);
             iconImg.setBackground(drawable);
 
