@@ -200,6 +200,8 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
     private ViewDragHelper viewDragHelper;
     private IconDragHelperCallback iconDragHelperCallback;
 
+    private boolean onDarkBackground = false;
+
     public IftttConnectButton(Context context) {
         this(context, null);
     }
@@ -366,33 +368,13 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
     }
 
     /**
-     * If the button is used in a dark background, set this flag to true so that the button can adapt the UI.
+     * If the button is used in a dark background, set this flag to true so that the button can adapt the UI. This
+     * method must be called before {@link #setApplet(Applet)} to apply the change.
      *
      * @param onDarkBackground True if the button is used in a dark background, false otherwise.
      */
     public void setOnDarkBackground(boolean onDarkBackground) {
-        View buttonRoot = findViewById(R.id.ifttt_button_root);
-        TextView currentHelperTextView = (TextView) helperTxt.getCurrentView();
-        TextView nextHelperTextView = (TextView) helperTxt.getNextView();
-        if (onDarkBackground) {
-            // Add a border.
-            int buttonBorderSize = getResources().getDimensionPixelSize(R.dimen.ifttt_button_border_width);
-            buttonRoot.setBackgroundResource(R.drawable.ifttt_button_border);
-            buttonRoot.setPadding(buttonBorderSize, buttonBorderSize, buttonBorderSize, buttonBorderSize);
-
-            // Set helper text to white.
-            currentHelperTextView.setTextColor(Color.WHITE);
-            nextHelperTextView.setTextColor(Color.WHITE);
-
-            // Tint the Logo Drawable within the text.
-            DrawableCompat.setTint(DrawableCompat.wrap(iftttLogo), Color.WHITE);
-        } else {
-            buttonRoot.setBackground(null);
-            buttonRoot.setPadding(0, 0, 0, 0);
-            currentHelperTextView.setTextColor(Color.BLACK);
-            nextHelperTextView.setTextColor(Color.BLACK);
-            DrawableCompat.setTint(DrawableCompat.wrap(iftttLogo), Color.BLACK);
-        }
+        this.onDarkBackground = onDarkBackground;
     }
 
     /**
@@ -506,6 +488,32 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             public void onAnimationStart(Animator animation) {
                 buttonRoot.setBackground(buildStateListButtonBackground(getContext(), BLACK,
                         ContextCompat.getColor(getContext(), R.color.ifttt_background_touch_color)));
+
+                FrameLayout buttonRoot = findViewById(R.id.ifttt_button_root);
+                TextView currentHelperTextView = (TextView) helperTxt.getCurrentView();
+                TextView nextHelperTextView = (TextView) helperTxt.getNextView();
+
+                if (onDarkBackground) {
+                    // Add a border.
+                    buttonRoot.setForeground(ContextCompat.getDrawable(getContext(), R.drawable.ifttt_button_border));
+
+                    // Set helper text to white.
+                    currentHelperTextView.setTextColor(Color.WHITE);
+                    nextHelperTextView.setTextColor(Color.WHITE);
+
+                    // Tint the logo Drawable within the text to white.
+                    DrawableCompat.setTint(DrawableCompat.wrap(iftttLogo), Color.WHITE);
+                } else {
+                    // Remove border.
+                    buttonRoot.setForeground(null);
+
+                    // Set helper text to black.
+                    currentHelperTextView.setTextColor(Color.BLACK);
+                    nextHelperTextView.setTextColor(Color.BLACK);
+
+                    // Tint the logo Drawable within the text to black.
+                    DrawableCompat.setTint(DrawableCompat.wrap(iftttLogo), Color.BLACK);
+                }
             }
 
             @Override
@@ -549,11 +557,11 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             helperTxt.setOnClickListener(v -> buttonApiHelper.redirectToPlayStore(context));
         }
 
-        int iconBackgroundMargin = getResources().getDimensionPixelSize(R.dimen.ifttt_icon_margin);
-        ImageLoader.get().load(this, worksWithService.monochromeIconUrl, iconSize, bitmap -> {
+        ImageLoader.get().load(this, worksWithService.monochromeIconUrl, bitmap -> {
             BitmapDrawable serviceIcon = new BitmapDrawable(getResources(), bitmap);
+            int iconBackgroundMargin = getResources().getDimensionPixelSize(R.dimen.ifttt_icon_margin);
             StartIconDrawable drawable = new StartIconDrawable(context, serviceIcon, iconSize,
-                    iconImg.getHeight() - iconBackgroundMargin * 2);
+                    iconImg.getHeight() - iconBackgroundMargin * 2, onDarkBackground);
 
             ObjectAnimator fadeInIconImg = ObjectAnimator.ofFloat(iconImg, "alpha", 0f, 1f);
             fadeInIconImg.addListener(new AnimatorListenerAdapter() {
@@ -573,7 +581,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                 continue;
             }
 
-            ImageLoader.get().fetch(getLifecycle(), service.monochromeIconUrl, iconSize);
+            ImageLoader.get().fetch(getLifecycle(), service.monochromeIconUrl);
         }
 
         // Move the icon to the right if the Applet has already been authenticated and enabled.
@@ -857,11 +865,11 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             monitorRedirect();
         });
 
-        ImageLoader.get().load(this, service.monochromeIconUrl, iconSize, bitmap -> {
+        ImageLoader.get().load(this, service.monochromeIconUrl, bitmap -> {
             int iconBackgroundMargin = getResources().getDimensionPixelSize(R.dimen.ifttt_icon_margin);
             BitmapDrawable serviceIcon = new BitmapDrawable(getResources(), bitmap);
             StartIconDrawable drawable = new StartIconDrawable(getContext(), serviceIcon, iconSize,
-                    iconImg.getHeight() - iconBackgroundMargin * 2);
+                    iconImg.getHeight() - iconBackgroundMargin * 2, onDarkBackground);
             drawable.setBackgroundColor(service.brandColor);
             iconImg.setBackground(drawable);
 
@@ -961,12 +969,11 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             public void onAnimationStart(Animator animation) {
                 setProgressBackgroundColor(progressRoot.getBackground(), worksWithService.brandColor,
                         getDarkerColor(worksWithService.brandColor));
-                ImageLoader.get()
-                        .load(IftttConnectButton.this, worksWithService.monochromeIconUrl, iconSize, bitmap -> {
-                            if (bitmap != null) {
-                                progressIconImg.setImageBitmap(bitmap);
-                            }
-                        });
+                ImageLoader.get().load(IftttConnectButton.this, worksWithService.monochromeIconUrl, bitmap -> {
+                    if (bitmap != null) {
+                        progressIconImg.setImageBitmap(bitmap);
+                    }
+                });
             }
         });
 

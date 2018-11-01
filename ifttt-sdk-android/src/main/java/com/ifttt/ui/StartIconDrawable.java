@@ -5,9 +5,11 @@ import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Outline;
 import android.graphics.PixelFormat;
+import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
@@ -18,7 +20,6 @@ import androidx.core.content.ContextCompat;
 import com.ifttt.R;
 import javax.annotation.Nullable;
 
-import static android.graphics.Color.BLACK;
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
 
 final class StartIconDrawable extends Drawable {
@@ -32,14 +33,22 @@ final class StartIconDrawable extends Drawable {
     private final int initialBackgroundSize;
     private final int startIconWidth;
     private final int startIconHeight;
+    private final int startIconBackgroundColor;
 
-    StartIconDrawable(Context context, Drawable serviceIcon, int iconSize, int initialBackgroundSize) {
+    StartIconDrawable(Context context, Drawable serviceIcon, int iconSize, int initialBackgroundSize,
+            boolean onDarkBackground) {
         this.serviceIcon = serviceIcon;
         this.startIcon = ContextCompat.getDrawable(context, R.drawable.ic_start_arrow);
         startIconWidth = context.getResources().getDimensionPixelSize(R.dimen.ifttt_start_image_width);
         startIconHeight = context.getResources().getDimensionPixelSize(R.dimen.ifttt_start_image_height);
         this.iconSize = iconSize;
         this.initialBackgroundSize = initialBackgroundSize;
+        this.startIconBackgroundColor =
+                onDarkBackground ? ContextCompat.getColor(context, R.color.ifttt_start_icon_background_on_dark)
+                        : Color.BLACK;
+        if (onDarkBackground) {
+            startIcon.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
+        }
 
         this.startIcon.setAlpha(0);
         this.serviceIcon.setAlpha(255);
@@ -128,7 +137,7 @@ final class StartIconDrawable extends Drawable {
                     radius, radius, rounded, rounded, rounded, rounded, radius, radius
             }, null, null));
 
-            Integer color = (Integer) EVALUATOR.evaluate(progress, backgroundColor, BLACK);
+            Integer color = (Integer) EVALUATOR.evaluate(progress, backgroundColor, startIconBackgroundColor);
             background.getPaint().setColor(color);
 
             float animatedSize = (float) animation.getAnimatedValue();
