@@ -8,6 +8,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Outline;
+import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
@@ -35,6 +36,11 @@ final class StartIconDrawable extends Drawable {
     private final int startIconHeight;
     private final int startIconBackgroundColor;
 
+    private final int borderColor;
+    private final int borderWidth;
+
+    @Nullable private ShapeDrawable borderDrawable;
+
     StartIconDrawable(Context context, Drawable serviceIcon, int iconSize, int initialBackgroundSize,
             boolean onDarkBackground) {
         this.serviceIcon = serviceIcon;
@@ -50,6 +56,9 @@ final class StartIconDrawable extends Drawable {
             startIcon.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
         }
 
+        borderColor = ContextCompat.getColor(context, R.color.ifttt_progress_circle_color);
+        borderWidth = context.getResources().getDimensionPixelSize(R.dimen.ifttt_button_border_width);
+
         this.startIcon.setAlpha(0);
         this.serviceIcon.setAlpha(255);
     }
@@ -57,6 +66,17 @@ final class StartIconDrawable extends Drawable {
     @Override
     public void draw(Canvas canvas) {
         background.draw(canvas);
+
+        if (borderDrawable != null) {
+            if (borderDrawable.getBounds().isEmpty()) {
+                borderDrawable.setBounds(background.getBounds());
+            }
+            if (borderDrawable.getShape() == null) {
+                borderDrawable.setShape(background.getShape());
+            }
+            borderDrawable.draw(canvas);
+        }
+
         serviceIcon.draw(canvas);
         startIcon.draw(canvas);
     }
@@ -121,6 +141,17 @@ final class StartIconDrawable extends Drawable {
 
     void setBackgroundColor(@ColorInt int color) {
         background.getPaint().setColor(color);
+
+        if (isDarkColor(color)) {
+            // Add a border to the icon background if the service color is dark.
+            borderDrawable = new ShapeDrawable();
+            borderDrawable.getPaint().setStyle(Paint.Style.STROKE);
+            borderDrawable.getPaint().setStrokeWidth(borderWidth);
+            borderDrawable.getPaint().setColor(borderColor);
+        } else {
+            borderDrawable = null;
+        }
+
         invalidateSelf();
     }
 
@@ -151,5 +182,12 @@ final class StartIconDrawable extends Drawable {
         });
 
         return iconMorphing;
+    }
+    
+    private static boolean isDarkColor(@ColorInt int color) {
+        float[] hsv = new float[3];
+        Color.colorToHSV(color, hsv);
+
+        return hsv[2] < 0.25f;
     }
 }
