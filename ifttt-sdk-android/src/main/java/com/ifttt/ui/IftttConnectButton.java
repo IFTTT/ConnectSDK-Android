@@ -279,7 +279,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         progressTxt.setTypeface(boldTypeface);
 
         int checkMarkSize = getResources().getDimensionPixelSize(R.dimen.ifttt_check_mark_size);
-        int circleColor = ContextCompat.getColor(getContext(), R.color.ifttt_progress_circle_color);
+        int circleColor = ContextCompat.getColor(getContext(), R.color.ifttt_semi_transparent_white);
         int dotColor = Color.WHITE;
         CheckMarkDrawable drawable = new CheckMarkDrawable(checkMarkSize, circleColor, dotColor);
         completeImg = findViewById(R.id.ifttt_progress_check_mark);

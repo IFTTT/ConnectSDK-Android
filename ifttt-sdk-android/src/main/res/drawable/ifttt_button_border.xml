@@ -4,6 +4,6 @@
 
     <size android:height="@dimen/connect_button_height"/>
     <corners android:radius="@dimen/connect_button_radius"/>
-    <stroke android:color="@color/ifttt_progress_circle_color" android:width="@dimen/ifttt_button_border_width"/>
+    <stroke android:color="@color/ifttt_semi_transparent_white" android:width="@dimen/ifttt_button_border_width"/>
 
 </shape>
