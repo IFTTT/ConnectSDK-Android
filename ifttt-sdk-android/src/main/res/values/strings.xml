@@ -22,4 +22,5 @@
     <string name="ifttt_all_set">You\'re all set. Manage connection with IFTTT</string>
     <string name="slide_to_turn_off">Slide to disconnect</string>
     <string name="ifttt_signing_in_to_ifttt">Signing in to IFTTT</string>
+    <string name="ifttt_enter_valid_email">Please enter a valid email address</string>
 </resources>
