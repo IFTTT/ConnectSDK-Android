@@ -106,7 +106,10 @@ class MainActivity : AppCompatActivity() {
         if (authenticationResult.nextStep == AuthenticationResult.NextStep.Complete) {
             // The authentication has completed, we can now fetch the user token and refresh the UI.
             ApiHelper.fetchIftttToken(next = {
-                iftttApiClient.setUserToken(it!!)
+                if (it != null) {
+                    iftttApiClient.setUserToken(it)
+                }
+
                 iftttApiClient.api().showApplet(APPLET_ID).execute(object : PendingResult.ResultCallback<Applet> {
                     override fun onSuccess(result: Applet) {
                         // After this, users will be able to turn on or off the Applet.

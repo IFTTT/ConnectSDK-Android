@@ -173,7 +173,7 @@ Because `IftttConnectButton` holds the authentication states, we recommend you t
 <activity  
   android:name=".YourActivity"  
   android:exported="true"  
-  android:launchMode="singleTop">
+  android:launchMode="singleTask">
   <!-- IntentFilters and other Activity setup -->
 </activity>
 ```
