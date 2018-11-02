@@ -1,6 +1,7 @@
 package com.ifttt.ui;
 
 import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.content.Context;
@@ -17,6 +18,7 @@ import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RoundRectShape;
 import androidx.annotation.ColorInt;
 import androidx.annotation.RequiresApi;
+import androidx.annotation.VisibleForTesting;
 import androidx.core.content.ContextCompat;
 import com.ifttt.R;
 import javax.annotation.Nullable;
@@ -36,10 +38,10 @@ final class StartIconDrawable extends Drawable {
     private final int startIconHeight;
     private final int startIconBackgroundColor;
 
-    private final int borderColor;
-    private final int borderWidth;
+    private final ShapeDrawable borderDrawable = new ShapeDrawable();
 
-    @Nullable private ShapeDrawable borderDrawable;
+    // If true, add a border to the icon background if the service color is dark.
+    private boolean shouldDrawBorder;
 
     StartIconDrawable(Context context, Drawable serviceIcon, int iconSize, int initialBackgroundSize,
             boolean onDarkBackground) {
@@ -56,8 +58,11 @@ final class StartIconDrawable extends Drawable {
             startIcon.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
         }
 
-        borderColor = ContextCompat.getColor(context, R.color.ifttt_semi_transparent_white);
-        borderWidth = context.getResources().getDimensionPixelSize(R.dimen.ifttt_button_border_width);
+        int borderColor = ContextCompat.getColor(context, R.color.ifttt_semi_transparent_white);
+        int borderWidth = context.getResources().getDimensionPixelSize(R.dimen.ifttt_button_border_width);
+        borderDrawable.getPaint().setColor(borderColor);
+        borderDrawable.getPaint().setStyle(Paint.Style.STROKE);
+        borderDrawable.getPaint().setStrokeWidth(borderWidth);
 
         this.startIcon.setAlpha(0);
         this.serviceIcon.setAlpha(255);
@@ -67,13 +72,7 @@ final class StartIconDrawable extends Drawable {
     public void draw(Canvas canvas) {
         background.draw(canvas);
 
-        if (borderDrawable != null) {
-            if (borderDrawable.getBounds().isEmpty()) {
-                borderDrawable.setBounds(background.getBounds());
-            }
-            if (borderDrawable.getShape() == null) {
-                borderDrawable.setShape(background.getShape());
-            }
+        if (shouldDrawBorder) {
             borderDrawable.draw(canvas);
         }
 
@@ -110,6 +109,9 @@ final class StartIconDrawable extends Drawable {
         background.setShape(
                 new RoundRectShape(new float[] { radius, radius, radius, radius, radius, radius, radius, radius }, null,
                         null));
+
+        borderDrawable.setShape(background.getShape());
+        borderDrawable.setBounds(background.getBounds());
     }
 
     @Override
@@ -141,17 +143,7 @@ final class StartIconDrawable extends Drawable {
 
     void setBackgroundColor(@ColorInt int color) {
         background.getPaint().setColor(color);
-
-        if (isDarkColor(color)) {
-            // Add a border to the icon background if the service color is dark.
-            borderDrawable = new ShapeDrawable();
-            borderDrawable.getPaint().setStyle(Paint.Style.STROKE);
-            borderDrawable.getPaint().setStrokeWidth(borderWidth);
-            borderDrawable.getPaint().setColor(borderColor);
-        } else {
-            borderDrawable = null;
-        }
-
+        shouldDrawBorder = isDarkColor(color);
         invalidateSelf();
     }
 
@@ -181,10 +173,19 @@ final class StartIconDrawable extends Drawable {
             invalidateSelf();
         });
 
+        iconMorphing.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                // As soon as the animation starts, remove the border.
+                shouldDrawBorder = false;
+            }
+        });
+
         return iconMorphing;
     }
-    
-    private static boolean isDarkColor(@ColorInt int color) {
+
+    @VisibleForTesting
+    static boolean isDarkColor(@ColorInt int color) {
         float[] hsv = new float[3];
         Color.colorToHSV(color, hsv);
 
