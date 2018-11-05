@@ -155,7 +155,7 @@ final class StartIconDrawable extends Drawable {
         invalidateSelf();
     }
 
-    Animator getAnimator() {
+    Animator getMorphAnimator() {
         int width = getBounds().width();
         int height = getBounds().height();
         int backgroundColor = background.getPaint().getColor();

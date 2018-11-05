@@ -5,7 +5,8 @@
     <dimen name="ifttt_start_image_width">10dp</dimen>
     <dimen name="ifttt_start_image_height">17dp</dimen>
     <dimen name="ifttt_icon_margin">4dp</dimen>
-    <dimen name="ifttt_icon_elevation">8dp</dimen>
+    <dimen name="ifttt_icon_elevation">2dp</dimen>
+    <dimen name="ifttt_connect_button_elevation">2dp</dimen>
     <dimen name="ifttt_check_mark_size">40dp</dimen>
     <dimen name="ifttt_about_drawable_padding">16dp</dimen>
     <dimen name="connect_button_height">60dp</dimen>
