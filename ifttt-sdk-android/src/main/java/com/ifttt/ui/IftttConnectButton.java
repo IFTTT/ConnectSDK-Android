@@ -262,7 +262,12 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         manageApplets = replaceKeyWithImage((TextView) helperTxt.getCurrentView(),
                 getResources().getString(R.string.ifttt_all_set), "IFTTT", iftttLogo);
 
-        helperTxt.setOnClickListener(v -> getContext().startActivity(IftttAboutActivity.intent(context, applet)));
+        helperTxt.setOnClickListener(new DebouncingOnClickListener() {
+            @Override
+            void doClick(View v) {
+                getContext().startActivity(IftttAboutActivity.intent(context, applet));
+            }
+        });
 
         buttonRoot = findViewById(R.id.ifttt_toggle_root);
 
@@ -349,6 +354,11 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
      *
      * @param iftttApiClient IftttApiClient instance.
      * @param email This is used to pre-fill the email EditText when the user is doing Applet authentication.
+     * @param redirectUrl URL string that will be used when the Applet authentication flow is completed on web view, in
+     * order to return the result to the app.
+     * @param oAuthTokenProvider OAuthTokenProvider implementation that returns your user's OAuth token. The token will
+     * be used to exchange an opaque token with ifttt.com. The process is going to be used to automatically connect
+     * your service on IFTTT for this user.
      */
     public void setup(String email, IftttApiClient iftttApiClient, String redirectUrl,
             OAuthTokenProvider oAuthTokenProvider) {
@@ -554,7 +564,12 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             float progress = 1f;
             setConnectTextState(progress, enabledText, disabledText);
 
-            helperTxt.setOnClickListener(v -> buttonApiHelper.redirectToPlayStore(context));
+            helperTxt.setOnClickListener(new DebouncingOnClickListener() {
+                @Override
+                void doClick(View v) {
+                    buttonApiHelper.redirectToPlayStore(context);
+                }
+            });
         }
 
         ImageLoader.get().load(this, worksWithService.monochromeIconUrl, bitmap -> {
@@ -589,12 +604,13 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         lp.gravity = applet.status == enabled ? Gravity.END : Gravity.START;
         iconImg.setLayoutParams(lp);
 
-        if (SDK_INT < KITKAT) {
-            // On Jelly Bean, the click events on the button will only take users out to the browser.
-            buttonRoot.setOnClickListener(v -> buttonApiHelper.redirectToWebCompat(context, applet));
-        } else if (applet.status == enabled) {
-            buttonRoot.setOnClickListener(
-                    v -> setTextSwitcherText(helperTxt, getResources().getString(R.string.slide_to_turn_off)));
+        if (applet.status == enabled) {
+            buttonRoot.setOnClickListener(new DebouncingOnClickListener() {
+                @Override
+                void doClick(View v) {
+                    setTextSwitcherText(helperTxt, getResources().getString(R.string.slide_to_turn_off));
+                }
+            });
         } else {
             buttonRoot.setOnClickListener(v -> {
                 if (!isUserAuthenticated) {
@@ -667,7 +683,12 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                 recordState(Enabled);
 
                 setTextSwitcherText(helperTxt, manageApplets);
-                helperTxt.setOnClickListener(v -> buttonApiHelper.redirectToPlayStore(getContext()));
+                helperTxt.setOnClickListener(new DebouncingOnClickListener() {
+                    @Override
+                    void doClick(View v) {
+                        buttonApiHelper.redirectToPlayStore(getContext());
+                    }
+                });
 
                 // After the applet has been authenticated, temporarily disable toggling feature until the new Applet
                 // object has been set.
@@ -806,35 +827,38 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
 
         // Morph service icon into the start button.
         if (iconImg.getBackground() != null) {
-            Animator iconMorphing = ((StartIconDrawable) iconImg.getBackground()).getAnimator();
+            Animator iconMorphing = ((StartIconDrawable) iconImg.getBackground()).getMorphAnimator();
             iconMorphing.setDuration(ANIM_DURATION_MEDIUM);
             set.playTogether(iconMorphing, fadeOutConnect);
         }
 
         set.setInterpolator(EASE_INTERPOLATOR);
 
-        OnClickListener startAuthOnClickListener = v -> {
-            if (ButtonUiHelper.isEmailInvalid(emailEdt.getText())) {
-                if (buttonStateChangeListener != null) {
-                    buttonStateChangeListener.onError(INVALID_EMAIL);
+        OnClickListener startAuthOnClickListener = new DebouncingOnClickListener() {
+            @Override
+            void doClick(View v) {
+                if (ButtonUiHelper.isEmailInvalid(emailEdt.getText())) {
+                    if (buttonStateChangeListener != null) {
+                        buttonStateChangeListener.onError(INVALID_EMAIL);
+                    }
+
+                    setTextSwitcherText(helperTxt, getResources().getString(R.string.ifttt_enter_valid_email));
+                    return;
                 }
 
-                setTextSwitcherText(helperTxt, getResources().getString(R.string.ifttt_enter_valid_email));
-                return;
+                v.setClickable(false);
+                // Dismiss keyboard if needed.
+                InputMethodManager inputMethodManager =
+                        (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputMethodManager.hideSoftInputFromWindow(emailEdt.getWindowToken(), 0);
+
+                animateEmailValidation();
+
+                String email = emailEdt.getText().toString();
+                buttonApiHelper.prepareAuthentication(email);
+
+                setTextSwitcherText(helperTxt, poweredByIfttt);
             }
-
-            v.setClickable(false);
-            // Dismiss keyboard if needed.
-            InputMethodManager inputMethodManager =
-                    (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-            inputMethodManager.hideSoftInputFromWindow(emailEdt.getWindowToken(), 0);
-
-            animateEmailValidation();
-
-            String email = emailEdt.getText().toString();
-            buttonApiHelper.prepareAuthentication(email);
-
-            setTextSwitcherText(helperTxt, poweredByIfttt);
         };
 
         // Only enable the OnClickListener after the animation has completed.
@@ -860,9 +884,12 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         } else {
             connectStateTxt.setText(connectText);
         }
-        buttonRoot.setOnClickListener(v -> {
-            buttonApiHelper.redirectToWeb(getContext(), applet, emailEdt.getText().toString(), buttonState);
-            monitorRedirect();
+        buttonRoot.setOnClickListener(new DebouncingOnClickListener() {
+            @Override
+            void doClick(View v) {
+                buttonApiHelper.redirectToWeb(getContext(), applet, emailEdt.getText().toString(), buttonState);
+                monitorRedirect();
+            }
         });
 
         ImageLoader.get().load(this, service.monochromeIconUrl, bitmap -> {
