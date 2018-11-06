@@ -10,14 +10,21 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.PathShape;
 import android.graphics.drawable.shapes.RoundRectShape;
-import android.os.Build;
 import androidx.annotation.ColorInt;
 import androidx.annotation.FloatRange;
 import androidx.annotation.RequiresApi;
 import javax.annotation.Nullable;
 
-@RequiresApi(Build.VERSION_CODES.KITKAT)
-final class ProgressBackgroundDrawable extends Drawable {
+import static android.os.Build.VERSION_CODES.KITKAT;
+
+/**
+ * Implementation of a {@link ProgressBackground} that renders a rounded rectangle shape, same as the Connect Button's
+ * shape, and a progress layer on top.
+ *
+ * This implementation is only used for KitKat and above, as we are using the {@link Path.Op} class.
+ */
+@RequiresApi(KITKAT)
+final class ProgressBackgroundKitKat extends Drawable implements ProgressBackground {
 
     private final Path progressPath = new Path();
 
@@ -30,13 +37,15 @@ final class ProgressBackgroundDrawable extends Drawable {
      * @param primaryColor Primary color of the drawable.
      * @param progressColor Progress bar color of the drawable.
      */
-    void setColor(@ColorInt int primaryColor, @ColorInt int progressColor) {
+    @Override
+    public void setColor(@ColorInt int primaryColor, @ColorInt int progressColor) {
         drawable.getPaint().setColor(primaryColor);
         progressDrawable.getPaint().setColor(progressColor);
         invalidateSelf();
     }
 
-    void setProgress(@FloatRange(from = 0.0f, to = 1.0f) float progress) {
+    @Override
+    public void setProgress(@FloatRange(from = 0.0f, to = 1.0f) float progress) {
 
         progressPath.reset();
 

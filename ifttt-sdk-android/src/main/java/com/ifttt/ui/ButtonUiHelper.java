@@ -23,7 +23,6 @@ import android.util.Patterns;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
 import androidx.annotation.ColorInt;
-import androidx.annotation.FloatRange;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
@@ -32,7 +31,6 @@ import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 
 import static android.os.Build.VERSION.SDK_INT;
-import static android.os.Build.VERSION_CODES.KITKAT;
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
 
 final class ButtonUiHelper {
@@ -169,36 +167,6 @@ final class ButtonUiHelper {
         }
 
         textSwitcher.setText(text);
-    }
-
-    static void setProgressBackgroundProgress(@Nullable Drawable drawable,
-            @FloatRange(from = 0.0f, to = 1.0f) float progress) {
-        if (SDK_INT <= KITKAT) {
-            // No-op for older Android versions, the ProgressBackgroundDrawable needs Path.Op to render the effect,
-            // and it is not available until 19.
-            return;
-        }
-
-        if (!(drawable instanceof ProgressBackgroundDrawable)) {
-            return;
-        }
-
-        ((ProgressBackgroundDrawable) drawable).setProgress(progress);
-    }
-
-    static void setProgressBackgroundColor(@Nullable Drawable drawable, @ColorInt int primaryColor,
-            @ColorInt int progressColor) {
-        if (SDK_INT <= KITKAT) {
-            // No-op for older Android versions, the ProgressBackgroundDrawable needs Path.Op to render the effect,
-            // and it is not available until 19.
-            return;
-        }
-
-        if (!(drawable instanceof ProgressBackgroundDrawable)) {
-            return;
-        }
-
-        ((ProgressBackgroundDrawable) drawable).setColor(primaryColor, progressColor);
     }
 
     private ButtonUiHelper() {
