@@ -1,11 +1,10 @@
 package com.ifttt.ui;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
+import androidx.annotation.MainThread;
 import androidx.browser.customtabs.CustomTabsIntent;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
@@ -30,24 +29,24 @@ import static com.ifttt.ui.IftttConnectButton.ButtonState.ServiceConnection;
 final class ButtonApiHelper {
 
     private final IftttApi iftttApi;
-    private final OAuthTokenProvider oAuthTokenProvider;
+    private final OAuthCodeProvider oAuthCodeProvider;
     private final Lifecycle lifecycle;
     private final String redirectUri;
     private final String inviteCode;
 
-    @Nullable private String opaqueToken;
+    @Nullable private String oAuthCode;
 
     // Default to account existed, so that we don't create unnecessary account through the automatic flow. This is used
     // to help simplify the flow by setting an aggressive timeout for account checking requests.
     private boolean accountFound = true;
 
-    ButtonApiHelper(IftttApiClient iftttApiClient, String redirectUri, OAuthTokenProvider provider,
+    ButtonApiHelper(IftttApiClient iftttApiClient, String redirectUri, OAuthCodeProvider provider,
             Lifecycle lifecycle) {
         this.lifecycle = lifecycle;
         this.redirectUri = redirectUri;
         inviteCode = iftttApiClient.getInviteCode();
         iftttApi = iftttApiClient.api();
-        oAuthTokenProvider = provider;
+        oAuthCodeProvider = provider;
     }
 
     void disableApplet(String appletId, ResultCallback<Applet> resultCallback) {
@@ -66,14 +65,8 @@ final class ButtonApiHelper {
         });
     }
 
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-    void redirectToWebCompat(Context context, Applet applet) {
-        CustomTabsIntent intent = new CustomTabsIntent.Builder().build();
-        intent.launchUrl(context, Uri.parse(applet.embeddedUrl));
-    }
-
     void redirectToWeb(Context context, Applet applet, String email, ButtonState buttonState) {
-        Uri uri = getEmbedUri(applet, buttonState, redirectUri, email, opaqueToken, inviteCode);
+        Uri uri = getEmbedUri(applet, buttonState, redirectUri, email, oAuthCode, inviteCode);
         CustomTabsIntent intent = new CustomTabsIntent.Builder().build();
         intent.launchUrl(context, uri);
     }
@@ -94,9 +87,10 @@ final class ButtonApiHelper {
         return accountFound;
     }
 
+    @MainThread
     void prepareAuthentication(String email) {
-        RedirectPrepAsyncTask task = new RedirectPrepAsyncTask(oAuthTokenProvider, email, prepResult -> {
-            this.opaqueToken = prepResult.opaqueToken;
+        RedirectPrepAsyncTask task = new RedirectPrepAsyncTask(oAuthCodeProvider, email, prepResult -> {
+            this.oAuthCode = prepResult.opaqueToken;
             this.accountFound = prepResult.accountFound;
         });
         lifecycle.addObserver(new OAuthTokenExchangeTaskObserver(task));
@@ -108,7 +102,7 @@ final class ButtonApiHelper {
      * option invite code for the service.
      */
     private static Uri getEmbedUri(Applet applet, IftttConnectButton.ButtonState buttonState,
-            @Nullable String redirectUri, @Nullable String email, @Nullable String opaqueToken,
+            @Nullable String redirectUri, @Nullable String email, @Nullable String oAuthCode,
             @Nullable String inviteCode) {
         Uri.Builder builder = Uri.parse(applet.embeddedUrl)
                 .buildUpon()
@@ -133,9 +127,9 @@ final class ButtonApiHelper {
             builder.appendQueryParameter("sdk_create_account", "true");
         }
 
-        if ((buttonState == CreateAccount || buttonState == Login) && opaqueToken != null) {
+        if ((buttonState == CreateAccount || buttonState == Login) && oAuthCode != null) {
             // Only append the opaque token if we are creating a new account or logging into an existing account.
-            builder.appendQueryParameter("token", opaqueToken);
+            builder.appendQueryParameter("code", oAuthCode);
         }
 
         return builder.build();
