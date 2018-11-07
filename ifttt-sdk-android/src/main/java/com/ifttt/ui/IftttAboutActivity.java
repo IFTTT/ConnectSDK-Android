@@ -37,7 +37,7 @@ public final class IftttAboutActivity extends Activity {
         setContentView(R.layout.view_ifttt_about);
 
         Typeface avenirBold = Typeface.createFromAsset(getAssets(), "avenir_next_ltpro_bold.otf");
-        Typeface avenirDemi = Typeface.createFromAsset(getAssets(), "avenir_next_ltpro_demi.otf");
+        Typeface avenirMedium = Typeface.createFromAsset(getAssets(), "avenir_next_ltpro_medium.otf");
 
         TextView title = findViewById(R.id.ifttt_about_title);
         title.setTypeface(avenirBold);
@@ -45,13 +45,13 @@ public final class IftttAboutActivity extends Activity {
                 ContextCompat.getDrawable(this, R.drawable.ifttt_logo_white)));
 
         TextView description1 = findViewById(R.id.ifttt_about_1);
-        description1.setTypeface(avenirDemi);
+        description1.setTypeface(avenirMedium);
 
         TextView description2 = findViewById(R.id.ifttt_about_2);
-        description2.setTypeface(avenirDemi);
+        description2.setTypeface(avenirMedium);
 
         TextView description3 = findViewById(R.id.ifttt_about_3);
-        description3.setTypeface(avenirDemi);
+        description3.setTypeface(avenirMedium);
 
         TextView moreButton = findViewById(R.id.ifttt_more_about_button);
         moreButton.setTypeface(avenirBold);
