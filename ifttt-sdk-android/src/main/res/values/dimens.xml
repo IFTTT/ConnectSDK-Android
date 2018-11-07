@@ -2,8 +2,8 @@
 <resources>
     <dimen name="connect_text_padding_horizontal">76dp</dimen>
     <dimen name="ifttt_icon_image_size">34dp</dimen>
-    <dimen name="ifttt_start_image_width">10dp</dimen>
-    <dimen name="ifttt_start_image_height">17dp</dimen>
+    <dimen name="ifttt_start_image_width">9dp</dimen>
+    <dimen name="ifttt_start_image_height">16dp</dimen>
     <dimen name="ifttt_icon_margin">4dp</dimen>
     <dimen name="ifttt_icon_elevation">8dp</dimen>
     <dimen name="ifttt_start_icon_elevation_dark_mode">2dp</dimen>

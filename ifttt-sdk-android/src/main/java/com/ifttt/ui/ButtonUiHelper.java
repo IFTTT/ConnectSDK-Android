@@ -17,14 +17,17 @@ import android.graphics.drawable.StateListDrawable;
 import android.graphics.drawable.shapes.RoundRectShape;
 import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.StaticLayout;
 import android.text.TextUtils;
 import android.text.style.ImageSpan;
 import android.util.Patterns;
+import android.view.ViewTreeObserver;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
 import androidx.annotation.ColorInt;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.core.view.ViewCompat;
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
 import com.ifttt.R;
 import javax.annotation.CheckReturnValue;
@@ -167,6 +170,32 @@ final class ButtonUiHelper {
         }
 
         textSwitcher.setText(text);
+    }
+
+    static void setConnectStateText(TextView textView, CharSequence text, CharSequence fallback) {
+        if (ViewCompat.isLaidOut(textView)) {
+            setText(textView, text, fallback);
+        } else {
+            textView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+                @Override
+                public boolean onPreDraw() {
+                    textView.getViewTreeObserver().removeOnPreDrawListener(this);
+                    setText(textView, text, fallback);
+                    return false;
+                }
+            });
+        }
+    }
+
+    private static void setText(TextView textView, CharSequence text, CharSequence fallback) {
+        float width = StaticLayout.getDesiredWidth(text, textView.getPaint());
+        int marginHorizontal =
+                textView.getResources().getDimensionPixelSize(R.dimen.connect_text_padding_horizontal) * 2;
+        if (width > textView.getWidth() - marginHorizontal) {
+            textView.setText(fallback);
+        } else {
+            textView.setText(text);
+        }
     }
 
     private ButtonUiHelper() {

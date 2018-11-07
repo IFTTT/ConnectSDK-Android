@@ -66,6 +66,7 @@ import static com.ifttt.ui.ButtonUiHelper.buildStateListButtonBackground;
 import static com.ifttt.ui.ButtonUiHelper.getDarkerColor;
 import static com.ifttt.ui.ButtonUiHelper.getTextTransitionAnimator;
 import static com.ifttt.ui.ButtonUiHelper.replaceKeyWithImage;
+import static com.ifttt.ui.ButtonUiHelper.setConnectStateText;
 import static com.ifttt.ui.ButtonUiHelper.setTextSwitcherText;
 import static com.ifttt.ui.IftttConnectButton.ButtonState.CreateAccount;
 import static com.ifttt.ui.IftttConnectButton.ButtonState.Enabled;
@@ -113,10 +114,6 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
     private static final ErrorResponse CANCELED_AUTH = new ErrorResponse("canceled", "Authentication canceled");
     private static final ErrorResponse UNKNOWN_STATE = new ErrorResponse("unknown_state", "Cannot verify Button state");
 
-    // Max length for the main text in the button. If the text plus service name is longer than this, we will only
-    // render the text.
-    private static final int MAX_LENGTH = 25;
-
     private static final float FADE_OUT_PROGRESS = 0.3f;
     private static final float FADE_IN_PROGRESS = 0.6f;
 
@@ -137,10 +134,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         @Override
         public void onSuccess(Applet result) {
             String connectText = getResources().getString(R.string.ifttt_connect_to, worksWithService.name);
-            if (connectText.length() > MAX_LENGTH) {
-                connectText = getResources().getString(R.string.ifttt_connect);
-            }
-
+            setConnectStateText(connectStateTxt, connectText, getResources().getString(R.string.ifttt_connect));
             setTextSwitcherText(helperTxt, poweredByIfttt);
 
             Animator connectTextReset = getTextTransitionAnimator(connectStateTxt, Change, connectText);
@@ -549,12 +543,9 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         if (applet.status != Applet.Status.enabled) {
             recordState(Initial);
 
-            String signInText = getResources().getString(R.string.ifttt_connect_to, worksWithService.name);
-            if (signInText.length() > MAX_LENGTH) {
-                connectStateTxt.setText(R.string.ifttt_connect);
-            } else {
-                connectStateTxt.setText(signInText);
-            }
+            setConnectStateText(connectStateTxt,
+                    getResources().getString(R.string.ifttt_connect_to, worksWithService.name),
+                    getResources().getString(R.string.ifttt_connect));
 
             helperTxt.setClickable(true);
             iconDragHelperCallback.setDragEnabled(false);
@@ -902,12 +893,8 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
      */
     private Animator getServiceConnectionAnimator(Service service) {
         buttonRoot.setBackground(buildButtonBackground(getContext(), service.brandColor));
-        String connectText = getResources().getString(R.string.ifttt_sign_in_to, service.name);
-        if (connectText.length() > MAX_LENGTH) {
-            connectStateTxt.setText(R.string.ifttt_sign_in);
-        } else {
-            connectStateTxt.setText(connectText);
-        }
+        setConnectStateText(connectStateTxt, getResources().getString(R.string.ifttt_sign_in_to, service.name),
+                getResources().getString(R.string.ifttt_sign_in));
         buttonRoot.setOnClickListener(new DebouncingOnClickListener() {
             @Override
             void doClick(View v) {
