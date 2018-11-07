@@ -85,7 +85,7 @@ class MainActivity : AppCompatActivity() {
                         iftttApiClient.setUserToken(iftttToken)
                     }
 
-                    renderUi(token)
+                    renderUi()
                 }, error = {
                     showSnackbar(getString(R.string.user_auth_error))
                 })
@@ -134,7 +134,7 @@ class MainActivity : AppCompatActivity() {
         appletsPendingResult?.cancel()
     }
 
-    private fun renderUi(token: String) {
+    private fun renderUi() {
         appletContainer.visibility = View.VISIBLE
         signInRoot.visibility = View.GONE
         startButton.isClickable = false
@@ -149,7 +149,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 description.text = result.description
                 iftttConnectButton.setup(EMAIL, iftttApiClient, ApiHelper.REDIRECT_URI) {
-                    token
+                    "Your_users_oauth_code"
                 }
                 iftttConnectButton.setApplet(result)
             }
