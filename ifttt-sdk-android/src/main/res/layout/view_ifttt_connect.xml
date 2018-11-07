@@ -40,9 +40,7 @@
                 android:paddingEnd="@dimen/connect_text_padding_horizontal"
                 android:paddingStart="@dimen/connect_text_padding_horizontal"
                 android:paddingTop="8dp"
-                android:textColor="@android:color/white"
-                app:autoSizeMaxTextSize="20sp"
-                app:autoSizeTextType="uniform"/>
+                android:textColor="@android:color/white"/>
 
             <ImageButton
                 android:id="@+id/ifttt_icon"
@@ -65,8 +63,8 @@
                 android:id="@+id/ifttt_progress_text"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:gravity="center"
                 android:alpha="0"
+                android:gravity="center"
                 android:lines="1"
                 android:paddingEnd="60dp"
                 android:paddingStart="60dp"
