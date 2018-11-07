@@ -359,23 +359,22 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
      * @param email This is used to pre-fill the email EditText when the user is doing Applet authentication.
      * @param redirectUrl URL string that will be used when the Applet authentication flow is completed on web view, in
      * order to return the result to the app.
-     * @param oAuthTokenProvider OAuthTokenProvider implementation that returns your user's OAuth token. The token will
-     * be used to exchange an opaque token with ifttt.com. The process is going to be used to automatically connect
-     * your service on IFTTT for this user.
+     * @param oAuthCodeProvider OAuthCodeProvider implementation that returns your user's OAuth code. The code will be
+     * used to automatically connect your service on IFTTT for this user.
      */
     public void setup(String email, IftttApiClient iftttApiClient, String redirectUrl,
-            OAuthTokenProvider oAuthTokenProvider) {
+            OAuthCodeProvider oAuthCodeProvider) {
         if (ButtonUiHelper.isEmailInvalid(email)) {
             // Crash in debug build to inform developers.
             throw new IllegalStateException(email
                     + " is not a valid email address, please make sure you pass in a valid user email string to set up IftttConnectButton.");
         }
 
-        if (oAuthTokenProvider == null) {
+        if (oAuthCodeProvider == null) {
             throw new IllegalStateException("OAuth token provider cannot be null.");
         }
 
-        buttonApiHelper = new ButtonApiHelper(iftttApiClient, redirectUrl, oAuthTokenProvider, getLifecycle());
+        buttonApiHelper = new ButtonApiHelper(iftttApiClient, redirectUrl, oAuthCodeProvider, getLifecycle());
         isUserAuthenticated = iftttApiClient.isUserAuthenticated();
         emailEdt.setText(email);
     }

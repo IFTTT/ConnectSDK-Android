@@ -1,15 +1,12 @@
 package com.ifttt.ui;
 
 import android.os.AsyncTask;
-import com.squareup.moshi.Moshi;
 import java.io.IOException;
 import javax.annotation.Nullable;
 import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.moshi.MoshiConverterFactory;
-
-import static com.ifttt.ui.TokenExchangeApi.TOKEN_EXCHANGE_JSON_ADAPTER;
 
 /**
  * Worker {@link AsyncTask} used for token exchange and account matching.
@@ -20,11 +17,11 @@ final class RedirectPrepAsyncTask extends AsyncTask<Void, Void, RedirectPrepAsyn
         void onExchanged(PrepResult result);
     }
 
-    private final OAuthTokenProvider provider;
+    private final OAuthCodeProvider provider;
     private final OnTokenExchangeListener listener;
     private final String email;
 
-    RedirectPrepAsyncTask(OAuthTokenProvider provider, String email, OnTokenExchangeListener listener) {
+    RedirectPrepAsyncTask(OAuthCodeProvider provider, String email, OnTokenExchangeListener listener) {
         this.provider = provider;
         this.email = email;
         this.listener = listener;
@@ -32,23 +29,11 @@ final class RedirectPrepAsyncTask extends AsyncTask<Void, Void, RedirectPrepAsyn
 
     @Override
     protected PrepResult doInBackground(Void... voids) {
-        String oAuthToken = provider.getOAuthToken();
-        if (oAuthToken == null) {
-            // Intentionally set the flag to true, so that the SDK will know to bring users to the web flow
-            // to continue Applet authentication.
-            return new PrepResult(null, true);
-        }
-
         try {
-            Response<String> tokenExchangeResponse = TokenExchangeApiHelper.get().exchangeToken(oAuthToken).execute();
-            String opaqueToken = null;
-            if (tokenExchangeResponse.isSuccessful()) {
-                opaqueToken = tokenExchangeResponse.body();
-            }
-
+            String oAuthCode = provider.getOAuthCode();
             Response<Void> accountMatchResponse = AccountApiHelper.get().findAccount(email).execute();
             boolean accountFound = accountMatchResponse.code() != 404;
-            return new PrepResult(opaqueToken, accountFound);
+            return new PrepResult(oAuthCode, accountFound);
         } catch (IOException e) {
             // Intentionally set the flag to true, so that the SDK will know to bring users to the web flow
             // to continue Applet authentication.
@@ -95,33 +80,6 @@ final class RedirectPrepAsyncTask extends AsyncTask<Void, Void, RedirectPrepAsyn
         static AccountApiHelper get() {
             if (INSTANCE == null) {
                 INSTANCE = new AccountApiHelper();
-            }
-
-            return INSTANCE;
-        }
-    }
-
-    private static final class TokenExchangeApiHelper {
-
-        private static TokenExchangeApiHelper INSTANCE;
-
-        private final TokenExchangeApi tokenExchangeApi;
-
-        private TokenExchangeApiHelper() {
-            Moshi moshi = new Moshi.Builder().add(TOKEN_EXCHANGE_JSON_ADAPTER).build();
-            Retrofit retrofit = new Retrofit.Builder().addConverterFactory(MoshiConverterFactory.create(moshi))
-                    .baseUrl("https://ifttt.com")
-                    .build();
-            tokenExchangeApi = retrofit.create(TokenExchangeApi.class);
-        }
-
-        Call<String> exchangeToken(String token) {
-            return tokenExchangeApi.exchangeToken(token);
-        }
-
-        static TokenExchangeApiHelper get() {
-            if (INSTANCE == null) {
-                INSTANCE = new TokenExchangeApiHelper();
             }
 
             return INSTANCE;

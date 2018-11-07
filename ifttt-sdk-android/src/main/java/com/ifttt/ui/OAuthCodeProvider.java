@@ -2,8 +2,8 @@ package com.ifttt.ui;
 
 import androidx.annotation.WorkerThread;
 
-public interface OAuthTokenProvider {
+public interface OAuthCodeProvider {
 
     @WorkerThread
-    String getOAuthToken();
+    String getOAuthCode();
 }
