@@ -128,7 +128,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
     private static final LinearInterpolator LINEAR_INTERPOLATOR = new LinearInterpolator();
     private static final FastOutSlowInInterpolator EASE_INTERPOLATOR = new FastOutSlowInInterpolator();
 
-    private static final String AVENIR_DEMI = "avenir_next_ltpro_demi.otf";
+    private static final String AVENIR_MEDIUM = "avenir_next_ltpro_medium.otf";
     private static final String AVENIR_BOLD = "avenir_next_ltpro_bold.otf";
 
     private static final ArgbEvaluator EVALUATOR = new ArgbEvaluator();
@@ -223,11 +223,11 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
 
         inflate(context, R.layout.view_ifttt_connect, this);
 
-        Typeface demiTypeface = Typeface.createFromAsset(context.getAssets(), AVENIR_DEMI);
+        Typeface mediumTypeface = Typeface.createFromAsset(context.getAssets(), AVENIR_MEDIUM);
         Typeface boldTypeface = Typeface.createFromAsset(context.getAssets(), AVENIR_BOLD);
 
         emailEdt = findViewById(R.id.ifttt_email);
-        emailEdt.setTypeface(demiTypeface);
+        emailEdt.setTypeface(mediumTypeface);
         Drawable emailBackground = ButtonUiHelper.buildButtonBackground(context,
                 ContextCompat.getColor(getContext(), R.color.ifttt_email_background_color));
         emailEdt.setBackground(emailBackground);
@@ -243,7 +243,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             // Workaround: TextSwitcher is looking for the View's LayoutParams to be a FrameLayout.LayoutParams. So
             // set one up here so that it doesn't complain.
             textView.setLayoutParams(new FrameLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
-            textView.setTypeface(demiTypeface);
+            textView.setTypeface(mediumTypeface);
             return textView;
         });
         helperTxt.setInAnimation(context, R.anim.ifttt_helper_text_in);
@@ -592,6 +592,9 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                 public void onAnimationStart(Animator animation) {
                     iconImg.setBackground(drawable);
                     drawable.setBackgroundColor(worksWithService.brandColor);
+
+                    // Set elevation.
+                    ViewCompat.setElevation(iconImg, getResources().getDimension(R.dimen.ifttt_icon_elevation));
                 }
             });
 
@@ -655,8 +658,8 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             });
         }
 
-        ValueAnimator iconElevation =
-                ValueAnimator.ofFloat(0f, getResources().getDimension(R.dimen.ifttt_icon_elevation));
+        ValueAnimator iconElevation = ValueAnimator.ofFloat(ViewCompat.getElevation(iconImg),
+                getResources().getDimension(R.dimen.ifttt_icon_elevation));
         iconElevation.setDuration(ANIM_DURATION_MEDIUM);
         iconElevation.setInterpolator(EASE_INTERPOLATOR);
         iconElevation.addUpdateListener(
@@ -723,6 +726,9 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         } else {
             progressTxt.setText(R.string.ifttt_validating_email);
         }
+
+        // Remove icon elevation when the progress bar is visible.
+        ViewCompat.setElevation(iconImg, 0f);
 
         Animator showProgressText = getTextTransitionAnimator(progressTxt, Appear, null);
 
@@ -833,8 +839,15 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             }
         });
 
+        // Adjust icon elevation.
+        float startButtonElevation =
+                onDarkBackground ? getResources().getDimension(R.dimen.ifttt_start_icon_elevation_dark_mode) : 0f;
+        ValueAnimator elevationChange = ValueAnimator.ofFloat(ViewCompat.getElevation(iconImg), startButtonElevation);
+        elevationChange.addUpdateListener(
+                animation -> ViewCompat.setElevation(iconImg, (Float) animation.getAnimatedValue()));
+
         AnimatorSet set = new AnimatorSet();
-        set.playTogether(fadeOutConnect, fadeInEmailEdit, slideIcon);
+        set.playTogether(fadeOutConnect, fadeInEmailEdit, slideIcon, elevationChange);
 
         // Morph service icon into the start button.
         if (iconImg.getBackground() != null) {

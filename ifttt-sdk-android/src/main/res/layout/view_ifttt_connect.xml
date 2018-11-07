@@ -7,8 +7,7 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/connect_button_height"
         android:clipChildren="false"
-        android:clipToPadding="false"
-        android:elevation="@dimen/ifttt_connect_button_elevation">
+        android:clipToPadding="false">
 
         <FrameLayout
             android:id="@+id/ifttt_toggle_root"
@@ -25,8 +24,8 @@
                 android:background="@color/ifttt_email_background_color"
                 android:hint="@string/ifttt_email"
                 android:inputType="textEmailAddress"
-                android:paddingEnd="76dp"
-                android:paddingStart="16dp"
+                android:paddingEnd="@dimen/connect_text_padding_horizontal"
+                android:paddingStart="32dp"
                 android:textColor="@android:color/black"
                 android:textColorHint="@color/ifttt_email_hint_text_color"
                 android:visibility="gone"/>
