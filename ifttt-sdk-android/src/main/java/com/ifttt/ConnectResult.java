@@ -79,7 +79,7 @@ public final class ConnectResult implements Parcelable {
         }
 
         String nextStepParam = data.getQueryParameter("next_step");
-        if ("service_connection".equals(nextStepParam)) {
+        if ("service_authentication".equals(nextStepParam)) {
             String serviceId = data.getQueryParameter("service_id");
             if (serviceId == null || serviceId.length() == 0) {
                 return new ConnectResult(Unknown, null, null);
