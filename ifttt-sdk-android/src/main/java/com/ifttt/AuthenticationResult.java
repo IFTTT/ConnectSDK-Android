@@ -62,6 +62,10 @@ public final class AuthenticationResult implements Parcelable {
      * will be non-null, and the value is the service id to be connected next.
      */
     @Nullable public final String serviceId;
+
+    /**
+     * Additional information when {@link #nextStep} is {@link NextStep#Error}. In other cases this field is null.
+     */
     @Nullable public final String errorType;
 
     /**
