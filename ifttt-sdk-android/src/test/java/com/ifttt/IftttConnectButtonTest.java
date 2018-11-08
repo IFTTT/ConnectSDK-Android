@@ -26,7 +26,6 @@ import static com.google.common.truth.Truth.assertThat;
 @RunWith(RobolectricTestRunner.class)
 public final class IftttConnectButtonTest {
 
-    private final Activity activity = Robolectric.setupActivity(TestActivity.class);
     private final Moshi moshi = new Moshi.Builder().add(Date.class, new Rfc3339DateJsonAdapter().nullSafe())
             .add(new AppletJsonAdapter())
             .add(new TestHexColorJsonAdapter())
@@ -37,7 +36,8 @@ public final class IftttConnectButtonTest {
 
     @Before
     public void setUp() throws Exception {
-        button = new IftttConnectButton(activity);
+        Activity activity = Robolectric.setupActivity(TestActivity.class);
+        button = activity.findViewById(R.id.ifttt_connect_button_test);
     }
 
     @Test
