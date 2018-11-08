@@ -92,6 +92,8 @@ The APIs available are:
 * `user`: return the authenticated user.
 * `userToken`: given the user's OAuth token to your service, plus your IFTTT Service key, return the IFTTT user token.
 
+For more details about authentication level in IFTTT API and the SDK, please go to the following Authentication section.
+
 ## Authentication
 The SDK supports two different types of API authentication: anonymous and user authentication. 
 
@@ -125,7 +127,7 @@ Content-Type: application/json
   "token": "{{token}}"
 }
 ```
-The request body must contains a `token`, which is **the OAuth access token that you issued to IFTTT on behalf of this user** when they connected their IFTTT account to your service.
+The request body must contain a `token`, which is **the OAuth access token that you issued to IFTTT on behalf of this user** when they connected their IFTTT account to your service.
 
 Once you have the user token, pass it to the `IftttApiClient#setUserToken` method, and all of the subsequent requests will be user authenticated.
 
@@ -136,7 +138,7 @@ The `IftttApiClient` also wraps the above API call in `IftttApi#userToken(String
 If your service has not yet been published on IFTTT, you should provide the invite code to the `IftttApiClient` to the SDK for full access to the IFTTT API. You can find your invite code under [**Invite URL** on the Service tab](https://platform.ifttt.com/mkt/general) on the IFTTT platform.
 
 ## Connection and Service data structure
-The SDK provides the basic data structure for the data returned from the IFTTT API: Connection, Service and User. It also includes a few utility methods and tweaks for easier development. Some example fields that we provides are
+The SDK provides the basic data structure for the data returned from the IFTTT API: Connection, Service and User. It also includes a few utility methods and tweaks for easier development. Some example fields that we provide are
 * Connection:
 	* id
 	* title
