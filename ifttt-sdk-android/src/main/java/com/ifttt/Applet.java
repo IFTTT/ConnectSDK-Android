@@ -2,6 +2,7 @@ package com.ifttt;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import com.ifttt.ui.IftttConnectButton;
 import java.util.Date;
 import java.util.List;
 import javax.annotation.Nullable;
@@ -56,11 +57,20 @@ public final class Applet implements Parcelable {
      * date when the Applet last ran, can be null if the Applet is not activated for the user or it has never run.
      */
     @Nullable public final Date lastRunAt;
+
+    /**
+     * URL string that links to the owner service's website.
+     */
     public final String url;
     public final List<Service> services;
 
+    /**
+     * URL string that links to this Applet's authentication flow. This value should not be used on its own, and the
+     * Applet authentication flow should be handled by {@link IftttConnectButton}.
+     */
     public final String embeddedUrl;
 
+    // Cached primary service object.
     @Nullable private Service primaryService;
 
     public Applet(String id, String name, String description, Status status, @Nullable Date publishedAt,

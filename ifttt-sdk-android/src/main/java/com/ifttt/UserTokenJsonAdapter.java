@@ -10,6 +10,9 @@ import java.lang.annotation.Retention;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+/**
+ * JSON adapter for parsing user token.
+ */
 final class UserTokenJsonAdapter {
     @Retention(RUNTIME)
     @JsonQualifier

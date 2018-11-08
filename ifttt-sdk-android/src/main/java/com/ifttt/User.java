@@ -6,7 +6,7 @@ import com.squareup.moshi.Json;
 import javax.annotation.Nullable;
 
 /**
- * Data structure for a user from {@link UserApi#user()}.
+ * Data structure for a user.
  */
 public final class User implements Parcelable {
 
