@@ -24,8 +24,6 @@ Android SDK version 19 or higher.
 To get started, after setting up the dependency, you can instantiate an `IftttApiClient` and add an `IftttConnectButton` to show your users the UI for a Connection. For example, in your Activity,
 
 ```java
-
-
 IftttApiClient iftttApiClient = new IftttApiClient.Builder().build()
 OAuthCodeProvider provider = new OAuthCodeProvider() {
 	@Override
