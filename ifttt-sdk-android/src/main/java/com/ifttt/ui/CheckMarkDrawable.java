@@ -24,6 +24,7 @@ final class CheckMarkDrawable extends Drawable {
     private static final long ANIM_CHECK_MARK_DURATION = 600L;
     private static final long ANIM_SCALE_DURATION = 400L;
     private static final long ANIM_PATH_SCALE_DOWN_START_DELAY = 300L;
+    private static final float CHECK_MARK_SCALE = 0.8f;
 
     private final Paint circlePaint;
     private final Paint dotPaint;
@@ -60,7 +61,7 @@ final class CheckMarkDrawable extends Drawable {
 
     @Override
     public void draw(Canvas canvas) {
-        canvas.save();
+        int count = canvas.save();
         int radius = checkMarkSize / 2;
         int cx = getBounds().width() / 2;
         int cy = getBounds().height() / 2;
@@ -68,6 +69,8 @@ final class CheckMarkDrawable extends Drawable {
 
         canvas.drawCircle(cx, cy, radius, circlePaint);
 
+        // Scale down the check mark without changing the path.
+        canvas.scale(CHECK_MARK_SCALE, CHECK_MARK_SCALE, cx, cy);
         if (drawCheckMark) {
             canvas.drawPath(checkMarkPath, checkMarkPaint);
         } else {
@@ -78,7 +81,7 @@ final class CheckMarkDrawable extends Drawable {
             canvas.drawCircle(dotPos[0], dotPos[1], 5f, dotPaint);
         }
 
-        canvas.restore();
+        canvas.restoreToCount(count);
     }
 
     @Override

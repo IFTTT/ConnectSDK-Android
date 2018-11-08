@@ -66,6 +66,7 @@ import static com.ifttt.ui.ButtonUiHelper.buildStateListButtonBackground;
 import static com.ifttt.ui.ButtonUiHelper.getDarkerColor;
 import static com.ifttt.ui.ButtonUiHelper.getTextTransitionAnimator;
 import static com.ifttt.ui.ButtonUiHelper.replaceKeyWithImage;
+import static com.ifttt.ui.ButtonUiHelper.setConnectStateText;
 import static com.ifttt.ui.ButtonUiHelper.setTextSwitcherText;
 import static com.ifttt.ui.IftttConnectButton.ButtonState.CreateAccount;
 import static com.ifttt.ui.IftttConnectButton.ButtonState.Enabled;
@@ -109,13 +110,8 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         Enabled
     }
 
-    private static final ErrorResponse INVALID_EMAIL = new ErrorResponse("invalid_email", "Invalid email address");
     private static final ErrorResponse CANCELED_AUTH = new ErrorResponse("canceled", "Authentication canceled");
     private static final ErrorResponse UNKNOWN_STATE = new ErrorResponse("unknown_state", "Cannot verify Button state");
-
-    // Max length for the main text in the button. If the text plus service name is longer than this, we will only
-    // render the text.
-    private static final int MAX_LENGTH = 25;
 
     private static final float FADE_OUT_PROGRESS = 0.3f;
     private static final float FADE_IN_PROGRESS = 0.6f;
@@ -128,7 +124,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
     private static final LinearInterpolator LINEAR_INTERPOLATOR = new LinearInterpolator();
     private static final FastOutSlowInInterpolator EASE_INTERPOLATOR = new FastOutSlowInInterpolator();
 
-    private static final String AVENIR_DEMI = "avenir_next_ltpro_demi.otf";
+    private static final String AVENIR_MEDIUM = "avenir_next_ltpro_medium.otf";
     private static final String AVENIR_BOLD = "avenir_next_ltpro_bold.otf";
 
     private static final ArgbEvaluator EVALUATOR = new ArgbEvaluator();
@@ -137,10 +133,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         @Override
         public void onSuccess(Applet result) {
             String connectText = getResources().getString(R.string.ifttt_connect_to, worksWithService.name);
-            if (connectText.length() > MAX_LENGTH) {
-                connectText = getResources().getString(R.string.ifttt_connect);
-            }
-
+            setConnectStateText(connectStateTxt, connectText, getResources().getString(R.string.ifttt_connect));
             setTextSwitcherText(helperTxt, poweredByIfttt);
 
             Animator connectTextReset = getTextTransitionAnimator(connectStateTxt, Change, connectText);
@@ -223,11 +216,11 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
 
         inflate(context, R.layout.view_ifttt_connect, this);
 
-        Typeface demiTypeface = Typeface.createFromAsset(context.getAssets(), AVENIR_DEMI);
+        Typeface mediumTypeface = Typeface.createFromAsset(context.getAssets(), AVENIR_MEDIUM);
         Typeface boldTypeface = Typeface.createFromAsset(context.getAssets(), AVENIR_BOLD);
 
         emailEdt = findViewById(R.id.ifttt_email);
-        emailEdt.setTypeface(demiTypeface);
+        emailEdt.setTypeface(mediumTypeface);
         Drawable emailBackground = ButtonUiHelper.buildButtonBackground(context,
                 ContextCompat.getColor(getContext(), R.color.ifttt_email_background_color));
         emailEdt.setBackground(emailBackground);
@@ -243,7 +236,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             // Workaround: TextSwitcher is looking for the View's LayoutParams to be a FrameLayout.LayoutParams. So
             // set one up here so that it doesn't complain.
             textView.setLayoutParams(new FrameLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
-            textView.setTypeface(demiTypeface);
+            textView.setTypeface(mediumTypeface);
             return textView;
         });
         helperTxt.setInAnimation(context, R.anim.ifttt_helper_text_in);
@@ -549,12 +542,9 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         if (applet.status != Applet.Status.enabled) {
             recordState(Initial);
 
-            String signInText = getResources().getString(R.string.ifttt_connect_to, worksWithService.name);
-            if (signInText.length() > MAX_LENGTH) {
-                connectStateTxt.setText(R.string.ifttt_connect);
-            } else {
-                connectStateTxt.setText(signInText);
-            }
+            setConnectStateText(connectStateTxt,
+                    getResources().getString(R.string.ifttt_connect_to, worksWithService.name),
+                    getResources().getString(R.string.ifttt_connect));
 
             helperTxt.setClickable(true);
             iconDragHelperCallback.setDragEnabled(false);
@@ -592,6 +582,9 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                 public void onAnimationStart(Animator animation) {
                     iconImg.setBackground(drawable);
                     drawable.setBackgroundColor(worksWithService.brandColor);
+
+                    // Set elevation.
+                    ViewCompat.setElevation(iconImg, getResources().getDimension(R.dimen.ifttt_icon_elevation));
                 }
             });
 
@@ -655,8 +648,8 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             });
         }
 
-        ValueAnimator iconElevation =
-                ValueAnimator.ofFloat(0f, getResources().getDimension(R.dimen.ifttt_icon_elevation));
+        ValueAnimator iconElevation = ValueAnimator.ofFloat(ViewCompat.getElevation(iconImg),
+                getResources().getDimension(R.dimen.ifttt_icon_elevation));
         iconElevation.setDuration(ANIM_DURATION_MEDIUM);
         iconElevation.setInterpolator(EASE_INTERPOLATOR);
         iconElevation.addUpdateListener(
@@ -723,6 +716,9 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         } else {
             progressTxt.setText(R.string.ifttt_validating_email);
         }
+
+        // Remove icon elevation when the progress bar is visible.
+        ViewCompat.setElevation(iconImg, 0f);
 
         Animator showProgressText = getTextTransitionAnimator(progressTxt, Appear, null);
 
@@ -833,8 +829,15 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             }
         });
 
+        // Adjust icon elevation.
+        float startButtonElevation =
+                onDarkBackground ? getResources().getDimension(R.dimen.ifttt_start_icon_elevation_dark_mode) : 0f;
+        ValueAnimator elevationChange = ValueAnimator.ofFloat(ViewCompat.getElevation(iconImg), startButtonElevation);
+        elevationChange.addUpdateListener(
+                animation -> ViewCompat.setElevation(iconImg, (Float) animation.getAnimatedValue()));
+
         AnimatorSet set = new AnimatorSet();
-        set.playTogether(fadeOutConnect, fadeInEmailEdit, slideIcon);
+        set.playTogether(fadeOutConnect, fadeInEmailEdit, slideIcon, elevationChange);
 
         // Morph service icon into the start button.
         if (iconImg.getBackground() != null) {
@@ -849,10 +852,6 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             @Override
             void doClick(View v) {
                 if (ButtonUiHelper.isEmailInvalid(emailEdt.getText())) {
-                    if (buttonStateChangeListener != null) {
-                        buttonStateChangeListener.onError(INVALID_EMAIL);
-                    }
-
                     setTextSwitcherText(helperTxt, getResources().getString(R.string.ifttt_enter_valid_email));
                     return;
                 }
@@ -889,12 +888,8 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
      */
     private Animator getServiceConnectionAnimator(Service service) {
         buttonRoot.setBackground(buildButtonBackground(getContext(), service.brandColor));
-        String connectText = getResources().getString(R.string.ifttt_sign_in_to, service.name);
-        if (connectText.length() > MAX_LENGTH) {
-            connectStateTxt.setText(R.string.ifttt_sign_in);
-        } else {
-            connectStateTxt.setText(connectText);
-        }
+        setConnectStateText(connectStateTxt, getResources().getString(R.string.ifttt_sign_in_to, service.name),
+                getResources().getString(R.string.ifttt_sign_in));
         buttonRoot.setOnClickListener(new DebouncingOnClickListener() {
             @Override
             void doClick(View v) {
