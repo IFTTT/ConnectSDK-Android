@@ -110,7 +110,6 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         Enabled
     }
 
-    private static final ErrorResponse INVALID_EMAIL = new ErrorResponse("invalid_email", "Invalid email address");
     private static final ErrorResponse CANCELED_AUTH = new ErrorResponse("canceled", "Authentication canceled");
     private static final ErrorResponse UNKNOWN_STATE = new ErrorResponse("unknown_state", "Cannot verify Button state");
 
@@ -853,10 +852,6 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             @Override
             void doClick(View v) {
                 if (ButtonUiHelper.isEmailInvalid(emailEdt.getText())) {
-                    if (buttonStateChangeListener != null) {
-                        buttonStateChangeListener.onError(INVALID_EMAIL);
-                    }
-
                     setTextSwitcherText(helperTxt, getResources().getString(R.string.ifttt_enter_valid_email));
                     return;
                 }
