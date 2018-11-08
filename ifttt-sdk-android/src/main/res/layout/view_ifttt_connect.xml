@@ -40,6 +40,7 @@
                 android:paddingEnd="@dimen/connect_text_padding_horizontal"
                 android:paddingStart="@dimen/connect_text_padding_horizontal"
                 android:paddingTop="8dp"
+                android:textSize="@dimen/ifttt_connect_text_size"
                 android:textColor="@android:color/white"/>
 
             <ImageButton
