@@ -13,8 +13,8 @@ public final class Service implements Parcelable {
     @Json(name = "service_name") public final String name;
 
     /**
-     * A primary service's triggers or actions don't have to be used in the Applet, it can also be the owner service.
-     * One use case of the primary service is to display the branding for this Applet.
+     * A primary service's triggers or actions don't have to be used in the Connection, it can also be the owner service.
+     * One use case of the primary service is to display the branding for this Connection.
      */
     @Json(name = "is_primary") public final boolean isPrimary;
 

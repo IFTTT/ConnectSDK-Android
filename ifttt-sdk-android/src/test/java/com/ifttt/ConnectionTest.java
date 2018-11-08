@@ -15,32 +15,32 @@ import org.junit.runners.JUnit4;
 import static com.google.common.truth.Truth.assertThat;
 
 @RunWith(JUnit4.class)
-public final class AppletTest {
+public final class ConnectionTest {
 
     private final Moshi moshi = new Moshi.Builder().add(Date.class, new Rfc3339DateJsonAdapter().nullSafe())
             .add(new TestHexColorJsonAdapter())
-            .add(new AppletJsonAdapter())
+            .add(new ConnectionJsonAdapter())
             .build();
-    private final JsonAdapter<Applet> adapter = moshi.adapter(Applet.class);
+    private final JsonAdapter<Connection> adapter = moshi.adapter(Connection.class);
 
-    private Applet applet;
+    private Connection connection;
 
     @Before
     public void setUp() throws Exception {
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("applet.json");
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("connection.json");
         JsonReader jsonReader = JsonReader.of(Okio.buffer(Okio.source(inputStream)));
-        applet = adapter.fromJson(jsonReader);
+        connection = adapter.fromJson(jsonReader);
     }
 
     @Test
-    public void testAppletDeserialization() throws Exception {
-        assertThat(applet.status).isNotNull();
-        assertThat(applet.status).isEqualTo(Applet.Status.unknown);
+    public void testConnection() throws Exception {
+        assertThat(connection.status).isNotNull();
+        assertThat(connection.status).isEqualTo(Connection.Status.unknown);
     }
 
     @Test
     public void testPrimaryService() {
-        assertThat(applet.getPrimaryService()).isNotNull();
-        assertThat(applet.getPrimaryService().id).isEqualTo("instagram");
+        assertThat(connection.getPrimaryService()).isNotNull();
+        assertThat(connection.getPrimaryService().id).isEqualTo("instagram");
     }
 }

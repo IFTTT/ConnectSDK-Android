@@ -15,7 +15,7 @@
     <string name="ifttt_sign_in">Sign in</string>
     <string name="ifttt_connected">Connected</string>
     <string name="ifttt_connecting_account">Connecting account…</string>
-    <string name="ifttt_applet_off">Off</string>
+    <string name="ifttt_connection_off">Off</string>
     <string name="ifttt_sign_in_to_ifttt_or_create_new_account">Sign in to IFTTT or create a new account</string>
     <string name="ifttt_using_email">Using %1$s\n <u>Use a different email</u></string>
     <string name="ifttt_connect_services_description">Sign in to connect %1$s with %2$s</string>

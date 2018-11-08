@@ -17,12 +17,12 @@ public final class ApiPendingResultTest {
 
     @Test
     public void testExecution() {
-        ApiPendingResult<Applet> pendingResult = new ApiPendingResult<>(Calls.<Applet>failure(new IOException()),
+        ApiPendingResult<Connection> pendingResult = new ApiPendingResult<>(Calls.<Connection>failure(new IOException()),
                 new Moshi.Builder().build().adapter(ErrorResponse.class));
         final AtomicReference<ErrorResponse> errorResponseAtomicReference = new AtomicReference<>();
-        pendingResult.execute(new PendingResult.ResultCallback<Applet>() {
+        pendingResult.execute(new PendingResult.ResultCallback<Connection>() {
             @Override
-            public void onSuccess(Applet result) {
+            public void onSuccess(Connection result) {
                 fail();
             }
 

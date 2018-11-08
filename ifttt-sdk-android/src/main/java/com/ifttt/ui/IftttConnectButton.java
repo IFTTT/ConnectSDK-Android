@@ -41,8 +41,8 @@ import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LifecycleRegistry;
-import com.ifttt.Applet;
-import com.ifttt.AuthenticationResult;
+import com.ifttt.ConnectResult;
+import com.ifttt.Connection;
 import com.ifttt.ErrorResponse;
 import com.ifttt.IftttApiClient;
 import com.ifttt.R;
@@ -58,7 +58,7 @@ import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 import static androidx.lifecycle.Lifecycle.State.CREATED;
 import static androidx.lifecycle.Lifecycle.State.DESTROYED;
 import static androidx.lifecycle.Lifecycle.State.STARTED;
-import static com.ifttt.Applet.Status.enabled;
+import static com.ifttt.Connection.Status.enabled;
 import static com.ifttt.ui.ButtonUiHelper.TextTransitionType.Appear;
 import static com.ifttt.ui.ButtonUiHelper.TextTransitionType.Change;
 import static com.ifttt.ui.ButtonUiHelper.buildButtonBackground;
@@ -72,7 +72,7 @@ import static com.ifttt.ui.IftttConnectButton.ButtonState.CreateAccount;
 import static com.ifttt.ui.IftttConnectButton.ButtonState.Enabled;
 import static com.ifttt.ui.IftttConnectButton.ButtonState.Initial;
 import static com.ifttt.ui.IftttConnectButton.ButtonState.Login;
-import static com.ifttt.ui.IftttConnectButton.ButtonState.ServiceConnection;
+import static com.ifttt.ui.IftttConnectButton.ButtonState.ServiceAuthentication;
 
 /**
  *
@@ -81,7 +81,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
 
     public enum ButtonState {
         /**
-         * A button state for displaying an Applet in its initial state, the user has never authenticated this Applet
+         * A button state for displaying an Connection in its initial state, the user has never authenticated this Connection
          * before.
          */
         Initial,
@@ -102,10 +102,10 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
          * A button state for service connection step. In this step, the user is going to be redirected to web to
          * login to the service and connect to IFTTT.
          */
-        ServiceConnection,
+        ServiceAuthentication,
 
         /**
-         * A button state for displaying an Applet that is enabled.
+         * A button state for displaying an Connection that is enabled.
          */
         Enabled
     }
@@ -129,9 +129,9 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
 
     private static final ArgbEvaluator EVALUATOR = new ArgbEvaluator();
 
-    private final ResultCallback<Applet> appletResultCallback = new ResultCallback<Applet>() {
+    private final ResultCallback<Connection> connectionResultCallback = new ResultCallback<Connection>() {
         @Override
-        public void onSuccess(Applet result) {
+        public void onSuccess(Connection result) {
             String connectText = getResources().getString(R.string.ifttt_connect_to, worksWithService.name);
             setConnectStateText(connectStateTxt, connectText, getResources().getString(R.string.ifttt_connect));
             setTextSwitcherText(helperTxt, poweredByIfttt);
@@ -140,7 +140,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             connectTextReset.addListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    setApplet(result);
+                    setConnection(result);
                 }
             });
 
@@ -159,7 +159,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
 
     // Spannable text that replaces the text "IFTTT" with IFTTT logo.
     private final SpannableString poweredByIfttt;
-    private final CharSequence manageApplets;
+    private final CharSequence manageConnection;
     private final Drawable iftttLogo;
 
     private final EditText emailEdt;
@@ -180,7 +180,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
     private boolean isUserAuthenticated = false;
 
     private ButtonState buttonState = Initial;
-    private Applet applet;
+    private Connection connection;
     private Service worksWithService;
 
     @Nullable private ButtonStateChangeListener buttonStateChangeListener;
@@ -249,14 +249,13 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                 getResources().getString(R.string.ifttt_powered_by_ifttt), "IFTTT", iftttLogo));
         poweredByIfttt.setSpan(new AvenirTypefaceSpan(boldTypeface), 0, poweredByIfttt.length(),
                 Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-        manageApplets = replaceKeyWithImage((TextView) helperTxt.getCurrentView(),
+        manageConnection = replaceKeyWithImage((TextView) helperTxt.getCurrentView(),
                 getResources().getString(R.string.ifttt_all_set), "IFTTT", iftttLogo);
 
         helperTxt.setOnClickListener(new DebouncingOnClickListener() {
             @Override
             void doClick(View v) {
-                getContext().startActivity(IftttAboutActivity.intent(context, applet));
+                getContext().startActivity(IftttAboutActivity.intent(context, connection));
             }
         });
 
@@ -322,7 +321,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
 
     @Override
     protected Parcelable onSaveInstanceState() {
-        return new SavedState(super.onSaveInstanceState(), buttonState, applet);
+        return new SavedState(super.onSaveInstanceState(), buttonState, connection);
     }
 
     @Override
@@ -331,7 +330,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         super.onRestoreInstanceState(savedState.superState);
 
         this.buttonState = savedState.buttonState;
-        setApplet(savedState.applet);
+        setConnection(savedState.connection);
     }
 
     @NonNull
@@ -341,7 +340,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
     }
 
     /**
-     * Enable the Connect Button's Applet authentication and configuration features with an {@link IftttApiClient}
+     * Enable the Connect Button's Connection authentication and configuration features with an {@link IftttApiClient}
      * instance and a user email.
      *
      * Note:
@@ -349,13 +348,13 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
      * - User email is a required parameter, the Button will crash if the value is not a valid email in DEBUG build.
      *
      * @param iftttApiClient IftttApiClient instance.
-     * @param email This is used to pre-fill the email EditText when the user is doing Applet authentication.
-     * @param redirectUrl URL string that will be used when the Applet authentication flow is completed on web view, in
+     * @param email This is used to pre-fill the email EditText when the user is doing Connection authentication.
+     * @param redirectUri URL string that will be used when the Connection authentication flow is completed on web view, in
      * order to return the result to the app.
      * @param oAuthCodeProvider OAuthCodeProvider implementation that returns your user's OAuth code. The code will be
      * used to automatically connect your service on IFTTT for this user.
      */
-    public void setup(String email, IftttApiClient iftttApiClient, String redirectUrl,
+    public void setup(String email, IftttApiClient iftttApiClient, String redirectUri,
             OAuthCodeProvider oAuthCodeProvider) {
         if (ButtonUiHelper.isEmailInvalid(email)) {
             // Crash in debug build to inform developers.
@@ -367,14 +366,14 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             throw new IllegalStateException("OAuth token provider cannot be null.");
         }
 
-        buttonApiHelper = new ButtonApiHelper(iftttApiClient, redirectUrl, oAuthCodeProvider, getLifecycle());
+        buttonApiHelper = new ButtonApiHelper(iftttApiClient, redirectUri, oAuthCodeProvider, getLifecycle());
         isUserAuthenticated = iftttApiClient.isUserAuthenticated();
         emailEdt.setText(email);
     }
 
     /**
      * If the button is used in a dark background, set this flag to true so that the button can adapt the UI. This
-     * method must be called before {@link #setApplet(Applet)} to apply the change.
+     * method must be called before {@link #setConnection(Connection)} to apply the change.
      *
      * @param onDarkBackground True if the button is used in a dark background, false otherwise.
      */
@@ -390,12 +389,12 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
     }
 
     /**
-     * Given an {@link AuthenticationResult} from web redirect, refresh the UI of the button to reflect the current
-     * state of the Applet authentication flow.
+     * Given an {@link ConnectResult} from web redirect, refresh the UI of the button to reflect the current
+     * state of the Connection authentication flow.
      *
      * @param result Authentication flow redirect result from the web view.
      */
-    public void setAuthenticationResult(AuthenticationResult result) {
+    public void setConnectResult(ConnectResult result) {
         if (activityLifecycleCallbacks != null) {
             // Unregister existing ActivityLifecycleCallbacks and let the AuthenticationResult handle the button
             // state change.
@@ -404,7 +403,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         }
 
         switch (result.nextStep) {
-            case ServiceConnection:
+            case ServiceAuthentication:
                 if (buttonState == Login) {
                     // If the previous state is Login, continue the progress to finish.
                     Animator completeEmailValidation = getCompleteEmailValidationAnimator();
@@ -432,7 +431,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                 } else {
                     // If the previous state is service connection, finish it with a progress bar. Otherwise finish
                     // with only the check mark.
-                    Animator animator = buttonState == ServiceConnection ? getServiceConnectingAnimator(
+                    Animator animator = buttonState == ServiceAuthentication ? getServiceConnectingAnimator(
                             getResources().getString(R.string.ifttt_connecting_account)) : getCheckMarkAnimator();
                     animator.addListener(new AnimatorListenerAdapter() {
                         @Override
@@ -456,7 +455,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                     animator.start();
                 }
 
-                recordState(ServiceConnection);
+                recordState(ServiceAuthentication);
                 break;
             case Complete:
                 Animator authenticatedAnimator = getAuthenticatedAnimator();
@@ -484,13 +483,13 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
     }
 
     /**
-     * Render the Connect Button to show the status of the Applet.
+     * Render the Connect Button to show the status of the Connection.
      *
-     * @param applet Applet instance to be displayed.
+     * @param connection Connection instance to be displayed.
      */
-    public void setApplet(Applet applet) {
-        this.applet = applet;
-        worksWithService = findWorksWithService(applet);
+    public void setConnection(Connection connection) {
+        this.connection = connection;
+        worksWithService = findWorksWithService(connection);
 
         // Initialize UI.
         ObjectAnimator fadeInButtonRoot = ObjectAnimator.ofFloat(buttonRoot, "alpha", 0f, 1f);
@@ -529,8 +528,8 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
 
             @Override
             public void onAnimationEnd(Animator animation) {
-                if (applet.status == enabled) {
-                    setTextSwitcherText(helperTxt, manageApplets);
+                if (connection.status == enabled) {
+                    setTextSwitcherText(helperTxt, manageConnection);
                 } else {
                     setTextSwitcherText(helperTxt, poweredByIfttt);
                 }
@@ -539,7 +538,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         fadeInButtonRoot.start();
 
         final Context context = getContext();
-        if (applet.status != Applet.Status.enabled) {
+        if (connection.status != Connection.Status.enabled) {
             recordState(Initial);
 
             setConnectStateText(connectStateTxt,
@@ -555,7 +554,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             iconImg.setOnClickListener(null);
 
             CharSequence enabledText = getResources().getText(R.string.ifttt_connected);
-            CharSequence disabledText = getResources().getText(R.string.ifttt_applet_off);
+            CharSequence disabledText = getResources().getText(R.string.ifttt_connection_off);
             iconDragHelperCallback.setDragEnabled(true);
             iconDragHelperCallback.setTexts(enabledText, disabledText);
 
@@ -592,7 +591,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         });
 
         // Warm up icon image cache.
-        for (Service service : applet.services) {
+        for (Service service : connection.services) {
             if (service.id.equals(worksWithService.id)) {
                 continue;
             }
@@ -600,12 +599,12 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             ImageLoader.get().fetch(getLifecycle(), service.monochromeIconUrl);
         }
 
-        // Move the icon to the right if the Applet has already been authenticated and enabled.
+        // Move the icon to the right if the Connection has already been authenticated and enabled.
         FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) iconImg.getLayoutParams();
-        lp.gravity = applet.status == enabled ? Gravity.END : Gravity.START;
+        lp.gravity = connection.status == enabled ? Gravity.END : Gravity.START;
         iconImg.setLayoutParams(lp);
 
-        if (applet.status == enabled) {
+        if (connection.status == enabled) {
             buttonRoot.setOnClickListener(new DebouncingOnClickListener() {
                 @Override
                 void doClick(View v) {
@@ -686,7 +685,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             public void onAnimationEnd(Animator animation) {
                 recordState(Enabled);
 
-                setTextSwitcherText(helperTxt, manageApplets);
+                setTextSwitcherText(helperTxt, manageConnection);
                 helperTxt.setOnClickListener(new DebouncingOnClickListener() {
                     @Override
                     void doClick(View v) {
@@ -694,9 +693,9 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                     }
                 });
 
-                // After the applet has been authenticated, temporarily disable toggling feature until the new Applet
+                // After the connection has been authenticated, temporarily disable toggling feature until the new Connection
                 // object has been set.
-                if (applet.status != enabled) {
+                if (connection.status != enabled) {
                     buttonRoot.setClickable(false);
                     iconImg.setClickable(false);
                 }
@@ -775,7 +774,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                     createAccountCompleteSet.start();
                 } else {
                     recordState(Login);
-                    buttonApiHelper.redirectToWeb(getContext(), applet, emailEdt.getText().toString(), buttonState);
+                    buttonApiHelper.redirectToWeb(getContext(), connection, emailEdt.getText().toString(), buttonState);
                     monitorRedirect();
                 }
             }
@@ -803,7 +802,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
     }
 
     /**
-     * Start the animation for Applet authentication.
+     * Start the animation for Connection authentication.
      */
     private void animateToEmailField() {
         setTextSwitcherText(helperTxt, getResources().getString(R.string.ifttt_sign_in_to_ifttt_or_create_new_account));
@@ -893,7 +892,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         buttonRoot.setOnClickListener(new DebouncingOnClickListener() {
             @Override
             void doClick(View v) {
-                buttonApiHelper.redirectToWeb(getContext(), applet, emailEdt.getText().toString(), buttonState);
+                buttonApiHelper.redirectToWeb(getContext(), connection, emailEdt.getText().toString(), buttonState);
                 monitorRedirect();
             }
         });
@@ -918,7 +917,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             public void onAnimationStart(Animator animation) {
                 setTextSwitcherText(helperTxt,
                         getResources().getString(R.string.ifttt_connect_services_description, service.name,
-                                applet.getPrimaryService().name));
+                                connection.getPrimaryService().name));
             }
         });
 
@@ -1013,9 +1012,9 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         return set;
     }
 
-    private Service findWorksWithService(Applet applet) {
+    private Service findWorksWithService(Connection connection) {
         Service otherService = null;
-        for (Service service : applet.services) {
+        for (Service service : connection.services) {
             if (!service.isPrimary) {
                 otherService = service;
                 break;
@@ -1023,7 +1022,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         }
 
         if (otherService == null) {
-            throw new IllegalStateException("There is no primary service for this Applet.");
+            throw new IllegalStateException("There is no primary service for this Connection.");
         }
 
         return otherService;
@@ -1059,7 +1058,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         }
 
         // Reset the button state.
-        setApplet(applet);
+        setConnection(connection);
     }
 
     private void monitorRedirect() {
@@ -1092,10 +1091,10 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
     }
 
     @Nullable
-    private Service findNextServiceToConnect(AuthenticationResult result) {
+    private Service findNextServiceToConnect(ConnectResult result) {
         // Find the next service to connect.
         Service nextService = null;
-        for (Service service : applet.services) {
+        for (Service service : connection.services) {
             if (service.id.equals(result.serviceId)) {
                 nextService = service;
                 break;
@@ -1165,7 +1164,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                         if (viewDragHelper.continueSettling(false)) {
                             post(this);
                         } else {
-                            buttonApiHelper.disableApplet(applet.id, appletResultCallback);
+                            buttonApiHelper.disableConnection(connection.id, connectionResultCallback);
                         }
                     }
                 };
@@ -1182,7 +1181,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                         if (viewDragHelper.continueSettling(false)) {
                             post(this);
                         } else {
-                            setTextSwitcherText(helperTxt, manageApplets);
+                            setTextSwitcherText(helperTxt, manageConnection);
                         }
                     }
                 };
@@ -1195,25 +1194,25 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
     private static final class SavedState implements Parcelable {
         @Nullable final Parcelable superState;
         final ButtonState buttonState;
-        final Applet applet;
+        final Connection connection;
 
-        SavedState(@Nullable Parcelable superState, ButtonState buttonState, Applet applet) {
+        SavedState(@Nullable Parcelable superState, ButtonState buttonState, Connection connection) {
             this.superState = superState;
             this.buttonState = buttonState;
-            this.applet = applet;
+            this.connection = connection;
         }
 
         protected SavedState(Parcel in) {
             superState = in.readParcelable(IftttConnectButton.class.getClassLoader());
             buttonState = (ButtonState) in.readSerializable();
-            applet = in.readParcelable(Applet.class.getClassLoader());
+            connection = in.readParcelable(Connection.class.getClassLoader());
         }
 
         @Override
         public void writeToParcel(Parcel dest, int flags) {
             dest.writeParcelable(superState, flags);
             dest.writeSerializable(buttonState);
-            dest.writeParcelable(applet, flags);
+            dest.writeParcelable(connection, flags);
         }
 
         @Override

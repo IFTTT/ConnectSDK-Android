@@ -27,10 +27,10 @@ import static com.google.common.truth.Truth.assertThat;
 public final class IftttConnectButtonTest {
 
     private final Moshi moshi = new Moshi.Builder().add(Date.class, new Rfc3339DateJsonAdapter().nullSafe())
-            .add(new AppletJsonAdapter())
+            .add(new ConnectionJsonAdapter())
             .add(new TestHexColorJsonAdapter())
             .build();
-    private final JsonAdapter<Applet> adapter = moshi.adapter(Applet.class);
+    private final JsonAdapter<Connection> adapter = moshi.adapter(Connection.class);
 
     private IftttConnectButton button;
 
@@ -61,12 +61,12 @@ public final class IftttConnectButtonTest {
     }
 
     @Test
-    public void setApplet() throws IOException {
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("applet.json");
+    public void setConnection() throws IOException {
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("connection.json");
         JsonReader jsonReader = JsonReader.of(Okio.buffer(Okio.source(inputStream)));
-        Applet applet = adapter.fromJson(jsonReader);
+        Connection connection = adapter.fromJson(jsonReader);
 
-        button.setApplet(applet);
+        button.setConnection(connection);
 
         TextView connectText = button.findViewById(R.id.connect_with_ifttt);
         assertThat(connectText.getText()).isEqualTo("Connect Twitter");
