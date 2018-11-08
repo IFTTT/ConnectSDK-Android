@@ -6,11 +6,19 @@ import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
 
 /**
- * Retrofit interface for fetching authenticated user information.
+ * IFTTT API endpoints.
  */
-interface RetrofitUserApi {
+interface RetrofitIftttApi {
+
+    @GET("/v2/connections/{id}")
+    Call<Connection> showConnection(@Path("id") String id);
+
+    @POST("/v2/connections/{id}/disable")
+    Call<Connection> disableConnection(@Path("id") String id);
+
     @GET("/v2/me")
     Call<User> user();
 

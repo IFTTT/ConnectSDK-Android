@@ -8,36 +8,36 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 /**
- * Data structure for an Applet.
+ * Data structure for an Connection.
  */
 @FieldAreNonnullByDefault
-public final class Applet implements Parcelable {
+public final class Connection implements Parcelable {
 
     /**
-     * User status for an Applet. If the API calls are user authenticated, the Applet status will be one of
+     * User status for a Connection. If the API calls are user authenticated, the Connection status will be one of
      * {@link Status#enabled}, {@link Status#disabled} and {@link Status#never_enabled}.
      *
-     * For unauthenticated calls or user cannot be found, the Applet status will always be {@link Status#unknown}.
+     * For unauthenticated calls or user cannot be found, the Connection status will always be {@link Status#unknown}.
      */
     public enum Status {
         /**
-         * User status for the Applet indicating the Applet is currently activated for the user.
+         * User status for the Connection indicating the Connection is currently activated for the user.
          */
         enabled,
 
         /**
-         * User status for the Applet indicating the Applet is currently disabled for the user.
+         * User status for the Connection indicating the Connection is currently disabled for the user.
          */
         disabled,
 
         /**
-         * User status for the Applet indicating the Applet has never been activated for the user, who needs to go
+         * User status for the Connection indicating the Connection has never been activated for the user, who needs to go
          * through the activation flow to turn it on.
          */
         never_enabled,
 
         /**
-         * Unknown user status for the Applet.
+         * Unknown user status for the Connection.
          */
         unknown
     }
@@ -48,13 +48,13 @@ public final class Applet implements Parcelable {
     public final Status status;
 
     /**
-     * Date when the Applet is published, can be null if the Applet is not yet published.
+     * Date when the Connection is published, can be null if the Connection is not yet published.
      */
     @Nullable public final Date publishedAt;
     public final int enabledCount;
 
     /**
-     * date when the Applet last ran, can be null if the Applet is not activated for the user or it has never run.
+     * date when the Connection last ran, can be null if the Connection is not activated for the user or it has never run.
      */
     @Nullable public final Date lastRunAt;
 
@@ -65,15 +65,15 @@ public final class Applet implements Parcelable {
     public final List<Service> services;
 
     /**
-     * URL string that links to this Applet's authentication flow. This value should not be used on its own, and the
-     * Applet authentication flow should be handled by {@link IftttConnectButton}.
+     * URL string that links to this Connection's authentication flow. This value should not be used on its own, and the
+     * Connection authentication flow should be handled by {@link IftttConnectButton}.
      */
     public final String embeddedUrl;
 
     // Cached primary service object.
     @Nullable private Service primaryService;
 
-    public Applet(String id, String name, String description, Status status, @Nullable Date publishedAt,
+    public Connection(String id, String name, String description, Status status, @Nullable Date publishedAt,
             int enabledCount, @Nullable Date lastRunAt, String url, String embeddedUrl, List<Service> services) {
         this.id = id;
         this.name = name;
@@ -88,8 +88,8 @@ public final class Applet implements Parcelable {
     }
 
     /**
-     * @return the primary {@link Service} for this Applet. A primary service's triggers or actions don't have to be
-     * used in the Applet.
+     * @return the primary {@link Service} for this Connection. A primary service's triggers or actions don't have to be
+     * used in the Connection.
      */
     public Service getPrimaryService() {
         if (primaryService == null) {
@@ -108,7 +108,7 @@ public final class Applet implements Parcelable {
         return primaryService;
     }
 
-    protected Applet(Parcel in) {
+    protected Connection(Parcel in) {
         id = in.readString();
         name = in.readString();
         description = in.readString();
@@ -135,15 +135,15 @@ public final class Applet implements Parcelable {
         services = in.createTypedArrayList(Service.CREATOR);
     }
 
-    public static final Creator<Applet> CREATOR = new Creator<Applet>() {
+    public static final Creator<Connection> CREATOR = new Creator<Connection>() {
         @Override
-        public Applet createFromParcel(Parcel in) {
-            return new Applet(in);
+        public Connection createFromParcel(Parcel in) {
+            return new Connection(in);
         }
 
         @Override
-        public Applet[] newArray(int size) {
-            return new Applet[size];
+        public Connection[] newArray(int size) {
+            return new Connection[size];
         }
     };
 

@@ -14,8 +14,8 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.ifttt.Applet
-import com.ifttt.AuthenticationResult
+import com.ifttt.ConnectResult
+import com.ifttt.Connection
 import com.ifttt.ErrorResponse
 import com.ifttt.IftttApiClient
 import com.ifttt.api.PendingResult
@@ -27,7 +27,7 @@ import com.squareup.picasso.Picasso
 class MainActivity : AppCompatActivity() {
 
     private lateinit var signInRoot: LinearLayout
-    private lateinit var appletContainer: ViewGroup
+    private lateinit var connectionContainer: ViewGroup
     private lateinit var userIdEdit: EditText
     private lateinit var startButton: Button
     private lateinit var icon: ImageView
@@ -37,14 +37,14 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var iftttApiClient: IftttApiClient
 
-    private var appletsPendingResult: PendingResult<Applet>? = null
+    private var connectionPendingResult: PendingResult<Connection>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.main)
 
-        appletContainer = findViewById<ViewGroup>(R.id.applet_view).apply {
+        connectionContainer = findViewById<ViewGroup>(R.id.connection_view).apply {
             visibility = View.GONE
         }
 
@@ -100,20 +100,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onNewIntent(intent: Intent) {
-        val authenticationResult = AuthenticationResult.fromIntent(intent)
-        iftttConnectButton.setAuthenticationResult(authenticationResult)
+        val authenticationResult = ConnectResult.fromIntent(intent)
+        iftttConnectButton.setConnectResult(authenticationResult)
 
-        if (authenticationResult.nextStep == AuthenticationResult.NextStep.Complete) {
+        if (authenticationResult.nextStep == ConnectResult.NextStep.Complete) {
             // The authentication has completed, we can now fetch the user token and refresh the UI.
             ApiHelper.fetchIftttToken(next = {
                 if (it != null) {
                     iftttApiClient.setUserToken(it)
                 }
 
-                iftttApiClient.api().showApplet(APPLET_ID).execute(object : PendingResult.ResultCallback<Applet> {
-                    override fun onSuccess(result: Applet) {
-                        // After this, users will be able to turn on or off the Applet.
-                        iftttConnectButton.setApplet(result)
+                iftttApiClient.api().showConnection(CONNECTION_ID).execute(object : PendingResult.ResultCallback<Connection> {
+                    override fun onSuccess(result: Connection) {
+                        // After this, users will be able to turn on or off the Connection.
+                        iftttConnectButton.setConnection(result)
                     }
 
                     override fun onFailure(errorResponse: ErrorResponse) {
@@ -131,17 +131,17 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
 
         ApiHelper.clearPendingRequests()
-        appletsPendingResult?.cancel()
+        connectionPendingResult?.cancel()
     }
 
     private fun renderUi() {
-        appletContainer.visibility = View.VISIBLE
+        connectionContainer.visibility = View.VISIBLE
         signInRoot.visibility = View.GONE
         startButton.isClickable = false
 
-        appletsPendingResult = iftttApiClient.api().showApplet(APPLET_ID)
-        appletsPendingResult!!.execute(object : PendingResult.ResultCallback<Applet> {
-            override fun onSuccess(result: Applet) {
+        connectionPendingResult = iftttApiClient.api().showConnection(CONNECTION_ID)
+        connectionPendingResult!!.execute(object : PendingResult.ResultCallback<Connection> {
+            override fun onSuccess(result: Connection) {
                 title.text = result.name
                 Picasso.get().load(result.primaryService.colorIconUrl).into(icon)
                 icon.background = ShapeDrawable(OvalShape()).apply {
@@ -151,7 +151,7 @@ class MainActivity : AppCompatActivity() {
                 iftttConnectButton.setup(EMAIL, iftttApiClient, ApiHelper.REDIRECT_URI) {
                     "Your_users_oauth_code"
                 }
-                iftttConnectButton.setApplet(result)
+                iftttConnectButton.setConnection(result)
             }
 
             override fun onFailure(errorResponse: ErrorResponse) {
@@ -161,8 +161,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private companion object {
-        // Example Applet.
-        const val APPLET_ID = "mZRHhST7"
+        // Example Connection.
+        const val CONNECTION_ID = "mZRHhST7"
         const val EMAIL = "user@email.com"
     }
 }

@@ -13,8 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.browser.customtabs.CustomTabsIntent;
 import androidx.core.content.ContextCompat;
-import com.ifttt.Applet;
-import com.ifttt.AuthenticationResult;
+import com.ifttt.Connection;
 import com.ifttt.R;
 import com.ifttt.Service;
 
@@ -23,11 +22,11 @@ import com.ifttt.Service;
  */
 public final class IftttAboutActivity extends Activity {
 
-    private static final String EXTRA_APPLET = "extra_applet";
+    private static final String EXTRA_CONNECTION = "extra_connection";
     private static final Uri IFTTT_ABOUT = Uri.parse("http://ifttt.com/about");
 
-    static Intent intent(Context context, Applet applet) {
-        return new Intent(context, IftttAboutActivity.class).putExtra(EXTRA_APPLET, applet);
+    static Intent intent(Context context, Connection connection) {
+        return new Intent(context, IftttAboutActivity.class).putExtra(EXTRA_CONNECTION, connection);
     }
 
     @Override
@@ -65,12 +64,12 @@ public final class IftttAboutActivity extends Activity {
 
         ImageView logoView = findViewById(R.id.ifttt_logo_view);
 
-        Applet applet = getIntent().getParcelableExtra(EXTRA_APPLET);
-        int primaryColor = applet.getPrimaryService().brandColor;
+        Connection connection = getIntent().getParcelableExtra(EXTRA_CONNECTION);
+        int primaryColor = connection.getPrimaryService().brandColor;
         int secondaryColor = Color.BLACK;
 
         // Use the first non-primary service' brand color as the secondary logo color.
-        for (Service service : applet.services) {
+        for (Service service : connection.services) {
             if (!service.isPrimary) {
                 secondaryColor = service.brandColor;
                 break;
@@ -78,12 +77,5 @@ public final class IftttAboutActivity extends Activity {
         }
 
         logoView.setImageDrawable(new IconDrawable(primaryColor, secondaryColor));
-    }
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-        AuthenticationResult result = AuthenticationResult.fromIntent(intent);
-        IftttConnectButton iftttConnectButton = new IftttConnectButton(this);
-        iftttConnectButton.setAuthenticationResult(result);
     }
 }

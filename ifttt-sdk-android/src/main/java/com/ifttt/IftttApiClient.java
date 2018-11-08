@@ -25,13 +25,11 @@ public final class IftttApiClient {
     private final IftttApi iftttApi;
     private final TokenInterceptor tokenInterceptor;
 
-    private IftttApiClient(@Nullable String inviteCode, RetrofitAppletsApi retrofitAppletsApi,
-            RetrofitAppletConfigApi retrofitAppletConfigApi, RetrofitUserApi retrofitUserApi,
+    private IftttApiClient(@Nullable String inviteCode, RetrofitIftttApi retrofitIftttApi,
             JsonAdapter<ErrorResponse> errorResponseJsonAdapter, TokenInterceptor tokenInterceptor) {
         this.inviteCode = inviteCode;
         this.tokenInterceptor = tokenInterceptor;
-        iftttApi = new IftttApiImpl(retrofitAppletsApi, retrofitUserApi, retrofitAppletConfigApi,
-                errorResponseJsonAdapter);
+        iftttApi = new IftttApiImpl(retrofitIftttApi, errorResponseJsonAdapter);
     }
 
     /**
@@ -92,7 +90,7 @@ public final class IftttApiClient {
         public IftttApiClient build() {
             Moshi moshi = new Moshi.Builder().add(new HexColorJsonAdapter())
                     .add(Date.class, new Rfc3339DateJsonAdapter().nullSafe())
-                    .add(new AppletJsonAdapter())
+                    .add(new ConnectionJsonAdapter())
                     .add(new UserTokenJsonAdapter())
                     .build();
             JsonAdapter<ErrorResponse> errorResponseJsonAdapter = moshi.adapter(ErrorResponse.class);
@@ -110,48 +108,40 @@ public final class IftttApiClient {
                     .client(okHttpClient)
                     .build();
 
-            RetrofitAppletsApi retrofitAppletsApi = retrofit.create(RetrofitAppletsApi.class);
-            RetrofitAppletConfigApi retrofitAppletConfigApi = retrofit.create(RetrofitAppletConfigApi.class);
-            RetrofitUserApi retrofitUserApi = retrofit.create(RetrofitUserApi.class);
+            RetrofitIftttApi retrofitIftttApi = retrofit.create(RetrofitIftttApi.class);
 
-            return new IftttApiClient(inviteCode, retrofitAppletsApi, retrofitAppletConfigApi, retrofitUserApi,
-                    errorResponseJsonAdapter, tokenInterceptor);
+            return new IftttApiClient(inviteCode, retrofitIftttApi, errorResponseJsonAdapter, tokenInterceptor);
         }
     }
 
     private static final class IftttApiImpl implements IftttApi {
 
-        private final RetrofitAppletsApi retrofitAppletsApi;
-        private final RetrofitUserApi retrofitUserApi;
-        private final RetrofitAppletConfigApi retrofitAppletConfigApi;
+        private final RetrofitIftttApi retrofitIftttApi;
         private final JsonAdapter<ErrorResponse> errorResponseJsonAdapter;
 
-        IftttApiImpl(RetrofitAppletsApi retrofitAppletsApi, RetrofitUserApi retrofitUserApi,
-                RetrofitAppletConfigApi retrofitAppletConfigApi, JsonAdapter<ErrorResponse> errorResponseJsonAdapter) {
-            this.retrofitAppletsApi = retrofitAppletsApi;
-            this.retrofitUserApi = retrofitUserApi;
-            this.retrofitAppletConfigApi = retrofitAppletConfigApi;
+        IftttApiImpl(RetrofitIftttApi retrofitIftttApi, JsonAdapter<ErrorResponse> errorResponseJsonAdapter) {
+            this.retrofitIftttApi = retrofitIftttApi;
             this.errorResponseJsonAdapter = errorResponseJsonAdapter;
         }
 
         @Override
-        public PendingResult<Applet> showApplet(String appletId) {
-            return new ApiPendingResult<>(retrofitAppletsApi.showApplet(appletId), errorResponseJsonAdapter);
+        public PendingResult<Connection> showConnection(String id) {
+            return new ApiPendingResult<>(retrofitIftttApi.showConnection(id), errorResponseJsonAdapter);
         }
 
         @Override
-        public PendingResult<Applet> disableApplet(String appletId) {
-            return new ApiPendingResult<>(retrofitAppletConfigApi.disableApplet(appletId), errorResponseJsonAdapter);
+        public PendingResult<Connection> disableConnection(String id) {
+            return new ApiPendingResult<>(retrofitIftttApi.disableConnection(id), errorResponseJsonAdapter);
         }
 
         @Override
         public PendingResult<User> user() {
-            return new ApiPendingResult<>(retrofitUserApi.user(), errorResponseJsonAdapter);
+            return new ApiPendingResult<>(retrofitIftttApi.user(), errorResponseJsonAdapter);
         }
 
         @Override
         public PendingResult<String> userToken(String oAuthToken, String serviceKey) {
-            return new ApiPendingResult<>(retrofitUserApi.getUserToken(oAuthToken, serviceKey),
+            return new ApiPendingResult<>(retrofitIftttApi.getUserToken(oAuthToken, serviceKey),
                     errorResponseJsonAdapter);
         }
     }

@@ -1,6 +1,6 @@
 package com.ifttt.api;
 
-import com.ifttt.Applet;
+import com.ifttt.Connection;
 import com.ifttt.IftttApiClient;
 import com.ifttt.User;
 
@@ -13,20 +13,20 @@ import com.ifttt.User;
 public interface IftttApi {
 
     /**
-     * API for showing an Applet from a service.
+     * API for fetching a Connection's metadata.
      *
-     * @param appletId Applet id.
+     * @param id Connection id.
      * @return A {@link PendingResult} for the API call execution.
      */
-    PendingResult<Applet> showApplet(String appletId);
+    PendingResult<Connection> showConnection(String id);
 
     /**
-     * API for disabling an Applet.
+     * API for disabling a Connection.
      *
-     * @param appletId  Applet id.
+     * @param id  Connection id.
      * @return A {@link PendingResult} for the API call execution.
      */
-    PendingResult<Applet> disableApplet(String appletId);
+    PendingResult<Connection> disableConnection(String id);
 
     /**
      * API for retrieving information about the IFTTT user, as well as the authentication level of the current
@@ -38,9 +38,9 @@ public interface IftttApi {
 
     /**
      * API for exchanging an IFTTT user token. The IFTTT user token may be used to make user authenticated API calls,
-     * for example {@link #disableApplet(String)}.
+     * for example {@link #disableConnection(String)}.
      *
-     * @param oAuthToken Your user's OAuth access token or refresh token.
+     * @param oAuthToken Your user's OAuth access token.
      * @param serviceKey Your IFTTT service key.
      *
      * @return A {@link PendingResult} for the API call execution.

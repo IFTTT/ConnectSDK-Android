@@ -10,30 +10,31 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 /**
- * JSON adapter for single Applet object from {@link IftttApi#showApplet(String)}.
+ * JSON adapter for single Connection object from {@link IftttApi#showConnection(String)}.
  */
-final class AppletJsonAdapter {
+final class ConnectionJsonAdapter {
 
     @FromJson
-    Applet fromJson(AppletJson appletJson) throws IOException {
-        Applet.Status status;
-        if (appletJson.user_status == null) {
-            status = Applet.Status.unknown;
+    Connection fromJson(ConnectionJson connectionJson) throws IOException {
+        Connection.Status status;
+        if (connectionJson.user_status == null) {
+            status = Connection.Status.unknown;
         } else {
-            status = Applet.Status.valueOf(appletJson.user_status);
+            status = Connection.Status.valueOf(connectionJson.user_status);
         }
 
-        return new Applet(appletJson.id, appletJson.name, appletJson.description, status, appletJson.published_at,
-                appletJson.enabled_count, appletJson.last_run_at, appletJson.url, appletJson.embedded_url,
-                appletJson.services);
+        return new Connection(
+                connectionJson.id, connectionJson.name, connectionJson.description, status, connectionJson.published_at,
+                connectionJson.enabled_count, connectionJson.last_run_at, connectionJson.url, connectionJson.embedded_url,
+                connectionJson.services);
     }
 
     @ToJson
-    void toJson(JsonWriter jsonWriter, Applet applet) {
+    void toJson(JsonWriter jsonWriter, Connection connection) {
         throw new UnsupportedOperationException();
     }
 
-    static final class AppletJson {
+    static final class ConnectionJson {
         final String id;
         final String name;
         final String description;
@@ -45,7 +46,7 @@ final class AppletJsonAdapter {
         final String embedded_url;
         final List<Service> services;
 
-        AppletJson(String id, String name, String description, @Nullable String user_status, Date published_at,
+        ConnectionJson(String id, String name, String description, @Nullable String user_status, Date published_at,
                 int enabled_count, Date last_run_at, String url, String embedded_url, List<Service> services) {
             this.id = id;
             this.name = name;

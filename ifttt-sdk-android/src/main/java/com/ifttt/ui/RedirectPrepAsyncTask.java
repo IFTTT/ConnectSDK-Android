@@ -36,7 +36,7 @@ final class RedirectPrepAsyncTask extends AsyncTask<Void, Void, RedirectPrepAsyn
             return new PrepResult(oAuthCode, accountFound);
         } catch (IOException e) {
             // Intentionally set the flag to true, so that the SDK will know to bring users to the web flow
-            // to continue Applet authentication.
+            // to continue Connection authentication.
             return new PrepResult(null, true);
         }
     }
@@ -57,7 +57,7 @@ final class RedirectPrepAsyncTask extends AsyncTask<Void, Void, RedirectPrepAsyn
     }
 
     /**
-     * API helper class that handles APIs that {@link IftttConnectButton} needs for the Applet authentication flow.
+     * API helper class that handles APIs that {@link IftttConnectButton} needs for the Connection authentication flow.
      */
     private static final class AccountApiHelper {
 

@@ -9,7 +9,7 @@ import androidx.browser.customtabs.CustomTabsIntent;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.OnLifecycleEvent;
-import com.ifttt.Applet;
+import com.ifttt.Connection;
 import com.ifttt.BuildConfig;
 import com.ifttt.ErrorResponse;
 import com.ifttt.IftttApiClient;
@@ -21,7 +21,7 @@ import javax.annotation.Nullable;
 
 import static com.ifttt.ui.IftttConnectButton.ButtonState.CreateAccount;
 import static com.ifttt.ui.IftttConnectButton.ButtonState.Login;
-import static com.ifttt.ui.IftttConnectButton.ButtonState.ServiceConnection;
+import static com.ifttt.ui.IftttConnectButton.ButtonState.ServiceAuthentication;
 
 /**
  * Helper class that handles all API call and non-UI specific tasks for the {@link IftttConnectButton}.
@@ -49,12 +49,12 @@ final class ButtonApiHelper {
         oAuthCodeProvider = provider;
     }
 
-    void disableApplet(String appletId, ResultCallback<Applet> resultCallback) {
-        PendingResult<Applet> pendingResult = iftttApi.disableApplet(appletId);
+    void disableConnection(String id, ResultCallback<Connection> resultCallback) {
+        PendingResult<Connection> pendingResult = iftttApi.disableConnection(id);
         lifecycle.addObserver(new PendingResultLifecycleObserver<>(pendingResult));
-        pendingResult.execute(new ResultCallback<Applet>() {
+        pendingResult.execute(new ResultCallback<Connection>() {
             @Override
-            public void onSuccess(Applet result) {
+            public void onSuccess(Connection result) {
                 resultCallback.onSuccess(result);
             }
 
@@ -65,8 +65,8 @@ final class ButtonApiHelper {
         });
     }
 
-    void redirectToWeb(Context context, Applet applet, String email, ButtonState buttonState) {
-        Uri uri = getEmbedUri(applet, buttonState, redirectUri, email, oAuthCode, inviteCode);
+    void redirectToWeb(Context context, Connection connection, String email, ButtonState buttonState) {
+        Uri uri = getEmbedUri(connection, buttonState, redirectUri, email, oAuthCode, inviteCode);
         CustomTabsIntent intent = new CustomTabsIntent.Builder().build();
         intent.launchUrl(context, uri);
     }
@@ -98,13 +98,13 @@ final class ButtonApiHelper {
     }
 
     /**
-     * Generate a URL for configuring this Applet on web view. The URL can include an optional user email, and an
+     * Generate a URL for configuring this Connection on web view. The URL can include an optional user email, and an
      * option invite code for the service.
      */
-    private static Uri getEmbedUri(Applet applet, IftttConnectButton.ButtonState buttonState,
+    private static Uri getEmbedUri(Connection connection, IftttConnectButton.ButtonState buttonState,
             @Nullable String redirectUri, @Nullable String email, @Nullable String oAuthCode,
             @Nullable String inviteCode) {
-        Uri.Builder builder = Uri.parse(applet.embeddedUrl)
+        Uri.Builder builder = Uri.parse(connection.embeddedUrl)
                 .buildUpon()
                 .appendQueryParameter("ifttt_sdk_version", BuildConfig.VERSION_NAME)
                 .appendQueryParameter("ifttt_sdk_platform", "android");
@@ -121,7 +121,7 @@ final class ButtonApiHelper {
             builder.appendQueryParameter("invite_code", inviteCode);
         }
 
-        if (buttonState == ServiceConnection) {
+        if (buttonState == ServiceAuthentication) {
             builder.appendQueryParameter("skip_sdk_redirect", "true");
         } else if (buttonState == CreateAccount) {
             builder.appendQueryParameter("sdk_create_account", "true");
