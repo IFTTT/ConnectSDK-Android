@@ -20,7 +20,6 @@ import com.ifttt.ErrorResponse
 import com.ifttt.IftttApiClient
 import com.ifttt.api.PendingResult
 import com.ifttt.api.demo.api.ApiHelper
-import com.ifttt.ui.ButtonStateChangeListener
 import com.ifttt.ui.IftttConnectButton
 import com.squareup.picasso.Picasso
 
@@ -37,8 +36,6 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var iftttApiClient: IftttApiClient
 
-    private var connectionPendingResult: PendingResult<Connection>? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -51,26 +48,20 @@ class MainActivity : AppCompatActivity() {
         icon = findViewById(R.id.icon)
         title = findViewById(R.id.title)
         description = findViewById(R.id.description)
-        iftttConnectButton = findViewById(R.id.connect_button)
-        iftttConnectButton.setButtonStateChangeListener(object : ButtonStateChangeListener {
-            override fun onStateChanged(currentState: IftttConnectButton.ButtonState,
-                    previousState: IftttConnectButton.ButtonState) {
-                showSnackbar("Current state: ${currentState.name}, previous state: ${previousState.name}")
-            }
-
-            override fun onError(errorResponse: ErrorResponse) {
-                showSnackbar(errorResponse.message)
-            }
-
-        })
-
         signInRoot = findViewById(R.id.sign_in_root)
         userIdEdit = findViewById(R.id.user_id)
         startButton = findViewById(R.id.start)
 
-        iftttApiClient = IftttApiClient.Builder()
-                .setInviteCode(ApiHelper.INVITE_CODE)
-                .build()
+        iftttApiClient = IftttApiClient.Builder().setInviteCode(ApiHelper.INVITE_CODE).build()
+        iftttConnectButton = findViewById<IftttConnectButton>(R.id.connect_button).apply {
+            // Setup the Connect Button.
+            setup(EMAIL, iftttApiClient, ApiHelper.REDIRECT_URI) {
+                // This is a required step to make sure the user doesn't have to connect your service on IFTTT
+                // during the Connection enable flow.
+                // The code here will be run on a background thread.
+                "Your_users_oauth_code"
+            }
+        }
 
         startButton.setOnClickListener { view ->
             val userId = userIdEdit.text.toString()
@@ -79,16 +70,15 @@ class MainActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            ApiHelper.login(userId, next = { token ->
-                ApiHelper.fetchIftttToken(next = { iftttToken ->
-                    if (iftttToken != null) {
-                        iftttApiClient.setUserToken(iftttToken)
+            ApiHelper.login(userId, next = {
+                renderUi { connection ->
+                    title.text = connection.name
+                    Picasso.get().load(connection.primaryService.colorIconUrl).into(icon)
+                    icon.background = ShapeDrawable(OvalShape()).apply {
+                        paint.color = connection.primaryService.brandColor
                     }
-
-                    renderUi()
-                }, error = {
-                    showSnackbar(getString(R.string.user_auth_error))
-                })
+                    description.text = connection.description
+                }
             }, error = {
                 showSnackbar(getString(R.string.user_auth_error))
             })
@@ -104,55 +94,37 @@ class MainActivity : AppCompatActivity() {
         iftttConnectButton.setConnectResult(authenticationResult)
 
         if (authenticationResult.nextStep == ConnectResult.NextStep.Complete) {
-            // The authentication has completed, we can now fetch the user token and refresh the UI.
+            // The connection is now enabled. Now we need to sync the Connection status from the IFTTT,
+            // and refresh the Connect Button.
+            // To do so:
+            // - fetch IFTTT user token, you can do so by implementing an API from your backend or use
+            //   client.api().getUserToken(), providing IFTTT Service key (please do not hard code this in the app)
+            //   and user OAuth token.
+            // - call client.setUserToken()
+            // - call client.api().showConnection() again to get the latest Connection metadata.
+            // - call button.setConnection and pass in the metadata
             ApiHelper.fetchIftttToken(next = {
                 if (it != null) {
                     iftttApiClient.setUserToken(it)
                 }
 
-                iftttApiClient.api().showConnection(CONNECTION_ID).execute(object :
-                        PendingResult.ResultCallback<Connection> {
-                    override fun onSuccess(result: Connection) {
-                        // After this, users will be able to turn on or off the Connection.
-                        iftttConnectButton.setConnection(result)
-                    }
-
-                    override fun onFailure(errorResponse: ErrorResponse) {
-                        showSnackbar(errorResponse.message)
-                    }
-
-                })
+                renderUi()
             }, error = {
                 showSnackbar(getString(R.string.user_auth_error))
             })
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-
-        ApiHelper.clearPendingRequests()
-        connectionPendingResult?.cancel()
-    }
-
-    private fun renderUi() {
+    private fun renderUi(complete: (Connection) -> Unit = {}) {
         connectionContainer.visibility = View.VISIBLE
         signInRoot.visibility = View.GONE
         startButton.isClickable = false
 
-        connectionPendingResult = iftttApiClient.api().showConnection(CONNECTION_ID)
-        connectionPendingResult!!.execute(object : PendingResult.ResultCallback<Connection> {
+        // Fetch the Connection
+        iftttApiClient.api().showConnection(CONNECTION_ID).execute(object : PendingResult.ResultCallback<Connection> {
             override fun onSuccess(result: Connection) {
-                title.text = result.name
-                Picasso.get().load(result.primaryService.colorIconUrl).into(icon)
-                icon.background = ShapeDrawable(OvalShape()).apply {
-                    paint.color = result.primaryService.brandColor
-                }
-                description.text = result.description
-                iftttConnectButton.setup(EMAIL, iftttApiClient, ApiHelper.REDIRECT_URI) {
-                    "Your_users_oauth_code"
-                }
                 iftttConnectButton.setConnection(result)
+                complete(result)
             }
 
             override fun onFailure(errorResponse: ErrorResponse) {

@@ -26,15 +26,19 @@ android {
 }
 
 dependencies {
-    implementation project(':ifttt-sdk-android')
-    implementation 'com.google.android.material:material:1.0.0'
-    implementation 'androidx.appcompat:appcompat:1.0.0'
-    implementation 'androidx.browser:browser:1.0.0'
+    // Including the library as an aar file doesn't come with any transitive dependencies,
+    // you will need to include them manually.
+    // This is temporary, and can be removed when the library is live in jcenter,
+    implementation(name: 'ifttt-sdk-android-release', ext: 'aar')
+    implementation "com.squareup.okhttp3:okhttp:$okHttpVersion"
     implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
     implementation "com.squareup.retrofit2:converter-moshi:$retrofitVersion"
-    implementation "com.squareup.okhttp3:logging-interceptor:$okHttpVersion"
-    implementation "com.squareup.moshi:moshi-adapters:$moshiVersion"
     implementation "com.squareup.moshi:moshi:$moshiVersion"
+    implementation "com.squareup.moshi:moshi-adapters:$moshiVersion"
+    implementation 'androidx.browser:browser:1.0.0'
+
+    implementation "com.squareup.okhttp3:logging-interceptor:$okHttpVersion"
+    implementation 'com.google.android.material:material:1.0.0'
     implementation 'com.squareup.picasso:picasso:2.71828'
 
     implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"

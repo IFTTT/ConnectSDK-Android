@@ -8,7 +8,7 @@ import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.ToJson
 import java.io.IOException
 
-internal object TokenJsonAdapter {
+object TokenJsonAdapter {
 
     @JsonQualifier
     annotation class Token
