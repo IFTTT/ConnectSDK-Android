@@ -27,13 +27,9 @@ object ApiHelper {
             .client(okHttpClient)
             .addConverterFactory(MoshiConverterFactory.create(Moshi.Builder()
                     .add(TokenJsonAdapter)
-                    .add(LoginUrlJsonAdapter)
                     .build()))
             .build()
     private val api: TokenApi = retrofit.create(TokenApi::class.java)
-
-    private var exampleAppTokenCall: Call<String>? = null
-    private var iftttUserTokenCall: Call<String?>? = null
 
     /**
      * Log in the user with the user name, this simulates a user logging into your app. If the request returns
@@ -41,8 +37,7 @@ object ApiHelper {
      * authenticated by it.
      */
     fun login(username: String, next: (String) -> Unit, error: () -> Unit) {
-        exampleAppTokenCall = api.login(username)
-        exampleAppTokenCall!!.enqueue(object : Callback<String> {
+        api.login(username).enqueue(object : Callback<String> {
             override fun onResponse(call: Call<String>, response: Response<String>) {
                 if (response.isSuccessful) {
                     val exampleAppToken = response.body()!!
@@ -54,10 +49,8 @@ object ApiHelper {
             }
 
             override fun onFailure(call: Call<String>, t: Throwable) {
-                exampleAppTokenCall = null
                 error()
             }
-
         })
     }
 
@@ -66,15 +59,12 @@ object ApiHelper {
      * authenticated calls to IFTTT API.
      */
     fun fetchIftttToken(next: (String?) -> Unit, error: () -> Unit) {
-        iftttUserTokenCall = api.getIftttToken()
-        iftttUserTokenCall!!.enqueue(object : Callback<String?> {
+        api.getIftttToken().enqueue(object : Callback<String?> {
             override fun onFailure(call: Call<String?>, t: Throwable) {
-                iftttUserTokenCall = null
                 error()
             }
 
             override fun onResponse(call: Call<String?>, response: Response<String?>) {
-                iftttUserTokenCall = null
                 if (response.isSuccessful) {
                     next(response.body())
                 } else {
@@ -82,17 +72,5 @@ object ApiHelper {
                 }
             }
         })
-    }
-
-    fun clearPendingRequests() {
-        if (exampleAppTokenCall != null) {
-            exampleAppTokenCall!!.cancel()
-            exampleAppTokenCall = null
-        }
-
-        if (iftttUserTokenCall != null) {
-            iftttUserTokenCall!!.cancel()
-            iftttUserTokenCall = null
-        }
     }
 }

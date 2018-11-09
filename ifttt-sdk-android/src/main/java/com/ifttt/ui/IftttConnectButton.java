@@ -488,6 +488,10 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
      * @param connection Connection instance to be displayed.
      */
     public void setConnection(Connection connection) {
+        if (buttonApiHelper == null) {
+            throw new IllegalStateException("Connect Button is not set up, please call setup() first.");
+        }
+
         this.connection = connection;
         worksWithService = findWorksWithService(connection);
 
