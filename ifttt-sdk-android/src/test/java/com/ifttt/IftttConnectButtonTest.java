@@ -22,6 +22,7 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 
 import static com.google.common.truth.Truth.assertThat;
+import static junit.framework.TestCase.fail;
 
 @RunWith(RobolectricTestRunner.class)
 public final class IftttConnectButtonTest {
@@ -60,12 +61,23 @@ public final class IftttConnectButtonTest {
         assertThat(((TextView) helperText.getCurrentView()).getText()).isEqualTo("");
     }
 
+    @Test(expected = IllegalStateException.class)
+    public void testWithoutSetup() throws Exception {
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("connection.json");
+        JsonReader jsonReader = JsonReader.of(Okio.buffer(Okio.source(inputStream)));
+        Connection connection = adapter.fromJson(jsonReader);
+
+        button.setConnection(connection);
+        fail();
+    }
+
     @Test
     public void setConnection() throws IOException {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("connection.json");
         JsonReader jsonReader = JsonReader.of(Okio.buffer(Okio.source(inputStream)));
         Connection connection = adapter.fromJson(jsonReader);
 
+        button.setup("a@b.com", new IftttApiClient.Builder().build(), "", () -> "");
         button.setConnection(connection);
 
         TextView connectText = button.findViewById(R.id.connect_with_ifttt);
