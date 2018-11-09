@@ -21,9 +21,6 @@ This SDK uses the following libraries as dependencies:
 * Java 8
 * Android SDK version 19 or higher.
 
-## [DRAFT] Naming change
-We are going to rename 
-
 ## Get started
 To get started, after setting up the dependency, you can instantiate an `IftttApiClient` and add an `IftttConnectButton` to show your users the UI for a Connection. For example, in your Activity,
 
