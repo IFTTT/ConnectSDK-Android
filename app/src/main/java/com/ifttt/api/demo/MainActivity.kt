@@ -110,7 +110,8 @@ class MainActivity : AppCompatActivity() {
                     iftttApiClient.setUserToken(it)
                 }
 
-                iftttApiClient.api().showConnection(CONNECTION_ID).execute(object : PendingResult.ResultCallback<Connection> {
+                iftttApiClient.api().showConnection(CONNECTION_ID).execute(object :
+                        PendingResult.ResultCallback<Connection> {
                     override fun onSuccess(result: Connection) {
                         // After this, users will be able to turn on or off the Connection.
                         iftttConnectButton.setConnection(result)

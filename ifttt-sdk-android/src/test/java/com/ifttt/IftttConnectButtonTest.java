@@ -28,7 +28,7 @@ public final class IftttConnectButtonTest {
 
     private final Moshi moshi = new Moshi.Builder().add(Date.class, new Rfc3339DateJsonAdapter().nullSafe())
             .add(new ConnectionJsonAdapter())
-            .add(new TestHexColorJsonAdapter())
+            .add(new HexColorJsonAdapter())
             .build();
     private final JsonAdapter<Connection> adapter = moshi.adapter(Connection.class);
 

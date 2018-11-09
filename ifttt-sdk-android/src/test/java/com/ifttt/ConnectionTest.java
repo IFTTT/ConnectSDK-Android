@@ -10,15 +10,15 @@ import okio.Okio;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.robolectric.RobolectricTestRunner;
 
 import static com.google.common.truth.Truth.assertThat;
 
-@RunWith(JUnit4.class)
+@RunWith(RobolectricTestRunner.class)
 public final class ConnectionTest {
 
     private final Moshi moshi = new Moshi.Builder().add(Date.class, new Rfc3339DateJsonAdapter().nullSafe())
-            .add(new TestHexColorJsonAdapter())
+            .add(new HexColorJsonAdapter())
             .add(new ConnectionJsonAdapter())
             .build();
     private final JsonAdapter<Connection> adapter = moshi.adapter(Connection.class);
