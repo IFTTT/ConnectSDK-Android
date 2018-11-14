@@ -21,7 +21,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
-                android:background="@color/ifttt_email_background_color"
+                android:background="@drawable/background_button"
                 android:hint="@string/ifttt_email"
                 android:inputType="textEmailAddress"
                 android:paddingEnd="@dimen/connect_text_padding_horizontal"
