@@ -79,7 +79,7 @@ In addition, you can also use the `Connection` object returned from the API to r
 With the instance, you can use `IftttApiClient#api()` to get access to the APIs for Connection data.
 ```java
 IftttApiClient iftttApiClient = new IftttApiClient.Builder()  
-        .setInviteCode("invite_code") // Optional, only needed if your service is not yet published.
+        .setInviteCode("invite_code") // Optional, only needed if your service is not published on the IFTTT Platform..
         .build();
 
 IftttApi iftttApi = iftttApiClient.api();
