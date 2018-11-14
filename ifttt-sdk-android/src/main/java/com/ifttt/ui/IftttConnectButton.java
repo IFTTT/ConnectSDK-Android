@@ -244,7 +244,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
 
         // Initialize SpannableString that replaces text with logo, using the current TextView in the TextSwitcher as
         // measurement, the CharSequence will only be used there.
-        iftttLogo = ContextCompat.getDrawable(getContext(), R.drawable.ifttt_logo);
+        iftttLogo = ContextCompat.getDrawable(getContext(), R.drawable.ic_ifttt_logo_black);
         poweredByIfttt = new SpannableString(replaceKeyWithImage((TextView) helperTxt.getCurrentView(),
                 getResources().getString(R.string.ifttt_powered_by_ifttt), "IFTTT", iftttLogo));
         poweredByIfttt.setSpan(new AvenirTypefaceSpan(boldTypeface), 0, poweredByIfttt.length(),
@@ -668,7 +668,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         if (isUserAuthenticated) {
             progressTxt.setText(
                     replaceKeyWithImage(connectStateTxt, getResources().getString(R.string.ifttt_signing_in_to_ifttt),
-                            "IFTTT", ContextCompat.getDrawable(getContext(), R.drawable.ifttt_logo_white)));
+                            "IFTTT", ContextCompat.getDrawable(getContext(), R.drawable.ic_ifttt_logo_white)));
         } else {
             progressTxt.setText(R.string.ifttt_validating_email);
         }

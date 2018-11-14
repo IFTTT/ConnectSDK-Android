@@ -41,7 +41,7 @@ public final class IftttAboutActivity extends Activity {
         TextView title = findViewById(R.id.ifttt_about_title);
         title.setTypeface(avenirBold);
         title.setText(ButtonUiHelper.replaceKeyWithImage(title, title.getText().toString(), "IFTTT",
-                ContextCompat.getDrawable(this, R.drawable.ifttt_logo_white)));
+                ContextCompat.getDrawable(this, R.drawable.ic_ifttt_logo_white)));
 
         TextView description1 = findViewById(R.id.ifttt_about_1);
         description1.setTypeface(avenirMedium);
