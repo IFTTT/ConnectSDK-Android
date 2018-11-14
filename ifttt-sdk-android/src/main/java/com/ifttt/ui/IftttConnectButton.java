@@ -49,6 +49,7 @@ import com.ifttt.R;
 import com.ifttt.Service;
 import com.ifttt.api.PendingResult.ResultCallback;
 import javax.annotation.Nullable;
+import okhttp3.Call;
 
 import static android.graphics.Color.BLACK;
 import static android.os.Build.VERSION.SDK_INT;
@@ -192,6 +193,8 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
     private IconDragHelperCallback iconDragHelperCallback;
 
     private boolean onDarkBackground = false;
+
+    @Nullable private Call ongoingImageCall;
 
     public IftttConnectButton(Context context) {
         this(context, null);
@@ -528,7 +531,8 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             });
         }
 
-        ImageLoader.get().load(this, worksWithService.monochromeIconUrl, bitmap -> {
+        ongoingImageCall = ImageLoader.get().load(this, worksWithService.monochromeIconUrl, bitmap -> {
+            ongoingImageCall = null;
             BitmapDrawable serviceIcon = new BitmapDrawable(getResources(), bitmap);
             int iconBackgroundMargin = getResources().getDimensionPixelSize(R.dimen.ifttt_icon_margin);
             StartIconDrawable drawable = new StartIconDrawable(context, serviceIcon, iconSize,
@@ -574,6 +578,13 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             buttonRoot.setOnClickListener(new DebouncingOnClickListener() {
                 @Override
                 void doClick(View v) {
+                    // Cancel potential ongoing image loading task. Users have already click the button and the service
+                    // icon will not be used in the next UI state.
+                    if (ongoingImageCall != null) {
+                        ongoingImageCall.cancel();
+                        ongoingImageCall = null;
+                    }
+
                     if (!isUserAuthenticated) {
                         animateToEmailField();
                     } else {
@@ -777,10 +788,17 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         fadeInEmailEdit.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {
-                // Hide email field and its text when the animation starts.
+                // Hide email field and disable it when the animation starts.
+                emailEdt.setEnabled(false);
                 emailEdt.setTextColor(Color.TRANSPARENT);
                 emailEdt.setAlpha(0f);
                 emailEdt.setVisibility(VISIBLE);
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                // Re-enable email field.
+                emailEdt.setEnabled(true);
             }
         });
 
