@@ -712,6 +712,9 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         set.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {
+                // When the animation starts, disable the click on buttonRoot, so that the flow will not be started
+                // again.
+                buttonRoot.setClickable(false);
                 emailEdt.setVisibility(GONE);
             }
 
