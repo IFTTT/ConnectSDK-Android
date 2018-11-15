@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import androidx.annotation.MainThread;
+import androidx.annotation.VisibleForTesting;
 import androidx.browser.customtabs.CustomTabsIntent;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
@@ -101,21 +102,15 @@ final class ButtonApiHelper {
      * Generate a URL for configuring this Connection on web view. The URL can include an optional user email, and an
      * option invite code for the service.
      */
-    private static Uri getEmbedUri(Connection connection, IftttConnectButton.ButtonState buttonState,
-            @Nullable String redirectUri, @Nullable String email, @Nullable String oAuthCode,
-            @Nullable String inviteCode) {
+    @VisibleForTesting
+    static Uri getEmbedUri(Connection connection, IftttConnectButton.ButtonState buttonState, String redirectUri,
+            String email, @Nullable String oAuthCode, @Nullable String inviteCode) {
         Uri.Builder builder = Uri.parse(connection.embeddedUrl)
                 .buildUpon()
                 .appendQueryParameter("ifttt_sdk_version", BuildConfig.VERSION_NAME)
-                .appendQueryParameter("ifttt_sdk_platform", "android");
-
-        if (redirectUri != null) {
-            builder.appendQueryParameter("sdk_return_to", redirectUri);
-        }
-
-        if (email != null) {
-            builder.appendQueryParameter("email", email);
-        }
+                .appendQueryParameter("ifttt_sdk_platform", "android")
+                .appendQueryParameter("sdk_return_to", redirectUri)
+                .appendQueryParameter("email", email);
 
         if (inviteCode != null) {
             builder.appendQueryParameter("invite_code", inviteCode);
