@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="connect_text_padding_horizontal">76dp</dimen>
+    <dimen name="connect_text_padding_horizontal">60dp</dimen>
     <dimen name="ifttt_icon_image_size">34dp</dimen>
     <dimen name="ifttt_start_image_width">9dp</dimen>
     <dimen name="ifttt_start_image_height">16dp</dimen>

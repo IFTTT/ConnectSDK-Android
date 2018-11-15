@@ -122,7 +122,7 @@ final class StartIconDrawable extends Drawable {
     @RequiresApi(api = LOLLIPOP)
     @Override
     public void getOutline(Outline outline) {
-        background.getOutline(outline);
+        outline.setOval(background.getBounds());
     }
 
     void reset() {

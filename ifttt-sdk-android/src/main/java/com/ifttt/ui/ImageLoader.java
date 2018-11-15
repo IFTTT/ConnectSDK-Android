@@ -55,11 +55,12 @@ final class ImageLoader {
     private ImageLoader() {
     }
 
-    void load(LifecycleOwner lifecycleOwner, String url, OnBitmapLoadedListener listener) {
+    @Nullable
+    Call load(LifecycleOwner lifecycleOwner, String url, OnBitmapLoadedListener listener) {
         Bitmap cached = cache.get(url);
         if (cached != null) {
             listener.onComplete(cached);
-            return;
+            return null;
         }
 
         Request request = new Request.Builder().url(url).build();
@@ -85,6 +86,8 @@ final class ImageLoader {
                 handler.post(() -> listener.onComplete(bitmap));
             }
         });
+
+        return call;
     }
 
     void fetch(Lifecycle lifecycle, String url) {

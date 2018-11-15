@@ -53,6 +53,12 @@ public final class ConnectResult implements Parcelable {
     public final NextStep nextStep;
 
     /**
+     * Additional information when {@link #nextStep} is {@link NextStep#Complete}. This is used to differentiate between
+     * a completed Connection enable flow with and without configuration.
+     */
+    @Nullable public final boolean completeFromConfig;
+
+    /**
      * Additional information when {@link #nextStep} is {@link NextStep#ServiceAuthentication}. This is used to help the
      * IftttConnectButton show proper service information to guide users in the enable flow.
      *
@@ -75,35 +81,39 @@ public final class ConnectResult implements Parcelable {
     public static ConnectResult fromIntent(Intent intent) {
         Uri data = intent.getData();
         if (data == null) {
-            return new ConnectResult(Unknown, null, null);
+            return new ConnectResult(Unknown, false, null, null);
         }
 
         String nextStepParam = data.getQueryParameter("next_step");
         if ("service_authentication".equals(nextStepParam)) {
             String serviceId = data.getQueryParameter("service_id");
             if (serviceId == null || serviceId.length() == 0) {
-                return new ConnectResult(Unknown, null, null);
+                return new ConnectResult(Unknown, false, null, null);
             }
 
-            return new ConnectResult(ServiceAuthentication, serviceId, null);
+            return new ConnectResult(ServiceAuthentication, false, serviceId, null);
         } else if ("complete".equals(nextStepParam)) {
-            return new ConnectResult(Complete, null, null);
+            boolean fromConfig = data.getBooleanQueryParameter("config", false);
+            return new ConnectResult(Complete, fromConfig, null, null);
         } else if ("error".equals(nextStepParam)) {
             String errorType = data.getQueryParameter("error_type");
-            return new ConnectResult(NextStep.Error, null, errorType);
+            return new ConnectResult(NextStep.Error, false, null, errorType);
         }
 
-        return new ConnectResult(Unknown, null, null);
+        return new ConnectResult(Unknown, false, null, null);
     }
 
-    private ConnectResult(NextStep nextStep, @Nullable String serviceId, @Nullable String errorType) {
+    private ConnectResult(NextStep nextStep, @Nullable boolean completeFromConfig, @Nullable String serviceId,
+            @Nullable String errorType) {
         this.nextStep = nextStep;
+        this.completeFromConfig = completeFromConfig;
         this.serviceId = serviceId;
         this.errorType = errorType;
     }
 
     protected ConnectResult(Parcel in) {
         serviceId = in.readString();
+        completeFromConfig = in.readInt() == 1;
         nextStep = (NextStep) in.readSerializable();
         errorType = in.readString();
     }
@@ -128,6 +138,8 @@ public final class ConnectResult implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(serviceId);
+        dest.writeInt(completeFromConfig ? 1 : 0);
         dest.writeSerializable(nextStep);
+        dest.writeString(errorType);
     }
 }
