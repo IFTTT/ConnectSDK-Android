@@ -12,6 +12,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -531,14 +532,26 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             });
         }
 
+        // Set a placeholder for the image.
+        final StartIconDrawable placeHolderImage;
+        if (iconImg.getBackground() == null) {
+            placeHolderImage = new StartIconDrawable(getContext(), new ColorDrawable(), 0, 0, false);
+            iconImg.setBackground(placeHolderImage);
+            iconImg.setAlpha(1f);
+        } else {
+            placeHolderImage = null;
+        }
+
         ongoingImageCall = ImageLoader.get().load(this, worksWithService.monochromeIconUrl, bitmap -> {
             ongoingImageCall = null;
-            BitmapDrawable serviceIcon = new BitmapDrawable(getResources(), bitmap);
+
             int iconBackgroundMargin = getResources().getDimensionPixelSize(R.dimen.ifttt_icon_margin);
+            BitmapDrawable serviceIcon = new BitmapDrawable(getResources(), bitmap);
             StartIconDrawable drawable = new StartIconDrawable(context, serviceIcon, iconSize,
                     iconImg.getHeight() - iconBackgroundMargin * 2, onDarkBackground);
 
-            ObjectAnimator fadeInIconImg = ObjectAnimator.ofFloat(iconImg, "alpha", iconImg.getAlpha(), 1f);
+            ObjectAnimator fadeInIconImg =
+                    ObjectAnimator.ofFloat(iconImg, "alpha", placeHolderImage == null ? iconImg.getAlpha() : 0f, 1f);
             fadeInIconImg.addListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationStart(Animator animation) {
@@ -608,14 +621,11 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                     ((Integer) animation.getAnimatedValue()) - completeImg.getLeft());
         });
 
-        if (iconImg.getBackground() != null) {
-            StartIconDrawable iconDrawable = (StartIconDrawable) iconImg.getBackground();
-            iconMovement.addUpdateListener(animation -> {
-                int color =
-                        (int) EVALUATOR.evaluate(animation.getAnimatedFraction(), BLACK, worksWithService.brandColor);
-                iconDrawable.setBackgroundColor(color);
-            });
-        }
+        StartIconDrawable iconDrawable = (StartIconDrawable) iconImg.getBackground();
+        iconMovement.addUpdateListener(animation -> {
+            int color = (int) EVALUATOR.evaluate(animation.getAnimatedFraction(), BLACK, worksWithService.brandColor);
+            iconDrawable.setBackgroundColor(color);
+        });
 
         ValueAnimator iconElevation = ValueAnimator.ofFloat(ViewCompat.getElevation(iconImg),
                 getResources().getDimension(R.dimen.ifttt_icon_elevation));
@@ -707,10 +717,8 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             public void onAnimationEnd(Animator animation) {
                 // After fading in progress bar, reset the icon's StartIconDrawable back to initial state.
                 iconImg.setTranslationX(0f);
-                if (iconImg.getBackground() != null) {
-                    ((StartIconDrawable) iconImg.getBackground()).reset();
-                    ((StartIconDrawable) iconImg.getBackground()).setBackgroundColor(worksWithService.brandColor);
-                }
+                ((StartIconDrawable) iconImg.getBackground()).reset();
+                ((StartIconDrawable) iconImg.getBackground()).setBackgroundColor(worksWithService.brandColor);
             }
         });
 
@@ -831,11 +839,9 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         set.playSequentially(slideIcon, fadeInEmailText);
 
         // Morph service icon into the start button.
-        if (iconImg.getBackground() != null) {
-            Animator iconMorphing = ((StartIconDrawable) iconImg.getBackground()).getMorphAnimator();
-            iconMorphing.setDuration(ANIM_DURATION_MEDIUM);
-            set.playTogether(iconMorphing, fadeOutConnect);
-        }
+        Animator iconMorphing = ((StartIconDrawable) iconImg.getBackground()).getMorphAnimator();
+        iconMorphing.setDuration(ANIM_DURATION_MEDIUM);
+        set.playTogether(iconMorphing, fadeOutConnect);
 
         set.setInterpolator(EASE_INTERPOLATOR);
 
@@ -858,7 +864,17 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                 String email = emailEdt.getText().toString();
                 buttonApiHelper.prepareAuthentication(email);
 
-                setTextSwitcherText(helperTxt, poweredByIfttt);
+                if (!iftttApiClient.isUserAuthenticated()) {
+                    // Show users their email to be used to create an account or sign in.
+                    Typeface boldTypeface = Typeface.createFromAsset(getContext().getAssets(), AVENIR_BOLD);
+                    String usingEmail = getResources().getString(R.string.ifttt_using_email, emailEdt.getText());
+                    SpannableString boldEmail = new SpannableString(usingEmail);
+                    boldEmail.setSpan(new AvenirTypefaceSpan(boldTypeface), 6, usingEmail.length(),
+                            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    setTextSwitcherText(helperTxt, boldEmail);
+                } else {
+                    setTextSwitcherText(helperTxt, poweredByIfttt);
+                }
             }
         };
 
