@@ -10,10 +10,9 @@ import androidx.browser.customtabs.CustomTabsIntent;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.OnLifecycleEvent;
-import com.ifttt.Connection;
 import com.ifttt.BuildConfig;
+import com.ifttt.Connection;
 import com.ifttt.ErrorResponse;
-import com.ifttt.IftttApiClient;
 import com.ifttt.api.IftttApi;
 import com.ifttt.api.PendingResult;
 import com.ifttt.api.PendingResult.ResultCallback;
@@ -41,12 +40,12 @@ final class ButtonApiHelper {
     // to help simplify the flow by setting an aggressive timeout for account checking requests.
     private boolean accountFound = true;
 
-    ButtonApiHelper(IftttApiClient iftttApiClient, String redirectUri, OAuthCodeProvider provider,
+    ButtonApiHelper(IftttApi iftttApi, String redirectUri, String inviteCode, OAuthCodeProvider provider,
             Lifecycle lifecycle) {
         this.lifecycle = lifecycle;
         this.redirectUri = redirectUri;
-        inviteCode = iftttApiClient.getInviteCode();
-        iftttApi = iftttApiClient.api();
+        this.inviteCode = inviteCode;
+        this.iftttApi = iftttApi;
         oAuthCodeProvider = provider;
     }
 
