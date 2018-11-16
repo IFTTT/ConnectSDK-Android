@@ -35,6 +35,7 @@ import javax.annotation.Nullable;
 
 import static android.os.Build.VERSION.SDK_INT;
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
+import static com.ifttt.ui.ButtonUiHelper.TextTransitionType.Change;
 
 final class ButtonUiHelper {
 
@@ -78,7 +79,7 @@ final class ButtonUiHelper {
         AnimatorSet set = new AnimatorSet();
         if (type == TextTransitionType.Appear) {
             set.play(fadeIn).with(slideIn);
-        } else if (type == TextTransitionType.Change) {
+        } else if (type == Change) {
             fadeIn.addListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationStart(Animator animation) {
@@ -192,9 +193,17 @@ final class ButtonUiHelper {
         int marginHorizontal =
                 textView.getResources().getDimensionPixelSize(R.dimen.connect_text_padding_horizontal) * 2;
         if (width > textView.getWidth() - marginHorizontal) {
-            textView.setText(fallback);
+            if (TextUtils.isEmpty(textView.getText())) {
+                textView.setText(fallback);
+            } else {
+                getTextTransitionAnimator(textView, Change, fallback).start();
+            }
         } else {
-            textView.setText(text);
+            if (TextUtils.isEmpty(textView.getText())) {
+                textView.setText(text);
+            } else {
+                getTextTransitionAnimator(textView, Change, text).start();
+            }
         }
     }
 
