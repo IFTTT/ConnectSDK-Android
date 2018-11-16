@@ -14,7 +14,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipChildren="false"
-            android:clipToPadding="false">
+            android:clipToPadding="false"
+            android:alpha="0">
 
             <EditText
                 android:id="@+id/ifttt_email"
@@ -50,7 +51,8 @@
                 android:layout_gravity="center_vertical"
                 android:background="@null"
                 android:elevation="@dimen/ifttt_icon_elevation"
-                android:scaleType="centerInside"/>
+                android:scaleType="centerInside"
+                android:alpha="0"/>
 
         </FrameLayout>
 
