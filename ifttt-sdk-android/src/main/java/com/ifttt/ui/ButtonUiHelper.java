@@ -192,16 +192,17 @@ final class ButtonUiHelper {
         float width = StaticLayout.getDesiredWidth(text, textView.getPaint());
         int marginHorizontal =
                 textView.getResources().getDimensionPixelSize(R.dimen.connect_text_padding_horizontal) * 2;
+        CharSequence currentText = textView.getText();
         if (width > textView.getWidth() - marginHorizontal) {
-            if (TextUtils.isEmpty(textView.getText())) {
+            if (TextUtils.isEmpty(currentText)) {
                 textView.setText(fallback);
-            } else {
+            } else if (!fallback.equals(currentText)) {
                 getTextTransitionAnimator(textView, Change, fallback).start();
             }
         } else {
-            if (TextUtils.isEmpty(textView.getText())) {
+            if (TextUtils.isEmpty(currentText)) {
                 textView.setText(text);
-            } else {
+            } else if (!text.equals(currentText)) {
                 getTextTransitionAnimator(textView, Change, text).start();
             }
         }
