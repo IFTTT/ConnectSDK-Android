@@ -42,8 +42,9 @@ public interface IftttApi {
      *
      * @param oAuthToken Your user's OAuth access token.
      * @param serviceKey Your IFTTT service key.
+     * @param userId User's id in your service.
      *
      * @return A {@link PendingResult} for the API call execution.
      */
-    PendingResult<String> userToken(String oAuthToken, String serviceKey);
+    PendingResult<String> userToken(String oAuthToken, String userId, String serviceKey);
 }

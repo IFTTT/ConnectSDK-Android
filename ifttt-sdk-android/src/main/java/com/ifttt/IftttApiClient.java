@@ -140,8 +140,8 @@ public final class IftttApiClient {
         }
 
         @Override
-        public PendingResult<String> userToken(String oAuthToken, String serviceKey) {
-            return new ApiPendingResult<>(retrofitIftttApi.getUserToken(oAuthToken, serviceKey),
+        public PendingResult<String> userToken(String oAuthToken, String userId, String serviceKey) {
+            return new ApiPendingResult<>(retrofitIftttApi.getUserToken(oAuthToken, userId, serviceKey),
                     errorResponseJsonAdapter);
         }
     }

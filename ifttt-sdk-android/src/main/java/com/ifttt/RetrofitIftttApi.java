@@ -7,6 +7,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 /**
  * IFTTT API endpoints.
@@ -23,5 +24,6 @@ interface RetrofitIftttApi {
     Call<User> user();
 
     @POST("/v2/user_token")
-    Call<String> getUserToken(@UserTokenRequest @Body String token, @Header("IFTTT-Service-Key") String serviceKey);
+    Call<String> getUserToken(@UserTokenRequest @Body String token, @Query("user_id") String userId,
+            @Header("IFTTT-Service-Key") String serviceKey);
 }
