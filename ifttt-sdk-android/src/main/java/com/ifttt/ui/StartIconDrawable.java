@@ -66,6 +66,8 @@ final class StartIconDrawable extends Drawable {
 
         this.startIcon.setAlpha(0);
         this.serviceIcon.setAlpha(255);
+
+        background.getPaint().setColor(Color.TRANSPARENT);
     }
 
     @Override
@@ -122,6 +124,11 @@ final class StartIconDrawable extends Drawable {
     @RequiresApi(api = LOLLIPOP)
     @Override
     public void getOutline(Outline outline) {
+        if (background.getPaint().getColor() == Color.TRANSPARENT) {
+            // Do not set outline if the background's color is transparent.
+            return;
+        }
+
         outline.setOval(background.getBounds());
     }
 
