@@ -106,8 +106,8 @@ final class ButtonApiHelper {
             String email, @Nullable String oAuthCode, @Nullable String inviteCode) {
         Uri.Builder builder = Uri.parse(connection.embeddedUrl)
                 .buildUpon()
-                .appendQueryParameter("ifttt_sdk_version", BuildConfig.VERSION_NAME)
-                .appendQueryParameter("ifttt_sdk_platform", "android")
+                .appendQueryParameter("sdk_version", BuildConfig.VERSION_NAME)
+                .appendQueryParameter("sdk_platform", "android")
                 .appendQueryParameter("sdk_return_to", redirectUri)
                 .appendQueryParameter("email", email);
 
