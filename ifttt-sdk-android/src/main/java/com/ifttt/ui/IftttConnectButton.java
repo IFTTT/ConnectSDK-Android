@@ -1017,10 +1017,15 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
 
     private Service findWorksWithService(Connection connection) {
         Service otherService = null;
-        for (Service service : connection.services) {
-            if (!service.isPrimary) {
-                otherService = service;
-                break;
+        if (connection.services.size() == 1) {
+            // If there is only one service involved.
+            otherService = connection.services.get(0);
+        } else {
+            for (Service service : connection.services) {
+                if (!service.isPrimary) {
+                    otherService = service;
+                    break;
+                }
             }
         }
 
