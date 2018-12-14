@@ -32,7 +32,7 @@
                 android:gravity="center"
                 android:text="@string/ifttt_about_title"
                 android:layout_marginTop="32dp"
-                android:lineSpacingMultiplier="1.2"
+                android:lineSpacingExtra="@dimen/ifttt_about_text_line_space"
                 android:textAppearance="@style/AboutIfttt.Title"/>
 
             <TextView
@@ -43,7 +43,7 @@
                 android:drawablePadding="@dimen/ifttt_about_drawable_padding"
                 android:drawableStart="@drawable/ic_ifttt_about_1"
                 android:text="@string/ifttt_about_1"
-                android:lineSpacingMultiplier="1.2"
+                android:lineSpacingExtra="@dimen/ifttt_about_text_line_space"
                 android:textAppearance="@style/AboutIfttt.Description"/>
 
             <TextView
@@ -54,7 +54,7 @@
                 android:drawablePadding="@dimen/ifttt_about_drawable_padding"
                 android:drawableStart="@drawable/ic_ifttt_about_2"
                 android:text="@string/ifttt_about_2"
-                android:lineSpacingMultiplier="1.2"
+                android:lineSpacingExtra="@dimen/ifttt_about_text_line_space"
                 android:textAppearance="@style/AboutIfttt.Description"/>
 
             <TextView
@@ -65,15 +65,25 @@
                 android:drawablePadding="@dimen/ifttt_about_drawable_padding"
                 android:drawableStart="@drawable/ic_ifttt_about_3"
                 android:text="@string/ifttt_about_3"
-                android:lineSpacingMultiplier="1.2"
+                android:lineSpacingExtra="@dimen/ifttt_about_text_line_space"
                 android:textAppearance="@style/AboutIfttt.Description"/>
+
+            <TextView
+                android:id="@+id/term_and_privacy"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:lineSpacingExtra="@dimen/ifttt_about_text_line_space"
+                android:textColor="@android:color/white"
+                android:textSize="12sp"
+                android:layout_marginTop="48dp"
+                android:gravity="center"/>
 
             <TextView
                 android:id="@+id/ifttt_more_about_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="32dp"
-                android:layout_marginTop="48dp"
+                android:layout_marginTop="32dp"
                 android:background="@drawable/ifttt_about_button_background"
                 android:paddingStart="@dimen/ifttt_about_button_radius"
                 android:paddingEnd="@dimen/ifttt_about_button_radius"

@@ -15,4 +15,5 @@
     <dimen name="ifttt_about_button_height">34sp</dimen>
     <dimen name="ifttt_button_border_width">1dp</dimen>
     <dimen name="ifttt_connect_text_size">20sp</dimen>
+    <dimen name="ifttt_about_text_line_space">6sp</dimen>
 </resources>
