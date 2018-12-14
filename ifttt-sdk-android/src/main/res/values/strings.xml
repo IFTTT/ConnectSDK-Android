@@ -16,7 +16,7 @@
     <string name="ifttt_connected">Connected</string>
     <string name="ifttt_connecting_account">Connecting account…</string>
     <string name="ifttt_connection_off">Off</string>
-    <string name="ifttt_sign_in_to_ifttt_or_create_new_account">Sign in to IFTTT or create a new account</string>
+    <string name="ifttt_sign_in_to_ifttt_or_create_new_account"><![CDATA[You are creating or using your IFTTT account subject to <a href=\"https://ifttt.com/terms\">Terms</a> & <a href=\"https://ifttt.com/privacy\">Privacy Policy</a>.]]></string>
     <string name="ifttt_using_email">Using %1$s</string>
     <string name="ifttt_connect_services_description">Sign in to connect %1$s with %2$s</string>
     <string name="ifttt_all_set">You\'re all set. Manage connection with IFTTT</string>

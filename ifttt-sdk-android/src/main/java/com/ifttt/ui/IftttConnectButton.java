@@ -16,8 +16,10 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.Html;
 import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.method.LinkMovementMethod;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -236,7 +238,8 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         helperTxt.setFactory(() -> {
             TextView textView = (TextView) LayoutInflater.from(context)
                     .inflate(R.layout.view_ifttt_helper_text, IftttConnectButton.this, false);
-
+            textView.setLinkTextColor(Color.BLACK);
+            textView.setMovementMethod(LinkMovementMethod.getInstance());
             // Workaround: TextSwitcher is looking for the View's LayoutParams to be a FrameLayout.LayoutParams. So
             // set one up here so that it doesn't complain.
             textView.setLayoutParams(new FrameLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
@@ -788,7 +791,8 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
      * Start the animation for Connection authentication.
      */
     private void animateToEmailField() {
-        setTextSwitcherText(helperTxt, getResources().getString(R.string.ifttt_sign_in_to_ifttt_or_create_new_account));
+        setTextSwitcherText(helperTxt,
+                Html.fromHtml(getResources().getString(R.string.ifttt_sign_in_to_ifttt_or_create_new_account)));
         helperTxt.setClickable(false);
 
         // Fade out "Connect X" text.
