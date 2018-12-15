@@ -25,6 +25,6 @@
     <string name="ifttt_enter_valid_email">Please enter a valid email address</string>
     <string name="ifttt_save_settings">Saving settings…
     </string>
-    <string name="terms_and_privacy"><![CDATA[By using this IFTTT service you agree to <a href=\"https://ifttt.com/terms\">Terms of Use</a> and <a href=\"https://ifttt.com/privacy\">Privacy Policy</a>.]]></string>
+    <string name="terms_and_privacy"><![CDATA[By using this IFTTT service you agree to the <a href=\"https://ifttt.com/terms\">Terms of Use</a> and <a href=\"https://ifttt.com/privacy\">Privacy Policy</a>.]]></string>
 
 </resources>
