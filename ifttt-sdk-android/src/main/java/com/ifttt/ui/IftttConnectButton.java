@@ -239,7 +239,6 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             TextView textView = (TextView) LayoutInflater.from(context)
                     .inflate(R.layout.view_ifttt_helper_text, IftttConnectButton.this, false);
             textView.setLinkTextColor(Color.BLACK);
-            textView.setMovementMethod(LinkMovementMethod.getInstance());
             // Workaround: TextSwitcher is looking for the View's LayoutParams to be a FrameLayout.LayoutParams. So
             // set one up here so that it doesn't complain.
             textView.setLayoutParams(new FrameLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
@@ -791,9 +790,11 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
      * Start the animation for Connection authentication.
      */
     private void animateToEmailField() {
+        // Set up links for helper text.
         setTextSwitcherText(helperTxt,
                 Html.fromHtml(getResources().getString(R.string.ifttt_sign_in_to_ifttt_or_create_new_account)));
         helperTxt.setClickable(false);
+        ((TextView) helperTxt.getCurrentView()).setMovementMethod(LinkMovementMethod.getInstance());
 
         // Fade out "Connect X" text.
         ObjectAnimator fadeOutConnect = ObjectAnimator.ofFloat(connectStateTxt, "alpha", 1f, 0f);
@@ -867,6 +868,9 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
 
                 String email = emailEdt.getText().toString();
                 buttonApiHelper.prepareAuthentication(email);
+
+                // Revert movement method to allow click events to the TextView.
+                ((TextView) helperTxt.getCurrentView()).setMovementMethod(null);
 
                 if (!iftttApiClient.isUserAuthenticated()) {
                     // Show users their email to be used to create an account or sign in.
