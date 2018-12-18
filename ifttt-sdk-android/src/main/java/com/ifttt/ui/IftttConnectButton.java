@@ -590,7 +590,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                 }
             });
         } else {
-            buttonRoot.setOnClickListener(new DebouncingOnClickListener() {
+            DebouncingOnClickListener onClickListener = new DebouncingOnClickListener() {
                 @Override
                 void doClick(View v) {
                     // Cancel potential ongoing image loading task. Users have already click the button and the service
@@ -606,7 +606,11 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                         animateEmailValidation();
                     }
                 }
-            });
+            };
+
+            // Clicking both the button or the icon ImageView starts the flow.
+            buttonRoot.setOnClickListener(onClickListener);
+            iconImg.setOnClickListener(onClickListener);
         }
     }
 
