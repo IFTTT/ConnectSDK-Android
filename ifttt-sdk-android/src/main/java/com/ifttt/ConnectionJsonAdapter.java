@@ -23,10 +23,9 @@ final class ConnectionJsonAdapter {
             status = Connection.Status.valueOf(connectionJson.user_status);
         }
 
-        return new Connection(
-                connectionJson.id, connectionJson.name, connectionJson.description, status, connectionJson.published_at,
-                connectionJson.enabled_count, connectionJson.last_run_at, connectionJson.url, connectionJson.embedded_url,
-                connectionJson.services);
+        return new Connection(connectionJson.id, connectionJson.name, connectionJson.description, status,
+                connectionJson.published_at, connectionJson.enabled_count, connectionJson.last_run_at,
+                connectionJson.url, connectionJson.services);
     }
 
     @ToJson
@@ -43,11 +42,10 @@ final class ConnectionJsonAdapter {
         final int enabled_count;
         final Date last_run_at;
         final String url;
-        final String embedded_url;
         final List<Service> services;
 
         ConnectionJson(String id, String name, String description, @Nullable String user_status, Date published_at,
-                int enabled_count, Date last_run_at, String url, String embedded_url, List<Service> services) {
+                int enabled_count, Date last_run_at, String url, List<Service> services) {
             this.id = id;
             this.name = name;
             this.description = description;
@@ -56,7 +54,6 @@ final class ConnectionJsonAdapter {
             this.enabled_count = enabled_count;
             this.last_run_at = last_run_at;
             this.url = url;
-            this.embedded_url = embedded_url;
             this.services = services;
         }
     }

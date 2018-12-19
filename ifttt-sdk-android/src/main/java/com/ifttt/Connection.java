@@ -2,7 +2,6 @@ package com.ifttt;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import com.ifttt.ui.IftttConnectButton;
 import java.util.Date;
 import java.util.List;
 import javax.annotation.Nullable;
@@ -64,17 +63,11 @@ public final class Connection implements Parcelable {
     public final String url;
     public final List<Service> services;
 
-    /**
-     * URL string that links to this Connection's authentication flow. This value should not be used on its own, and the
-     * Connection authentication flow should be handled by {@link IftttConnectButton}.
-     */
-    public final String embeddedUrl;
-
     // Cached primary service object.
     @Nullable private Service primaryService;
 
     public Connection(String id, String name, String description, Status status, @Nullable Date publishedAt,
-            int enabledCount, @Nullable Date lastRunAt, String url, String embeddedUrl, List<Service> services) {
+            int enabledCount, @Nullable Date lastRunAt, String url, List<Service> services) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -83,7 +76,6 @@ public final class Connection implements Parcelable {
         this.enabledCount = enabledCount;
         this.lastRunAt = lastRunAt;
         this.url = url;
-        this.embeddedUrl = embeddedUrl;
         this.services = services;
     }
 
@@ -131,7 +123,6 @@ public final class Connection implements Parcelable {
         }
 
         url = in.readString();
-        embeddedUrl = in.readString();
         services = in.createTypedArrayList(Service.CREATOR);
     }
 
@@ -162,7 +153,6 @@ public final class Connection implements Parcelable {
         parcel.writeInt(enabledCount);
         parcel.writeLong(lastRunAt != null ? lastRunAt.getTime() : -1L);
         parcel.writeString(url);
-        parcel.writeString(embeddedUrl);
         parcel.writeTypedList(services);
     }
 }

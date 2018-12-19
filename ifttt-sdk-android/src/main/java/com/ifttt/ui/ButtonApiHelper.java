@@ -28,6 +28,8 @@ import static com.ifttt.ui.IftttConnectButton.ButtonState.ServiceAuthentication;
  */
 final class ButtonApiHelper {
 
+    private static final String SHOW_CONNECTION_API_URL = "https://ifttt.com/access/api/";
+
     private final IftttApi iftttApi;
     private final OAuthCodeProvider oAuthCodeProvider;
     private final Lifecycle lifecycle;
@@ -104,7 +106,7 @@ final class ButtonApiHelper {
     @VisibleForTesting
     static Uri getEmbedUri(Connection connection, IftttConnectButton.ButtonState buttonState, String redirectUri,
             String email, @Nullable String oAuthCode, @Nullable String inviteCode) {
-        Uri.Builder builder = Uri.parse(connection.embeddedUrl)
+        Uri.Builder builder = Uri.parse(SHOW_CONNECTION_API_URL + connection.id)
                 .buildUpon()
                 .appendQueryParameter("sdk_version", BuildConfig.VERSION_NAME)
                 .appendQueryParameter("sdk_platform", "android")
