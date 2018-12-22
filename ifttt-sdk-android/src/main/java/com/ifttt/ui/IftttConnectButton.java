@@ -20,6 +20,7 @@ import android.text.Html;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
+import android.text.style.UnderlineSpan;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -412,7 +413,8 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             case ServiceAuthentication:
                 // If the previous button state is login, complete the progress before going
                 Animator animator = buttonState == Login ? getCheckMarkAnimator()
-                        : getServiceAuthProcessingAnimator(getResources().getString(R.string.ifttt_connecting_account));
+                        : getProcessingAnimator(getResources().getString(R.string.ifttt_connecting_account),
+                                worksWithService.brandColor);
                 animator.addListener(new AnimatorListenerAdapter() {
                     @Override
                     public void onAnimationEnd(Animator animation) {
@@ -583,12 +585,15 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         iconImg.setLayoutParams(lp);
 
         if (connection.status == enabled) {
-            buttonRoot.setOnClickListener(new DebouncingOnClickListener() {
+            DebouncingOnClickListener onClickListener = new DebouncingOnClickListener() {
                 @Override
                 void doClick(View v) {
                     setTextSwitcherText(helperTxt, getResources().getString(R.string.slide_to_turn_off));
+                    helperTxt.setClickable(false);
                 }
-            });
+            };
+            buttonRoot.setOnClickListener(onClickListener);
+            iconImg.setOnClickListener(onClickListener);
         } else {
             DebouncingOnClickListener onClickListener = new DebouncingOnClickListener() {
                 @Override
@@ -603,7 +608,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                     if (!iftttApiClient.isUserAuthenticated()) {
                         animateToEmailField();
                     } else {
-                        animateEmailValidation();
+                        getEmailValidationAnimator().start();
                     }
                 }
             };
@@ -647,13 +652,11 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
 
         completeSet.playTogether(iconMovement, iconElevation, fadeInConnectStateTxt);
 
-        ObjectAnimator fadeOutProgressRoot = ObjectAnimator.ofFloat(progressRoot, "alpha", 1f, 0f);
-        fadeOutProgressRoot.setDuration(ANIM_DURATION_MEDIUM);
-        fadeOutProgressRoot.setInterpolator(EASE_INTERPOLATOR);
+        Animator fadeOutProgressRoot = getFadeOutProgressBarAnimator();
 
         CharSequence text = hasConfig ? getResources().getString(R.string.ifttt_save_settings)
                 : getResources().getString(R.string.ifttt_connecting_account);
-        Animator checkMarkAnimator = getServiceAuthProcessingAnimator(text);
+        Animator checkMarkAnimator = getProcessingAnimator(text, worksWithService.brandColor);
         iconMovement.setStartDelay(ICON_MOVEMENT_START_DELAY);
         fadeOutProgressRoot.setStartDelay(ICON_MOVEMENT_START_DELAY);
         completeSet.playTogether(checkMarkAnimator, iconMovement, fadeOutProgressRoot);
@@ -696,9 +699,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         completeSet.start();
     }
 
-    private void animateEmailValidation() {
-        setTextSwitcherText(helperTxt, poweredByIfttt);
-
+    private AnimatorSet getEmailValidationAnimator() {
         if (iftttApiClient.isUserAuthenticated()) {
             progressTxt.setText(
                     replaceKeyWithImage(connectStateTxt, getResources().getString(R.string.ifttt_signing_in_to_ifttt),
@@ -718,19 +719,14 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                 (float) animation.getAnimatedValue()));
 
         ObjectAnimator fadeInProgressContainer = ObjectAnimator.ofFloat(progressRoot, "alpha", 0f, 1f);
-        fadeInProgressContainer.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                // After fading in progress bar, reset the icon's StartIconDrawable back to initial state.
-                iconImg.setTranslationX(0f);
-                ((StartIconDrawable) iconImg.getBackground()).reset();
-                ((StartIconDrawable) iconImg.getBackground()).setBackgroundColor(worksWithService.brandColor);
-            }
-        });
 
         AnimatorSet set = new AnimatorSet();
         set.playTogether(fadeInProgressContainer, showProgress, showProgressText);
         set.addListener(new AnimatorListenerAdapter() {
+
+            // Flag to skip onAnimationEnd callback when the animation is canceled.
+            private boolean isCanceled = false;
+
             @Override
             public void onAnimationStart(Animator animation) {
                 // When the animation starts, disable the click on buttonRoot, so that the flow will not be started
@@ -740,7 +736,23 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             }
 
             @Override
+            public void onAnimationCancel(Animator animation) {
+                isCanceled = true;
+                emailEdt.setVisibility(VISIBLE);
+                getFadeOutProgressBarAnimator().start();
+            }
+
+            @Override
             public void onAnimationEnd(Animator animation) {
+                if (isCanceled) {
+                    return;
+                }
+
+                // Reset the icon's StartIconDrawable back to initial state.
+                iconImg.setTranslationX(0f);
+                ((StartIconDrawable) iconImg.getBackground()).reset();
+                ((StartIconDrawable) iconImg.getBackground()).setBackgroundColor(worksWithService.brandColor);
+
                 // Complete email validation progress bar.
                 ValueAnimator completeProgress = ValueAnimator.ofFloat(0.5f, 1f);
                 completeProgress.setInterpolator(LINEAR_INTERPOLATOR);
@@ -756,8 +768,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                     Animator fadeInCheckMark = getCheckMarkAnimator();
 
                     // Fade out progress bar.
-                    ObjectAnimator fadeOutProgressRoot = ObjectAnimator.ofFloat(progressRoot, "alpha", 1f, 0f);
-                    fadeOutProgressRoot.setInterpolator(EASE_INTERPOLATOR);
+                    Animator fadeOutProgressRoot = getFadeOutProgressBarAnimator();
 
                     // Group changing progress text and completing progress bar animation together.
                     createAccountCompleteSet.playTogether(getTextTransitionAnimator(progressTxt, Change,
@@ -787,7 +798,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             }
         });
 
-        set.start();
+        return set;
     }
 
     /**
@@ -795,8 +806,9 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
      */
     private void animateToEmailField() {
         // Set up links for helper text.
-        setTextSwitcherText(helperTxt,
-                Html.fromHtml(getResources().getString(R.string.ifttt_sign_in_to_ifttt_or_create_new_account)));
+        final Spanned emailFieldHelperText =
+                Html.fromHtml(getResources().getString(R.string.ifttt_sign_in_to_ifttt_or_create_new_account));
+        setTextSwitcherText(helperTxt, emailFieldHelperText);
         helperTxt.setClickable(false);
         ((TextView) helperTxt.getCurrentView()).setMovementMethod(LinkMovementMethod.getInstance());
 
@@ -868,7 +880,8 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                         (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                 inputMethodManager.hideSoftInputFromWindow(emailEdt.getWindowToken(), 0);
 
-                animateEmailValidation();
+                AnimatorSet emailValidation = getEmailValidationAnimator();
+                emailValidation.start();
 
                 String email = emailEdt.getText().toString();
                 buttonApiHelper.prepareAuthentication(email);
@@ -877,13 +890,35 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                 ((TextView) helperTxt.getCurrentView()).setMovementMethod(null);
 
                 if (!iftttApiClient.isUserAuthenticated()) {
-                    // Show users their email to be used to create an account or sign in.
+                    // Show users their email to be used to create an account or sign in. At the same time, provide
+                    // a chance for users to go back to the email field to correct the email address.
                     Typeface boldTypeface = Typeface.createFromAsset(getContext().getAssets(), AVENIR_BOLD);
-                    String usingEmail = getResources().getString(R.string.ifttt_using_email, emailEdt.getText());
-                    SpannableString boldEmail = new SpannableString(usingEmail);
-                    boldEmail.setSpan(new AvenirTypefaceSpan(boldTypeface), 6, usingEmail.length(),
+                    String usingEmail = getResources().getString(R.string.ifttt_using_email, email);
+                    SpannableString emailAddr = new SpannableString(usingEmail);
+                    int emailStart = 6;
+                    int emailEnd = emailStart + email.length();
+                    emailAddr.setSpan(new UnderlineSpan(), emailStart, emailEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                    int changeStart = emailEnd + 2;
+                    int changeEnd = usingEmail.length() - 1;
+                    emailAddr.setSpan(new AvenirTypefaceSpan(boldTypeface), changeStart, changeEnd,
                             Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    setTextSwitcherText(helperTxt, boldEmail);
+                    emailAddr.setSpan(new UnderlineSpan(), changeStart, changeEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    setTextSwitcherText(helperTxt, emailAddr);
+
+                    // Return back to email field state.
+                    helperTxt.setOnClickListener(new DebouncingOnClickListener() {
+                        @Override
+                        void doClick(View v) {
+                            emailValidation.cancel();
+                            iconImg.setClickable(true);
+
+                            // Reset Helper text for email field.
+                            setTextSwitcherText(helperTxt, emailFieldHelperText);
+                            helperTxt.setClickable(false);
+                            ((TextView) helperTxt.getCurrentView()).setMovementMethod(LinkMovementMethod.getInstance());
+                        }
+                    });
                 } else {
                     setTextSwitcherText(helperTxt, poweredByIfttt);
                 }
@@ -955,6 +990,13 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         return set;
     }
 
+    private Animator getFadeOutProgressBarAnimator() {
+        ObjectAnimator fadeOutProgressRoot = ObjectAnimator.ofFloat(progressRoot, "alpha", 1f, 0f);
+        fadeOutProgressRoot.setDuration(ANIM_DURATION_MEDIUM);
+        fadeOutProgressRoot.setInterpolator(EASE_INTERPOLATOR);
+        return fadeOutProgressRoot;
+    }
+
     /**
      * Get an animator set that's used to run a "proceed and complete" animation, including a progress bar and a check
      * mark animation.
@@ -962,7 +1004,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
      * @param text Text to be shown while the progress animation is running.
      * @return the Animator object that has timing and interpolator set up.
      */
-    private Animator getServiceAuthProcessingAnimator(CharSequence text) {
+    private Animator getProcessingAnimator(CharSequence text, int color) {
         ObjectAnimator fadeInIconImg = ObjectAnimator.ofFloat(progressIconImg, "alpha", 0f, 1f);
         fadeInIconImg.setInterpolator(EASE_INTERPOLATOR);
 
@@ -1015,7 +1057,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
 
                 // Reset the progress background's progress and color.
                 progressBackground.setProgress(0f);
-                progressBackground.setColor(worksWithService.brandColor, getDarkerColor(worksWithService.brandColor));
+                progressBackground.setColor(color, getDarkerColor(color));
                 ImageLoader.get().load(IftttConnectButton.this, worksWithService.monochromeIconUrl, bitmap -> {
                     if (bitmap != null) {
                         progressIconImg.setImageBitmap(bitmap);
@@ -1177,20 +1219,46 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
 
         @Override
         public void onViewReleased(@NonNull View releasedChild, float xvel, float yvel) {
-            if ((releasedChild.getLeft() + iconImg.getWidth() / 2) / (float) buttonRoot.getWidth() <= 0.5f) {
+            if ((releasedChild.getLeft() + releasedChild.getWidth() / 2) / (float) buttonRoot.getWidth() <= 0.5f) {
                 Runnable settlingAnimation = new Runnable() {
                     @Override
                     public void run() {
                         if (viewDragHelper.continueSettling(false)) {
                             post(this);
                         } else {
-                            buttonApiHelper.disableConnection(connection.id, connectionResultCallback);
+                            Animator animator = getProcessingAnimator(getResources().getString(R.string.disconnecting),
+                                    worksWithService.brandColor);
+                            animator.start();
+                            buttonApiHelper.disableConnection(connection.id, new ResultCallback<Connection>() {
+                                @Override
+                                public void onSuccess(Connection result) {
+                                    connectionResultCallback.onSuccess(result);
+                                    Animator fadeOut = getFadeOutProgressBarAnimator();
+                                    if (animator.isRunning()) {
+                                        animator.addListener(new AnimatorListenerAdapter() {
+                                            @Override
+                                            public void onAnimationEnd(Animator animation) {
+                                                fadeOut.start();
+                                            }
+                                        });
+                                    } else {
+                                        fadeOut.start();
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(ErrorResponse errorResponse) {
+                                    connectionResultCallback.onFailure(errorResponse);
+                                }
+                            });
                         }
                     }
                 };
                 // Off state.
                 if (viewDragHelper.settleCapturedViewAt(0, 0)) {
                     post(settlingAnimation);
+                } else {
+                    settlingAnimation.run();
                 }
 
                 dragEnabled = false;
