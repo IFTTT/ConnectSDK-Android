@@ -231,13 +231,6 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         manageConnection = replaceKeyWithImage((TextView) helperTxt.getCurrentView(),
                 getResources().getString(R.string.ifttt_all_set), "IFTTT", iftttLogo);
 
-        helperTxt.setOnClickListener(new DebouncingOnClickListener() {
-            @Override
-            void doClick(View v) {
-                getContext().startActivity(IftttAboutActivity.intent(context, connection));
-            }
-        });
-
         buttonRoot = findViewById(R.id.ifttt_toggle_root);
 
         progressRoot = findViewById(R.id.ifttt_progress_container);
@@ -485,6 +478,13 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
 
             helperTxt.setClickable(true);
             iconDragHelperCallback.setDragEnabled(false);
+
+            helperTxt.setOnClickListener(new DebouncingOnClickListener() {
+                @Override
+                void doClick(View v) {
+                    getContext().startActivity(IftttAboutActivity.intent(context, connection));
+                }
+            });
         } else {
             recordState(Enabled);
 
