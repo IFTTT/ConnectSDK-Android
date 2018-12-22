@@ -71,14 +71,17 @@ class MainActivity : AppCompatActivity() {
             }
 
             ApiHelper.login(userId, next = {
-                renderUi { connection ->
-                    title.text = connection.name
-                    Picasso.get().load(connection.primaryService.monochromeIconUrl).into(icon)
-                    icon.background = ShapeDrawable(OvalShape()).apply {
-                        paint.color = connection.primaryService.brandColor
+                // After login, you may try to fetch the user's IFTTT user token, in the case where the user has already
+                // authenticate your service on IFTTT.
+                ApiHelper.fetchIftttToken(next = { token ->
+                    if (token != null) {
+                        iftttApiClient.setUserToken(token)
                     }
-                    description.text = connection.description
-                }
+
+                    renderUi()
+                }, error = {
+                    showSnackbar(getString(R.string.user_auth_error))
+                })
             }, error = {
                 showSnackbar(getString(R.string.user_auth_error))
             })
@@ -115,7 +118,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun renderUi(complete: (Connection) -> Unit = {}) {
+    private fun renderUi() {
         connectionContainer.visibility = View.VISIBLE
         signInRoot.visibility = View.GONE
         startButton.isClickable = false
@@ -124,7 +127,13 @@ class MainActivity : AppCompatActivity() {
         iftttApiClient.api().showConnection(CONNECTION_ID).execute(object : PendingResult.ResultCallback<Connection> {
             override fun onSuccess(result: Connection) {
                 iftttConnectButton.setConnection(result)
-                complete(result)
+
+                title.text = result.name
+                Picasso.get().load(result.primaryService.monochromeIconUrl).into(icon)
+                icon.background = ShapeDrawable(OvalShape()).apply {
+                    paint.color = result.primaryService.brandColor
+                }
+                description.text = result.description
             }
 
             override fun onFailure(errorResponse: ErrorResponse) {
