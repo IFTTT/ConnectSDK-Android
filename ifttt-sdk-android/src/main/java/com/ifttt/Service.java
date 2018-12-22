@@ -19,17 +19,14 @@ public final class Service implements Parcelable {
     @Json(name = "is_primary") public final boolean isPrimary;
 
     @Json(name = "monochrome_icon_url") public final String monochromeIconUrl;
-    @Json(name = "color_icon_url") public final String colorIconUrl;
     @HexColor @Json(name = "brand_color") public final int brandColor;
     public final String url;
 
-    public Service(String id, String name, boolean isPrimary, String monochromeIconUrl, String colorIconUrl,
-            int brandColor, String url) {
+    public Service(String id, String name, boolean isPrimary, String monochromeIconUrl, int brandColor, String url) {
         this.id = id;
         this.name = name;
         this.isPrimary = isPrimary;
         this.monochromeIconUrl = monochromeIconUrl;
-        this.colorIconUrl = colorIconUrl;
         this.brandColor = brandColor;
         this.url = url;
     }
@@ -39,7 +36,6 @@ public final class Service implements Parcelable {
         name = in.readString();
         isPrimary = in.readByte() != 0;
         monochromeIconUrl = in.readString();
-        colorIconUrl = in.readString();
         brandColor = in.readInt();
         url = in.readString();
     }
@@ -67,7 +63,6 @@ public final class Service implements Parcelable {
         parcel.writeString(name);
         parcel.writeByte((byte) (isPrimary ? 1 : 0));
         parcel.writeString(monochromeIconUrl);
-        parcel.writeString(colorIconUrl);
         parcel.writeInt(brandColor);
         parcel.writeString(url);
     }

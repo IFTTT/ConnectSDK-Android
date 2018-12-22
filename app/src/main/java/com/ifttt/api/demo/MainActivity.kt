@@ -73,7 +73,7 @@ class MainActivity : AppCompatActivity() {
             ApiHelper.login(userId, next = {
                 renderUi { connection ->
                     title.text = connection.name
-                    Picasso.get().load(connection.primaryService.colorIconUrl).into(icon)
+                    Picasso.get().load(connection.primaryService.monochromeIconUrl).into(icon)
                     icon.background = ShapeDrawable(OvalShape()).apply {
                         paint.color = connection.primaryService.brandColor
                     }
