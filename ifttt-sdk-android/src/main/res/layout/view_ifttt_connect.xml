@@ -98,6 +98,7 @@
         android:id="@+id/ifttt_helper_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="16sp"/>
+        android:padding="16dp"
+        android:background="?selectableItemBackground"/>
 
 </merge>
