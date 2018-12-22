@@ -564,7 +564,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
 
                     // Delay and revert helper text.
                     postDelayed(() -> {
-                        setTextSwitcherText(helperTxt, poweredByIfttt);
+                        setTextSwitcherText(helperTxt, manageConnection);
                         helperTxt.setClickable(true);
                     }, ANIM_DURATION_LONG);
                 }
