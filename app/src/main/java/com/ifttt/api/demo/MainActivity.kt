@@ -75,7 +75,7 @@ class MainActivity : AppCompatActivity() {
                 // authenticate your service on IFTTT.
                 ApiHelper.fetchIftttToken(next = { token ->
                     if (token != null) {
-//                        iftttApiClient.setUserToken(token)
+                        iftttApiClient.setUserToken(token)
                     }
 
                     renderUi()
