@@ -468,7 +468,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         });
         fadeInButtonRoot.start();
 
-        final Context context = getContext();
+        Context context = getContext();
         if (connection.status != Connection.Status.enabled) {
             recordState(Initial);
 
@@ -561,12 +561,6 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                 void doClick(View v) {
                     setTextSwitcherText(helperTxt, getResources().getString(R.string.slide_to_turn_off));
                     helperTxt.setClickable(false);
-
-                    // Delay and revert helper text.
-                    postDelayed(() -> {
-                        setTextSwitcherText(helperTxt, manageConnection);
-                        helperTxt.setClickable(true);
-                    }, ANIM_DURATION_LONG);
                 }
             };
             buttonRoot.setOnClickListener(onClickListener);
@@ -1206,6 +1200,16 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                             post(this);
                         } else {
                             Animator fadeOut = getFadeOutProgressBarAnimator();
+                            fadeOut.addListener(new AnimatorListenerAdapter() {
+                                @Override
+                                public void onAnimationEnd(Animator animation) {
+                                    // At the end of the animation, switch ProgressBackground back to the initial state
+                                    // colors.
+                                    int progressColor = ContextCompat.getColor(getContext(),
+                                            R.color.ifttt_progress_background_color);
+                                    ((ProgressBackground) progressRoot.getBackground()).setColor(progressColor, BLACK);
+                                }
+                            });
                             Animator processing =
                                     getProcessingAnimator(getResources().getString(R.string.disconnecting));
                             processing.start();
