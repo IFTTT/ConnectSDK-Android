@@ -22,7 +22,7 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 
 import static com.google.common.truth.Truth.assertThat;
-import static junit.framework.TestCase.fail;
+import static org.junit.Assert.fail;
 
 @RunWith(RobolectricTestRunner.class)
 public final class IftttConnectButtonTest {
@@ -77,7 +77,7 @@ public final class IftttConnectButtonTest {
         JsonReader jsonReader = JsonReader.of(Okio.buffer(Okio.source(inputStream)));
         Connection connection = adapter.fromJson(jsonReader);
 
-        button.setup("a@b.com", new IftttApiClient.Builder().build(), "", () -> "");
+        button.setup("a@b.com", "instagram", new IftttApiClient.Builder().build(), "", () -> "");
         button.setConnection(connection);
 
         TextView connectText = button.findViewById(R.id.connect_with_ifttt);
@@ -85,5 +85,17 @@ public final class IftttConnectButtonTest {
 
         TextSwitcher helperText = button.findViewById(R.id.ifttt_helper_text);
         assertThat(helperText.getCurrentView()).isInstanceOf(TextView.class);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testOwnerServiceCheck() throws IOException {
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("connection.json");
+        JsonReader jsonReader = JsonReader.of(Okio.buffer(Okio.source(inputStream)));
+        Connection connection = adapter.fromJson(jsonReader);
+
+        button.setup("a@b.com", "not_owner_service", new IftttApiClient.Builder().build(), "", () -> "");
+        button.setConnection(connection);
+
+        fail();
     }
 }

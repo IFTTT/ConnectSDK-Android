@@ -20,6 +20,7 @@ import com.ifttt.ErrorResponse
 import com.ifttt.IftttApiClient
 import com.ifttt.api.PendingResult
 import com.ifttt.api.demo.api.ApiHelper
+import com.ifttt.api.demo.api.ApiHelper.SERVICE_ID
 import com.ifttt.ui.IftttConnectButton
 import com.squareup.picasso.Picasso
 
@@ -55,7 +56,7 @@ class MainActivity : AppCompatActivity() {
         iftttApiClient = IftttApiClient.Builder().setInviteCode(ApiHelper.INVITE_CODE).build()
         iftttConnectButton = findViewById<IftttConnectButton>(R.id.connect_button).apply {
             // Setup the Connect Button.
-            setup(EMAIL, iftttApiClient, ApiHelper.REDIRECT_URI) {
+            setup(EMAIL, SERVICE_ID, iftttApiClient, ApiHelper.REDIRECT_URI) {
                 // This is a required step to make sure the user doesn't have to connect your service on IFTTT
                 // during the Connection enable flow.
                 // The code here will be run on a background thread.
