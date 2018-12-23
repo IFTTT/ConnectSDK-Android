@@ -16,6 +16,7 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 object ApiHelper {
     const val INVITE_CODE = "21790-7d53f29b1eaca0bdc5bd6ad24b8f4e1c"
     const val REDIRECT_URI = "ifttt-api-example://sdk-callback"
+    const val SERVICE_ID = "ifttt_api_example"
 
     private val exampleAppTokenInterceptor = ExampleAppTokenInterceptor()
     private val okHttpClient = OkHttpClient.Builder()

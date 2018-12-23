@@ -163,6 +163,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
     @Nullable private Application.ActivityLifecycleCallbacks activityLifecycleCallbacks;
     private ButtonApiHelper buttonApiHelper;
     private IftttApiClient iftttApiClient;
+    private String ownerServiceId;
 
     // Toggle drag events.
     private ViewDragHelper viewDragHelper;
@@ -320,12 +321,15 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
      *
      * @param iftttApiClient IftttApiClient instance.
      * @param email This is used to pre-fill the email EditText when the user is doing Connection authentication.
+     * @param ownerServiceId The id of the service that this Connect Button is used for. To ensure the Connection flow
+     * works with your IFTTT user token, you should make sure the Connection that you are embedding is owned by your
+     * service.
      * @param redirectUri URL string that will be used when the Connection authentication flow is completed on web view, in
      * order to return the result to the app.
      * @param oAuthCodeProvider OAuthCodeProvider implementation that returns your user's OAuth code. The code will be
      * used to automatically connect your service on IFTTT for this user.
      */
-    public void setup(String email, IftttApiClient iftttApiClient, String redirectUri,
+    public void setup(String email, String ownerServiceId, IftttApiClient iftttApiClient, String redirectUri,
             OAuthCodeProvider oAuthCodeProvider) {
         if (ButtonUiHelper.isEmailInvalid(email)) {
             // Crash in debug build to inform developers.
@@ -337,7 +341,12 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             throw new IllegalStateException("OAuth token provider cannot be null.");
         }
 
+        if (ownerServiceId == null) {
+            throw new IllegalStateException("Owner service id cannot be null.");
+        }
+
         this.iftttApiClient = iftttApiClient;
+        this.ownerServiceId = ownerServiceId;
         buttonApiHelper = new ButtonApiHelper(iftttApiClient.api(), redirectUri, iftttApiClient.getInviteCode(),
                 oAuthCodeProvider, getLifecycle());
         emailEdt.setText(email);
@@ -417,6 +426,10 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
     public void setConnection(Connection connection) {
         if (buttonApiHelper == null) {
             throw new IllegalStateException("Connect Button is not set up, please call setup() first.");
+        }
+
+        if (!connection.getPrimaryService().id.equals(ownerServiceId)) {
+            throw new IllegalStateException("The Connection is not owned by " + ownerServiceId);
         }
 
         this.connection = connection;
