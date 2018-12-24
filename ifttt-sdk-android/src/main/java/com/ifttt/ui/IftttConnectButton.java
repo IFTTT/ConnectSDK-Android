@@ -500,8 +500,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         } else {
             recordState(Enabled);
 
-            String enabledText = getResources().getString(R.string.ifttt_connected);
-            setConnectStateText(connectStateTxt, enabledText, enabledText);
+            connectStateTxt.setText(getResources().getString(R.string.ifttt_connected));
 
             helperTxt.setOnClickListener(new DebouncingOnClickListener() {
                 @Override
