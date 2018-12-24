@@ -51,7 +51,7 @@ import com.ifttt.ErrorResponse;
 import com.ifttt.IftttApiClient;
 import com.ifttt.R;
 import com.ifttt.Service;
-import com.ifttt.api.PendingResult.ResultCallback;
+import com.ifttt.api.PendingResult;
 import javax.annotation.Nullable;
 import okhttp3.Call;
 
@@ -489,28 +489,18 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                     getResources().getString(R.string.ifttt_connect_to, worksWithService.name),
                     getResources().getString(R.string.ifttt_connect));
 
-            helperTxt.setClickable(true);
-            iconDragHelperCallback.setDragEnabled(false);
-
             helperTxt.setOnClickListener(new DebouncingOnClickListener() {
                 @Override
                 void doClick(View v) {
                     getContext().startActivity(IftttAboutActivity.intent(context, connection));
                 }
             });
+
+            iconDragHelperCallback.setTexts("", connectStateTxt.getText());
         } else {
             recordState(Enabled);
 
-            // Remove the email validation click listener.
-            iconImg.setOnClickListener(null);
-
-            CharSequence enabledText = getResources().getText(R.string.ifttt_connected);
-            CharSequence disabledText = getResources().getText(R.string.ifttt_connection_off);
-            iconDragHelperCallback.setDragEnabled(true);
-            iconDragHelperCallback.setTexts(enabledText, disabledText);
-
-            float progress = 1f;
-            setProgressStateText(progress, enabledText, disabledText);
+            connectStateTxt.setText(getResources().getString(R.string.ifttt_connected));
 
             helperTxt.setOnClickListener(new DebouncingOnClickListener() {
                 @Override
@@ -518,6 +508,9 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                     buttonApiHelper.redirectToPlayStore(context);
                 }
             });
+
+            iconDragHelperCallback.setTexts(getResources().getText(R.string.ifttt_connected),
+                    getResources().getText(R.string.ifttt_connection_off));
         }
 
         // Set a placeholder for the image.
@@ -590,7 +583,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                     }
 
                     if (!iftttApiClient.isUserAuthenticated()) {
-                        animateToEmailField();
+                        animateToEmailField(0);
                     } else {
                         getEmailValidationAnimator().start();
                     }
@@ -790,7 +783,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
     /**
      * Start the animation for Connection authentication.
      */
-    private void animateToEmailField() {
+    private void animateToEmailField(float xvel) {
         // Set up links for helper text.
         Spanned emailFieldHelperText =
                 Html.fromHtml(getResources().getString(R.string.ifttt_sign_in_to_ifttt_or_create_new_account));
@@ -803,9 +796,13 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         fadeOutConnect.setDuration(ANIM_DURATION_MEDIUM);
 
         // Move service icon.
-        ObjectAnimator slideIcon =
-                ObjectAnimator.ofFloat(iconImg, "translationX", 0f, buttonRoot.getWidth() - iconImg.getWidth());
-        slideIcon.setDuration(ANIM_DURATION_MEDIUM);
+        int startPosition = iconImg.getLeft();
+        int endPosition = buttonRoot.getWidth() - iconImg.getWidth();
+
+        // Adjust duration based on the dragging velocity.
+        long duration = xvel > 0 ? (long) ((endPosition - startPosition) / xvel * 1000L) : ANIM_DURATION_MEDIUM;
+        ObjectAnimator slideIcon = ObjectAnimator.ofFloat(iconImg, "translationX", startPosition, endPosition);
+        slideIcon.setDuration(duration);
 
         // Fade in email EditText.
         ObjectAnimator fadeInEmailEdit = ObjectAnimator.ofFloat(emailEdt, "alpha", 0f, 1f);
@@ -1159,14 +1156,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
 
         private CharSequence enabledText;
         private CharSequence disabledText;
-        private boolean dragEnabled;
-
-        IconDragHelperCallback() {
-        }
-
-        void setDragEnabled(boolean dragEnabled) {
-            this.dragEnabled = dragEnabled;
-        }
+        private boolean dragEnabled = true;
 
         void setTexts(CharSequence enabledText, CharSequence disabledText) {
             this.enabledText = enabledText;
@@ -1206,94 +1196,115 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         @Override
         public void onViewReleased(@NonNull View releasedChild, float xvel, float yvel) {
             if ((releasedChild.getLeft() + releasedChild.getWidth() / 2) / (float) buttonRoot.getWidth() <= 0.5f) {
-                Runnable settlingAnimation = new Runnable() {
-                    @Override
-                    public void run() {
-                        if (viewDragHelper.continueSettling(false)) {
-                            post(this);
-                        } else {
-                            Animator fadeOut = getFadeOutProgressBarAnimator();
-                            fadeOut.addListener(new AnimatorListenerAdapter() {
-                                @Override
-                                public void onAnimationEnd(Animator animation) {
-                                    // At the end of the animation, switch ProgressBackground back to the initial state
-                                    // colors.
-                                    int progressColor = ContextCompat.getColor(getContext(),
-                                            R.color.ifttt_progress_background_color);
-                                    ((ProgressBackground) progressRoot.getBackground()).setColor(progressColor, BLACK);
-                                }
-                            });
-                            Animator processing =
-                                    getProcessingAnimator(getResources().getString(R.string.disconnecting));
-                            processing.start();
-                            buttonApiHelper.disableConnection(connection.id, new ResultCallback<Connection>() {
-                                @Override
-                                public void onSuccess(Connection result) {
-                                    setConnection(result);
-
-                                    if (processing.isRunning()) {
-                                        processing.addListener(new AnimatorListenerAdapter() {
-                                            @Override
-                                            public void onAnimationEnd(Animator animation) {
-                                                fadeOut.start();
-                                            }
-                                        });
-                                    } else {
-                                        fadeOut.start();
-                                    }
-                                }
-
-                                @Override
-                                public void onFailure(ErrorResponse errorResponse) {
-                                    iconDragHelperCallback.setDragEnabled(true);
-                                    if (buttonStateChangeListener != null) {
-                                        buttonStateChangeListener.onError(errorResponse);
-                                    }
-
-                                    fadeOut.start();
-
-                                    // Animate the button back to the enabled state, because this callback can only be
-                                    // used if the user is going to disable the Connection.
-                                    String connected = getResources().getString(R.string.ifttt_connected);
-                                    String off = getResources().getString(R.string.ifttt_connection_off);
-                                    ValueAnimator iconMovement =
-                                            ValueAnimator.ofInt(0, buttonRoot.getWidth() - iconImg.getWidth());
-                                    iconMovement.setDuration(ANIM_DURATION_MEDIUM);
-                                    iconMovement.setInterpolator(EASE_INTERPOLATOR);
-                                    iconMovement.addUpdateListener(animation -> {
-                                        ViewCompat.offsetLeftAndRight(iconImg,
-                                                ((Integer) animation.getAnimatedValue()) - iconImg.getLeft());
-                                        setProgressStateText(animation.getAnimatedFraction(), connected, off);
-                                    });
-                                    iconMovement.start();
-                                }
-                            });
-                        }
-                    }
-                };
-
-                // Off state.
-                if (viewDragHelper.settleCapturedViewAt(0, 0)) {
-                    post(settlingAnimation);
+                if (connection.status != enabled) {
+                    // Connection is already in disabled status.
+                    settleView(0, poweredByIfttt);
                 } else {
-                    settlingAnimation.run();
+                    // Dragging to left.
+                    Runnable settlingAnimation = new Runnable() {
+                        @Override
+                        public void run() {
+                            if (viewDragHelper.continueSettling(false)) {
+                                post(this);
+                            } else {
+                                disableConnection();
+                            }
+                        }
+                    };
+
+                    if (viewDragHelper.settleCapturedViewAt(0, 0)) {
+                        post(settlingAnimation);
+                    } else {
+                        settlingAnimation.run();
+                    }
+
+                    // Disable dragging until the API call is completed.
+                    dragEnabled = false;
+                }
+            } else {
+                if (connection.status == enabled) {
+                    // Connection is already in enabled status.
+                    settleView(buttonRoot.getWidth() - iconImg.getWidth(), manageConnection);
+                } else {
+                    animateToEmailField(Math.abs(xvel));
+                }
+            }
+        }
+
+        private void settleView(int left, CharSequence text) {
+            Runnable settlingAnimation = new Runnable() {
+                @Override
+                public void run() {
+                    if (viewDragHelper.continueSettling(false)) {
+                        post(this);
+                    } else {
+                        setTextSwitcherText(helperTxt, text);
+                    }
+                }
+            };
+
+            if (viewDragHelper.settleCapturedViewAt(left, 0)) {
+                post(settlingAnimation);
+            } else {
+                settlingAnimation.run();
+            }
+        }
+
+        private void disableConnection() {
+            Animator fadeOut = getFadeOutProgressBarAnimator();
+            fadeOut.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    // At the end of the animation, switch ProgressBackground back to the initial state
+                    // colors.
+                    int progressColor = ContextCompat.getColor(getContext(), R.color.ifttt_progress_background_color);
+                    ((ProgressBackground) progressRoot.getBackground()).setColor(progressColor, BLACK);
+                }
+            });
+            Animator processing = getProcessingAnimator(getResources().getString(R.string.disconnecting));
+            processing.start();
+            buttonApiHelper.disableConnection(connection.id, new PendingResult.ResultCallback<Connection>() {
+                @Override
+                public void onSuccess(Connection result) {
+                    dragEnabled = true;
+                    setConnection(result);
+
+                    if (processing.isRunning()) {
+                        processing.addListener(new AnimatorListenerAdapter() {
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                fadeOut.start();
+                            }
+                        });
+                    } else {
+                        fadeOut.start();
+                    }
                 }
 
-                dragEnabled = false;
-            } else if (viewDragHelper.settleCapturedViewAt(buttonRoot.getWidth() - iconImg.getWidth(), 0)) {
-                Runnable settlingAnimation = new Runnable() {
-                    @Override
-                    public void run() {
-                        if (viewDragHelper.continueSettling(false)) {
-                            post(this);
-                        } else {
-                            setTextSwitcherText(helperTxt, manageConnection);
-                        }
+                @Override
+                public void onFailure(ErrorResponse errorResponse) {
+                    dragEnabled = true;
+                    if (buttonStateChangeListener != null) {
+                        buttonStateChangeListener.onError(errorResponse);
                     }
-                };
-                // Back to on state.
-                post(settlingAnimation);
-            }
+
+                    fadeOut.start();
+
+                    // Animate the button back to the enabled state, because this callback can only be
+                    // used if the user is going to disable the Connection.
+                    String connected = getResources().getString(R.string.ifttt_connected);
+                    String off = getResources().getString(R.string.ifttt_connection_off);
+                    ValueAnimator iconMovement = ValueAnimator.ofInt(0, buttonRoot.getWidth() - iconImg.getWidth());
+                    iconMovement.setDuration(ANIM_DURATION_MEDIUM);
+                    iconMovement.setInterpolator(EASE_INTERPOLATOR);
+                    iconMovement.addUpdateListener(animation -> {
+                        ViewCompat.offsetLeftAndRight(iconImg,
+                                ((Integer) animation.getAnimatedValue()) - iconImg.getLeft());
+                        setProgressStateText(animation.getAnimatedFraction(), connected, off);
+                    });
+                    iconMovement.start();
+                }
+            });
         }
     }
 
