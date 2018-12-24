@@ -17,7 +17,7 @@ import static java.util.Collections.emptyList;
 public final class ButtonApiHelperTest {
 
     private final Connection connection =
-            new Connection("", "", "", Connection.Status.never_enabled, null, 0, null, "", emptyList());
+            new Connection("", "", "", Connection.Status.never_enabled, 0, "", emptyList());
 
     @Test
     public void testRequiredFields() {
