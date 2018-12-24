@@ -487,7 +487,8 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
 
             setConnectStateText(connectStateTxt,
                     getResources().getString(R.string.ifttt_connect_to, worksWithService.name),
-                    getResources().getString(R.string.ifttt_connect));
+                    getResources().getString(R.string.ifttt_connect),
+                    text -> iconDragHelperCallback.setTexts("", text));
 
             helperTxt.setOnClickListener(new DebouncingOnClickListener() {
                 @Override
@@ -495,12 +496,12 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                     getContext().startActivity(IftttAboutActivity.intent(context, connection));
                 }
             });
-
-            iconDragHelperCallback.setTexts("", connectStateTxt.getText());
         } else {
             recordState(Enabled);
 
             connectStateTxt.setText(getResources().getString(R.string.ifttt_connected));
+            iconDragHelperCallback.setTexts(getResources().getText(R.string.ifttt_connected),
+                    getResources().getText(R.string.ifttt_connection_off));
 
             helperTxt.setOnClickListener(new DebouncingOnClickListener() {
                 @Override
@@ -508,9 +509,6 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                     buttonApiHelper.redirectToPlayStore(context);
                 }
             });
-
-            iconDragHelperCallback.setTexts(getResources().getText(R.string.ifttt_connected),
-                    getResources().getText(R.string.ifttt_connection_off));
         }
 
         // Set a placeholder for the image.

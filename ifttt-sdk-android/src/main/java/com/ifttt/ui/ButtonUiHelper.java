@@ -173,22 +173,36 @@ final class ButtonUiHelper {
         textSwitcher.setText(text);
     }
 
-    static void setConnectStateText(TextView textView, CharSequence text, CharSequence fallback) {
+    interface OnConnectStateTextSetCallback {
+        /**
+         * Called when the TextView has been measured and the correct CharSequence to be used has been determined.
+         * @param text text to be used for the given TextView.
+         */
+        void onTextSet(CharSequence text);
+    }
+
+    static void setConnectStateText(TextView textView, CharSequence text, CharSequence fallback,
+            @Nullable OnConnectStateTextSetCallback callback) {
         if (ViewCompat.isLaidOut(textView)) {
-            setText(textView, text, fallback);
+            setText(textView, text, fallback, callback);
         } else {
             textView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
                 @Override
                 public boolean onPreDraw() {
                     textView.getViewTreeObserver().removeOnPreDrawListener(this);
-                    setText(textView, text, fallback);
+                    setText(textView, text, fallback, callback);
                     return false;
                 }
             });
         }
     }
 
-    private static void setText(TextView textView, CharSequence text, CharSequence fallback) {
+    static void setConnectStateText(TextView textView, CharSequence text, CharSequence fallback) {
+        setConnectStateText(textView, text, fallback, null);
+    }
+
+    private static void setText(TextView textView, CharSequence text, CharSequence fallback,
+            @Nullable OnConnectStateTextSetCallback callback) {
         float width = StaticLayout.getDesiredWidth(text, textView.getPaint());
         int marginHorizontal =
                 textView.getResources().getDimensionPixelSize(R.dimen.connect_text_padding_horizontal) * 2;
@@ -199,11 +213,19 @@ final class ButtonUiHelper {
             } else if (!fallback.equals(currentText)) {
                 getTextTransitionAnimator(textView, Change, fallback).start();
             }
+
+            if (callback != null) {
+                callback.onTextSet(fallback);
+            }
         } else {
             if (TextUtils.isEmpty(currentText)) {
                 textView.setText(text);
             } else if (!text.equals(currentText)) {
                 getTextTransitionAnimator(textView, Change, text).start();
+            }
+
+            if (callback != null) {
+                callback.onTextSet(text);
             }
         }
     }
