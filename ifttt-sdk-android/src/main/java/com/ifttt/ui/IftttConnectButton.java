@@ -799,6 +799,8 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         // Move service icon.
         int startPosition = iconImg.getLeft();
         int endPosition = buttonRoot.getWidth() - iconImg.getWidth();
+
+        // Adjust duration based on the dragging velocity.
         long duration = xvel > 0 ? (long) ((endPosition - startPosition) / xvel * 1000L) : ANIM_DURATION_MEDIUM;
         ObjectAnimator slideIcon = ObjectAnimator.ofFloat(iconImg, "translationX", startPosition, endPosition);
         slideIcon.setDuration(duration);
