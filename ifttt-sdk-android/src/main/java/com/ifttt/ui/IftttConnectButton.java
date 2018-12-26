@@ -302,7 +302,9 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         super.onRestoreInstanceState(savedState.superState);
 
         this.buttonState = savedState.buttonState;
-        setConnection(savedState.connection);
+        if (savedState.connection != null) {
+            setConnection(savedState.connection);
+        }
     }
 
     @NonNull
@@ -1101,7 +1103,9 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         }
 
         // Reset the button state.
-        setConnection(connection);
+        if (connection != null) {
+            setConnection(connection);
+        }
     }
 
     private void monitorRedirect() {
