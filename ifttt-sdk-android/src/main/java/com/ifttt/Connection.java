@@ -2,7 +2,6 @@ package com.ifttt;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import java.util.Date;
 import java.util.List;
 import javax.annotation.Nullable;
 
@@ -46,16 +45,7 @@ public final class Connection implements Parcelable {
     public final String description;
     public final Status status;
 
-    /**
-     * Date when the Connection is published, can be null if the Connection is not yet published.
-     */
-    @Nullable public final Date publishedAt;
     public final int enabledCount;
-
-    /**
-     * date when the Connection last ran, can be null if the Connection is not activated for the user or it has never run.
-     */
-    @Nullable public final Date lastRunAt;
 
     /**
      * URL string that links to the owner service's website.
@@ -66,15 +56,13 @@ public final class Connection implements Parcelable {
     // Cached primary service object.
     @Nullable private Service primaryService;
 
-    public Connection(String id, String name, String description, Status status, @Nullable Date publishedAt,
-            int enabledCount, @Nullable Date lastRunAt, String url, List<Service> services) {
+    public Connection(String id, String name, String description, Status status, int enabledCount, String url,
+            List<Service> services) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.status = status;
-        this.publishedAt = publishedAt;
         this.enabledCount = enabledCount;
-        this.lastRunAt = lastRunAt;
         this.url = url;
         this.services = services;
     }
@@ -106,21 +94,7 @@ public final class Connection implements Parcelable {
         description = in.readString();
         status = Status.valueOf(in.readString());
 
-        long publishedAtTimestamp = in.readLong();
-        if (publishedAtTimestamp < 0) {
-            publishedAt = null;
-        } else {
-            publishedAt = new Date(publishedAtTimestamp);
-        }
-
         enabledCount = in.readInt();
-
-        long lastRunAtTimestamp = in.readLong();
-        if (lastRunAtTimestamp < 0) {
-            lastRunAt = null;
-        } else {
-            lastRunAt = new Date(lastRunAtTimestamp);
-        }
 
         url = in.readString();
         services = in.createTypedArrayList(Service.CREATOR);
@@ -149,9 +123,7 @@ public final class Connection implements Parcelable {
         parcel.writeString(name);
         parcel.writeString(description);
         parcel.writeString(status.name());
-        parcel.writeLong(publishedAt != null ? publishedAt.getTime() : -1L);
         parcel.writeInt(enabledCount);
-        parcel.writeLong(lastRunAt != null ? lastRunAt.getTime() : -1L);
         parcel.writeString(url);
         parcel.writeTypedList(services);
     }
