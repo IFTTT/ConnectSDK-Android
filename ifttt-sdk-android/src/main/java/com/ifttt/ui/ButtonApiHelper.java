@@ -51,7 +51,7 @@ final class ButtonApiHelper {
         oAuthCodeProvider = provider;
     }
 
-    void disableConnection(String id, ResultCallback<Connection> resultCallback) {
+    void disableConnection(Lifecycle lifecycle, String id, ResultCallback<Connection> resultCallback) {
         PendingResult<Connection> pendingResult = iftttApi.disableConnection(id);
         lifecycle.addObserver(new PendingResultLifecycleObserver<>(pendingResult));
         pendingResult.execute(new ResultCallback<Connection>() {
@@ -65,6 +65,8 @@ final class ButtonApiHelper {
                 resultCallback.onFailure(errorResponse);
             }
         });
+
+        lifecycle.addObserver(new PendingResultLifecycleObserver<>(pendingResult));
     }
 
     void redirectToWeb(Context context, Connection connection, String email, ButtonState buttonState) {

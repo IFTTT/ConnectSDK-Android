@@ -36,6 +36,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
+import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
@@ -43,8 +44,10 @@ import androidx.core.view.ViewCompat;
 import androidx.customview.widget.ViewDragHelper;
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
 import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LifecycleRegistry;
+import androidx.lifecycle.OnLifecycleEvent;
 import com.ifttt.ConnectResult;
 import com.ifttt.Connection;
 import com.ifttt.ErrorResponse;
@@ -52,6 +55,7 @@ import com.ifttt.IftttApiClient;
 import com.ifttt.R;
 import com.ifttt.Service;
 import com.ifttt.api.PendingResult;
+import java.util.ArrayList;
 import javax.annotation.Nullable;
 import okhttp3.Call;
 
@@ -154,6 +158,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
     private final int iconSize;
 
     private final LifecycleRegistry lifecycleRegistry;
+    private final AnimatorLifecycleObserver animatorLifecycleObserver = new AnimatorLifecycleObserver();
 
     private ButtonState buttonState = Initial;
     private Connection connection;
@@ -192,6 +197,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         iconSize = getResources().getDimensionPixelSize(R.dimen.ifttt_icon_image_size);
 
         lifecycleRegistry = new LifecycleRegistry(this);
+        lifecycleRegistry.addObserver(animatorLifecycleObserver);
         lifecycleRegistry.markState(CREATED);
 
         inflate(context, R.layout.view_ifttt_connect, this);
@@ -439,9 +445,10 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
 
         // Initialize UI.
         ObjectAnimator fadeInButtonRoot = ObjectAnimator.ofFloat(buttonRoot, "alpha", buttonRoot.getAlpha(), 1f);
-        fadeInButtonRoot.addListener(new AnimatorListenerAdapter() {
+        fadeInButtonRoot.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
             @Override
             public void onAnimationStart(Animator animation) {
+                super.onAnimationStart(animation);
                 buttonRoot.setBackground(buildStateListButtonBackground(getContext(), BLACK,
                         ContextCompat.getColor(getContext(), R.color.ifttt_background_touch_color)));
 
@@ -474,6 +481,11 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
 
             @Override
             public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                if (isCanceled()) {
+                    return;
+                }
+
                 if (connection.status == enabled) {
                     setTextSwitcherText(helperTxt, manageConnection);
                 } else {
@@ -533,9 +545,10 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
 
             ObjectAnimator fadeInIconImg =
                     ObjectAnimator.ofFloat(iconImg, "alpha", placeHolderImage == null ? iconImg.getAlpha() : 0f, 1f);
-            fadeInIconImg.addListener(new AnimatorListenerAdapter() {
+            fadeInIconImg.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
                 @Override
                 public void onAnimationStart(Animator animation) {
+                    super.onAnimationStart(animation);
                     iconImg.setBackground(drawable);
                     drawable.setBackgroundColor(worksWithService.brandColor);
 
@@ -638,15 +651,21 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         fadeOutProgressRoot.setStartDelay(ICON_MOVEMENT_START_DELAY);
         completeSet.playTogether(checkMarkAnimator, iconMovement, fadeOutProgressRoot);
 
-        completeSet.addListener(new AnimatorListenerAdapter() {
+        completeSet.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
             @Override
             public void onAnimationStart(Animator animation) {
+                super.onAnimationStart(animation);
                 connectStateTxt.setAlpha(0f);
                 connectStateTxt.setText(R.string.ifttt_connected);
             }
 
             @Override
             public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                if (isCanceled()) {
+                    return;
+                }
+
                 recordState(Enabled);
 
                 // Reset check mark drawable position back to the center.
@@ -699,14 +718,11 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
 
         AnimatorSet set = new AnimatorSet();
         set.playTogether(fadeInProgressContainer, showProgress, showProgressText);
-        set.addListener(new AnimatorListenerAdapter() {
-
-            // Flag to skip onAnimationEnd callback when the animation is canceled.
-            private boolean isCanceled = false;
+        set.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
 
             @Override
             public void onAnimationStart(Animator animation) {
-                isCanceled = false;
+                super.onAnimationStart(animation);
 
                 // When the animation starts, disable the click on buttonRoot, so that the flow will not be started
                 // again.
@@ -716,14 +732,15 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
 
             @Override
             public void onAnimationCancel(Animator animation) {
-                isCanceled = true;
+                super.onAnimationCancel(animation);
                 emailEdt.setVisibility(VISIBLE);
                 getFadeOutProgressBarAnimator().start();
             }
 
             @Override
             public void onAnimationEnd(Animator animation) {
-                if (isCanceled) {
+                super.onAnimationEnd(animation);
+                if (isCanceled()) {
                     return;
                 }
 
@@ -807,10 +824,11 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         // Fade in email EditText.
         ObjectAnimator fadeInEmailEdit = ObjectAnimator.ofFloat(emailEdt, "alpha", 0f, 1f);
         fadeInEmailEdit.setDuration(ANIM_DURATION_MEDIUM);
-        fadeInEmailEdit.addListener(new AnimatorListenerAdapter() {
+        fadeInEmailEdit.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
             @Override
             public void onAnimationStart(Animator animation) {
                 // Hide email field and disable it when the animation starts.
+                super.onAnimationStart(animation);
                 emailEdt.setEnabled(false);
                 emailEdt.setTextColor(Color.TRANSPARENT);
                 emailEdt.setAlpha(0f);
@@ -820,6 +838,11 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             @Override
             public void onAnimationEnd(Animator animation) {
                 // Re-enable email field.
+                super.onAnimationEnd(animation);
+                if (isCanceled()) {
+                    return;
+                }
+
                 emailEdt.setEnabled(true);
             }
         });
@@ -909,9 +932,14 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         };
 
         // Only enable the OnClickListener after the animation has completed.
-        set.addListener(new AnimatorListenerAdapter() {
+        set.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
             @Override
             public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                if (isCanceled()) {
+                    return;
+                }
+
                 iconImg.setOnClickListener(startAuthOnClickListener);
                 connectStateTxt.setClickable(false);
             }
@@ -950,9 +978,10 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         ObjectAnimator slideInConnectText = ObjectAnimator.ofFloat(connectStateTxt, "translationX", 50f, 0f);
         ObjectAnimator fadeInConnectText =
                 ObjectAnimator.ofFloat(connectStateTxt, "alpha", 0f, 1f).setDuration(ANIM_DURATION_MEDIUM);
-        fadeInConnectText.addListener(new AnimatorListenerAdapter() {
+        fadeInConnectText.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
             @Override
             public void onAnimationStart(Animator animation) {
+                super.onAnimationStart(animation);
                 setTextSwitcherText(helperTxt,
                         getResources().getString(R.string.ifttt_connect_services_description, service.name,
                                 connection.getPrimaryService().name));
@@ -997,9 +1026,10 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         ObjectAnimator fadeInProgressContainer =
                 ObjectAnimator.ofFloat(progressRoot, "alpha", progressRoot.getAlpha(), 1f);
         fadeInProgressContainer.setInterpolator(EASE_INTERPOLATOR);
-        fadeInProgressContainer.addListener(new AnimatorListenerAdapter() {
+        fadeInProgressContainer.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
             @Override
             public void onAnimationStart(Animator animation) {
+                super.onAnimationStart(animation);
                 progressTxt.setText(text);
                 progressTxt.setAlpha(1f);
             }
@@ -1014,9 +1044,14 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         CheckMarkDrawable drawable = (CheckMarkDrawable) completeImg.getDrawable();
         Animator checkMarkAnimator = drawable.getAnimator();
         checkMarkAnimator.setStartDelay(200L);
-        checkMarkAnimator.addListener(new AnimatorListenerAdapter() {
+        checkMarkAnimator.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
             @Override
             public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                if (isCanceled()) {
+                    return;
+                }
+
                 buttonRoot.setBackground(buildStateListButtonBackground(getContext(), BLACK,
                         ContextCompat.getColor(getContext(), R.color.ifttt_background_touch_color)));
             }
@@ -1033,9 +1068,10 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         set.play(checkMarkAnimator).with(textTransition).with(fadeOutServiceIcon).with(fadeOutProgressTxt);
         set.playSequentially(fadeInProgressContainer, completeProgress, checkMarkAnimator);
         set.playTogether(fadeInProgressContainer, fadeInIconImg);
-        set.addListener(new AnimatorListenerAdapter() {
+        set.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
             @Override
             public void onAnimationStart(Animator animation) {
+                super.onAnimationStart(animation);
                 ProgressBackground progressBackground = (ProgressBackground) progressRoot.getBackground();
 
                 // Reset the progress background's progress and color.
@@ -1254,59 +1290,66 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
 
         private void disableConnection() {
             Animator fadeOut = getFadeOutProgressBarAnimator();
-            fadeOut.addListener(new AnimatorListenerAdapter() {
+            fadeOut.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
                 @Override
                 public void onAnimationEnd(Animator animation) {
                     // At the end of the animation, switch ProgressBackground back to the initial state
                     // colors.
+                    super.onAnimationEnd(animation);
+                    if (isCanceled()) {
+                        return;
+                    }
+
                     int progressColor = ContextCompat.getColor(getContext(), R.color.ifttt_progress_background_color);
                     ((ProgressBackground) progressRoot.getBackground()).setColor(progressColor, BLACK);
                 }
             });
             Animator processing = getProcessingAnimator(getResources().getString(R.string.disconnecting));
             processing.start();
-            buttonApiHelper.disableConnection(connection.id, new PendingResult.ResultCallback<Connection>() {
-                @Override
-                public void onSuccess(Connection result) {
-                    dragEnabled = true;
-                    setConnection(result);
+            buttonApiHelper.disableConnection(getLifecycle(), connection.id,
+                    new PendingResult.ResultCallback<Connection>() {
+                        @Override
+                        public void onSuccess(Connection result) {
+                            dragEnabled = true;
+                            setConnection(result);
 
-                    if (processing.isRunning()) {
-                        processing.addListener(new AnimatorListenerAdapter() {
-                            @Override
-                            public void onAnimationEnd(Animator animation) {
+                            if (processing.isRunning()) {
+                                processing.addListener(new AnimatorListenerAdapter() {
+                                    @Override
+                                    public void onAnimationEnd(Animator animation) {
+                                        fadeOut.start();
+                                    }
+                                });
+                            } else {
                                 fadeOut.start();
                             }
-                        });
-                    } else {
-                        fadeOut.start();
-                    }
-                }
+                        }
 
-                @Override
-                public void onFailure(ErrorResponse errorResponse) {
-                    dragEnabled = true;
-                    if (buttonStateChangeListener != null) {
-                        buttonStateChangeListener.onError(errorResponse);
-                    }
+                        @Override
+                        public void onFailure(ErrorResponse errorResponse) {
+                            dragEnabled = true;
+                            if (buttonStateChangeListener != null) {
+                                buttonStateChangeListener.onError(errorResponse);
+                            }
 
-                    fadeOut.start();
+                            fadeOut.start();
 
-                    // Animate the button back to the enabled state, because this callback can only be
-                    // used if the user is going to disable the Connection.
-                    String connected = getResources().getString(R.string.ifttt_connected);
-                    String off = getResources().getString(R.string.ifttt_connection_off);
-                    ValueAnimator iconMovement = ValueAnimator.ofInt(0, buttonRoot.getWidth() - iconImg.getWidth());
-                    iconMovement.setDuration(ANIM_DURATION_MEDIUM);
-                    iconMovement.setInterpolator(EASE_INTERPOLATOR);
-                    iconMovement.addUpdateListener(animation -> {
-                        ViewCompat.offsetLeftAndRight(iconImg,
-                                ((Integer) animation.getAnimatedValue()) - iconImg.getLeft());
-                        setProgressStateText(animation.getAnimatedFraction(), connected, off);
+                            // Animate the button back to the enabled state, because this callback can only be
+                            // used if the user is going to disable the Connection.
+                            String connected = getResources().getString(R.string.ifttt_connected);
+                            String off = getResources().getString(R.string.ifttt_connection_off);
+                            ValueAnimator iconMovement =
+                                    ValueAnimator.ofInt(0, buttonRoot.getWidth() - iconImg.getWidth());
+                            iconMovement.setDuration(ANIM_DURATION_MEDIUM);
+                            iconMovement.setInterpolator(EASE_INTERPOLATOR);
+                            iconMovement.addUpdateListener(animation -> {
+                                ViewCompat.offsetLeftAndRight(iconImg,
+                                        ((Integer) animation.getAnimatedValue()) - iconImg.getLeft());
+                                setProgressStateText(animation.getAnimatedFraction(), connected, off);
+                            });
+                            iconMovement.start();
+                        }
                     });
-                    iconMovement.start();
-                }
-            });
         }
     }
 
@@ -1350,5 +1393,68 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                 return new SavedState[size];
             }
         };
+    }
+
+    /**
+     * {@link LifecycleObserver} that records the Animators used in this class, and cancel the ongoing ones when the
+     * Activity is stopped.
+     */
+    private static final class AnimatorLifecycleObserver implements LifecycleObserver {
+
+        private final ArrayList<Animator> ongoingAnimators = new ArrayList<>();
+
+        void addAnimator(Animator animator) {
+            ongoingAnimators.add(animator);
+        }
+
+        void removeAnimator(Animator animator) {
+            ongoingAnimators.remove(animator);
+        }
+
+        @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+        void onStop() {
+            for (Animator animator : ongoingAnimators) {
+                animator.cancel();
+            }
+            ongoingAnimators.clear();
+        }
+    }
+
+    /**
+     * Helper AnimatorListener for {@link AnimatorLifecycleObserver} to add/remove animators as they are started or
+     * stopped.
+     */
+    private static class CancelAnimatorListenerAdapter extends AnimatorListenerAdapter {
+
+        private boolean isCanceled = false;
+
+        private final AnimatorLifecycleObserver observer;
+
+        private CancelAnimatorListenerAdapter(AnimatorLifecycleObserver observer) {
+            this.observer = observer;
+        }
+
+        @Override
+        @CallSuper
+        public void onAnimationCancel(Animator animation) {
+            isCanceled = true;
+        }
+
+        @Override
+        @CallSuper
+        public void onAnimationStart(Animator animation) {
+            observer.addAnimator(animation);
+            isCanceled = false;
+        }
+
+        @Override
+        @CallSuper
+        public void onAnimationEnd(Animator animation) {
+            observer.removeAnimator(animation);
+        }
+
+        boolean isCanceled() {
+            return isCanceled;
+        }
     }
 }
