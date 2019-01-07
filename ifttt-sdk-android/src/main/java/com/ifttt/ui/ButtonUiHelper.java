@@ -176,6 +176,7 @@ final class ButtonUiHelper {
     interface OnConnectStateTextSetCallback {
         /**
          * Called when the TextView has been measured and the correct CharSequence to be used has been determined.
+         *
          * @param text text to be used for the given TextView.
          */
         void onTextSet(CharSequence text);
@@ -204,10 +205,8 @@ final class ButtonUiHelper {
     private static void setText(TextView textView, CharSequence text, CharSequence fallback,
             @Nullable OnConnectStateTextSetCallback callback) {
         float width = StaticLayout.getDesiredWidth(text, textView.getPaint());
-        int marginHorizontal =
-                textView.getResources().getDimensionPixelSize(R.dimen.connect_text_padding_horizontal) * 2;
         CharSequence currentText = textView.getText();
-        if (width > textView.getWidth() - marginHorizontal) {
+        if (width > textView.getWidth()) {
             if (TextUtils.isEmpty(currentText)) {
                 textView.setText(fallback);
             } else if (!fallback.equals(currentText)) {

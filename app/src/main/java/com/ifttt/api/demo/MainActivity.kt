@@ -1,103 +1,118 @@
 package com.ifttt.api.demo
 
-import android.content.Context
+import android.app.Activity
 import android.content.Intent
-import android.graphics.drawable.ShapeDrawable
-import android.graphics.drawable.shapes.OvalShape
 import android.os.Bundle
-import android.view.View
-import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
+import android.view.Window
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.textfield.TextInputLayout
 import com.ifttt.ConnectResult
 import com.ifttt.Connection
 import com.ifttt.ErrorResponse
 import com.ifttt.IftttApiClient
 import com.ifttt.api.PendingResult
-import com.ifttt.api.demo.api.ApiHelper
-import com.ifttt.api.demo.api.ApiHelper.SERVICE_ID
+import com.ifttt.api.demo.ApiHelper.REDIRECT_URI
+import com.ifttt.api.demo.ApiHelper.SERVICE_ID
 import com.ifttt.ui.IftttConnectButton
-import com.squareup.picasso.Picasso
+import com.ifttt.ui.OAuthCodeProvider
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var signInRoot: LinearLayout
-    private lateinit var connectionContainer: ViewGroup
-    private lateinit var userIdEdit: EditText
-    private lateinit var startButton: Button
-    private lateinit var icon: ImageView
-    private lateinit var title: TextView
-    private lateinit var description: TextView
     private lateinit var iftttConnectButton: IftttConnectButton
+    private lateinit var toolbar: Toolbar
+    private lateinit var emailPreferencesHelper: EmailPreferencesHelper
 
     private lateinit var iftttApiClient: IftttApiClient
+
+    private val apiCallback = object : ApiHelper.Callback {
+        override fun onSuccess(token: String?) {
+            if (token != null) {
+                iftttApiClient.setUserToken(token)
+            }
+
+            renderUi()
+        }
+
+        override fun onFailure(code: String?) {
+            if (code == "unauthorized") {
+                showSnackbar(getString(R.string.user_auth_error))
+            } else {
+                showSnackbar(getString(R.string.network_request_error))
+            }
+        }
+    }
+
+    private val oAuthCodeProvider = OAuthCodeProvider {
+        // This is a required step to make sure the user doesn't have to connect your service on IFTTT
+        // during the Connection enable flow.
+        // The code here will be run on a background thread.
+        emailPreferencesHelper.getEmail()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.main)
+        setContentView(R.layout.activity_main)
 
-        connectionContainer = findViewById<ViewGroup>(R.id.connection_view).apply {
-            visibility = View.GONE
-        }
+        emailPreferencesHelper = EmailPreferencesHelper(this, EMAIL)
 
-        icon = findViewById(R.id.icon)
-        title = findViewById(R.id.title)
-        description = findViewById(R.id.description)
-        signInRoot = findViewById(R.id.sign_in_root)
-        userIdEdit = findViewById(R.id.user_id)
-        startButton = findViewById(R.id.start)
+        toolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
+        title = null
 
         iftttApiClient = IftttApiClient.Builder().setInviteCode(ApiHelper.INVITE_CODE).build()
-        iftttConnectButton = findViewById<IftttConnectButton>(R.id.connect_button).apply {
-            // Setup the Connect Button.
-            setup(EMAIL, SERVICE_ID, iftttApiClient, ApiHelper.REDIRECT_URI) {
-                // This is a required step to make sure the user doesn't have to connect your service on IFTTT
-                // during the Connection enable flow.
-                // The code here will be run on a background thread.
-                "Your_users_oauth_code"
-            }
+        iftttConnectButton = findViewById(R.id.connect_button)
+
+        val email = emailPreferencesHelper.getEmail()
+        iftttConnectButton.setup(email, SERVICE_ID, iftttApiClient, REDIRECT_URI, oAuthCodeProvider)
+
+        ApiHelper.getUserToken(email, apiCallback)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.set_email) {
+            val emailView =
+                LayoutInflater.from(this).inflate(
+                    R.layout.view_email,
+                    findViewById(Window.ID_ANDROID_CONTENT),
+                    false
+                ) as TextInputLayout
+            emailView.editText!!.setText(emailPreferencesHelper.getEmail())
+
+            AlertDialog.Builder(this)
+                .setView(emailView)
+                .setTitle(R.string.email_title)
+                .setPositiveButton(android.R.string.ok) { _, _ ->
+                    val newEmail = emailView.editText!!.text.toString()
+                    emailPreferencesHelper.setEmail(newEmail)
+                    iftttConnectButton.setup(newEmail, SERVICE_ID, iftttApiClient, REDIRECT_URI, oAuthCodeProvider)
+
+                    // Refresh user token.
+                    ApiHelper.getUserToken(newEmail, apiCallback)
+                }.show()
+            return true
         }
-
-        startButton.setOnClickListener { view ->
-            val userId = userIdEdit.text.toString()
-            if (userId.isEmpty()) {
-                userIdEdit.error = getString(R.string.empty_user_id)
-                return@setOnClickListener
-            }
-
-            ApiHelper.login(userId, next = {
-                // After login, you may try to fetch the user's IFTTT user token, in the case where the user has already
-                // authenticate your service on IFTTT.
-                ApiHelper.fetchIftttToken(next = { token ->
-                    if (token != null) {
-                        iftttApiClient.setUserToken(token)
-                    }
-
-                    renderUi()
-                }, error = {
-                    showSnackbar(getString(R.string.user_auth_error))
-                })
-            }, error = {
-                showSnackbar(getString(R.string.user_auth_error))
-            })
-
-            // Hide keyboard.
-            val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
-        }
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onNewIntent(intent: Intent) {
-        val authenticationResult = ConnectResult.fromIntent(intent)
-        iftttConnectButton.setConnectResult(authenticationResult)
+        super.onNewIntent(intent)
 
-        if (authenticationResult.nextStep == ConnectResult.NextStep.Complete) {
+        val result = ConnectResult.fromIntent(intent)
+        iftttConnectButton.setConnectResult(result)
+
+        if (result.nextStep == ConnectResult.NextStep.Complete) {
             // The connection is now enabled. Now we need to sync the Connection status from the IFTTT,
             // and refresh the Connect Button.
             // To do so:
@@ -107,34 +122,14 @@ class MainActivity : AppCompatActivity() {
             // - call client.setUserToken()
             // - call client.api().showConnection() again to get the latest Connection metadata.
             // - call button.setConnection and pass in the metadata
-            ApiHelper.fetchIftttToken(next = {
-                if (it != null) {
-                    iftttApiClient.setUserToken(it)
-                }
-
-                renderUi()
-            }, error = {
-                showSnackbar(getString(R.string.user_auth_error))
-            })
+            ApiHelper.getUserToken(emailPreferencesHelper.getEmail(), apiCallback)
         }
     }
 
     private fun renderUi() {
-        connectionContainer.visibility = View.VISIBLE
-        signInRoot.visibility = View.GONE
-        startButton.isClickable = false
-
-        // Fetch the Connection
         iftttApiClient.api().showConnection(CONNECTION_ID).execute(object : PendingResult.ResultCallback<Connection> {
             override fun onSuccess(result: Connection) {
                 iftttConnectButton.setConnection(result)
-
-                title.text = result.name
-                Picasso.get().load(result.primaryService.monochromeIconUrl).into(icon)
-                icon.background = ShapeDrawable(OvalShape()).apply {
-                    paint.color = result.primaryService.brandColor
-                }
-                description.text = result.description
             }
 
             override fun onFailure(errorResponse: ErrorResponse) {
@@ -144,8 +139,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private companion object {
-        // Example Connection.
-        const val CONNECTION_ID = "mZRHhST7"
+        const val CONNECTION_ID = "dngPHVFe"
         const val EMAIL = "user@email.com"
+    }
+
+    private fun Activity.showSnackbar(charSequence: CharSequence) {
+        Snackbar.make(findViewById(Window.ID_ANDROID_CONTENT), charSequence, Snackbar.LENGTH_LONG).show()
     }
 }

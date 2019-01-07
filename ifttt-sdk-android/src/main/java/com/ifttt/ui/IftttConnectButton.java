@@ -941,7 +941,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                 }
 
                 iconImg.setOnClickListener(startAuthOnClickListener);
-                connectStateTxt.setClickable(false);
+                buttonRoot.setClickable(false);
             }
         });
 
