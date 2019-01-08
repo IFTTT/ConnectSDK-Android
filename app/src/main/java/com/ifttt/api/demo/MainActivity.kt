@@ -2,14 +2,19 @@ package com.ifttt.api.demo
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
+import android.view.ViewGroup
 import android.view.Window
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.graphics.drawable.DrawableCompat
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
 import com.ifttt.ConnectResult
@@ -27,6 +32,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var iftttConnectButton: IftttConnectButton
     private lateinit var toolbar: Toolbar
     private lateinit var emailPreferencesHelper: EmailPreferencesHelper
+    private lateinit var uiPreferencesHelper: UiPreferencesHelper
 
     private lateinit var iftttApiClient: IftttApiClient
 
@@ -61,6 +67,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         emailPreferencesHelper = EmailPreferencesHelper(this, EMAIL)
+        uiPreferencesHelper = UiPreferencesHelper(this)
 
         toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -75,10 +82,14 @@ class MainActivity : AppCompatActivity() {
         // For development and testing purpose: we are using the user email directly as the OAuth code for this example
         // service.
         ApiHelper.getUserToken(email, apiCallback)
+
+        toggleValuePropColor()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu, menu)
+        menu.findItem(R.id.dark_mode).isChecked = uiPreferencesHelper.getDarkMode()
+
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -107,7 +118,14 @@ class MainActivity : AppCompatActivity() {
                     ApiHelper.getUserToken(newEmail, apiCallback)
                 }.show()
             return true
+        } else if (item.itemId == R.id.dark_mode) {
+            val toggled = !item.isChecked
+            uiPreferencesHelper.setDarkMode(toggled)
+
+            recreate()
+            return true
         }
+
         return super.onOptionsItemSelected(item)
     }
 
@@ -141,6 +159,35 @@ class MainActivity : AppCompatActivity() {
                 showSnackbar(errorResponse.message)
             }
         })
+    }
+
+    private fun toggleValuePropColor() {
+        // For testing and debugging purpose: toggling this changes the UI of the app as well as the Connect Button.
+        val darkMode = uiPreferencesHelper.getDarkMode()
+
+        val textColor: Int
+        val backgroundColor: Int
+        if (darkMode) {
+            textColor = Color.WHITE
+            backgroundColor = Color.BLACK
+        } else {
+            textColor = Color.BLACK
+            backgroundColor = Color.WHITE
+        }
+
+        window.setBackgroundDrawable(ColorDrawable(backgroundColor))
+        iftttConnectButton.setOnDarkBackground(darkMode)
+        findViewById<ViewGroup>(Window.ID_ANDROID_CONTENT).post {
+            val valueProp1 = findViewById<TextView>(R.id.value_prop_1)
+            valueProp1.setTextColor(textColor)
+            DrawableCompat.setTint(DrawableCompat.wrap(valueProp1.compoundDrawables[0]), textColor)
+            val valueProp2 = findViewById<TextView>(R.id.value_prop_2)
+            valueProp2.setTextColor(textColor)
+            DrawableCompat.setTint(DrawableCompat.wrap(valueProp2.compoundDrawables[0]), textColor)
+            val valueProp3 = findViewById<TextView>(R.id.value_prop_3)
+            valueProp3.setTextColor(textColor)
+            DrawableCompat.setTint(DrawableCompat.wrap(valueProp3.compoundDrawables[0]), textColor)
+        }
     }
 
     private companion object {
