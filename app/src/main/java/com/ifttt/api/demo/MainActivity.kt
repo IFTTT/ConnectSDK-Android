@@ -72,6 +72,8 @@ class MainActivity : AppCompatActivity() {
         val email = emailPreferencesHelper.getEmail()
         iftttConnectButton.setup(email, SERVICE_ID, iftttApiClient, REDIRECT_URI, oAuthCodeProvider)
 
+        // For development and testing purpose: we are using the user email directly as the OAuth code for this example
+        // service.
         ApiHelper.getUserToken(email, apiCallback)
     }
 
@@ -82,6 +84,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.set_email) {
+            // For development and testing purpose: this dialog simulates a login process, where the user enters their
+            // email, and the app tries to fetch the IFTTT user token for the user. In the case where the user token
+            // is empty, we treat it as the user have never connected the service to IFTTT before.
             val emailView =
                 LayoutInflater.from(this).inflate(
                     R.layout.view_email,
