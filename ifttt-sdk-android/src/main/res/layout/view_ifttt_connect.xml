@@ -13,9 +13,9 @@
             android:id="@+id/ifttt_toggle_root"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:alpha="0"
             android:clipChildren="false"
-            android:clipToPadding="false"
-            android:alpha="0">
+            android:clipToPadding="false">
 
             <EditText
                 android:id="@+id/ifttt_email"
@@ -38,21 +38,21 @@
                 android:gravity="center"
                 android:lines="1"
                 android:paddingBottom="8dp"
-                android:paddingEnd="@dimen/connect_text_padding_horizontal"
-                android:paddingStart="@dimen/connect_text_padding_horizontal"
+                android:layout_marginStart="@dimen/connect_text_padding_horizontal"
+                android:layout_marginEnd="@dimen/connect_text_padding_horizontal"
                 android:paddingTop="8dp"
-                android:textSize="@dimen/ifttt_connect_text_size"
-                android:textColor="@android:color/white"/>
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/ifttt_connect_text_size"/>
 
             <ImageButton
                 android:id="@+id/ifttt_icon"
                 android:layout_width="@dimen/connect_button_height"
                 android:layout_height="match_parent"
                 android:layout_gravity="center_vertical"
+                android:alpha="0"
                 android:background="@null"
                 android:elevation="@dimen/ifttt_icon_elevation"
-                android:scaleType="centerInside"
-                android:alpha="0"/>
+                android:scaleType="centerInside"/>
 
         </FrameLayout>
 

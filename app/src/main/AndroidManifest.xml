@@ -26,8 +26,8 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                    android:host="sdk-callback"
-                    android:scheme="ifttt-api-example"/>
+                    android:host="connectcallback"
+                    android:scheme="groceryexpress"/>
             </intent-filter>
         </activity>
 

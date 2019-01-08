@@ -1,14 +1,20 @@
 <resources>
-    <string name="app_name">IFTTT SDK Demo</string>
+    <string name="app_name">Grocery Express</string>
     <string name="user_id_hint">User id</string>
     <string name="email_hint">Email</string>
     <string name="start">Start</string>
     <string name="empty_user_id">User id cannot be empty</string>
     <string name="sign_in">Sign in</string>
     <string name="user_auth_error">User authentication failed.</string>
-    <string name="login_uri_error">Fetch login URI failed.</string>
+    <string name="network_request_error">Network request failed.</string>
     <string name="disable">Disable</string>
     <string name="enable">Enable</string>
     <string name="turn_on">Turn on</string>
     <string name="configure">Configure</string>
+    <string name="connection_title">Delivered when you\'re at home</string>
+    <string name="value_props_1">Schedule grocery delivery when you’re available</string>
+    <string name="value_props_2">Add delivery date and time to your calendar</string>
+    <string name="value_props_3">Unlock discount delivery rates</string>
+    <string name="set_email">Set email</string>
+    <string name="email_title">Please enter your email</string>
 </resources>
