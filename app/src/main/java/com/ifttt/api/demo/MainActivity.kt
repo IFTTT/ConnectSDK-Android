@@ -175,8 +175,11 @@ class MainActivity : AppCompatActivity() {
             backgroundColor = Color.WHITE
         }
 
-        window.setBackgroundDrawable(ColorDrawable(backgroundColor))
+        // If the Activity that Connect Button is displayed on has a dark background, call this function to toggle
+        // its look to adapt the UI.
         iftttConnectButton.setOnDarkBackground(darkMode)
+
+        window.setBackgroundDrawable(ColorDrawable(backgroundColor))
         findViewById<ViewGroup>(Window.ID_ANDROID_CONTENT).post {
             val valueProp1 = findViewById<TextView>(R.id.value_prop_1)
             valueProp1.setTextColor(textColor)
