@@ -21,6 +21,10 @@
             android:text="@string/connection_title"
             android:textColor="@android:color/white"
             android:textSize="32sp"
+            android:shadowColor="@android:color/black"
+            android:shadowRadius="2"
+            android:shadowDx="2"
+            android:shadowDy="2"
             android:layout_margin="@dimen/margin_horizontal"
             android:textStyle="bold"/>
 

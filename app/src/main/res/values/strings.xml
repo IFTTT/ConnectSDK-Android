@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">IFTTT SDK Demo</string>
+    <string name="app_name">Grocery Express</string>
     <string name="user_id_hint">User id</string>
     <string name="email_hint">Email</string>
     <string name="start">Start</string>
