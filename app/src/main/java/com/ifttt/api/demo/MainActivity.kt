@@ -47,7 +47,7 @@ class MainActivity : AppCompatActivity() {
 
         override fun onFailure(code: String?) {
             if (code == "unauthorized") {
-                showSnackbar(getString(R.string.user_auth_error))
+                renderUi()
             } else {
                 showSnackbar(getString(R.string.network_request_error))
             }
