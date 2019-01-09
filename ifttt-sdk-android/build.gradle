@@ -11,8 +11,6 @@ android {
         targetSdkVersion 28
         versionCode 4
         versionName "2.0.0-alpha4"
-
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -42,8 +40,11 @@ dependencies {
     implementation 'com.google.code.findbugs:jsr305:3.0.2'
 
     testImplementation 'junit:junit:4.12'
-    testImplementation "com.google.truth:truth:0.42"
-    testImplementation 'org.robolectric:robolectric:4.0'
+    testImplementation 'org.robolectric:robolectric:4.1'
+    testImplementation 'androidx.test:runner:1.1.1'
+    testImplementation 'androidx.test:core:1.1.0'
+    testImplementation 'androidx.test.ext:truth:1.1.0'
+    testImplementation 'androidx.test.ext:junit:1.1.0'
     testImplementation "com.squareup.retrofit2:retrofit-mock:$retrofitVersion"
 }
 
@@ -123,7 +124,7 @@ task javadoc(type: Javadoc) {
 
 afterEvaluate {
     javadoc.classpath += files(android.libraryVariants.collect { variant ->
-        variant.javaCompile.classpath.files
+        variant.javaCompileProvider.get().classpath.files
     })
 }
 
