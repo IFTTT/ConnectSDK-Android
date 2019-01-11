@@ -9,6 +9,7 @@ import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
@@ -27,6 +28,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.animation.LinearInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -525,39 +527,21 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             });
         }
 
-        // Set a placeholder for the image.
-        final StartIconDrawable placeHolderImage;
-        if (iconImg.getBackground() == null) {
-            placeHolderImage = new StartIconDrawable(getContext(), new ColorDrawable(), 0, 0, false);
-            iconImg.setBackground(placeHolderImage);
-            iconImg.setAlpha(1f);
-        } else {
-            placeHolderImage = null;
-        }
-
         ongoingImageCall = ImageLoader.get().load(this, worksWithService.monochromeIconUrl, bitmap -> {
             ongoingImageCall = null;
 
-            int iconBackgroundMargin = getResources().getDimensionPixelSize(R.dimen.ifttt_icon_margin);
-            BitmapDrawable serviceIcon = new BitmapDrawable(getResources(), bitmap);
-            StartIconDrawable drawable = new StartIconDrawable(context, serviceIcon, iconSize,
-                    iconImg.getHeight() - iconBackgroundMargin * 2, onDarkBackground);
-
-            ObjectAnimator fadeInIconImg =
-                    ObjectAnimator.ofFloat(iconImg, "alpha", placeHolderImage == null ? iconImg.getAlpha() : 0f, 1f);
-            fadeInIconImg.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
-                @Override
-                public void onAnimationStart(Animator animation) {
-                    super.onAnimationStart(animation);
-                    iconImg.setBackground(drawable);
-                    drawable.setBackgroundColor(worksWithService.brandColor);
-
-                    // Set elevation.
-                    ViewCompat.setElevation(iconImg, getResources().getDimension(R.dimen.ifttt_icon_elevation));
-                }
-            });
-
-            fadeInIconImg.start();
+            if (ViewCompat.isLaidOut(iconImg)) {
+                setServiceIconImage(bitmap);
+            } else {
+                iconImg.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+                    @Override
+                    public boolean onPreDraw() {
+                        iconImg.getViewTreeObserver().removeOnPreDrawListener(this);
+                        setServiceIconImage(bitmap);
+                        return false;
+                    }
+                });
+            }
         });
 
         // Warm up icon image cache.
@@ -607,6 +591,39 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             buttonRoot.setOnClickListener(onClickListener);
             iconImg.setOnClickListener(onClickListener);
         }
+    }
+
+    private void setServiceIconImage(@Nullable Bitmap bitmap) {
+        // Set a placeholder for the image.
+        final StartIconDrawable placeHolderImage;
+        if (iconImg.getBackground() == null) {
+            placeHolderImage = new StartIconDrawable(getContext(), new ColorDrawable(), 0, 0, false);
+            iconImg.setBackground(placeHolderImage);
+            iconImg.setAlpha(1f);
+        } else {
+            placeHolderImage = null;
+        }
+
+        int iconBackgroundMargin = getResources().getDimensionPixelSize(R.dimen.ifttt_icon_margin);
+        BitmapDrawable serviceIcon = new BitmapDrawable(getResources(), bitmap);
+        StartIconDrawable drawable = new StartIconDrawable(getContext(), serviceIcon, iconSize,
+                iconImg.getHeight() - iconBackgroundMargin * 2, onDarkBackground);
+
+        ObjectAnimator fadeInIconImg =
+                ObjectAnimator.ofFloat(iconImg, "alpha", placeHolderImage == null ? iconImg.getAlpha() : 0f, 1f);
+        fadeInIconImg.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                super.onAnimationStart(animation);
+                iconImg.setBackground(drawable);
+                drawable.setBackgroundColor(worksWithService.brandColor);
+
+                // Set elevation.
+                ViewCompat.setElevation(iconImg, getResources().getDimension(R.dimen.ifttt_icon_elevation));
+            }
+        });
+
+        fadeInIconImg.start();
     }
 
     private void complete(boolean hasConfig) {

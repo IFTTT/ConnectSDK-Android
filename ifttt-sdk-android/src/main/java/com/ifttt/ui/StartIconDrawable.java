@@ -56,6 +56,8 @@ final class StartIconDrawable extends Drawable {
                         : Color.BLACK;
         if (onDarkBackground) {
             startIcon.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
+        } else {
+            startIcon.setColorFilter(null);
         }
 
         int borderColor = ContextCompat.getColor(context, R.color.ifttt_semi_transparent_white);

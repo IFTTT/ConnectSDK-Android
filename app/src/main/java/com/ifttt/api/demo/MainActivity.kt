@@ -8,8 +8,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -31,6 +33,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var iftttConnectButton: IftttConnectButton
     private lateinit var toolbar: Toolbar
+    private lateinit var progressBar: ProgressBar
     private lateinit var emailPreferencesHelper: EmailPreferencesHelper
     private lateinit var uiPreferencesHelper: UiPreferencesHelper
 
@@ -73,16 +76,15 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         title = null
 
+        progressBar = findViewById(R.id.progress_bar)
+
         iftttApiClient = IftttApiClient.Builder().setInviteCode(ApiHelper.INVITE_CODE).build()
         iftttConnectButton = findViewById(R.id.connect_button)
 
         val email = emailPreferencesHelper.getEmail()
         iftttConnectButton.setup(email, SERVICE_ID, iftttApiClient, REDIRECT_URI, oAuthCodeProvider)
 
-        // For development and testing purpose: we are using the user email directly as the OAuth code for this example
-        // service.
-        ApiHelper.getUserToken(email, apiCallback)
-
+        renderUi()
         toggleValuePropColor()
     }
 
@@ -109,14 +111,18 @@ class MainActivity : AppCompatActivity() {
             AlertDialog.Builder(this)
                 .setView(emailView)
                 .setTitle(R.string.email_title)
-                .setPositiveButton(android.R.string.ok) { _, _ ->
+                .setPositiveButton(R.string.login) { _, _ ->
                     val newEmail = emailView.editText!!.text.toString()
                     emailPreferencesHelper.setEmail(newEmail)
                     iftttConnectButton.setup(newEmail, SERVICE_ID, iftttApiClient, REDIRECT_URI, oAuthCodeProvider)
 
                     // Refresh user token.
+                    showLoading()
                     ApiHelper.getUserToken(newEmail, apiCallback)
-                }.show()
+                }.setNegativeButton(R.string.logout) { _, _ ->
+                    recreate()
+                }
+                .show()
             return true
         } else if (item.itemId == R.id.dark_mode) {
             val toggled = !item.isChecked
@@ -150,8 +156,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun renderUi() {
+        showLoading()
         iftttApiClient.api().showConnection(CONNECTION_ID).execute(object : PendingResult.ResultCallback<Connection> {
             override fun onSuccess(result: Connection) {
+                showButton()
+
                 iftttConnectButton.setConnection(result)
             }
 
@@ -159,6 +168,16 @@ class MainActivity : AppCompatActivity() {
                 showSnackbar(errorResponse.message)
             }
         })
+    }
+
+    private fun showLoading() {
+        progressBar.visibility = View.VISIBLE
+        iftttConnectButton.visibility = View.GONE
+    }
+
+    private fun showButton() {
+        progressBar.visibility = View.GONE
+        iftttConnectButton.visibility = View.VISIBLE
     }
 
     private fun toggleValuePropColor() {
