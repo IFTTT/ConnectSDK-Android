@@ -15,7 +15,8 @@
     <string name="value_props_1">Schedule grocery delivery when you’re available</string>
     <string name="value_props_2">Add delivery date and time to your calendar</string>
     <string name="value_props_3">Unlock discount delivery rates</string>
-    <string name="set_email">Set email</string>
     <string name="email_title">Please enter your email</string>
     <string name="dark_mode">Dark mode</string>
+    <string name="logout">Logout</string>
+    <string name="login">Login</string>
 </resources>
