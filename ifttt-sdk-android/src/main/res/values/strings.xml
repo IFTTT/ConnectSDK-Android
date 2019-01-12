@@ -9,7 +9,7 @@
     <string name="ifttt_about_1">Your favorite things work together in new ways</string>
     <string name="ifttt_about_2">Control how apps and devices access your data</string>
     <string name="ifttt_about_3">Protect and monitor your online data</string>
-    <string name="ifttt_validating_email">Validating your email…</string>
+    <string name="ifttt_validating_email">Checking for IFTTT account…</string>
     <string name="ifttt_creating_account">Creating account…</string>
     <string name="ifttt_sign_in_to">Sign in to %1$s</string>
     <string name="ifttt_sign_in">Sign in</string>
@@ -21,7 +21,7 @@
     <string name="ifttt_connect_services_description">Sign in to connect %1$s with %2$s</string>
     <string name="ifttt_all_set">You\'re all set. Manage connection with IFTTT</string>
     <string name="slide_to_turn_off">Slide to disconnect</string>
-    <string name="ifttt_signing_in_to_ifttt">Signing in to IFTTT</string>
+    <string name="ifttt_signing_in_to_ifttt">Accessing IFTTT account…</string>
     <string name="ifttt_enter_valid_email">Please enter a valid email address</string>
     <string name="ifttt_save_settings">Saving settings…</string>
     <string name="terms_and_privacy"><![CDATA[By using this IFTTT service you agree to the <a href=\"https://ifttt.com/terms\">Terms of Use</a> and <a href=\"https://ifttt.com/privacy\">Privacy Policy</a>.]]></string>
