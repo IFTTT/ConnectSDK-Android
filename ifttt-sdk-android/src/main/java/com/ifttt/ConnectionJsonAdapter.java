@@ -24,7 +24,7 @@ final class ConnectionJsonAdapter {
         }
 
         return new Connection(connectionJson.id, connectionJson.name, connectionJson.description, status,
-                connectionJson.enabled_count, connectionJson.url, connectionJson.services);
+                connectionJson.url, connectionJson.services);
     }
 
     @ToJson
@@ -38,18 +38,16 @@ final class ConnectionJsonAdapter {
         final String description;
         @Nullable final String user_status;
         final Date published_at;
-        final int enabled_count;
         final String url;
         final List<Service> services;
 
         ConnectionJson(String id, String name, String description, @Nullable String user_status, Date published_at,
-                int enabled_count, String url, List<Service> services) {
+                String url, List<Service> services) {
             this.id = id;
             this.name = name;
             this.description = description;
             this.user_status = user_status;
             this.published_at = published_at;
-            this.enabled_count = enabled_count;
             this.url = url;
             this.services = services;
         }

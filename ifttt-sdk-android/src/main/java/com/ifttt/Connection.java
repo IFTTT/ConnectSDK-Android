@@ -45,8 +45,6 @@ public final class Connection implements Parcelable {
     public final String description;
     public final Status status;
 
-    public final int enabledCount;
-
     /**
      * URL string that links to the owner service's website.
      */
@@ -56,13 +54,11 @@ public final class Connection implements Parcelable {
     // Cached primary service object.
     @Nullable private Service primaryService;
 
-    public Connection(String id, String name, String description, Status status, int enabledCount, String url,
-            List<Service> services) {
+    public Connection(String id, String name, String description, Status status, String url, List<Service> services) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.status = status;
-        this.enabledCount = enabledCount;
         this.url = url;
         this.services = services;
     }
@@ -94,8 +90,6 @@ public final class Connection implements Parcelable {
         description = in.readString();
         status = Status.valueOf(in.readString());
 
-        enabledCount = in.readInt();
-
         url = in.readString();
         services = in.createTypedArrayList(Service.CREATOR);
     }
@@ -123,7 +117,6 @@ public final class Connection implements Parcelable {
         parcel.writeString(name);
         parcel.writeString(description);
         parcel.writeString(status.name());
-        parcel.writeInt(enabledCount);
         parcel.writeString(url);
         parcel.writeTypedList(services);
     }
