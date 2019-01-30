@@ -16,8 +16,7 @@ import static java.util.Collections.emptyList;
 @RunWith(RobolectricTestRunner.class)
 public final class ButtonApiHelperTest {
 
-    private final Connection connection =
-            new Connection("", "", "", Connection.Status.never_enabled, 0, "", emptyList());
+    private final Connection connection = new Connection("", "", "", Connection.Status.never_enabled, "", emptyList());
 
     @Test
     public void testRequiredFields() {

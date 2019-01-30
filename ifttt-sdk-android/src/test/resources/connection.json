@@ -4,7 +4,6 @@
   "name": "Tweet your Instagrams as native photos on Twitter",
   "description": "Instagram photos will show up in your Twitter feed as a full image rather than a link",
   "published_at": "2017-02-16T11:10:43-08:00",
-  "enabled_count": 644429,
   "user_status": null,
   "last_run_at": null,
   "services": [
