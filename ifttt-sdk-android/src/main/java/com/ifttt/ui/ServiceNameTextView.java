@@ -59,7 +59,7 @@ final class ServiceNameTextView extends LinearLayout {
 
         float textWidth = StaticLayout.getDesiredWidth(serviceName, serviceText.getPaint());
         // The maximum width allowed for a service name is half of this View's width.
-        float maxWidth = getWidth() / 2f - paddingSmall;
+        float maxWidth = getWidth() - paddingHorizontal * 2;
         if (textWidth > maxWidth) {
             setPadding(paddingHorizontal, 0, paddingSmall, 0);
         } else {
