@@ -6,6 +6,7 @@
         android:id="@+id/ifttt_button_root"
         android:layout_width="@dimen/ifttt_connect_button_width"
         android:layout_height="@dimen/connect_button_height"
+        android:layout_marginTop="16dp"
         android:clipChildren="false"
         android:clipToPadding="false">
 

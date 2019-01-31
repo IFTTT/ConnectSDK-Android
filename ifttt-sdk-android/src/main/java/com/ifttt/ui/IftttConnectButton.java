@@ -130,6 +130,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
 
     private static final long ANIM_DURATION_MEDIUM = 700L;
     private static final long ANIM_DURATION_LONG = 1500L;
+    private static final long AUTO_ADVANCE_DELAY = 2000L;
     private static final LinearInterpolator LINEAR_INTERPOLATOR = new LinearInterpolator();
     private static final FastOutSlowInInterpolator EASE_INTERPOLATOR = new FastOutSlowInInterpolator();
 
@@ -385,9 +386,14 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                 // If the previous button state is login, complete the progress before going
                 Animator animator = buttonState == Login ? getCheckMarkAnimator()
                         : getProcessingAnimator(getResources().getString(R.string.ifttt_connecting_account));
-                animator.addListener(new AnimatorListenerAdapter() {
+                animator.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
                     @Override
                     public void onAnimationEnd(Animator animation) {
+                        super.onAnimationEnd(animation);
+                        if (isCanceled()) {
+                            return;
+                        }
+
                         worksWithService = findNextServiceToConnect(result);
                         ObjectAnimator fadeOutProgressRoot = ObjectAnimator.ofFloat(progressRoot, "alpha", 1f, 0f);
                         fadeOutProgressRoot.setInterpolator(EASE_INTERPOLATOR);
@@ -790,9 +796,14 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                     createAccountCompleteSet.start();
                 } else {
                     completeProgress.setDuration(ANIM_DURATION_MEDIUM);
-                    completeProgress.addListener(new AnimatorListenerAdapter() {
+                    completeProgress.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
                         @Override
                         public void onAnimationEnd(Animator animation) {
+                            super.onAnimationEnd(animation);
+                            if (isCanceled()) {
+                                return;
+                            }
+
                             recordState(Login);
                             buttonApiHelper.redirectToWeb(getContext(), connection, emailEdt.getText().toString(),
                                     buttonState);
@@ -938,8 +949,9 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
      */
     private Animator getStartServiceAuthAnimator(Service service) {
         buttonRoot.setBackground(buildButtonBackground(getContext(), service.brandColor));
-        getTextTransitionAnimator(connectStateTxt, Change, () -> connectStateTxt.setText(
-                getResources().getString(R.string.ifttt_sign_in_to, service.shortName))).start();
+        getTextTransitionAnimator(connectStateTxt, Change,
+                () -> connectStateTxt.setText(getResources().getString(R.string.ifttt_continue_to, service.shortName),
+                        true)).start();
         buttonRoot.setOnClickListener(new DebouncingOnClickListener() {
             @Override
             void doClick(View v) {
@@ -967,6 +979,18 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
 
         AnimatorSet set = new AnimatorSet();
         set.playTogether(slideInConnectText, fadeInConnectText);
+        set.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                if (isCanceled()) {
+                    return;
+                }
+
+                // Automatically advance to next step.
+                postDelayed(buttonRoot::performClick, AUTO_ADVANCE_DELAY);
+            }
+        });
         return set;
     }
 
@@ -1240,8 +1264,8 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                     super.onAnimationEnd(animation);
                     if (isCanceled()) {
                         return;
-                    }
 
+                }
                     int progressColor = ContextCompat.getColor(getContext(), R.color.ifttt_progress_background_color);
                     ((ProgressBackground) progressRoot.getBackground()).setColor(progressColor, BLACK);
                 }
@@ -1255,9 +1279,14 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                             setConnection(result);
 
                             if (processing.isRunning()) {
-                                processing.addListener(new AnimatorListenerAdapter() {
+                                processing.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
                                     @Override
                                     public void onAnimationEnd(Animator animation) {
+                                        super.onAnimationEnd(animation);
+                                        if (isCanceled()) {
+                                            return;
+                                        }
+
                                         fadeOut.start();
                                     }
                                 });

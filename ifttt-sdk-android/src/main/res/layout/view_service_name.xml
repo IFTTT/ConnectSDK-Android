@@ -4,7 +4,8 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/ifttt_service_name"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
+        android:layout_weight="1"
         android:layout_height="wrap_content"
         android:fontFamily="@font/avenir_next_ltpro_bold"
         android:lines="1"
@@ -13,5 +14,11 @@
         android:textSize="@dimen/ifttt_connect_text_size"
         app:autoSizeMaxTextSize="@dimen/ifttt_connect_text_size"
         app:autoSizeTextType="uniform"/>
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ifttt_continue_dots"
+        android:layout_width="@dimen/ifttt_dots_size"
+        android:layout_height="@dimen/ifttt_dots_size"
+        android:visibility="gone"/>
 
 </merge>
