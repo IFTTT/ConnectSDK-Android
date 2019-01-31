@@ -20,4 +20,5 @@
     <dimen name="ifttt_service_name_max_width">160dp</dimen>
     <dimen name="ifttt_service_name_height">26sp</dimen>
     <dimen name="ifttt_service_name_min_text_size">11sp</dimen>
+    <dimen name="ifttt_connect_button_width">310dp</dimen>
 </resources>
