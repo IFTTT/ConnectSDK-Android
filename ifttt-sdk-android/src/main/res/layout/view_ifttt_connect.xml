@@ -22,12 +22,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
-                android:background="@drawable/background_button"
                 android:hint="@string/ifttt_email"
                 android:inputType="textEmailAddress"
                 android:paddingEnd="@dimen/ifttt_text_padding_horizontal"
                 android:paddingStart="32dp"
+                android:background="@null"
                 android:textColor="@android:color/black"
+                android:fontFamily="@font/avenir_next_ltpro_demi"
                 android:textColorHint="@color/ifttt_email_hint_text_color"
                 android:visibility="gone"/>
 
@@ -60,28 +61,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:alpha="0"
+                android:fontFamily="@font/avenir_next_ltpro_bold"
                 android:gravity="center"
                 android:lines="1"
-                android:paddingEnd="@dimen/ifttt_text_padding_horizontal"
-                android:paddingStart="@dimen/ifttt_text_padding_horizontal"
+                android:paddingEnd="@dimen/ifttt_text_padding_horizontal_small"
+                android:paddingStart="@dimen/ifttt_text_padding_horizontal_small"
                 android:textColor="@android:color/white"
-                app:autoSizeMaxTextSize="20sp"
-                app:autoSizeTextType="uniform"
-                android:fontFamily="@font/avenir_next_ltpro_bold"/>
+                android:textSize="@dimen/ifttt_connect_text_size"
+                app:autoSizeMaxTextSize="@dimen/ifttt_connect_text_size"
+                app:autoSizeTextType="uniform"/>
 
             <ImageView
                 android:id="@+id/ifttt_progress_check_mark"
                 android:layout_width="64dp"
                 android:layout_height="52dp"
                 android:layout_gravity="center"
-                android:scaleType="centerInside"/>
-
-            <ImageView
-                android:id="@+id/ifttt_progress_service_icon"
-                android:layout_width="52dp"
-                android:layout_height="52dp"
-                android:layout_margin="@dimen/ifttt_icon_margin"
-                android:padding="8dp"
                 android:scaleType="centerInside"/>
 
         </FrameLayout>
@@ -92,6 +86,8 @@
         android:id="@+id/ifttt_helper_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="16dp"/>
+        android:background="?selectableItemBackground"
+        android:layout_margin="8dp"
+        android:padding="8dp"/>
 
 </merge>

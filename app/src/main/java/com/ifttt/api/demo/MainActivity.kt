@@ -84,6 +84,7 @@ class MainActivity : AppCompatActivity() {
         val email = emailPreferencesHelper.getEmail()
         iftttConnectButton.setup(email, SERVICE_ID, iftttApiClient, REDIRECT_URI, oAuthCodeProvider)
 
+        showLoading()
         renderUi()
         toggleValuePropColor()
     }
@@ -156,7 +157,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun renderUi() {
-        showLoading()
         iftttApiClient.api().showConnection(CONNECTION_ID).execute(object : PendingResult.ResultCallback<Connection> {
             override fun onSuccess(result: Connection) {
                 showButton()

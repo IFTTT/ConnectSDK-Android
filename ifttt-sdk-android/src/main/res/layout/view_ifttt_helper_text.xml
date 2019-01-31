@@ -7,4 +7,4 @@
     android:lineSpacingExtra="4sp"
     android:textColor="@android:color/black"
     android:textSize="12sp"
-    android:fontFamily="@font/avenir_next_ltpro_medium"/>
+    android:fontFamily="@font/avenir_next_ltpro_demi"/>
