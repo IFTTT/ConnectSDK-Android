@@ -32,6 +32,7 @@ import static android.os.Build.VERSION_CODES.LOLLIPOP;
 final class StartIconDrawable extends Drawable {
 
     private static final ArgbEvaluator EVALUATOR = new ArgbEvaluator();
+    private static final int PRESSED_ALPHA = 150;
 
     private final ShapeDrawable background = new ShapeDrawable();
     private final Drawable serviceIcon;
@@ -198,7 +199,9 @@ final class StartIconDrawable extends Drawable {
     }
 
     private Animator getPressedAnimator(boolean pressed) {
-        ValueAnimator pressAnimator = ValueAnimator.ofInt(pressed ? 255 : 150, pressed ? 150 : 255);
+        int startAlpha = pressed ? 255 : PRESSED_ALPHA;
+        int endAlpha = pressed ? PRESSED_ALPHA : 255;
+        ValueAnimator pressAnimator = ValueAnimator.ofInt(startAlpha, endAlpha);
         pressAnimator.addUpdateListener(animation -> {
             background.setAlpha((Integer) animation.getAnimatedValue());
             invalidateSelf();
@@ -248,6 +251,7 @@ final class StartIconDrawable extends Drawable {
                     ongoingAnimator.cancel();
                     drawable.getPressedAnimator(false).start();
                     ongoingAnimator = null;
+
                     if (event.getAction() == MotionEvent.ACTION_UP) {
                         v.performClick();
                     }

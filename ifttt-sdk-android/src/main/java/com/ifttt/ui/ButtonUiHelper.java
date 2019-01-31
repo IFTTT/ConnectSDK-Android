@@ -29,6 +29,14 @@ import static com.ifttt.ui.ButtonUiHelper.TextTransitionType.Change;
 
 final class ButtonUiHelper {
 
+    enum TextTransitionType {
+        Appear, Change
+    }
+
+    interface OnTextSwitchedListener {
+        void onSwitched();
+    }
+
     private static final FastOutSlowInInterpolator INTERPOLATOR = new FastOutSlowInInterpolator();
     private static final long ANIM_DURATION = 300L;
 
@@ -52,24 +60,6 @@ final class ButtonUiHelper {
         }
 
         return Color.HSVToColor(hsv);
-    }
-
-    @CheckReturnValue
-    static int getLighterColor(int color) {
-        final float[] hsv = new float[3];
-        Color.colorToHSV(color, hsv);
-
-        hsv[1] = 0.2f;
-        hsv[2] = 1f;
-        return Color.HSVToColor(hsv);
-    }
-
-    enum TextTransitionType {
-        Appear, Change
-    }
-
-    interface OnTextSwitchedListener {
-        void onSwitched();
     }
 
     @CheckReturnValue
