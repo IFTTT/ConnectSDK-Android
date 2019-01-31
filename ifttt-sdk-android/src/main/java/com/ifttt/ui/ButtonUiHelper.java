@@ -5,36 +5,26 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
-import android.content.res.ColorStateList;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.RippleDrawable;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.StateListDrawable;
-import android.graphics.drawable.shapes.RoundRectShape;
 import android.text.SpannableString;
 import android.text.Spanned;
-import android.text.StaticLayout;
 import android.text.TextUtils;
 import android.text.style.ImageSpan;
 import android.util.Patterns;
-import android.view.ViewTreeObserver;
+import android.view.View;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
 import androidx.annotation.ColorInt;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
-import androidx.core.view.ViewCompat;
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
 import com.ifttt.R;
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 
-import static android.os.Build.VERSION.SDK_INT;
-import static android.os.Build.VERSION_CODES.LOLLIPOP;
 import static com.ifttt.ui.ButtonUiHelper.TextTransitionType.Change;
 
 final class ButtonUiHelper {
@@ -68,13 +58,17 @@ final class ButtonUiHelper {
         Appear, Change
     }
 
+    interface OnTextSwitchedListener {
+        void onSwitched();
+    }
+
     @CheckReturnValue
-    static Animator getTextTransitionAnimator(TextView textView, TextTransitionType type,
-            @Nullable CharSequence newText) {
-        ObjectAnimator fadeOut = ObjectAnimator.ofFloat(textView, "alpha", 1f, 0f);
-        ObjectAnimator fadeIn = ObjectAnimator.ofFloat(textView, "alpha", 0f, 1f);
-        ObjectAnimator slideIn = ObjectAnimator.ofFloat(textView, "translationY", -50f, 0f);
-        ObjectAnimator slideOut = ObjectAnimator.ofFloat(textView, "translationY", 0f, 50f);
+    static Animator getTextTransitionAnimator(View view, TextTransitionType type,
+            OnTextSwitchedListener listener) {
+        ObjectAnimator fadeOut = ObjectAnimator.ofFloat(view, "alpha", 1f, 0f);
+        ObjectAnimator fadeIn = ObjectAnimator.ofFloat(view, "alpha", 0f, 1f);
+        ObjectAnimator slideIn = ObjectAnimator.ofFloat(view, "translationY", -50f, 0f);
+        ObjectAnimator slideOut = ObjectAnimator.ofFloat(view, "translationY", 0f, 50f);
 
         AnimatorSet set = new AnimatorSet();
         if (type == TextTransitionType.Appear) {
@@ -83,7 +77,7 @@ final class ButtonUiHelper {
             fadeIn.addListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationStart(Animator animation) {
-                    textView.setText(newText);
+                    listener.onSwitched();
                 }
             });
 
@@ -130,25 +124,6 @@ final class ButtonUiHelper {
     }
 
     @CheckReturnValue
-    static Drawable buildStateListButtonBackground(Context context, @ColorInt int color, @ColorInt int touchColor) {
-        Drawable content = ContextCompat.getDrawable(context, R.drawable.background_button);
-        float radius = context.getResources().getDimension(R.dimen.connect_button_radius);
-        ShapeDrawable mask = new ShapeDrawable(
-                new RoundRectShape(new float[] { radius, radius, radius, radius, radius, radius, radius, radius }, null,
-                        null));
-        mask.getPaint().setColor(touchColor);
-        content.setColorFilter(color, PorterDuff.Mode.SRC_IN);
-        if (SDK_INT >= LOLLIPOP) {
-            return new RippleDrawable(new ColorStateList(new int[][] { {} }, new int[] { touchColor }), content, mask);
-        }
-
-        StateListDrawable sld = new StateListDrawable();
-        sld.addState(new int[] { android.R.attr.state_pressed }, mask);
-        sld.addState(new int[] {}, content);
-        return sld;
-    }
-
-    @CheckReturnValue
     static Drawable buildButtonBackground(Context context, @ColorInt int color) {
         Drawable drawable = ContextCompat.getDrawable(context, R.drawable.background_button).mutate();
         DrawableCompat.setTint(DrawableCompat.wrap(drawable), color);
@@ -171,62 +146,6 @@ final class ButtonUiHelper {
         }
 
         textSwitcher.setText(text);
-    }
-
-    interface OnConnectStateTextSetCallback {
-        /**
-         * Called when the TextView has been measured and the correct CharSequence to be used has been determined.
-         *
-         * @param text text to be used for the given TextView.
-         */
-        void onTextSet(CharSequence text);
-    }
-
-    static void setConnectStateText(TextView textView, CharSequence text, CharSequence fallback,
-            @Nullable OnConnectStateTextSetCallback callback) {
-        if (ViewCompat.isLaidOut(textView)) {
-            setText(textView, text, fallback, callback);
-        } else {
-            textView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-                @Override
-                public boolean onPreDraw() {
-                    textView.getViewTreeObserver().removeOnPreDrawListener(this);
-                    setText(textView, text, fallback, callback);
-                    return false;
-                }
-            });
-        }
-    }
-
-    static void setConnectStateText(TextView textView, CharSequence text, CharSequence fallback) {
-        setConnectStateText(textView, text, fallback, null);
-    }
-
-    private static void setText(TextView textView, CharSequence text, CharSequence fallback,
-            @Nullable OnConnectStateTextSetCallback callback) {
-        float width = StaticLayout.getDesiredWidth(text, textView.getPaint());
-        CharSequence currentText = textView.getText();
-        if (width > textView.getWidth()) {
-            if (TextUtils.isEmpty(currentText)) {
-                textView.setText(fallback);
-            } else if (!fallback.equals(currentText)) {
-                getTextTransitionAnimator(textView, Change, fallback).start();
-            }
-
-            if (callback != null) {
-                callback.onTextSet(fallback);
-            }
-        } else {
-            if (TextUtils.isEmpty(currentText)) {
-                textView.setText(text);
-            } else if (!text.equals(currentText)) {
-                getTextTransitionAnimator(textView, Change, text).start();
-            }
-
-            if (callback != null) {
-                callback.onTextSet(text);
-            }
-        }
     }
 
     private ButtonUiHelper() {

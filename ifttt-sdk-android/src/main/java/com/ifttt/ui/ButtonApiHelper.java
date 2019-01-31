@@ -34,7 +34,7 @@ final class ButtonApiHelper {
     private final OAuthCodeProvider oAuthCodeProvider;
     private final Lifecycle lifecycle;
     private final String redirectUri;
-    private final String inviteCode;
+    @Nullable private final String inviteCode;
 
     @Nullable private String oAuthCode;
 
@@ -42,7 +42,7 @@ final class ButtonApiHelper {
     // to help simplify the flow by setting an aggressive timeout for account checking requests.
     private boolean accountFound = true;
 
-    ButtonApiHelper(IftttApi iftttApi, String redirectUri, String inviteCode, OAuthCodeProvider provider,
+    ButtonApiHelper(IftttApi iftttApi, String redirectUri, @Nullable String inviteCode, OAuthCodeProvider provider,
             Lifecycle lifecycle) {
         this.lifecycle = lifecycle;
         this.redirectUri = redirectUri;

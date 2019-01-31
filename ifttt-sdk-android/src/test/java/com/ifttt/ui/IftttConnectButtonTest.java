@@ -1,4 +1,4 @@
-package com.ifttt;
+package com.ifttt.ui;
 
 import android.app.Activity;
 import android.view.View;
@@ -6,32 +6,26 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
-import com.ifttt.ui.IftttConnectButton;
-import com.squareup.moshi.JsonAdapter;
-import com.squareup.moshi.JsonReader;
-import com.squareup.moshi.Moshi;
-import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import com.ifttt.Connection;
+import com.ifttt.IftttApiClient;
+import com.ifttt.R;
+import com.ifttt.ShadowResourcesCompat;
+import com.ifttt.TestActivity;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Date;
-import okio.Okio;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
-import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.ifttt.TestUtils.loadConnection;
 import static org.junit.Assert.fail;
 
-@RunWith(RobolectricTestRunner.class)
+@RunWith(AndroidJUnit4.class)
+@Config(shadows = ShadowResourcesCompat.class)
 public final class IftttConnectButtonTest {
-
-    private final Moshi moshi = new Moshi.Builder().add(Date.class, new Rfc3339DateJsonAdapter().nullSafe())
-            .add(new ConnectionJsonAdapter())
-            .add(new HexColorJsonAdapter())
-            .build();
-    private final JsonAdapter<Connection> adapter = moshi.adapter(Connection.class);
 
     private IftttConnectButton button;
 
@@ -43,7 +37,7 @@ public final class IftttConnectButtonTest {
 
     @Test
     public void initButton() {
-        TextView connectText = button.findViewById(R.id.connect_with_ifttt);
+        ServiceNameTextView connectText = button.findViewById(R.id.connect_with_ifttt);
         assertThat(connectText.getText()).isEqualTo("");
 
         ImageView iconImage = button.findViewById(R.id.ifttt_icon);
@@ -63,24 +57,19 @@ public final class IftttConnectButtonTest {
 
     @Test(expected = IllegalStateException.class)
     public void testWithoutSetup() throws Exception {
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("connection.json");
-        JsonReader jsonReader = JsonReader.of(Okio.buffer(Okio.source(inputStream)));
-        Connection connection = adapter.fromJson(jsonReader);
-
+        Connection connection = loadConnection(getClass().getClassLoader());
         button.setConnection(connection);
         fail();
     }
 
     @Test
     public void setConnection() throws IOException {
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("connection.json");
-        JsonReader jsonReader = JsonReader.of(Okio.buffer(Okio.source(inputStream)));
-        Connection connection = adapter.fromJson(jsonReader);
+        Connection connection = loadConnection(getClass().getClassLoader());
 
         button.setup("a@b.com", "instagram", new IftttApiClient.Builder().build(), "", () -> "");
         button.setConnection(connection);
 
-        TextView connectText = button.findViewById(R.id.connect_with_ifttt);
+        ServiceNameTextView connectText = button.findViewById(R.id.connect_with_ifttt);
         assertThat(connectText.getText()).isEqualTo("Connect Twitter");
 
         TextSwitcher helperText = button.findViewById(R.id.ifttt_helper_text);
@@ -89,9 +78,7 @@ public final class IftttConnectButtonTest {
 
     @Test(expected = IllegalStateException.class)
     public void testOwnerServiceCheck() throws IOException {
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("connection.json");
-        JsonReader jsonReader = JsonReader.of(Okio.buffer(Okio.source(inputStream)));
-        Connection connection = adapter.fromJson(jsonReader);
+        Connection connection = loadConnection(getClass().getClassLoader());
 
         button.setup("a@b.com", "not_owner_service", new IftttApiClient.Builder().build(), "", () -> "");
         button.setConnection(connection);

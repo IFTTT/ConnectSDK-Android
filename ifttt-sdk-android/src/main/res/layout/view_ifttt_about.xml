@@ -25,7 +25,7 @@
                 android:layout_height="64dp"
                 android:layout_marginTop="?actionBarSize"/>
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/ifttt_about_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -33,9 +33,10 @@
                 android:text="@string/ifttt_about_title"
                 android:layout_marginTop="32dp"
                 android:lineSpacingExtra="@dimen/ifttt_about_text_line_space"
+                android:fontFamily="@font/avenir_next_ltpro_bold"
                 android:textAppearance="@style/AboutIfttt.Title"/>
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/ifttt_about_1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -44,9 +45,10 @@
                 android:drawableStart="@drawable/ic_ifttt_about_1"
                 android:text="@string/ifttt_about_1"
                 android:lineSpacingExtra="@dimen/ifttt_about_text_line_space"
+                android:fontFamily="@font/avenir_next_ltpro_medium"
                 android:textAppearance="@style/AboutIfttt.Description"/>
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/ifttt_about_2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -55,9 +57,10 @@
                 android:drawableStart="@drawable/ic_ifttt_about_2"
                 android:text="@string/ifttt_about_2"
                 android:lineSpacingExtra="@dimen/ifttt_about_text_line_space"
+                android:fontFamily="@font/avenir_next_ltpro_medium"
                 android:textAppearance="@style/AboutIfttt.Description"/>
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/ifttt_about_3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -66,19 +69,21 @@
                 android:drawableStart="@drawable/ic_ifttt_about_3"
                 android:text="@string/ifttt_about_3"
                 android:lineSpacingExtra="@dimen/ifttt_about_text_line_space"
+                android:fontFamily="@font/avenir_next_ltpro_medium"
                 android:textAppearance="@style/AboutIfttt.Description"/>
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/term_and_privacy"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:lineSpacingExtra="@dimen/ifttt_about_text_line_space"
                 android:textColor="@android:color/white"
                 android:textSize="12sp"
+                android:fontFamily="@font/avenir_next_ltpro_medium"
                 android:layout_marginTop="48dp"
                 android:gravity="center"/>
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/ifttt_more_about_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -92,6 +97,7 @@
                 android:text="@string/ifttt_more_about_ifttt"
                 android:textAllCaps="false"
                 android:gravity="center"
+                android:fontFamily="@font/avenir_next_ltpro_bold"
                 android:textColor="@android:color/white"
                 android:textSize="18sp"/>
 

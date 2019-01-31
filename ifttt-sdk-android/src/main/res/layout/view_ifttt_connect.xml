@@ -4,7 +4,7 @@
 
     <FrameLayout
         android:id="@+id/ifttt_button_root"
-        android:layout_width="match_parent"
+        android:layout_width="@dimen/ifttt_connect_button_width"
         android:layout_height="@dimen/connect_button_height"
         android:clipChildren="false"
         android:clipToPadding="false">
@@ -25,24 +25,17 @@
                 android:background="@drawable/background_button"
                 android:hint="@string/ifttt_email"
                 android:inputType="textEmailAddress"
-                android:paddingEnd="@dimen/connect_text_padding_horizontal"
+                android:paddingEnd="@dimen/ifttt_text_padding_horizontal"
                 android:paddingStart="32dp"
                 android:textColor="@android:color/black"
                 android:textColorHint="@color/ifttt_email_hint_text_color"
                 android:visibility="gone"/>
 
-            <TextView
+            <com.ifttt.ui.ServiceNameTextView
                 android:id="@+id/connect_with_ifttt"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:lines="1"
-                android:paddingBottom="8dp"
-                android:layout_marginStart="@dimen/connect_text_padding_horizontal"
-                android:layout_marginEnd="@dimen/connect_text_padding_horizontal"
-                android:paddingTop="8dp"
-                android:textColor="@android:color/white"
-                android:textSize="@dimen/ifttt_connect_text_size"/>
+                android:layout_height="@dimen/ifttt_service_name_height"
+                android:layout_gravity="center"/>
 
             <ImageButton
                 android:id="@+id/ifttt_icon"
@@ -62,18 +55,19 @@
             android:layout_height="match_parent"
             android:alpha="0">
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/ifttt_progress_text"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:alpha="0"
                 android:gravity="center"
                 android:lines="1"
-                android:paddingEnd="60dp"
-                android:paddingStart="60dp"
+                android:paddingEnd="@dimen/ifttt_text_padding_horizontal"
+                android:paddingStart="@dimen/ifttt_text_padding_horizontal"
                 android:textColor="@android:color/white"
                 app:autoSizeMaxTextSize="20sp"
-                app:autoSizeTextType="uniform"/>
+                app:autoSizeTextType="uniform"
+                android:fontFamily="@font/avenir_next_ltpro_bold"/>
 
             <ImageView
                 android:id="@+id/ifttt_progress_check_mark"
