@@ -585,6 +585,8 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             buttonRoot.setOnClickListener(onClickListener);
             iconImg.setOnClickListener(onClickListener);
         }
+
+        StartIconDrawable.setPressListener(iconImg);
     }
 
     private void setServiceIconImage(@Nullable Bitmap bitmap) {

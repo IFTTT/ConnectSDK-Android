@@ -5,16 +5,10 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
-import android.content.res.ColorStateList;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.RippleDrawable;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.StateListDrawable;
-import android.graphics.drawable.shapes.RoundRectShape;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -31,8 +25,6 @@ import com.ifttt.R;
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 
-import static android.os.Build.VERSION.SDK_INT;
-import static android.os.Build.VERSION_CODES.LOLLIPOP;
 import static com.ifttt.ui.ButtonUiHelper.TextTransitionType.Change;
 
 final class ButtonUiHelper {
@@ -59,6 +51,16 @@ final class ButtonUiHelper {
             hsv[2] = value + 0.08f;
         }
 
+        return Color.HSVToColor(hsv);
+    }
+
+    @CheckReturnValue
+    static int getLighterColor(int color) {
+        final float[] hsv = new float[3];
+        Color.colorToHSV(color, hsv);
+
+        hsv[1] = 0.2f;
+        hsv[2] = 1f;
         return Color.HSVToColor(hsv);
     }
 
@@ -144,25 +146,6 @@ final class ButtonUiHelper {
         }
 
         return !Patterns.EMAIL_ADDRESS.matcher(email).matches();
-    }
-
-    @CheckReturnValue
-    static Drawable buildStateListButtonBackground(Context context, @ColorInt int color, @ColorInt int touchColor) {
-        Drawable content = ContextCompat.getDrawable(context, R.drawable.background_button);
-        float radius = context.getResources().getDimension(R.dimen.connect_button_radius);
-        ShapeDrawable mask = new ShapeDrawable(
-                new RoundRectShape(new float[] { radius, radius, radius, radius, radius, radius, radius, radius }, null,
-                        null));
-        mask.getPaint().setColor(touchColor);
-        content.setColorFilter(color, PorterDuff.Mode.SRC_IN);
-        if (SDK_INT >= LOLLIPOP) {
-            return new RippleDrawable(new ColorStateList(new int[][] { {} }, new int[] { touchColor }), content, mask);
-        }
-
-        StateListDrawable sld = new StateListDrawable();
-        sld.addState(new int[] { android.R.attr.state_pressed }, mask);
-        sld.addState(new int[] {}, content);
-        return sld;
     }
 
     static void setTextSwitcherText(TextSwitcher textSwitcher, CharSequence text) {
