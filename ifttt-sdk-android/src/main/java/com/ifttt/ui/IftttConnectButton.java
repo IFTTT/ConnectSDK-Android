@@ -489,11 +489,11 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             recordState(Initial);
 
             if (connectStateTxt.getText().length() == 0) {
-                connectStateTxt.setText(getResources().getString(R.string.ifttt_connect_to, worksWithService.name));
+                connectStateTxt.setText(getResources().getString(R.string.ifttt_connect_to, worksWithService.shortName));
             } else {
                 getTextTransitionAnimator(connectStateTxt,
                         TextUtils.isEmpty(connectStateTxt.getText()) ? Appear : Change, () -> connectStateTxt.setText(
-                                getResources().getString(R.string.ifttt_connect_to, worksWithService.name))).start();
+                                getResources().getString(R.string.ifttt_connect_to, worksWithService.shortName))).start();
             }
 
             helperTxt.setOnClickListener(new DebouncingOnClickListener() {
@@ -932,7 +932,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
     private Animator getStartServiceAuthAnimator(Service service) {
         buttonRoot.setBackground(buildButtonBackground(getContext(), service.brandColor));
         getTextTransitionAnimator(connectStateTxt, Change, () -> connectStateTxt.setText(
-                getResources().getString(R.string.ifttt_sign_in_to, service.name))).start();
+                getResources().getString(R.string.ifttt_sign_in_to, service.shortName))).start();
         buttonRoot.setOnClickListener(new DebouncingOnClickListener() {
             @Override
             void doClick(View v) {

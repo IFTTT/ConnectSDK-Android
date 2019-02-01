@@ -11,6 +11,7 @@ import com.squareup.moshi.Json;
 public final class Service implements Parcelable {
     @Json(name = "service_id") public final String id;
     @Json(name = "service_name") public final String name;
+    @Json(name = "service_short_name") public final String shortName;
 
     /**
      * A primary service's triggers or actions don't have to be used in the Connection, it can also be the owner service.
@@ -22,9 +23,11 @@ public final class Service implements Parcelable {
     @HexColor @Json(name = "brand_color") public final int brandColor;
     public final String url;
 
-    public Service(String id, String name, boolean isPrimary, String monochromeIconUrl, int brandColor, String url) {
+    public Service(String id, String name, String shortName, boolean isPrimary, String monochromeIconUrl,
+            int brandColor, String url) {
         this.id = id;
         this.name = name;
+        this.shortName = shortName;
         this.isPrimary = isPrimary;
         this.monochromeIconUrl = monochromeIconUrl;
         this.brandColor = brandColor;
@@ -34,6 +37,7 @@ public final class Service implements Parcelable {
     protected Service(Parcel in) {
         id = in.readString();
         name = in.readString();
+        shortName = in.readString();
         isPrimary = in.readByte() != 0;
         monochromeIconUrl = in.readString();
         brandColor = in.readInt();
@@ -61,6 +65,7 @@ public final class Service implements Parcelable {
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(id);
         parcel.writeString(name);
+        parcel.writeString(shortName);
         parcel.writeByte((byte) (isPrimary ? 1 : 0));
         parcel.writeString(monochromeIconUrl);
         parcel.writeInt(brandColor);
