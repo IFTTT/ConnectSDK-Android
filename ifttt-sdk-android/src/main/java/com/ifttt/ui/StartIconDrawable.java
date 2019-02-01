@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -16,6 +17,9 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RoundRectShape;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.ImageView;
 import androidx.annotation.ColorInt;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.VisibleForTesting;
@@ -28,6 +32,7 @@ import static android.os.Build.VERSION_CODES.LOLLIPOP;
 final class StartIconDrawable extends Drawable {
 
     private static final ArgbEvaluator EVALUATOR = new ArgbEvaluator();
+    private static final int PRESSED_ALPHA = 150;
 
     private final ShapeDrawable background = new ShapeDrawable();
     private final Drawable serviceIcon;
@@ -193,11 +198,67 @@ final class StartIconDrawable extends Drawable {
         return iconMorphing;
     }
 
+    private Animator getPressedAnimator(boolean pressed) {
+        int startAlpha = pressed ? 255 : PRESSED_ALPHA;
+        int endAlpha = pressed ? PRESSED_ALPHA : 255;
+        ValueAnimator pressAnimator = ValueAnimator.ofInt(startAlpha, endAlpha);
+        pressAnimator.addUpdateListener(animation -> {
+            background.setAlpha((Integer) animation.getAnimatedValue());
+            invalidateSelf();
+        });
+        return pressAnimator;
+    }
+
     @VisibleForTesting
     static boolean isDarkColor(@ColorInt int color) {
         float[] hsv = new float[3];
         Color.colorToHSV(color, hsv);
 
         return hsv[2] < 0.25f;
+    }
+
+    /**
+     * Set a {@link View.OnTouchListener} on the ImageView that uses StartIconDrawable as background. We will be using
+     * a custom animation to render press state.
+     *
+     * @param view The ImageView that has a StartIconDrawable as background. This method is no-op if this is not the
+     * case.
+     */
+    @SuppressLint("ClickableViewAccessibility")
+    static void setPressListener(ImageView view) {
+        view.setOnTouchListener(new View.OnTouchListener() {
+
+            @Nullable private Animator ongoingAnimator;
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (!(view.getBackground() instanceof StartIconDrawable)) {
+                    // No-op if the ImageView doesn't host a StartIconDrawable.
+                    return false;
+                }
+
+                StartIconDrawable drawable = (StartIconDrawable) view.getBackground();
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    ongoingAnimator = drawable.getPressedAnimator(true);
+                    ongoingAnimator.start();
+                    return true;
+                } else if (event.getAction() == MotionEvent.ACTION_UP
+                        || event.getAction() == MotionEvent.ACTION_CANCEL) {
+                    if (ongoingAnimator == null) {
+                        return true;
+                    }
+
+                    ongoingAnimator.cancel();
+                    drawable.getPressedAnimator(false).start();
+                    ongoingAnimator = null;
+
+                    if (event.getAction() == MotionEvent.ACTION_UP) {
+                        v.performClick();
+                    }
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 }

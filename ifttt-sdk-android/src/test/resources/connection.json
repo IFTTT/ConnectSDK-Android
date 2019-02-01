@@ -10,6 +10,7 @@
     {
       "service_id": "twitter",
       "service_name": "Twitter",
+      "service_short_name": "Twitter",
       "is_primary": false,
       "monochrome_icon_url": "https://assets.ifttt.com/images/channels/2/icons/monochrome_regular.png",
       "color_icon_url": "https://assets.ifttt.com/images/channels/2/icons/on_color_regular.png",
@@ -19,6 +20,7 @@
     {
       "service_id": "instagram",
       "service_name": "Instagram",
+      "service_short_name": "Instagram",
       "is_primary": true,
       "monochrome_icon_url": "https://assets.ifttt.com/images/channels/28/icons/monochrome_regular.png",
       "color_icon_url": "https://assets.ifttt.com/images/channels/28/icons/on_color_regular.png",

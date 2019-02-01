@@ -29,6 +29,14 @@ import static com.ifttt.ui.ButtonUiHelper.TextTransitionType.Change;
 
 final class ButtonUiHelper {
 
+    enum TextTransitionType {
+        Appear, Change
+    }
+
+    interface OnTextSwitchedListener {
+        void onSwitched();
+    }
+
     private static final FastOutSlowInInterpolator INTERPOLATOR = new FastOutSlowInInterpolator();
     private static final long ANIM_DURATION = 300L;
 
@@ -54,17 +62,8 @@ final class ButtonUiHelper {
         return Color.HSVToColor(hsv);
     }
 
-    enum TextTransitionType {
-        Appear, Change
-    }
-
-    interface OnTextSwitchedListener {
-        void onSwitched();
-    }
-
     @CheckReturnValue
-    static Animator getTextTransitionAnimator(View view, TextTransitionType type,
-            OnTextSwitchedListener listener) {
+    static Animator getTextTransitionAnimator(View view, TextTransitionType type, OnTextSwitchedListener listener) {
         ObjectAnimator fadeOut = ObjectAnimator.ofFloat(view, "alpha", 1f, 0f);
         ObjectAnimator fadeIn = ObjectAnimator.ofFloat(view, "alpha", 0f, 1f);
         ObjectAnimator slideIn = ObjectAnimator.ofFloat(view, "translationY", -50f, 0f);
