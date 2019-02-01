@@ -88,6 +88,7 @@
         android:layout_height="wrap_content"
         android:background="?selectableItemBackground"
         android:layout_margin="8dp"
+        android:alpha="0.3"
         android:padding="8dp"/>
 
 </merge>

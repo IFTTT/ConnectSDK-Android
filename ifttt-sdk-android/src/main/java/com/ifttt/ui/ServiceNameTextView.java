@@ -4,10 +4,8 @@ import android.content.Context;
 import android.text.StaticLayout;
 import android.util.AttributeSet;
 import android.view.Gravity;
-import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import androidx.core.view.ViewCompat;
 import com.ifttt.R;
 import javax.annotation.Nullable;
 
@@ -44,18 +42,7 @@ final class ServiceNameTextView extends LinearLayout {
             return;
         }
 
-        if (ViewCompat.isLaidOut(serviceText)) {
-            adjustServiceText(text);
-        } else {
-            serviceText.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-                @Override
-                public boolean onPreDraw() {
-                    serviceText.getViewTreeObserver().removeOnPreDrawListener(this);
-                    adjustServiceText(text);
-                    return false;
-                }
-            });
-        }
+        adjustServiceText(text);
     }
 
     private void adjustServiceText(CharSequence serviceName) {
