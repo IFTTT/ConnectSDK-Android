@@ -130,7 +130,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
 
     private static final long ANIM_DURATION_MEDIUM = 700L;
     private static final long ANIM_DURATION_LONG = 1500L;
-    private static final long AUTO_ADVANCE_DELAY = 2000L;
+    private static final long AUTO_ADVANCE_DELAY = 2400L;
     private static final LinearInterpolator LINEAR_INTERPOLATOR = new LinearInterpolator();
     private static final FastOutSlowInInterpolator EASE_INTERPOLATOR = new FastOutSlowInInterpolator();
 
