@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="ifttt_text_padding_horizontal">72dp</dimen>
-    <dimen name="ifttt_text_padding_horizontal_small">40dp</dimen>
+    <dimen name="ifttt_text_padding_horizontal_small">30dp</dimen>
     <dimen name="ifttt_icon_image_size">34dp</dimen>
     <dimen name="ifttt_start_image_width">9dp</dimen>
     <dimen name="ifttt_start_image_height">16dp</dimen>
@@ -21,4 +21,5 @@
     <dimen name="ifttt_service_name_height">26sp</dimen>
     <dimen name="ifttt_service_name_min_text_size">11sp</dimen>
     <dimen name="ifttt_connect_button_width">310dp</dimen>
+    <dimen name="ifttt_dots_size">18dp</dimen>
 </resources>
