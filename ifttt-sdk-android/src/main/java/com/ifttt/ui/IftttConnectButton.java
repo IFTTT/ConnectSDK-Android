@@ -384,8 +384,8 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         switch (result.nextStep) {
             case ServiceAuthentication:
                 // If the previous button state is login, complete the progress before going
-                Animator animator = buttonState == Login ? getCheckMarkAnimator()
-                        : getProcessingAnimator(getResources().getString(R.string.ifttt_connecting_account));
+                Animator animator = buttonState == Login ? ObjectAnimator.ofFloat(progressTxt, "alpha", 1f, 0f)
+                        : getProcessingAnimator(getResources().getString(R.string.ifttt_connecting_account), false);
                 animator.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
                     @Override
                     public void onAnimationEnd(Animator animation) {
@@ -667,7 +667,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
 
         CharSequence text = hasConfig ? getResources().getString(R.string.ifttt_save_settings)
                 : getResources().getString(R.string.ifttt_connecting_account);
-        Animator checkMarkAnimator = getProcessingAnimator(text);
+        Animator checkMarkAnimator = getProcessingAnimator(text, true);
         iconMovement.setStartDelay(ICON_MOVEMENT_START_DELAY);
         fadeOutProgressRoot.setStartDelay(ICON_MOVEMENT_START_DELAY);
         completeSet.playTogether(checkMarkAnimator, iconMovement, fadeOutProgressRoot);
@@ -994,13 +994,6 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         return set;
     }
 
-    private Animator getCheckMarkAnimator() {
-        AnimatorSet set = new AnimatorSet();
-        set.playSequentially(ObjectAnimator.ofFloat(progressTxt, "alpha", 1f, 0f),
-                ((CheckMarkDrawable) completeImg.getDrawable()).getAnimator());
-        return set;
-    }
-
     private Animator getFadeOutProgressBarAnimator() {
         ObjectAnimator fadeOutProgressRoot = ObjectAnimator.ofFloat(progressRoot, "alpha", 1f, 0f);
         fadeOutProgressRoot.setDuration(ANIM_DURATION_MEDIUM);
@@ -1015,7 +1008,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
      * @param text Text to be shown while the progress animation is running.
      * @return the Animator object that has timing and interpolator set up.
      */
-    private Animator getProcessingAnimator(CharSequence text) {
+    private Animator getProcessingAnimator(CharSequence text, boolean showCheckMark) {
         // It is possible that the progress bar is already visible in when this animation starts, for example, when
         // the user comes back from web knowing that all of the services have been authenticated. In this case, we will
         // reuse the current alpha value of the progressRoot, to avoid flashing the view.
@@ -1040,7 +1033,10 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         CheckMarkDrawable drawable = (CheckMarkDrawable) completeImg.getDrawable();
         Animator checkMarkAnimator = drawable.getAnimator();
         checkMarkAnimator.setStartDelay(200L);
-        checkMarkAnimator.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
+
+        ObjectAnimator fadeOutProgressTxt = ObjectAnimator.ofFloat(progressTxt, "alpha", 1f, 0f);
+        fadeOutProgressTxt.setInterpolator(EASE_INTERPOLATOR);
+        fadeOutProgressTxt.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
@@ -1053,13 +1049,15 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             }
         });
 
-        ObjectAnimator fadeOutProgressTxt = ObjectAnimator.ofFloat(progressTxt, "alpha", 1f, 0f);
-        fadeOutProgressTxt.setInterpolator(EASE_INTERPOLATOR);
-
         Animator textTransition =
                 getTextTransitionAnimator(connectStateTxt, Appear, () -> connectStateTxt.setText(null));
         AnimatorSet set = new AnimatorSet();
-        set.play(checkMarkAnimator).with(textTransition).with(fadeOutProgressTxt);
+        if (showCheckMark) {
+            set.play(checkMarkAnimator).with(textTransition).with(fadeOutProgressTxt);
+        } else {
+            set.play(textTransition).with(fadeOutProgressTxt);
+        }
+
         set.playSequentially(fadeInProgressContainer, completeProgress, checkMarkAnimator);
         set.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
             @Override
@@ -1264,13 +1262,12 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                     super.onAnimationEnd(animation);
                     if (isCanceled()) {
                         return;
-
-                }
+                    }
                     int progressColor = ContextCompat.getColor(getContext(), R.color.ifttt_progress_background_color);
                     ((ProgressBackground) progressRoot.getBackground()).setColor(progressColor, BLACK);
                 }
             });
-            Animator processing = getProcessingAnimator(getResources().getString(R.string.disconnecting));
+            Animator processing = getProcessingAnimator(getResources().getString(R.string.disconnecting), true);
             processing.start();
             buttonApiHelper.disableConnection(getLifecycle(), connection.id,
                     new PendingResult.ResultCallback<Connection>() {
