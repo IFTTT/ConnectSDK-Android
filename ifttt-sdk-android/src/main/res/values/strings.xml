@@ -19,7 +19,7 @@
     <string name="ifttt_sign_in_to_ifttt_or_create_new_account"><![CDATA[You are creating or using your IFTTT account subject to <a href=\"https://ifttt.com/terms\">Terms</a> & <a href=\"https://ifttt.com/privacy\">Privacy Policy</a>.]]></string>
     <string name="ifttt_all_set">You\'re all set. Manage connection with IFTTT</string>
     <string name="slide_to_turn_off">Slide to disconnect</string>
-    <string name="ifttt_signing_in_to_ifttt">Accessing IFTTT account…</string>
+    <string name="ifttt_accessing_account">Accessing IFTTT account…</string>
     <string name="ifttt_enter_valid_email">Please enter a valid email address</string>
     <string name="ifttt_save_settings">Saving settings</string>
     <string name="terms_and_privacy"><![CDATA[By using this IFTTT service you agree to the <a href=\"https://ifttt.com/terms\">Terms of Use</a> and <a href=\"https://ifttt.com/privacy\">Privacy Policy</a>.]]></string>

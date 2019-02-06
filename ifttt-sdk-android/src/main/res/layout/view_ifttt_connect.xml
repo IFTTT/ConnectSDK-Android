@@ -23,21 +23,46 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
+                android:background="@null"
+                android:fontFamily="@font/avenir_next_ltpro_demi"
                 android:hint="@string/ifttt_email"
                 android:inputType="textEmailAddress"
                 android:paddingEnd="@dimen/ifttt_text_padding_horizontal"
                 android:paddingStart="32dp"
-                android:background="@null"
                 android:textColor="@android:color/black"
-                android:fontFamily="@font/avenir_next_ltpro_demi"
                 android:textColorHint="@color/ifttt_email_hint_text_color"
                 android:visibility="gone"/>
 
-            <com.ifttt.ui.ServiceNameTextView
+            <com.ifttt.ui.ConnectButtonTextView
                 android:id="@+id/connect_with_ifttt"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/ifttt_service_name_height"
-                android:layout_gravity="center"/>
+                android:layout_gravity="center"
+                android:inAnimation="@anim/ifttt_helper_text_in"
+                android:outAnimation="@anim/ifttt_helper_text_out">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:fontFamily="@font/avenir_next_ltpro_bold"
+                    android:gravity="center"
+                    android:lines="1"
+                    android:textColor="@android:color/white"
+                    android:textSize="@dimen/ifttt_connect_text_size"
+                    app:autoSizeMaxTextSize="@dimen/ifttt_connect_text_size"
+                    app:autoSizeTextType="uniform"/>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:fontFamily="@font/avenir_next_ltpro_bold"
+                    android:gravity="center"
+                    android:textColor="@android:color/white"
+                    android:textSize="@dimen/ifttt_connect_text_size"
+                    app:autoSizeMaxTextSize="@dimen/ifttt_connect_text_size"
+                    app:autoSizeTextType="uniform"/>
+
+            </com.ifttt.ui.ConnectButtonTextView>
 
             <ImageButton
                 android:id="@+id/ifttt_icon"
@@ -57,20 +82,38 @@
             android:layout_height="match_parent"
             android:alpha="0">
 
-            <androidx.appcompat.widget.AppCompatTextView
+            <TextSwitcher
                 android:id="@+id/ifttt_progress_text"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:alpha="0"
-                android:fontFamily="@font/avenir_next_ltpro_bold"
-                android:gravity="center"
-                android:lines="1"
+                android:inAnimation="@anim/ifttt_helper_text_in"
+                android:outAnimation="@anim/ifttt_helper_text_out"
                 android:paddingEnd="@dimen/ifttt_text_padding_horizontal_small"
-                android:paddingStart="@dimen/ifttt_text_padding_horizontal_small"
-                android:textColor="@android:color/white"
-                android:textSize="@dimen/ifttt_connect_text_size"
-                app:autoSizeMaxTextSize="@dimen/ifttt_connect_text_size"
-                app:autoSizeTextType="uniform"/>
+                android:paddingStart="@dimen/ifttt_text_padding_horizontal_small">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:fontFamily="@font/avenir_next_ltpro_bold"
+                    android:gravity="center"
+                    android:lines="1"
+                    android:textColor="@android:color/white"
+                    android:textSize="@dimen/ifttt_connect_text_size"
+                    app:autoSizeMaxTextSize="@dimen/ifttt_connect_text_size"
+                    app:autoSizeTextType="uniform"/>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:fontFamily="@font/avenir_next_ltpro_bold"
+                    android:gravity="center"
+                    android:lines="1"
+                    android:textColor="@android:color/white"
+                    android:textSize="@dimen/ifttt_connect_text_size"
+                    app:autoSizeMaxTextSize="@dimen/ifttt_connect_text_size"
+                    app:autoSizeTextType="uniform"/>
+
+            </TextSwitcher>
 
             <ImageView
                 android:id="@+id/ifttt_progress_check_mark"
@@ -87,9 +130,33 @@
         android:id="@+id/ifttt_helper_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="?selectableItemBackground"
         android:layout_margin="8dp"
         android:alpha="0.3"
-        android:padding="8dp"/>
+        android:background="?selectableItemBackground"
+        android:inAnimation="@anim/ifttt_helper_text_in"
+        android:outAnimation="@anim/ifttt_helper_text_out"
+        android:padding="8dp">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fontFamily="@font/avenir_next_ltpro_demi"
+            android:gravity="center"
+            android:lineSpacingExtra="4sp"
+            android:textColor="@android:color/black"
+            android:textColorLink="@android:color/black"
+            android:textSize="12sp"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fontFamily="@font/avenir_next_ltpro_demi"
+            android:gravity="center"
+            android:lineSpacingExtra="4sp"
+            android:textColor="@android:color/black"
+            android:textColorLink="@android:color/black"
+            android:textSize="12sp"/>
+
+    </TextSwitcher>
 
 </merge>

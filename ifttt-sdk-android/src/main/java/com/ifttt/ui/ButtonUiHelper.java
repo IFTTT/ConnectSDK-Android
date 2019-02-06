@@ -1,9 +1,5 @@
 package com.ifttt.ui;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Canvas;
@@ -15,31 +11,15 @@ import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.style.ImageSpan;
 import android.util.Patterns;
-import android.view.View;
-import android.widget.TextSwitcher;
 import android.widget.TextView;
 import androidx.annotation.ColorInt;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
-import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
 import com.ifttt.R;
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 
-import static com.ifttt.ui.ButtonUiHelper.TextTransitionType.Change;
-
 final class ButtonUiHelper {
-
-    enum TextTransitionType {
-        Appear, Change
-    }
-
-    interface OnTextSwitchedListener {
-        void onSwitched();
-    }
-
-    private static final FastOutSlowInInterpolator INTERPOLATOR = new FastOutSlowInInterpolator();
-    private static final long ANIM_DURATION = 300L;
 
     private static final String PACKAGE_NAME_IFTTT = "com.ifttt.ifttt";
 
@@ -63,35 +43,6 @@ final class ButtonUiHelper {
         }
 
         return Color.HSVToColor(hsv);
-    }
-
-    @CheckReturnValue
-    static Animator getTextTransitionAnimator(View view, TextTransitionType type, OnTextSwitchedListener listener) {
-        ObjectAnimator fadeOut = ObjectAnimator.ofFloat(view, "alpha", 1f, 0f);
-        ObjectAnimator fadeIn = ObjectAnimator.ofFloat(view, "alpha", 0f, 1f);
-        ObjectAnimator slideIn = ObjectAnimator.ofFloat(view, "translationY", -50f, 0f);
-        ObjectAnimator slideOut = ObjectAnimator.ofFloat(view, "translationY", 0f, 50f);
-
-        AnimatorSet set = new AnimatorSet();
-        if (type == TextTransitionType.Appear) {
-            set.play(fadeIn).with(slideIn);
-        } else if (type == Change) {
-            fadeIn.addListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationStart(Animator animation) {
-                    listener.onSwitched();
-                }
-            });
-
-            set.play(fadeOut).with(slideOut);
-            set.play(fadeIn).with(slideIn);
-            set.play(fadeOut).before(fadeIn);
-        }
-
-        set.setDuration(ANIM_DURATION);
-        set.setInterpolator(INTERPOLATOR);
-
-        return set;
     }
 
     @CheckReturnValue
@@ -139,15 +90,6 @@ final class ButtonUiHelper {
         }
 
         return !Patterns.EMAIL_ADDRESS.matcher(email).matches();
-    }
-
-    static void setTextSwitcherText(TextSwitcher textSwitcher, CharSequence text) {
-        TextView currentText = (TextView) textSwitcher.getCurrentView();
-        if (currentText.getText().equals(text)) {
-            return;
-        }
-
-        textSwitcher.setText(text);
     }
 
     @CheckReturnValue
