@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -39,6 +40,8 @@ final class ButtonUiHelper {
 
     private static final FastOutSlowInInterpolator INTERPOLATOR = new FastOutSlowInInterpolator();
     private static final long ANIM_DURATION = 300L;
+
+    private static final String PACKAGE_NAME_IFTTT = "com.ifttt.ifttt";
 
     @CheckReturnValue
     static int getDarkerColor(int color) {
@@ -145,6 +148,16 @@ final class ButtonUiHelper {
         }
 
         textSwitcher.setText(text);
+    }
+
+    @CheckReturnValue
+    static boolean isIftttInstalled(PackageManager packageManager) {
+        try {
+            packageManager.getApplicationInfo(PACKAGE_NAME_IFTTT, 0);
+            return true;
+        } catch (PackageManager.NameNotFoundException e) {
+            return false;
+        }
     }
 
     private ButtonUiHelper() {

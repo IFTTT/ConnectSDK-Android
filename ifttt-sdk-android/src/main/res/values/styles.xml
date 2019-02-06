@@ -4,10 +4,10 @@
         <item name="android:textColor">@android:color/white</item>
     </style>
     <style name="AboutIfttt.Description">
-        <item name="android:textSize">18sp</item>
+        <item name="android:textSize">16sp</item>
     </style>
 
     <style name="AboutIfttt.Title">
-        <item name="android:textSize">26sp</item>
+        <item name="android:textSize">22sp</item>
     </style>
 </resources>

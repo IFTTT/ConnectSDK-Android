@@ -1,14 +1,19 @@
 package com.ifttt.ui;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
+import android.view.View;
 import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
+import com.ifttt.Connection;
 import com.ifttt.R;
 
 /**
@@ -34,5 +39,35 @@ public final class IftttAboutActivity extends Activity {
         termsAndPrivacy.setText(Html.fromHtml(getString(R.string.terms_and_privacy)));
         termsAndPrivacy.setLinkTextColor(Color.WHITE);
         termsAndPrivacy.setMovementMethod(LinkMovementMethod.getInstance());
+
+        View manageConnectionView = findViewById(R.id.ifttt_manage_connection);
+        View googlePlayView = findViewById(R.id.google_play_link);
+        Connection connection = getIntent().getParcelableExtra(EXTRA_CONNECTION);
+
+        PackageManager packageManager = getPackageManager();
+        if ((connection.status == Connection.Status.enabled || connection.status == Connection.Status.disabled)
+                && ButtonUiHelper.isIftttInstalled(packageManager)) {
+            googlePlayView.setVisibility(View.GONE);
+
+            Intent manageIntent = ButtonApiHelper.redirectToManage(this, connection.id);
+            if (manageIntent != null) {
+                manageConnectionView.setVisibility(View.VISIBLE);
+                manageConnectionView.setOnClickListener(v -> startActivity(manageIntent));
+            }
+        } else {
+            manageConnectionView.setVisibility(View.GONE);
+
+            Intent storeIntent = ButtonApiHelper.redirectToPlayStore(this);
+            if (storeIntent != null) {
+                googlePlayView.setVisibility(View.VISIBLE);
+                googlePlayView.setOnClickListener(v -> startActivity(storeIntent));
+            }
+        }
+    }
+
+    private static final String EXTRA_CONNECTION = "extra_connection";
+
+    public static Intent intent(Context context, Connection connection) {
+        return new Intent(context, IftttAboutActivity.class).putExtra(EXTRA_CONNECTION, connection);
     }
 }

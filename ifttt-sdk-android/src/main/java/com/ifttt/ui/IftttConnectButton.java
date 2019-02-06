@@ -490,7 +490,6 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         });
         fadeInButtonRoot.start();
 
-        Context context = getContext();
         if (connection.status != Connection.Status.enabled) {
             recordState(Initial);
 
@@ -514,13 +513,8 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             recordState(Enabled);
 
             connectStateTxt.setText(getResources().getString(R.string.ifttt_connected));
-            helperTxt.setOnClickListener(new DebouncingOnClickListener() {
-                @Override
-                void doClick(View v) {
-                    buttonApiHelper.redirectToPlayStore(context);
-                }
-            });
         }
+
         iconDragHelperCallback.setSettledAt(connection.status);
 
         ongoingImageCall = ImageLoader.get().load(this, worksWithService.monochromeIconUrl, bitmap -> {
@@ -595,6 +589,13 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         }
 
         StartIconDrawable.setPressListener(iconImg);
+
+        helperTxt.setOnClickListener(new DebouncingOnClickListener() {
+            @Override
+            void doClick(View v) {
+                getContext().startActivity(IftttAboutActivity.intent(getContext(), connection));
+            }
+        });
     }
 
     private void setServiceIconImage(@Nullable Bitmap bitmap) {
@@ -824,8 +825,6 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
      */
     private void animateToEmailField(float xvel) {
         setTextSwitcherText(helperTxt, getResources().getText(R.string.ifttt_authorize_with));
-        helperTxt.setOnClickListener(
-                v -> getContext().startActivity(new Intent(getContext(), IftttAboutActivity.class)));
 
         // Fade out "Connect X" text.
         ObjectAnimator fadeOutConnect =

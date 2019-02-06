@@ -17,6 +17,7 @@ import com.ifttt.api.IftttApi;
 import com.ifttt.api.PendingResult;
 import com.ifttt.api.PendingResult.ResultCallback;
 import com.ifttt.ui.IftttConnectButton.ButtonState;
+import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 
 import static com.ifttt.ui.IftttConnectButton.ButtonState.CreateAccount;
@@ -75,18 +76,6 @@ final class ButtonApiHelper {
         intent.launchUrl(context, uri);
     }
 
-    void redirectToPlayStore(Context context) {
-        Intent launchIntent = new Intent(Intent.ACTION_VIEW,
-                Uri.parse("https://play.google.com/store/apps/details?id=com.ifttt.ifttt"));
-        launchIntent.setPackage("com.android.vending");
-        if (!hasActivityToLaunch(context, launchIntent)) {
-            // No-op.
-            return;
-        }
-
-        context.startActivity(launchIntent);
-    }
-
     boolean isAccountFound() {
         return accountFound;
     }
@@ -131,6 +120,31 @@ final class ButtonApiHelper {
         }
 
         return builder.build();
+    }
+
+    @CheckReturnValue
+    static Intent redirectToPlayStore(Context context) {
+        Intent launchIntent = new Intent(Intent.ACTION_VIEW,
+                Uri.parse("https://play.google.com/store/apps/details?id=com.ifttt.ifttt"));
+        launchIntent.setPackage("com.android.vending");
+
+        if (!hasActivityToLaunch(context, launchIntent)) {
+            return null;
+        }
+
+        return launchIntent;
+    }
+
+    @CheckReturnValue
+    @Nullable
+    static Intent redirectToManage(Context context, String id) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse("https://ifttt.com/connections/" + id));
+        if (!hasActivityToLaunch(context, intent)) {
+            return null;
+        }
+
+        return intent;
     }
 
     private static boolean hasActivityToLaunch(Context context, Intent intent) {
