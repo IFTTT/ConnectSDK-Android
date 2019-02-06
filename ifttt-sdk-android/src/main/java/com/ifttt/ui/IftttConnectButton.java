@@ -454,7 +454,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                     return;
                 }
 
-                helperTxt.setText(worksWithIfttt);
+                helperTxt.setCurrentText(worksWithIfttt);
             }
         });
         fadeInButtonRoot.start();
@@ -645,13 +645,6 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                 // Reset progress color.
                 ((ProgressBackground) progressRoot.getBackground()).setColor(
                         ContextCompat.getColor(getContext(), R.color.ifttt_progress_background_color), BLACK);
-
-                helperTxt.setOnClickListener(new DebouncingOnClickListener() {
-                    @Override
-                    void doClick(View v) {
-                        buttonApiHelper.redirectToPlayStore(getContext());
-                    }
-                });
 
                 // After the connection has been authenticated, temporarily disable toggling feature until the new Connection
                 // object has been set.
