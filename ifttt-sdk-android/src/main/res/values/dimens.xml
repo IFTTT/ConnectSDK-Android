@@ -20,6 +20,19 @@
     <dimen name="ifttt_service_name_max_width">160dp</dimen>
     <dimen name="ifttt_service_name_height">26sp</dimen>
     <dimen name="ifttt_service_name_min_text_size">11sp</dimen>
-    <dimen name="ifttt_connect_button_width">310dp</dimen>
-    <dimen name="ifttt_dots_size">18dp</dimen>
+    <dimen name="ifttt_connect_button_width">330dp</dimen>
+    <dimen name="ifttt_dots_width">24dp</dimen>
+    <dimen name="ifttt_dots_height">18dp</dimen>
+    <dimen name="ifttt_about_padding_horizontal">48dp</dimen>
+    <dimen name="ifttt_about_logo_width">160dp</dimen>
+    <dimen name="ifttt_space_med">16dp</dimen>
+    <dimen name="ifttt_space_large">32dp</dimen>
+    <dimen name="ifttt_about_description_margin_top">24dp</dimen>
+    <dimen name="ifttt_space_small">8dp</dimen>
+    <dimen name="ifttt_about_google_play_badge_width">180dp</dimen>
+    <dimen name="ifttt_about_button_text_size">18sp</dimen>
+    <dimen name="ifttt_check_mark_width">64dp</dimen>
+    <dimen name="ifttt_check_mark_height">52dp</dimen>
+    <dimen name="ifttt_helper_text_size">12sp</dimen>
+    <dimen name="ifttt_helper_text_line_spacing">4sp</dimen>
 </resources>

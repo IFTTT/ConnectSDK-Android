@@ -6,7 +6,7 @@
         android:id="@+id/ifttt_button_root"
         android:layout_width="@dimen/ifttt_connect_button_width"
         android:layout_height="@dimen/connect_button_height"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="@dimen/ifttt_space_med"
         android:clipChildren="false"
         android:clipToPadding="false">
 
@@ -23,21 +23,46 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
+                android:background="@null"
+                android:fontFamily="@font/avenir_next_ltpro_demi"
                 android:hint="@string/ifttt_email"
                 android:inputType="textEmailAddress"
                 android:paddingEnd="@dimen/ifttt_text_padding_horizontal"
-                android:paddingStart="32dp"
-                android:background="@null"
+                android:paddingStart="@dimen/ifttt_space_large"
                 android:textColor="@android:color/black"
-                android:fontFamily="@font/avenir_next_ltpro_demi"
                 android:textColorHint="@color/ifttt_email_hint_text_color"
                 android:visibility="gone"/>
 
-            <com.ifttt.ui.ServiceNameTextView
+            <com.ifttt.ui.ConnectButtonTextView
                 android:id="@+id/connect_with_ifttt"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/ifttt_service_name_height"
-                android:layout_gravity="center"/>
+                android:layout_gravity="center"
+                android:inAnimation="@anim/ifttt_helper_text_in"
+                android:outAnimation="@anim/ifttt_helper_text_out">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:fontFamily="@font/avenir_next_ltpro_bold"
+                    android:gravity="center"
+                    android:lines="1"
+                    android:textColor="@android:color/white"
+                    android:textSize="@dimen/ifttt_connect_text_size"
+                    app:autoSizeMaxTextSize="@dimen/ifttt_connect_text_size"
+                    app:autoSizeTextType="uniform"/>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:fontFamily="@font/avenir_next_ltpro_bold"
+                    android:gravity="center"
+                    android:textColor="@android:color/white"
+                    android:textSize="@dimen/ifttt_connect_text_size"
+                    app:autoSizeMaxTextSize="@dimen/ifttt_connect_text_size"
+                    app:autoSizeTextType="uniform"/>
+
+            </com.ifttt.ui.ConnectButtonTextView>
 
             <ImageButton
                 android:id="@+id/ifttt_icon"
@@ -57,25 +82,43 @@
             android:layout_height="match_parent"
             android:alpha="0">
 
-            <androidx.appcompat.widget.AppCompatTextView
+            <TextSwitcher
                 android:id="@+id/ifttt_progress_text"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:alpha="0"
-                android:fontFamily="@font/avenir_next_ltpro_bold"
-                android:gravity="center"
-                android:lines="1"
+                android:inAnimation="@anim/ifttt_helper_text_in"
+                android:outAnimation="@anim/ifttt_helper_text_out"
                 android:paddingEnd="@dimen/ifttt_text_padding_horizontal_small"
-                android:paddingStart="@dimen/ifttt_text_padding_horizontal_small"
-                android:textColor="@android:color/white"
-                android:textSize="@dimen/ifttt_connect_text_size"
-                app:autoSizeMaxTextSize="@dimen/ifttt_connect_text_size"
-                app:autoSizeTextType="uniform"/>
+                android:paddingStart="@dimen/ifttt_text_padding_horizontal_small">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:fontFamily="@font/avenir_next_ltpro_bold"
+                    android:gravity="center"
+                    android:lines="1"
+                    android:textColor="@android:color/white"
+                    android:textSize="@dimen/ifttt_connect_text_size"
+                    app:autoSizeMaxTextSize="@dimen/ifttt_connect_text_size"
+                    app:autoSizeTextType="uniform"/>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:fontFamily="@font/avenir_next_ltpro_bold"
+                    android:gravity="center"
+                    android:lines="1"
+                    android:textColor="@android:color/white"
+                    android:textSize="@dimen/ifttt_connect_text_size"
+                    app:autoSizeMaxTextSize="@dimen/ifttt_connect_text_size"
+                    app:autoSizeTextType="uniform"/>
+
+            </TextSwitcher>
 
             <ImageView
                 android:id="@+id/ifttt_progress_check_mark"
-                android:layout_width="64dp"
-                android:layout_height="52dp"
+                android:layout_width="@dimen/ifttt_check_mark_width"
+                android:layout_height="@dimen/ifttt_check_mark_height"
                 android:layout_gravity="center"
                 android:scaleType="centerInside"/>
 
@@ -87,9 +130,33 @@
         android:id="@+id/ifttt_helper_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="?selectableItemBackground"
-        android:layout_margin="8dp"
+        android:layout_margin="@dimen/ifttt_space_small"
         android:alpha="0.3"
-        android:padding="8dp"/>
+        android:background="?selectableItemBackground"
+        android:inAnimation="@anim/ifttt_helper_text_in"
+        android:outAnimation="@anim/ifttt_helper_text_out"
+        android:padding="@dimen/ifttt_space_small">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fontFamily="@font/avenir_next_ltpro_demi"
+            android:gravity="center"
+            android:lineSpacingExtra="@dimen/ifttt_helper_text_line_spacing"
+            android:textColor="@android:color/black"
+            android:textColorLink="@android:color/black"
+            android:textSize="@dimen/ifttt_helper_text_size"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fontFamily="@font/avenir_next_ltpro_demi"
+            android:gravity="center"
+            android:lineSpacingExtra="@dimen/ifttt_helper_text_line_spacing"
+            android:textColor="@android:color/black"
+            android:textColorLink="@android:color/black"
+            android:textSize="@dimen/ifttt_helper_text_size"/>
+
+    </TextSwitcher>
 
 </merge>
