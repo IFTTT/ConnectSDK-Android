@@ -6,7 +6,7 @@
         android:id="@+id/ifttt_button_root"
         android:layout_width="@dimen/ifttt_connect_button_width"
         android:layout_height="@dimen/connect_button_height"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="@dimen/ifttt_space_med"
         android:clipChildren="false"
         android:clipToPadding="false">
 
@@ -28,7 +28,7 @@
                 android:hint="@string/ifttt_email"
                 android:inputType="textEmailAddress"
                 android:paddingEnd="@dimen/ifttt_text_padding_horizontal"
-                android:paddingStart="32dp"
+                android:paddingStart="@dimen/ifttt_space_large"
                 android:textColor="@android:color/black"
                 android:textColorHint="@color/ifttt_email_hint_text_color"
                 android:visibility="gone"/>
@@ -117,8 +117,8 @@
 
             <ImageView
                 android:id="@+id/ifttt_progress_check_mark"
-                android:layout_width="64dp"
-                android:layout_height="52dp"
+                android:layout_width="@dimen/ifttt_check_mark_width"
+                android:layout_height="@dimen/ifttt_check_mark_height"
                 android:layout_gravity="center"
                 android:scaleType="centerInside"/>
 
@@ -130,32 +130,32 @@
         android:id="@+id/ifttt_helper_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
+        android:layout_margin="@dimen/ifttt_space_small"
         android:alpha="0.3"
         android:background="?selectableItemBackground"
         android:inAnimation="@anim/ifttt_helper_text_in"
         android:outAnimation="@anim/ifttt_helper_text_out"
-        android:padding="8dp">
+        android:padding="@dimen/ifttt_space_small">
 
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fontFamily="@font/avenir_next_ltpro_demi"
             android:gravity="center"
-            android:lineSpacingExtra="4sp"
+            android:lineSpacingExtra="@dimen/ifttt_helper_text_line_spacing"
             android:textColor="@android:color/black"
             android:textColorLink="@android:color/black"
-            android:textSize="12sp"/>
+            android:textSize="@dimen/ifttt_helper_text_size"/>
 
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fontFamily="@font/avenir_next_ltpro_demi"
             android:gravity="center"
-            android:lineSpacingExtra="4sp"
+            android:lineSpacingExtra="@dimen/ifttt_helper_text_line_spacing"
             android:textColor="@android:color/black"
             android:textColorLink="@android:color/black"
-            android:textSize="12sp"/>
+            android:textSize="@dimen/ifttt_helper_text_size"/>
 
     </TextSwitcher>
 
