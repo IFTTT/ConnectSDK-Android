@@ -37,8 +37,9 @@ public final class IftttConnectButtonTest {
 
     @Test
     public void initButton() {
-        ServiceNameTextView connectText = button.findViewById(R.id.connect_with_ifttt);
-        assertThat(connectText.getText()).isEqualTo("");
+        TextSwitcher connectText = button.findViewById(R.id.connect_with_ifttt);
+        assertThat(connectText.getCurrentView()).isInstanceOf(TextView.class);
+        assertThat(((TextView) connectText.getCurrentView()).getText()).isEqualTo("");
 
         ImageView iconImage = button.findViewById(R.id.ifttt_icon);
         assertThat(iconImage.getBackground()).isNull();
@@ -69,8 +70,9 @@ public final class IftttConnectButtonTest {
         button.setup("a@b.com", "instagram", new IftttApiClient.Builder().build(), "", () -> "");
         button.setConnection(connection);
 
-        ServiceNameTextView connectText = button.findViewById(R.id.connect_with_ifttt);
-        assertThat(connectText.getText()).isEqualTo("Connect Twitter");
+        TextSwitcher connectText = button.findViewById(R.id.connect_with_ifttt);
+        assertThat(connectText.getCurrentView()).isInstanceOf(TextView.class);
+        assertThat(((TextView) connectText.getCurrentView()).getText()).isEqualTo("Connect Twitter");
 
         TextSwitcher helperText = button.findViewById(R.id.ifttt_helper_text);
         assertThat(helperText.getCurrentView()).isInstanceOf(TextView.class);
