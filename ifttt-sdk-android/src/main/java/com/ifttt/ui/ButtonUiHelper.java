@@ -15,7 +15,9 @@ import android.widget.TextView;
 import androidx.annotation.ColorInt;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
+import com.ifttt.Connection;
 import com.ifttt.R;
+import com.ifttt.Service;
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 
@@ -100,6 +102,28 @@ final class ButtonUiHelper {
         } catch (PackageManager.NameNotFoundException e) {
             return false;
         }
+    }
+
+    @CheckReturnValue
+    static Service findWorksWithService(Connection connection) {
+        Service otherService = null;
+        if (connection.services.size() == 1) {
+            // If there is only one service involved.
+            otherService = connection.services.get(0);
+        } else {
+            for (Service service : connection.services) {
+                if (!service.isPrimary) {
+                    otherService = service;
+                    break;
+                }
+            }
+        }
+
+        if (otherService == null) {
+            throw new IllegalStateException("There is no primary service for this Connection.");
+        }
+
+        return otherService;
     }
 
     private ButtonUiHelper() {

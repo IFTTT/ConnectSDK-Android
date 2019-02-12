@@ -3,7 +3,7 @@
     <string name="ifttt_connect_to">Connect %1$s</string>
     <string name="ifttt_connect">Connect</string>
     <string name="ifttt_email">Email</string>
-    <string name="ifttt_about_title">Everything works \nbetter together</string>
+    <string name="ifttt_about_title">IFTTT connects %1$s to %2$s</string>
     <string name="ifttt_more_about_ifttt">Learn more</string>
     <string name="ifttt_powered_by_ifttt">WORKS WITH IFTTT</string>
     <string name="ifttt_about_1">Unlock new features when your favorite things work together</string>

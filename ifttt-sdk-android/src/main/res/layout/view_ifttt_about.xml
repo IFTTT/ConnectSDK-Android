@@ -19,12 +19,6 @@
             android:paddingLeft="@dimen/ifttt_about_padding_horizontal"
             android:paddingRight="@dimen/ifttt_about_padding_horizontal">
 
-            <ImageView
-                android:layout_width="@dimen/ifttt_about_logo_width"
-                android:layout_height="wrap_content"
-                android:adjustViewBounds="true"
-                android:src="@drawable/ic_ifttt_logo_white"/>
-
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/ifttt_about_title"
                 android:layout_width="match_parent"

@@ -68,6 +68,7 @@ import static androidx.lifecycle.Lifecycle.State.DESTROYED;
 import static androidx.lifecycle.Lifecycle.State.STARTED;
 import static com.ifttt.Connection.Status.enabled;
 import static com.ifttt.ui.ButtonUiHelper.buildButtonBackground;
+import static com.ifttt.ui.ButtonUiHelper.findWorksWithService;
 import static com.ifttt.ui.ButtonUiHelper.getDarkerColor;
 import static com.ifttt.ui.ButtonUiHelper.replaceKeyWithImage;
 import static com.ifttt.ui.IftttConnectButton.ButtonState.CreateAccount;
@@ -1023,26 +1024,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         return set;
     }
 
-    private Service findWorksWithService(Connection connection) {
-        Service otherService = null;
-        if (connection.services.size() == 1) {
-            // If there is only one service involved.
-            otherService = connection.services.get(0);
-        } else {
-            for (Service service : connection.services) {
-                if (!service.isPrimary) {
-                    otherService = service;
-                    break;
-                }
-            }
-        }
 
-        if (otherService == null) {
-            throw new IllegalStateException("There is no primary service for this Connection.");
-        }
-
-        return otherService;
-    }
 
     private void setProgressStateText(float progress) {
         float fadeOutProgress = progress / FADE_OUT_PROGRESS;

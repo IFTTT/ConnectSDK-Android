@@ -16,6 +16,8 @@ import androidx.core.content.ContextCompat;
 import com.ifttt.Connection;
 import com.ifttt.R;
 
+import static com.ifttt.ui.ButtonUiHelper.findWorksWithService;
+
 /**
  * A static Activity for more information about IFTTT.
  */
@@ -27,7 +29,12 @@ public final class IftttAboutActivity extends Activity {
 
         setContentView(R.layout.view_ifttt_about);
 
+        Connection connection = getIntent().getParcelableExtra(EXTRA_CONNECTION);
+
         TextView title = findViewById(R.id.ifttt_about_title);
+        String primaryServiceName = connection.getPrimaryService().name;
+        String secondaryServiceName = findWorksWithService(connection).name;
+        title.setText(getString(R.string.ifttt_about_title, secondaryServiceName, primaryServiceName));
         title.setText(ButtonUiHelper.replaceKeyWithImage(title, title.getText().toString(), "IFTTT",
                 ContextCompat.getDrawable(this, R.drawable.ic_ifttt_logo_white)));
 
@@ -42,7 +49,6 @@ public final class IftttAboutActivity extends Activity {
 
         View manageConnectionView = findViewById(R.id.ifttt_manage_connection);
         View googlePlayView = findViewById(R.id.google_play_link);
-        Connection connection = getIntent().getParcelableExtra(EXTRA_CONNECTION);
 
         PackageManager packageManager = getPackageManager();
         if ((connection.status == Connection.Status.enabled || connection.status == Connection.Status.disabled)
