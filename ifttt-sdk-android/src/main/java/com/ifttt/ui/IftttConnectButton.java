@@ -461,6 +461,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
 
         connectStateTxt.setAlpha(1f);
         connectStateTxt.showDotsAnimation(false);
+        iconImg.setVisibility(VISIBLE);
         if (connection.status != Connection.Status.enabled) {
             recordState(Initial);
 
@@ -898,6 +899,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         buttonRoot.setBackground(buildButtonBackground(getContext(), service.brandColor));
         connectStateTxt.setText(getResources().getString(R.string.ifttt_continue_to, service.shortName));
         connectStateTxt.showDotsAnimation(true);
+        iconImg.setVisibility(GONE);
 
         Runnable clickRunnable = buttonRoot::performClick;
         buttonRoot.setOnClickListener(new DebouncingOnClickListener() {
@@ -1083,6 +1085,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                 if (activity == context) {
                     // Remove dots animation.
                     connectStateTxt.showDotsAnimation(false);
+                    iconImg.setVisibility(VISIBLE);
 
                     if (buttonState == Login) {
                         progressRoot.setAlpha(0f);
