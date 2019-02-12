@@ -52,21 +52,30 @@ final class ConnectButtonTextView extends TextSwitcher {
             currentView.setCompoundDrawables(null, null, null, null);
             nextView.setCompoundDrawables(null, null, null, null);
         }
+
+        applyPadding();
     }
 
     @Override
     public void setText(CharSequence text) {
         super.setText(text);
+        applyPadding();
+    }
 
+    private void applyPadding() {
         int paddingHorizontal = getResources().getDimensionPixelSize(R.dimen.ifttt_text_padding_horizontal);
         int paddingSmall = getResources().getDimensionPixelSize(R.dimen.ifttt_text_padding_horizontal_small);
 
         TextView currentView = (TextView) getCurrentView();
-        float textWidth = StaticLayout.getDesiredWidth(text, currentView.getPaint());
+        float textWidth = StaticLayout.getDesiredWidth(currentView.getText(), currentView.getPaint());
         float maxWidth = getWidth() - paddingHorizontal * 2;
-        // Reduce the right padding if the original text is longer than the available space in this View. This is to
-        // keep the text "center" visually.
-        if (textWidth > maxWidth) {
+        if (currentView.getCompoundDrawables()[2] != null) {
+            // Reduce horizontal padding when the animation is playing, this is to give more space to the text so that
+            // it can show larger text size.
+            setPadding(paddingSmall, 0, paddingSmall, 0);
+        } else if (textWidth > maxWidth) {
+            // Reduce the right padding if the original text is longer than the available space in this View. This is to
+            // keep the text "center" visually.
             setPadding(paddingHorizontal, 0, paddingSmall, 0);
         } else {
             setPadding(paddingHorizontal, 0, paddingHorizontal, 0);
