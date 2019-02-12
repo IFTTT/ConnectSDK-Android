@@ -463,7 +463,13 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         connectStateTxt.showDotsAnimation(false);
         if (connection.status != Connection.Status.enabled) {
             recordState(Initial);
-            connectStateTxt.setText(getResources().getString(R.string.ifttt_connect_to, worksWithService.shortName));
+
+            if (connection.status == Connection.Status.disabled) {
+                connectStateTxt.setText(getResources().getString(R.string.ifttt_reconnect, worksWithService.shortName));
+            } else {
+                connectStateTxt.setText(getResources().getString(R.string.ifttt_connect_to, worksWithService.shortName));
+            }
+
             helperTxt.setOnClickListener(new DebouncingOnClickListener() {
                 @Override
                 void doClick(View v) {

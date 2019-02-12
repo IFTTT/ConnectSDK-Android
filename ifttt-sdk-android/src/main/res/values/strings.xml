@@ -14,6 +14,7 @@
     <string name="ifttt_creating_account">Creating account…</string>
     <string name="ifttt_continue_to">Continue to %1$s</string>
     <string name="ifttt_connected">Connected</string>
+    <string name="ifttt_reconnect">Reconnect %1$s</string>
     <string name="ifttt_connecting_account">Connecting account…</string>
     <string name="ifttt_connection_off">Disconnect</string>
     <string name="ifttt_sign_in_to_ifttt_or_create_new_account"><![CDATA[You are creating or using your IFTTT account subject to <a href=\"https://ifttt.com/terms\">Terms</a> & <a href=\"https://ifttt.com/privacy\">Privacy Policy</a>.]]></string>
