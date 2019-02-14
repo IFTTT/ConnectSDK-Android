@@ -28,10 +28,11 @@ import static org.junit.Assert.fail;
 public final class IftttConnectButtonTest {
 
     private IftttConnectButton button;
+    private Activity activity;
 
     @Before
     public void setUp() throws Exception {
-        Activity activity = Robolectric.setupActivity(TestActivity.class);
+        activity = Robolectric.setupActivity(TestActivity.class);
         button = activity.findViewById(R.id.ifttt_connect_button_test);
     }
 
@@ -67,7 +68,7 @@ public final class IftttConnectButtonTest {
     public void setConnection() throws IOException {
         Connection connection = loadConnection(getClass().getClassLoader());
 
-        button.setup("a@b.com", "instagram", new IftttApiClient.Builder().build(), "", () -> "");
+        button.setup("a@b.com", "instagram", new IftttApiClient.Builder(activity).build(), "", () -> "");
         button.setConnection(connection);
 
         TextSwitcher connectText = button.findViewById(R.id.connect_with_ifttt);
@@ -82,7 +83,7 @@ public final class IftttConnectButtonTest {
     public void testOwnerServiceCheck() throws IOException {
         Connection connection = loadConnection(getClass().getClassLoader());
 
-        button.setup("a@b.com", "not_owner_service", new IftttApiClient.Builder().build(), "", () -> "");
+        button.setup("a@b.com", "not_owner_service", new IftttApiClient.Builder(activity).build(), "", () -> "");
         button.setConnection(connection);
 
         fail();

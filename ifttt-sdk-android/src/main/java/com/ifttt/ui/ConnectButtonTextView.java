@@ -6,7 +6,8 @@ import android.text.StaticLayout;
 import android.util.AttributeSet;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
-import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
 import com.ifttt.R;
 
 /**
@@ -15,44 +16,32 @@ import com.ifttt.R;
  */
 final class ConnectButtonTextView extends TextSwitcher {
 
-    private final AnimatedVectorDrawableCompat dotsAnimator;
-
     public ConnectButtonTextView(Context context) {
         this(context, null);
     }
 
     public ConnectButtonTextView(Context context, AttributeSet attrs) {
         super(context, attrs);
-
-        int width = context.getResources().getDimensionPixelSize(R.dimen.ifttt_dots_width);
-        int height = context.getResources().getDimensionPixelSize(R.dimen.ifttt_dots_height);
-        dotsAnimator = AnimatedVectorDrawableCompat.create(context, R.drawable.ifttt_continue_dots);
-        dotsAnimator.setBounds(0, 0, width, height);
-        dotsAnimator.registerAnimationCallback(new AnimatedVectorDrawableCompat.AnimationCallback() {
-            @Override
-            public void onAnimationEnd(Drawable drawable) {
-                post(dotsAnimator::start);
-            }
-        });
     }
 
-    /**
-     * Add the dots animations to the current view of this TextSwitcher.
-     *
-     * @param showAnimation true if the animation should be added, false otherwise.
-     */
-    void showDotsAnimation(boolean showAnimation) {
+    void showContinueAnimation(int color) {
+        TextView currentView = (TextView) getCurrentView();
+
+        int size = getResources().getDimensionPixelSize(R.dimen.ifttt_continue_icon_size);
+        Drawable image = ContextCompat.getDrawable(getContext(), R.drawable.ic_continue_triangle);
+        DrawableCompat.setTint(image, color);
+        ContinueDrawable continueDrawable = new ContinueDrawable(image, ButtonUiHelper.getDarkerColor(color));
+        continueDrawable.setBounds(0, 0, size, size);
+        currentView.setCompoundDrawables(null, null, continueDrawable, null);
+        continueDrawable.pulse();
+        applyPadding();
+    }
+
+    void hideContinueAnimation() {
         TextView currentView = (TextView) getCurrentView();
         TextView nextView = (TextView) getNextView();
-        if (showAnimation) {
-            currentView.setCompoundDrawables(null, null, dotsAnimator, null);
-            nextView.setCompoundDrawables(null, null, dotsAnimator, null);
-            dotsAnimator.start();
-        } else {
-            currentView.setCompoundDrawables(null, null, null, null);
-            nextView.setCompoundDrawables(null, null, null, null);
-        }
-
+        currentView.setCompoundDrawables(null, null, null, null);
+        nextView.setCompoundDrawables(null, null, null, null);
         applyPadding();
     }
 
@@ -72,7 +61,7 @@ final class ConnectButtonTextView extends TextSwitcher {
         if (currentView.getCompoundDrawables()[2] != null) {
             // Reduce horizontal padding when the animation is playing, this is to give more space to the text so that
             // it can show larger text size.
-            setPadding(paddingSmall, 0, paddingSmall, 0);
+            setPadding(paddingSmall, 0, paddingSmall / 2, 0);
         } else if (textWidth > maxWidth) {
             // Reduce the right padding if the original text is longer than the available space in this View. This is to
             // keep the text "center" visually.

@@ -36,7 +36,7 @@
             <com.ifttt.ui.ConnectButtonTextView
                 android:id="@+id/connect_with_ifttt"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/ifttt_service_name_height"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:inAnimation="@anim/ifttt_helper_text_in"
                 android:outAnimation="@anim/ifttt_helper_text_out">
@@ -50,17 +50,20 @@
                     android:textColor="@android:color/white"
                     android:textSize="@dimen/ifttt_connect_text_size"
                     app:autoSizeMaxTextSize="@dimen/ifttt_connect_text_size"
-                    app:autoSizeTextType="uniform"/>
+                    app:autoSizeTextType="uniform"
+                    android:drawablePadding="@dimen/ifttt_continue_icon_padding"/>
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:fontFamily="@font/avenir_next_ltpro_bold"
                     android:gravity="center"
+                    android:lines="1"
                     android:textColor="@android:color/white"
                     android:textSize="@dimen/ifttt_connect_text_size"
                     app:autoSizeMaxTextSize="@dimen/ifttt_connect_text_size"
-                    app:autoSizeTextType="uniform"/>
+                    app:autoSizeTextType="uniform"
+                    android:drawablePadding="@dimen/ifttt_continue_icon_padding"/>
 
             </com.ifttt.ui.ConnectButtonTextView>
 

@@ -461,7 +461,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         fadeInButtonRoot.start();
 
         connectStateTxt.setAlpha(1f);
-        connectStateTxt.showDotsAnimation(false);
+        connectStateTxt.hideContinueAnimation();
         iconImg.setVisibility(VISIBLE);
         if (connection.status != Connection.Status.enabled) {
             recordState(Initial);
@@ -469,7 +469,8 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             if (connection.status == Connection.Status.disabled) {
                 connectStateTxt.setText(getResources().getString(R.string.ifttt_reconnect, worksWithService.shortName));
             } else {
-                connectStateTxt.setText(getResources().getString(R.string.ifttt_connect_to, worksWithService.shortName));
+                connectStateTxt.setText(
+                        getResources().getString(R.string.ifttt_connect_to, worksWithService.shortName));
             }
 
             helperTxt.setOnClickListener(new DebouncingOnClickListener() {
@@ -521,12 +522,12 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             DebouncingOnClickListener onClickListener = new DebouncingOnClickListener() {
                 @Override
                 void doClick(View v) {
-                    helperTxt.setText(getResources().getString(R.string.slide_to_turn_off));
+                    connectStateTxt.setText(getResources().getString(R.string.slide_to_turn_off));
                     helperTxt.setClickable(false);
 
                     // Delay and switch back.
                     postDelayed(() -> {
-                        helperTxt.setText(worksWithIfttt);
+                        connectStateTxt.setText(getResources().getString(R.string.ifttt_connected));
                         helperTxt.setClickable(true);
                     }, ANIM_DURATION_LONG);
                 }
@@ -899,7 +900,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
     private Animator getStartServiceAuthAnimator(Service service) {
         buttonRoot.setBackground(buildButtonBackground(getContext(), service.brandColor));
         connectStateTxt.setText(getResources().getString(R.string.ifttt_continue_to, service.shortName));
-        connectStateTxt.showDotsAnimation(true);
+        connectStateTxt.showContinueAnimation(service.brandColor);
         iconImg.setVisibility(GONE);
 
         Runnable clickRunnable = buttonRoot::performClick;
@@ -926,14 +927,11 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             ViewCompat.setElevation(iconImg, 0f);
         });
 
-        ObjectAnimator slideInConnectText = ObjectAnimator.ofFloat(connectStateTxt, "translationX", 50f, 0f);
         ObjectAnimator fadeInConnectText =
                 ObjectAnimator.ofFloat(connectStateTxt, "alpha", 0f, 1f).setDuration(ANIM_DURATION_MEDIUM);
         helperTxt.setClickable(false);
 
-        AnimatorSet set = new AnimatorSet();
-        set.playTogether(slideInConnectText, fadeInConnectText);
-        set.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
+        fadeInConnectText.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
@@ -945,7 +943,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                 postDelayed(clickRunnable, AUTO_ADVANCE_DELAY);
             }
         });
-        return set;
+        return fadeInConnectText;
     }
 
     private Animator getFadeOutProgressBarAnimator() {
@@ -1024,8 +1022,6 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         return set;
     }
 
-
-
     private void setProgressStateText(float progress) {
         float fadeOutProgress = progress / FADE_OUT_PROGRESS;
         connectStateTxt.setAlpha(1 - fadeOutProgress);
@@ -1066,7 +1062,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             public void onActivityResumed(Activity activity) {
                 if (activity == context) {
                     // Remove dots animation.
-                    connectStateTxt.showDotsAnimation(false);
+                    connectStateTxt.hideContinueAnimation();
                     iconImg.setVisibility(VISIBLE);
 
                     if (buttonState == Login) {

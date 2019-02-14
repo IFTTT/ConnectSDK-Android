@@ -103,8 +103,6 @@ final class StartIconDrawable extends Drawable {
 
     @Override
     protected void onBoundsChange(Rect bounds) {
-        super.onBoundsChange(bounds);
-
         int cx = bounds.width() / 2;
         int cy = bounds.height() / 2;
         serviceIcon.setBounds(cx - iconSize / 2, cy - iconSize / 2, cx + iconSize / 2, cy + iconSize / 2);
