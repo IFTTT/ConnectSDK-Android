@@ -1,9 +1,11 @@
 package com.ifttt.ui;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.provider.Settings;
 import androidx.annotation.MainThread;
 import androidx.annotation.VisibleForTesting;
 import androidx.browser.customtabs.CustomTabsIntent;
@@ -70,8 +72,10 @@ final class ButtonApiHelper {
         lifecycle.addObserver(new PendingResultLifecycleObserver<>(pendingResult));
     }
 
+    @SuppressLint("HardwareIds")
     void redirectToWeb(Context context, Connection connection, String email, ButtonState buttonState) {
-        Uri uri = getEmbedUri(connection, buttonState, redirectUri, email, oAuthCode, inviteCode);
+        String anonymousId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+        Uri uri = getEmbedUri(connection, buttonState, redirectUri, email, anonymousId, oAuthCode, inviteCode);
         CustomTabsIntent intent = new CustomTabsIntent.Builder().build();
         intent.launchUrl(context, uri);
     }
@@ -96,12 +100,13 @@ final class ButtonApiHelper {
      */
     @VisibleForTesting
     static Uri getEmbedUri(Connection connection, IftttConnectButton.ButtonState buttonState, String redirectUri,
-            String email, @Nullable String oAuthCode, @Nullable String inviteCode) {
+            String email, String anonymousId, @Nullable String oAuthCode, @Nullable String inviteCode) {
         Uri.Builder builder = Uri.parse(SHOW_CONNECTION_API_URL + connection.id)
                 .buildUpon()
                 .appendQueryParameter("sdk_version", BuildConfig.VERSION_NAME)
                 .appendQueryParameter("sdk_platform", "android")
                 .appendQueryParameter("sdk_return_to", redirectUri)
+                .appendQueryParameter("sdk_anonymous_id", anonymousId)
                 .appendQueryParameter("email", email);
 
         if (inviteCode != null) {
