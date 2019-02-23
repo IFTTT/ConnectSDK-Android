@@ -1,8 +1,6 @@
 package com.ifttt.ui;
 
 import android.app.Activity;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
@@ -44,13 +42,6 @@ public final class IftttConnectButtonTest {
 
         ImageView iconImage = button.findViewById(R.id.ifttt_icon);
         assertThat(iconImage.getBackground()).isNull();
-
-        ViewGroup buttonRoot = button.findViewById(R.id.ifttt_toggle_root);
-        assertThat(buttonRoot.getVisibility()).isEqualTo(View.VISIBLE);
-
-        ViewGroup progressRoot = button.findViewById(R.id.ifttt_progress_container);
-        assertThat(progressRoot.getVisibility()).isEqualTo(View.VISIBLE);
-        assertThat(progressRoot.getAlpha()).isEqualTo(0f);
 
         TextSwitcher helperText = button.findViewById(R.id.ifttt_helper_text);
         assertThat(helperText.getCurrentView()).isInstanceOf(TextView.class);

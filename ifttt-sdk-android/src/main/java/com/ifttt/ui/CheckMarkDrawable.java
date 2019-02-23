@@ -13,11 +13,16 @@ import android.graphics.PathMeasure;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 import javax.annotation.Nullable;
 
 final class CheckMarkDrawable extends Drawable {
+
+    enum AnimatorType {
+        COMPLETE, ENABLE
+    }
 
     private static final Interpolator INTERPOLATOR = input -> (float) (Math.pow((input - 1), 5) + 1);
     private static final long ANIM_CIRCLE_DURATION = 800L;
@@ -105,6 +110,8 @@ final class CheckMarkDrawable extends Drawable {
     protected void onBoundsChange(Rect bounds) {
         super.onBoundsChange(bounds);
 
+        Log.w(CheckMarkDrawable.class.getSimpleName(), bounds.toString());
+
         checkMarkPaint.setPathEffect(null);
         dotPath.reset();
         checkMarkPath.reset();
@@ -132,7 +139,7 @@ final class CheckMarkDrawable extends Drawable {
         checkMarkPathMeasure = new PathMeasure(checkMarkPath, false);
     }
 
-    Animator getAnimator() {
+    Animator getAnimator(AnimatorType type) {
         ValueAnimator pathTracing = ValueAnimator.ofFloat(0f, 1f);
         pathTracing.setInterpolator(new LinearInterpolator());
         pathTracing.addUpdateListener(animation -> {
@@ -165,12 +172,18 @@ final class CheckMarkDrawable extends Drawable {
         scaleUp.setInterpolator(INTERPOLATOR);
         scaleUp.addUpdateListener(updateListener);
 
-        ValueAnimator scaleDown = ValueAnimator.ofFloat(1f, 0f).setDuration(ANIM_SCALE_DURATION);
-        scaleDown.addUpdateListener(updateListener);
-        scaleDown.setStartDelay(ANIM_PATH_SCALE_DOWN_START_DELAY);
-
         AnimatorSet set = new AnimatorSet();
-        set.playSequentially(pathTracing, checkMark, scaleDown);
+        if (type == AnimatorType.COMPLETE) {
+            ValueAnimator scaleDown = ValueAnimator.ofFloat(1f, 0f).setDuration(ANIM_SCALE_DURATION);
+            scaleDown.addUpdateListener(updateListener);
+            scaleDown.setStartDelay(ANIM_PATH_SCALE_DOWN_START_DELAY);
+            set.playSequentially(pathTracing, checkMark, scaleDown);
+        } else if (type == AnimatorType.ENABLE) {
+            set.playSequentially(pathTracing, checkMark);
+        } else {
+            throw new IllegalStateException("Unsupported animator type: " + type);
+        }
+
         set.playTogether(scaleUp, pathTracing);
         set.addListener(new AnimatorListenerAdapter() {
             @Override
