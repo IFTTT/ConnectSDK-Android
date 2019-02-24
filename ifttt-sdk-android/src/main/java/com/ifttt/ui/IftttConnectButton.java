@@ -54,6 +54,7 @@ import com.ifttt.R;
 import com.ifttt.Service;
 import com.ifttt.api.PendingResult;
 import java.util.ArrayList;
+import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 import okhttp3.Call;
 
@@ -111,7 +112,6 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         Enabled
     }
 
-    private static final ErrorResponse CANCELED_AUTH = new ErrorResponse("canceled", "Authentication canceled");
     private static final ErrorResponse UNKNOWN_STATE = new ErrorResponse("unknown_state", "Cannot verify Button state");
 
     private static final float FADE_OUT_PROGRESS = 0.5f;
@@ -500,9 +500,9 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                     }
 
                     if (!iftttApiClient.isUserAuthenticated()) {
-                        animateToEmailField(0);
+                        buildEmailTransitionAnimator(0).start();
                     } else {
-                        getEmailValidationAnimator().start();
+                        buildEmailValidationAnimator().start();
                     }
                 }
             };
@@ -625,7 +625,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         ButtonUiHelper.adjustPadding(connectStateTxt);
     }
 
-    private Animator getEmailValidationAnimator() {
+    private Animator buildEmailValidationAnimator() {
         // Remove icon elevation when the progress bar is visible.
         ViewCompat.setElevation(iconImg, 0f);
 
@@ -713,9 +713,8 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
     /**
      * Start the animation for Connection authentication.
      */
-    private void animateToEmailField(float xvel) {
-        helperTxt.setText(getResources().getText(R.string.ifttt_authorize_with));
-
+    @CheckReturnValue
+    private Animator buildEmailTransitionAnimator(float xvel) {
         // Fade out "Connect X" text.
         ObjectAnimator fadeOutConnect =
                 ObjectAnimator.ofFloat(connectStateTxt, "alpha", connectStateTxt.getAlpha(), 0f);
@@ -797,7 +796,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                         (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                 inputMethodManager.hideSoftInputFromWindow(emailEdt.getWindowToken(), 0);
 
-                Animator emailValidation = getEmailValidationAnimator();
+                Animator emailValidation = buildEmailValidationAnimator();
                 emailValidation.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
                     @Override
                     public void onAnimationStart(Animator animation) {
@@ -818,6 +817,13 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
 
         // Only enable the OnClickListener after the animation has completed.
         set.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
+
+            @Override
+            public void onAnimationStart(Animator animation) {
+                super.onAnimationStart(animation);
+                helperTxt.setText(getResources().getText(R.string.ifttt_authorize_with));
+            }
+
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
@@ -830,7 +836,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             }
         });
 
-        set.start();
+        return set;
     }
 
     /**
@@ -971,7 +977,15 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                     cleanUpViews(ProgressView.class);
                     cleanUpViews(CheckMarkView.class);
 
-                    dispatchError(CANCELED_AUTH);
+                    if (!iftttApiClient.isUserAuthenticated()) {
+                        Animator animator = buildEmailTransitionAnimator(0f);
+                        animator.start();
+                        // Immediately end the animation and move to the email field state.
+                        animator.end();
+                    } else if (connection != null) {
+                        setConnection(connection);
+                    }
+
                     activity.getApplication().unregisterActivityLifecycleCallbacks(this);
                     activityLifecycleCallbacks = null;
                 }
@@ -1059,9 +1073,9 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                 } else {
                     if (!iftttApiClient.isUserAuthenticated()) {
                         settledAt = left;
-                        animateToEmailField(Math.abs(xvel));
+                        buildEmailTransitionAnimator(Math.abs(xvel)).start();
                     } else {
-                        settleView(left, () -> getEmailValidationAnimator().start());
+                        settleView(left, () -> buildEmailValidationAnimator().start());
                     }
                 }
             }
