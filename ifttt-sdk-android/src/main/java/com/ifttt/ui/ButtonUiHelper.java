@@ -2,15 +2,18 @@ package com.ifttt.ui;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.StaticLayout;
 import android.text.TextUtils;
 import android.text.style.ImageSpan;
 import android.util.Patterns;
+import android.widget.TextSwitcher;
 import android.widget.TextView;
 import androidx.annotation.ColorInt;
 import androidx.core.content.ContextCompat;
@@ -124,6 +127,23 @@ final class ButtonUiHelper {
         }
 
         return otherService;
+    }
+
+    static void adjustPadding(TextSwitcher switcher) {
+        Resources resources = switcher.getResources();
+        int paddingHorizontal = resources.getDimensionPixelSize(R.dimen.ifttt_text_padding_horizontal);
+        int paddingSmall = resources.getDimensionPixelSize(R.dimen.ifttt_text_padding_horizontal_small);
+
+        TextView currentView = (TextView) switcher.getCurrentView();
+        float textWidth = StaticLayout.getDesiredWidth(currentView.getText(), currentView.getPaint());
+        float maxWidth = switcher.getWidth() - paddingHorizontal * 2;
+        if (textWidth > maxWidth) {
+            // Reduce the right padding if the original text is longer than the available space in this View. This is to
+            // keep the text "center" visually.
+            switcher.setPadding(paddingHorizontal, 0, paddingSmall, 0);
+        } else {
+            switcher.setPadding(paddingHorizontal, 0, paddingHorizontal, 0);
+        }
     }
 
     private ButtonUiHelper() {

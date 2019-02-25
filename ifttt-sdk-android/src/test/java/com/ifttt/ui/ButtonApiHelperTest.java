@@ -20,7 +20,8 @@ public final class ButtonApiHelperTest {
 
     @Test
     public void testRequiredFields() {
-        Uri uri = ButtonApiHelper.getEmbedUri(connection, Initial, "http://redirect", "abc@efg.com", "auth_code", null);
+        Uri uri = ButtonApiHelper.getEmbedUri(connection, Initial, "http://redirect", "abc@efg.com", "", "auth_code",
+                null);
 
         assertThat(uri.getQueryParameter("sdk_return_to")).isEqualTo("http://redirect");
         assertThat(uri.getQueryParameter("email")).isEqualTo("abc@efg.com");
@@ -29,45 +30,45 @@ public final class ButtonApiHelperTest {
 
     @Test
     public void testInviteCode() {
-        Uri uri =
-                ButtonApiHelper.getEmbedUri(connection, Initial, "http://redirect", "abc@efg.com", "auth_code", "abcd");
+        Uri uri = ButtonApiHelper.getEmbedUri(connection, Initial, "http://redirect", "abc@efg.com", "", "auth_code",
+                "abcd");
         assertThat(uri.getQueryParameter("invite_code")).isEqualTo("abcd");
     }
 
     @Test
     public void testOAuthCode() {
-        Uri uri =
-                ButtonApiHelper.getEmbedUri(connection, Initial, "http://redirect", "abc@efg.com", "auth_code", "abcd");
+        Uri uri = ButtonApiHelper.getEmbedUri(connection, Initial, "http://redirect", "abc@efg.com", "", "auth_code",
+                "abcd");
         assertThat(uri.getQueryParameter("code")).isNull();
 
-        Uri uri1 = ButtonApiHelper.getEmbedUri(connection, CreateAccount, "http://redirect", "abc@efg.com", "auth_code",
-                "abcd");
+        Uri uri1 = ButtonApiHelper.getEmbedUri(connection, CreateAccount, "http://redirect", "abc@efg.com", "",
+                "auth_code", "abcd");
         assertThat(uri1.getQueryParameter("code")).isEqualTo("auth_code");
 
-        Uri uri2 =
-                ButtonApiHelper.getEmbedUri(connection, Login, "http://redirect", "abc@efg.com", "auth_code", "abcd");
+        Uri uri2 = ButtonApiHelper.getEmbedUri(connection, Login, "http://redirect", "abc@efg.com", "", "auth_code",
+                "abcd");
         assertThat(uri2.getQueryParameter("code")).isEqualTo("auth_code");
     }
 
     @Test
     public void testServiceAuthentication() {
-        Uri uri =
-                ButtonApiHelper.getEmbedUri(connection, Initial, "http://redirect", "abc@efg.com", "auth_code", "abcd");
+        Uri uri = ButtonApiHelper.getEmbedUri(connection, Initial, "http://redirect", "abc@efg.com", "", "auth_code",
+                "abcd");
         assertThat(uri.getQueryParameter("skip_sdk_redirect")).isNull();
 
-        Uri uri1 = ButtonApiHelper.getEmbedUri(connection, ServiceAuthentication, "http://redirect", "abc@efg.com",
+        Uri uri1 = ButtonApiHelper.getEmbedUri(connection, ServiceAuthentication, "http://redirect", "abc@efg.com", "",
                 "auth_code", "abcd");
         assertThat(uri1.getQueryParameter("skip_sdk_redirect")).isEqualTo("true");
     }
 
     @Test
     public void testSdkCreateAccount() {
-        Uri uri =
-                ButtonApiHelper.getEmbedUri(connection, Initial, "http://redirect", "abc@efg.com", "auth_code", "abcd");
+        Uri uri = ButtonApiHelper.getEmbedUri(connection, Initial, "http://redirect", "abc@efg.com", "", "auth_code",
+                "abcd");
         assertThat(uri.getQueryParameter("sdk_create_account")).isNull();
 
-        Uri uri1 = ButtonApiHelper.getEmbedUri(connection, CreateAccount, "http://redirect", "abc@efg.com", "auth_code",
-                "abcd");
+        Uri uri1 = ButtonApiHelper.getEmbedUri(connection, CreateAccount, "http://redirect", "abc@efg.com", "",
+                "auth_code", "abcd");
         assertThat(uri1.getQueryParameter("sdk_create_account")).isEqualTo("true");
     }
 }

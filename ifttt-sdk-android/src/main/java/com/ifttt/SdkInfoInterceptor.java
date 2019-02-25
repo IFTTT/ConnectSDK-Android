@@ -9,12 +9,19 @@ import okhttp3.Response;
  */
 final class SdkInfoInterceptor implements Interceptor {
 
+    private final String anonymousId;
+
+    SdkInfoInterceptor(String anonymousId) {
+        this.anonymousId = anonymousId;
+    }
+
     @Override
     public Response intercept(Chain chain) throws IOException {
         return chain.proceed(chain.request()
                 .newBuilder()
                 .addHeader("IFTTT-SDK-Version", BuildConfig.VERSION_NAME)
                 .addHeader("IFTTT-SDK-Platform", "android")
+                .addHeader("IFTTT-SDK-Anonymous-Id", anonymousId)
                 .build());
     }
 }

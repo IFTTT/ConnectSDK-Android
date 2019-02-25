@@ -78,7 +78,7 @@ class MainActivity : AppCompatActivity() {
 
         progressBar = findViewById(R.id.progress_bar)
 
-        iftttApiClient = IftttApiClient.Builder().setInviteCode(ApiHelper.INVITE_CODE).build()
+        iftttApiClient = IftttApiClient.Builder(this).setInviteCode(ApiHelper.INVITE_CODE).build()
         iftttConnectButton = findViewById(R.id.connect_button)
 
         val email = emailPreferencesHelper.getEmail()

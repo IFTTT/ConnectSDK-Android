@@ -1,5 +1,8 @@
 package com.ifttt;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.provider.Settings;
 import androidx.annotation.MainThread;
 import com.ifttt.api.IftttApi;
 import com.ifttt.api.PendingResult;
@@ -74,7 +77,18 @@ public final class IftttApiClient {
      */
     public static final class Builder {
 
+        private final String anonymousId;
+
         @Nullable private String inviteCode;
+
+        /**
+         * @param context Context instance used to generate an anonymous id using the device's {@link Settings.Secure#ANDROID_ID}.
+         * The value will be sent to IFTTT API and web view redirects for measurement and analytics purpose.
+         */
+        @SuppressLint("HardwareIds")
+        public Builder(Context context) {
+            anonymousId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+        }
 
         /**
          * Pass in a non-null String as the invite code for accessing an IFTTT service that has not yet published. You
@@ -95,8 +109,9 @@ public final class IftttApiClient {
                     .build();
             JsonAdapter<ErrorResponse> errorResponseJsonAdapter = moshi.adapter(ErrorResponse.class);
             TokenInterceptor tokenInterceptor = new TokenInterceptor(null);
-            OkHttpClient.Builder builder = new OkHttpClient.Builder().addInterceptor(new SdkInfoInterceptor())
-                    .addInterceptor(tokenInterceptor);
+            OkHttpClient.Builder builder =
+                    new OkHttpClient.Builder().addInterceptor(new SdkInfoInterceptor(anonymousId))
+                            .addInterceptor(tokenInterceptor);
 
             if (inviteCode != null) {
                 builder.addInterceptor(new InviteCodeInterceptor(inviteCode));
