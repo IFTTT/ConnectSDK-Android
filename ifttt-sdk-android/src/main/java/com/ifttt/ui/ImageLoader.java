@@ -8,7 +8,6 @@ import android.util.LruCache;
 import androidx.annotation.MainThread;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
-import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.OnLifecycleEvent;
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,7 +55,7 @@ final class ImageLoader {
     }
 
     @Nullable
-    Call load(LifecycleOwner lifecycleOwner, String url, OnBitmapLoadedListener listener) {
+    Call load(Lifecycle lifecycle, String url, OnBitmapLoadedListener listener) {
         Bitmap cached = cache.get(url);
         if (cached != null) {
             listener.onComplete(cached);
@@ -65,7 +64,7 @@ final class ImageLoader {
 
         Request request = new Request.Builder().url(url).build();
         Call call = client.newCall(request);
-        lifecycleOwner.getLifecycle().addObserver(new CallLifecycleObserver(call));
+        lifecycle.addObserver(new CallLifecycleObserver(call));
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {

@@ -36,4 +36,5 @@
     <dimen name="ifttt_helper_text_line_spacing">4sp</dimen>
     <dimen name="ifttt_continue_icon_margin_end">16dp</dimen>
     <dimen name="ifttt_continue_icon_padding">4dp</dimen>
+    <dimen name="ifttt_about_icon_size">48dp</dimen>
 </resources>
