@@ -441,7 +441,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         iconDragHelperCallback.setSettledAt(connection.status);
 
         setServiceIconImage(null);
-        ongoingImageCall = ImageLoader.get().load(this, worksWithService.monochromeIconUrl, bitmap -> {
+        ongoingImageCall = ImageLoader.get().load(getLifecycle(), worksWithService.monochromeIconUrl, bitmap -> {
             ongoingImageCall = null;
 
             if (ViewCompat.isLaidOut(iconImg)) {

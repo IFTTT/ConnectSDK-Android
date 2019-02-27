@@ -26,6 +26,34 @@
             android:paddingLeft="@dimen/ifttt_about_padding_horizontal"
             android:paddingRight="@dimen/ifttt_about_padding_horizontal">
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/ifttt_primary_service_icon"
+                    android:layout_width="@dimen/ifttt_about_icon_size"
+                    android:layout_height="@dimen/ifttt_about_icon_size"
+                    android:layout_margin="@dimen/ifttt_space_small"/>
+
+                <ImageView
+                    android:layout_width="@dimen/ifttt_about_icon_size"
+                    android:layout_height="@dimen/ifttt_about_icon_size"
+                    android:padding="@dimen/ifttt_space_small"
+                    android:layout_marginStart="@dimen/ifttt_space_small"
+                    android:layout_marginEnd="@dimen/ifttt_space_small"
+                    android:src="@drawable/ic_ifttt_about_arrow"/>
+
+                <ImageView
+                    android:id="@+id/ifttt_secondary_service_icon"
+                    android:layout_width="@dimen/ifttt_about_icon_size"
+                    android:layout_height="@dimen/ifttt_about_icon_size"
+                    android:layout_margin="@dimen/ifttt_space_small"/>
+
+            </LinearLayout>
+
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/ifttt_about_title"
                 android:layout_width="match_parent"
@@ -89,16 +117,16 @@
                 android:id="@+id/ifttt_manage_connection"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/ifttt_space_large"
                 android:background="@drawable/ifttt_about_button_background"
+                android:fontFamily="@font/avenir_next_ltpro_bold"
                 android:paddingBottom="@dimen/ifttt_space_small"
                 android:paddingEnd="@dimen/ifttt_space_med"
                 android:paddingStart="@dimen/ifttt_space_med"
                 android:paddingTop="@dimen/ifttt_space_small"
-                android:layout_marginTop="@dimen/ifttt_space_large"
-                android:textSize="@dimen/ifttt_about_button_text_size"
                 android:text="@string/ifttt_manage_connection"
-                android:fontFamily="@font/avenir_next_ltpro_bold"
-                android:textColor="@android:color/white"/>
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/ifttt_about_button_text_size"/>
 
             <ImageView
                 android:id="@+id/google_play_link"

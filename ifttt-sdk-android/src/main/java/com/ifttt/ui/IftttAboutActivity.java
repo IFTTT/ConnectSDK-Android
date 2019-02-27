@@ -1,6 +1,5 @@
 package com.ifttt.ui;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -9,19 +8,22 @@ import android.os.Bundle;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import com.ifttt.Connection;
 import com.ifttt.R;
+import com.ifttt.Service;
 
 import static com.ifttt.ui.ButtonUiHelper.findWorksWithService;
 
 /**
  * A static Activity for more information about IFTTT.
  */
-public final class IftttAboutActivity extends Activity {
+public final class IftttAboutActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -31,10 +33,17 @@ public final class IftttAboutActivity extends Activity {
 
         Connection connection = getIntent().getParcelableExtra(EXTRA_CONNECTION);
 
+        Service primaryService = connection.getPrimaryService();
+        Service secondaryService = findWorksWithService(connection);
+
+        ImageView primaryServiceIcon = findViewById(R.id.ifttt_primary_service_icon);
+        ImageView secondaryServiceIcon = findViewById(R.id.ifttt_secondary_service_icon);
+        ImageLoader.get().load(getLifecycle(), primaryService.monochromeIconUrl, primaryServiceIcon::setImageBitmap);
+        ImageLoader.get()
+                .load(getLifecycle(), secondaryService.monochromeIconUrl, secondaryServiceIcon::setImageBitmap);
+
         TextView title = findViewById(R.id.ifttt_about_title);
-        String primaryServiceName = connection.getPrimaryService().name;
-        String secondaryServiceName = findWorksWithService(connection).name;
-        title.setText(getString(R.string.ifttt_about_title, secondaryServiceName, primaryServiceName));
+        title.setText(getString(R.string.ifttt_about_title, secondaryService.name, primaryService.name));
         title.setText(ButtonUiHelper.replaceKeyWithImage(title, title.getText().toString(), "IFTTT",
                 ContextCompat.getDrawable(this, R.drawable.ic_ifttt_logo_white)));
 
