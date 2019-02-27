@@ -62,7 +62,6 @@ import static android.graphics.Color.WHITE;
 import static androidx.lifecycle.Lifecycle.State.CREATED;
 import static androidx.lifecycle.Lifecycle.State.DESTROYED;
 import static androidx.lifecycle.Lifecycle.State.STARTED;
-import static com.ifttt.Connection.Status.disabled;
 import static com.ifttt.Connection.Status.enabled;
 import static com.ifttt.ui.ButtonUiHelper.buildButtonBackground;
 import static com.ifttt.ui.ButtonUiHelper.findWorksWithService;
@@ -472,7 +471,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             buttonRoot.setOnClickListener(onClickListener);
             iconImg.setOnClickListener(onClickListener);
 
-            iconDragHelperCallback.setEndTrackColor(
+            iconDragHelperCallback.setTrackColor(BLACK,
                     ContextCompat.getColor(getContext(), R.color.ifttt_disabled_background));
         } else {
             if (connection.status == Connection.Status.disabled) {
@@ -482,6 +481,8 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
 
                 buttonRoot.setBackground(buildButtonBackground(getContext(),
                         ContextCompat.getColor(getContext(), R.color.ifttt_disabled_background)));
+                iconDragHelperCallback.setTrackColor(
+                        ContextCompat.getColor(getContext(), R.color.ifttt_disabled_background), BLACK);
             } else {
                 dispatchState(Initial);
                 connectStateTxt.setText(
@@ -489,6 +490,11 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                 ButtonUiHelper.adjustPadding(connectStateTxt);
 
                 buttonRoot.setBackground(buildButtonBackground(getContext(), BLACK));
+                // Depending on whether we need to show the email field, use different track colors.
+                int trackEndColor = iftttApiClient.isUserAuthenticated() ? BLACK
+                        : ContextCompat.getColor(getContext(), R.color.ifttt_button_background);
+
+                iconDragHelperCallback.setTrackColor(BLACK, trackEndColor);
             }
 
             helperTxt.setOnClickListener(new DebouncingOnClickListener() {
@@ -519,9 +525,6 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             // Clicking both the button or the icon ImageView starts the flow.
             buttonRoot.setOnClickListener(onClickListener);
             iconImg.setOnClickListener(onClickListener);
-
-            iconDragHelperCallback.setEndTrackColor(
-                    ContextCompat.getColor(getContext(), R.color.ifttt_button_background));
         }
 
         StartIconDrawable.setPressListener(iconImg);
@@ -1017,7 +1020,8 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
     private final class IconDragHelperCallback extends ViewDragHelper.Callback {
 
         private int settledAt = 0;
-        private int endTrackColor = Color.BLACK;
+        private int trackEndColor = Color.BLACK;
+        private int trackStartColor = Color.BLACK;
 
         void setSettledAt(Connection.Status status) {
             if (status == enabled) {
@@ -1027,8 +1031,9 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             }
         }
 
-        void setEndTrackColor(@ColorInt int color) {
-            this.endTrackColor = color;
+        void setTrackColor(@ColorInt int startColor, @ColorInt int endColor) {
+            this.trackStartColor = startColor;
+            this.trackEndColor = endColor;
         }
 
         @Override
@@ -1047,7 +1052,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             float progress = Math.abs((left - settledAt) / (float) (buttonRoot.getWidth() - iconImg.getWidth()));
 
             DrawableCompat.setTint(DrawableCompat.wrap(buttonRoot.getBackground()),
-                    (Integer) EVALUATOR.evaluate(progress, BLACK, endTrackColor));
+                    (Integer) EVALUATOR.evaluate(progress, trackStartColor, trackEndColor));
 
             float textFadingProgress = Math.max(Math.min(1f, progress * 1.5f), 0f);
             setProgressStateText(textFadingProgress);
@@ -1087,7 +1092,13 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                     if (!iftttApiClient.isUserAuthenticated()) {
                         settleView(left, () -> buildEmailTransitionAnimator().start());
                     } else {
-                        settleView(left, () -> buildEmailValidationAnimator().start());
+                        settleView(left, () -> {
+                            FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) releasedChild.getLayoutParams();
+                            lp.gravity = Gravity.END;
+                            releasedChild.setLayoutParams(lp);
+
+                            buildEmailValidationAnimator().start();
+                        });
                     }
                 }
             }
