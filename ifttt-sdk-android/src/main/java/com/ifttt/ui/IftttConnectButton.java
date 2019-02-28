@@ -44,7 +44,6 @@ import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LifecycleRegistry;
 import androidx.lifecycle.OnLifecycleEvent;
-import com.ifttt.ConnectResult;
 import com.ifttt.Connection;
 import com.ifttt.ErrorResponse;
 import com.ifttt.IftttApiClient;
@@ -563,8 +562,6 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                 cleanUpViews(ProgressView.class);
                 cleanUpViews(CheckMarkView.class);
 
-                dispatchState(Enabled);
-
                 // After the connection has been authenticated, temporarily disable toggling feature until the new Connection
                 // object has been set.
                 if (connection.status != enabled) {
@@ -579,6 +576,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         connectStateTxt.setAlpha(1f);
         connectStateTxt.setText(getResources().getString(R.string.ifttt_connected));
         ButtonUiHelper.adjustPadding(connectStateTxt);
+        dispatchState(Enabled);
     }
 
     private Animator buildEmailValidationAnimator() {

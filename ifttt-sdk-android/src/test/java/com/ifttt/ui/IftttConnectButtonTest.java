@@ -1,16 +1,21 @@
 package com.ifttt.ui;
 
 import android.app.Activity;
+import android.graphics.Color;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import com.ifttt.Connection;
+import com.ifttt.ErrorResponse;
 import com.ifttt.IftttApiClient;
 import com.ifttt.R;
 import com.ifttt.ShadowResourcesCompat;
 import com.ifttt.TestActivity;
+import com.ifttt.ui.IftttConnectButton.ButtonState;
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,7 +50,7 @@ public final class IftttConnectButtonTest {
 
         TextSwitcher helperText = button.findViewById(R.id.ifttt_helper_text);
         assertThat(helperText.getCurrentView()).isInstanceOf(TextView.class);
-        assertThat(((TextView) helperText.getCurrentView()).getText().toString()).isEqualTo("");
+        assertThat(((TextView) helperText.getCurrentView()).getText().toString()).isEqualTo("WORKS WITH IFTTT");
     }
 
     @Test(expected = IllegalStateException.class)
@@ -78,5 +83,61 @@ public final class IftttConnectButtonTest {
         button.setConnection(connection);
 
         fail();
+    }
+
+    @Test
+    public void testOnDarkBackground() {
+        TextSwitcher helperText = button.findViewById(R.id.ifttt_helper_text);
+        TextView currentHelperTextView = (TextView) helperText.getCurrentView();
+        TextView nextHelperTextView = (TextView) helperText.getNextView();
+
+        FrameLayout buttonRoot = button.findViewById(R.id.ifttt_button_root);
+
+        button.setOnDarkBackground(true);
+        assertThat(currentHelperTextView.getCurrentTextColor()).isEqualTo(Color.WHITE);
+        assertThat(nextHelperTextView.getCurrentTextColor()).isEqualTo(Color.WHITE);
+        assertThat(buttonRoot.getForeground()).isNotNull();
+
+        button.setOnDarkBackground(false);
+        assertThat(currentHelperTextView.getCurrentTextColor()).isEqualTo(Color.BLACK);
+        assertThat(nextHelperTextView.getCurrentTextColor()).isEqualTo(Color.BLACK);
+        assertThat(buttonRoot.getForeground()).isNull();
+    }
+
+    @Test
+    public void testDispatchStates() throws IOException {
+        button.setup("a@b.com", "instagram", new IftttApiClient.Builder(activity).build(), "", () -> "");
+
+        AtomicReference<ButtonState> currentStateRef = new AtomicReference<>(ButtonState.Initial);
+        AtomicReference<ButtonState> prevStateRef = new AtomicReference<>();
+        AtomicReference<ErrorResponse> errorRef = new AtomicReference<>();
+        button.setButtonStateChangeListener(new ButtonStateChangeListener() {
+            @Override
+            public void onStateChanged(ButtonState currentState, ButtonState previousState) {
+                currentStateRef.set(currentState);
+                prevStateRef.set(previousState);
+            }
+
+            @Override
+            public void onError(ErrorResponse errorResponse) {
+                errorRef.set(errorResponse);
+            }
+        });
+
+        Connection connection = loadConnection(getClass().getClassLoader());
+        button.setConnection(connection);
+        assertThat(currentStateRef.get()).isEqualTo(ButtonState.Initial);
+
+        button.setConnectResult(
+                new ConnectResult(ConnectResult.NextStep.ServiceAuthentication, false, "instagram", null));
+        assertThat(currentStateRef.get()).isEqualTo(ButtonState.ServiceAuthentication);
+
+        button.setConnectResult(new ConnectResult(ConnectResult.NextStep.Error, false, null, "error"));
+        assertThat(currentStateRef.get()).isEqualTo(ButtonState.Initial);
+        assertThat(errorRef.get()).isNotNull();
+
+        errorRef.set(null);
+        button.setConnectResult(new ConnectResult(ConnectResult.NextStep.Complete, false, null, null));
+        assertThat(currentStateRef.get()).isEqualTo(ButtonState.Enabled);
     }
 }

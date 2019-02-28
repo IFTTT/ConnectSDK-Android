@@ -1,6 +1,5 @@
 package com.ifttt.api.demo
 
-import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -15,9 +14,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.graphics.drawable.DrawableCompat
-import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
-import com.ifttt.ConnectResult
+import com.ifttt.ui.ConnectResult
 import com.ifttt.api.demo.ApiHelper.REDIRECT_URI
 import com.ifttt.api.demo.ApiHelper.SERVICE_ID
 import com.ifttt.ui.SimpleConnectButton
@@ -139,9 +137,5 @@ class MainActivity : AppCompatActivity() {
     private companion object {
         const val CONNECTION_ID = "fWj4fxYg"
         const val EMAIL = "user@email.com"
-    }
-
-    private fun Activity.showSnackbar(charSequence: CharSequence) {
-        Snackbar.make(findViewById(Window.ID_ANDROID_CONTENT), charSequence, Snackbar.LENGTH_LONG).show()
     }
 }

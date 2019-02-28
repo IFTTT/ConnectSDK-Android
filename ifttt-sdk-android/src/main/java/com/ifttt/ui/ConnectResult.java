@@ -1,15 +1,15 @@
-package com.ifttt;
+package com.ifttt.ui;
 
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
-import com.ifttt.ui.IftttConnectButton;
+import androidx.annotation.VisibleForTesting;
 import javax.annotation.Nullable;
 
-import static com.ifttt.ConnectResult.NextStep.Complete;
-import static com.ifttt.ConnectResult.NextStep.ServiceAuthentication;
-import static com.ifttt.ConnectResult.NextStep.Unknown;
+import static com.ifttt.ui.ConnectResult.NextStep.Complete;
+import static com.ifttt.ui.ConnectResult.NextStep.ServiceAuthentication;
+import static com.ifttt.ui.ConnectResult.NextStep.Unknown;
 
 /**
  * Data structure for Connection enable flow status from the web view. To get an instance, use
@@ -103,7 +103,8 @@ public final class ConnectResult implements Parcelable {
         return new ConnectResult(Unknown, false, null, null);
     }
 
-    private ConnectResult(NextStep nextStep, @Nullable boolean completeFromConfig, @Nullable String serviceId,
+    @VisibleForTesting
+    ConnectResult(NextStep nextStep, @Nullable boolean completeFromConfig, @Nullable String serviceId,
             @Nullable String errorType) {
         this.nextStep = nextStep;
         this.completeFromConfig = completeFromConfig;

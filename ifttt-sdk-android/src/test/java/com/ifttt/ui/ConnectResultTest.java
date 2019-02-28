@@ -1,4 +1,4 @@
-package com.ifttt;
+package com.ifttt.ui;
 
 import android.content.Intent;
 import android.net.Uri;

@@ -15,7 +15,6 @@ import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LifecycleRegistry;
 import androidx.lifecycle.OnLifecycleEvent;
-import com.ifttt.ConnectResult;
 import com.ifttt.Connection;
 import com.ifttt.ErrorResponse;
 import com.ifttt.IftttApiClient;
