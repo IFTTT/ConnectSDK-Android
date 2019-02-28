@@ -236,26 +236,39 @@ final class StartIconDrawable extends Drawable {
                 }
 
                 StartIconDrawable drawable = (StartIconDrawable) view.getBackground();
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    ongoingAnimator = drawable.getPressedAnimator(true);
-                    ongoingAnimator.start();
-                    return true;
-                } else if (event.getAction() == MotionEvent.ACTION_UP
-                        || event.getAction() == MotionEvent.ACTION_CANCEL) {
-                    if (ongoingAnimator == null) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        ongoingAnimator = drawable.getPressedAnimator(true);
+                        ongoingAnimator.start();
                         return true;
-                    }
+                    case MotionEvent.ACTION_UP:
+                        // Fall through
+                    case MotionEvent.ACTION_CANCEL:
+                        if (ongoingAnimator == null) {
+                            return true;
+                        }
 
-                    ongoingAnimator.cancel();
-                    drawable.getPressedAnimator(false).start();
-                    ongoingAnimator = null;
+                        ongoingAnimator.cancel();
+                        drawable.getPressedAnimator(false).start();
+                        ongoingAnimator = null;
 
-                    if (event.getAction() == MotionEvent.ACTION_UP) {
-                        v.performClick();
-                    }
-                    return true;
+                        if (event.getAction() == MotionEvent.ACTION_UP) {
+                            v.performClick();
+                        }
+                        return true;
+                    case MotionEvent.ACTION_MOVE:
+                        // Revert the animation and dismiss click.
+                        if (ongoingAnimator == null) {
+                            return true;
+                        }
+
+                        ongoingAnimator.cancel();
+                        drawable.getPressedAnimator(false).start();
+                        ongoingAnimator = null;
+                        return true;
+                    default:
+                        return false;
                 }
-                return false;
             }
         });
     }

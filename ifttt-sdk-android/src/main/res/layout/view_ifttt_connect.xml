@@ -2,13 +2,11 @@
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <FrameLayout
+    <com.ifttt.ui.DragParentView
         android:id="@+id/ifttt_button_root"
         android:layout_width="@dimen/ifttt_connect_button_width"
         android:layout_height="@dimen/connect_button_height"
         android:layout_marginTop="@dimen/ifttt_space_med"
-        android:clipChildren="false"
-        android:clipToPadding="false"
         android:alpha="0">
 
         <EditText
@@ -69,7 +67,7 @@
             android:elevation="@dimen/ifttt_icon_elevation"
             android:scaleType="centerInside"/>
 
-    </FrameLayout>
+    </com.ifttt.ui.DragParentView>
 
     <TextSwitcher
         android:id="@+id/ifttt_helper_text"

@@ -22,7 +22,6 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.util.AttributeSet;
 import android.view.Gravity;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.animation.LinearInterpolator;
@@ -132,7 +131,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
     private final TextSwitcher connectStateTxt;
     private final ImageView iconImg;
     private final TextSwitcher helperTxt;
-    private final FrameLayout buttonRoot;
+    private final DragParentView buttonRoot;
 
     private final int iconSize;
 
@@ -201,7 +200,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                 Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
         iconDragHelperCallback = new IconDragHelperCallback();
-        viewDragHelper = ViewDragHelper.create(buttonRoot, iconDragHelperCallback);
+        viewDragHelper = buttonRoot.getViewDragHelperCallback(iconDragHelperCallback);
     }
 
     @Override
@@ -214,21 +213,6 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         lifecycleRegistry.markState(DESTROYED);
-    }
-
-    @Override
-    public boolean onInterceptTouchEvent(MotionEvent ev) {
-        if (viewDragHelper.shouldInterceptTouchEvent(ev)) {
-            return true;
-        }
-
-        return super.onInterceptTouchEvent(ev);
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        viewDragHelper.processTouchEvent(event);
-        return super.onTouchEvent(event);
     }
 
     @Override
