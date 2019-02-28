@@ -188,16 +188,17 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                 ContextCompat.getColor(getContext(), R.color.ifttt_button_background)));
 
         connectStateTxt = findViewById(R.id.connect_with_ifttt);
-        helperTxt = findViewById(R.id.ifttt_helper_text);
         iconImg = findViewById(R.id.ifttt_icon);
 
         // Initialize SpannableString that replaces text with logo, using the current TextView in the TextSwitcher as
         // measurement, the CharSequence will only be used there.
         iftttLogo = ContextCompat.getDrawable(getContext(), R.drawable.ic_ifttt_logo_black);
+        helperTxt = findViewById(R.id.ifttt_helper_text);
         worksWithIfttt = new SpannableString(replaceKeyWithImage((TextView) helperTxt.getCurrentView(),
                 getResources().getString(R.string.ifttt_powered_by_ifttt), "IFTTT", iftttLogo));
         worksWithIfttt.setSpan(new AvenirTypefaceSpan(boldTypeface), 0, worksWithIfttt.length(),
                 Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        helperTxt.setText(worksWithIfttt);
 
         iconDragHelperCallback = new IconDragHelperCallback();
         viewDragHelper = buttonRoot.getViewDragHelperCallback(iconDragHelperCallback);
@@ -349,52 +350,32 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         this.connection = connection;
         worksWithService = findWorksWithService(connection);
 
-        // Initialize UI.
-        ObjectAnimator fadeInButtonRoot = ObjectAnimator.ofFloat(buttonRoot, "alpha", buttonRoot.getAlpha(), 1f);
-        fadeInButtonRoot.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                super.onAnimationStart(animation);
-                buttonRoot.setBackground(
-                        ContextCompat.getDrawable(getContext(), R.drawable.background_button_selector));
+        buttonRoot.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.background_button_selector));
 
-                TextView currentHelperTextView = (TextView) helperTxt.getCurrentView();
-                TextView nextHelperTextView = (TextView) helperTxt.getNextView();
+        TextView currentHelperTextView = (TextView) helperTxt.getCurrentView();
+        TextView nextHelperTextView = (TextView) helperTxt.getNextView();
 
-                if (onDarkBackground) {
-                    // Add a border.
-                    buttonRoot.setForeground(ContextCompat.getDrawable(getContext(), R.drawable.ifttt_button_border));
+        if (onDarkBackground) {
+            // Add a border.
+            buttonRoot.setForeground(ContextCompat.getDrawable(getContext(), R.drawable.ifttt_button_border));
 
-                    // Set helper text to white.
-                    currentHelperTextView.setTextColor(WHITE);
-                    nextHelperTextView.setTextColor(WHITE);
+            // Set helper text to white.
+            currentHelperTextView.setTextColor(WHITE);
+            nextHelperTextView.setTextColor(WHITE);
 
-                    // Tint the logo Drawable within the text to white.
-                    DrawableCompat.setTint(DrawableCompat.wrap(iftttLogo), WHITE);
-                } else {
-                    // Remove border.
-                    buttonRoot.setForeground(null);
+            // Tint the logo Drawable within the text to white.
+            DrawableCompat.setTint(DrawableCompat.wrap(iftttLogo), WHITE);
+        } else {
+            // Remove border.
+            buttonRoot.setForeground(null);
 
-                    // Set helper text to black.
-                    currentHelperTextView.setTextColor(BLACK);
-                    nextHelperTextView.setTextColor(BLACK);
+            // Set helper text to black.
+            currentHelperTextView.setTextColor(BLACK);
+            nextHelperTextView.setTextColor(BLACK);
 
-                    // Tint the logo Drawable within the text to black.
-                    DrawableCompat.setTint(DrawableCompat.wrap(iftttLogo), BLACK);
-                }
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                if (isCanceled()) {
-                    return;
-                }
-
-                helperTxt.setCurrentText(worksWithIfttt);
-            }
-        });
-        fadeInButtonRoot.start();
+            // Tint the logo Drawable within the text to black.
+            DrawableCompat.setTint(DrawableCompat.wrap(iftttLogo), BLACK);
+        }
 
         connectStateTxt.setAlpha(1f);
         iconImg.setVisibility(VISIBLE);

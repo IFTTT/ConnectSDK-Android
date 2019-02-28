@@ -40,19 +40,10 @@
 
         </FrameLayout>
 
-        <ProgressBar
-            android:id="@+id/progress_bar"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="24dp"
-            android:layout_gravity="center"/>
-
-        <com.ifttt.ui.IftttConnectButton
+        <com.ifttt.ui.SimpleConnectButton
             android:id="@+id/connect_button"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"/>
+            android:layout_height="wrap_content"/>
 
         <TextView
             android:id="@+id/value_prop_1"

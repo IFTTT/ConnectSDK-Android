@@ -2,7 +2,7 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
 
-    <size android:height="@dimen/connect_button_height"/>
+    <size android:height="@dimen/ifttt_connect_button_height"/>
     <corners android:radius="@dimen/connect_button_radius"/>
     <solid android:color="@android:color/black" />
 </shape>
