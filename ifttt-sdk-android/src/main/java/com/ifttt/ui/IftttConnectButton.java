@@ -1092,13 +1092,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                     if (!iftttApiClient.isUserAuthenticated()) {
                         settleView(left, () -> buildEmailTransitionAnimator().start());
                     } else {
-                        settleView(left, () -> {
-                            FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) releasedChild.getLayoutParams();
-                            lp.gravity = Gravity.END;
-                            releasedChild.setLayoutParams(lp);
-
-                            buildEmailValidationAnimator().start();
-                        });
+                        settleView(left, () -> buildEmailValidationAnimator().start());
                     }
                 }
             }
