@@ -515,7 +515,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                     }
 
                     if (!iftttApiClient.isUserAuthenticated()) {
-                        buildEmailTransitionAnimator().start();
+                        buildEmailTransitionAnimator(0).start();
                     } else {
                         buildEmailValidationAnimator().start();
                     }
@@ -721,7 +721,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
      * Start the animation for Connection authentication.
      */
     @CheckReturnValue
-    private Animator buildEmailTransitionAnimator() {
+    private Animator buildEmailTransitionAnimator(float xvel) {
         // Fade out "Connect X" text.
         ObjectAnimator fadeOutConnect =
                 ObjectAnimator.ofFloat(connectStateTxt, "alpha", connectStateTxt.getAlpha(), 0f);
@@ -732,14 +732,14 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         int endPosition = buttonRoot.getWidth() - iconImg.getWidth();
 
         // Adjust duration based on the dragging velocity.
+        long duration = xvel > 0 ? (long) ((endPosition - startPosition) / xvel * 1000L) : ANIM_DURATION_MEDIUM;
         ObjectAnimator slideIcon = ObjectAnimator.ofFloat(iconImg, "translationX", startPosition, endPosition);
-        slideIcon.setDuration(ANIM_DURATION_MEDIUM);
 
         // Fade in email EditText.
         ObjectAnimator fadeOutButtonRootBackground = ObjectAnimator.ofInt(buttonRoot.getBackground(), "alpha", 255, 0);
-        fadeOutButtonRootBackground.setDuration(ANIM_DURATION_MEDIUM);
+        fadeOutButtonRootBackground.setDuration(duration);
         ObjectAnimator fadeInEmailEdit = ObjectAnimator.ofFloat(emailEdt, "alpha", 0f, 1f);
-        fadeInEmailEdit.setDuration(ANIM_DURATION_MEDIUM);
+        fadeInEmailEdit.setDuration(duration);
         fadeInEmailEdit.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
             @Override
             public void onAnimationStart(Animator animation) {
@@ -783,7 +783,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
 
         // Morph service icon into the start button.
         Animator iconMorphing = ((StartIconDrawable) iconImg.getBackground()).getMorphAnimator();
-        iconMorphing.setDuration(ANIM_DURATION_MEDIUM);
+        iconMorphing.setDuration(Math.max(300L, duration));
         set.playTogether(iconMorphing, fadeOutConnect);
 
         set.setInterpolator(EASE_INTERPOLATOR);
@@ -984,7 +984,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                     cleanUpViews(CheckMarkView.class);
 
                     if (!iftttApiClient.isUserAuthenticated()) {
-                        Animator animator = buildEmailTransitionAnimator();
+                        Animator animator = buildEmailTransitionAnimator(0);
                         animator.start();
                         // Immediately end the animation and move to the email field state.
                         animator.end();
@@ -1090,9 +1090,16 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                     settleView(left, null);
                 } else {
                     if (!iftttApiClient.isUserAuthenticated()) {
-                        settleView(left, () -> buildEmailTransitionAnimator().start());
+                        settledAt = left;
+                        buildEmailTransitionAnimator(xvel).start();
                     } else {
-                        settleView(left, () -> buildEmailValidationAnimator().start());
+                        settleView(left, () -> {
+                            FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) releasedChild.getLayoutParams();
+                            lp.gravity = Gravity.END;
+                            releasedChild.setLayoutParams(lp);
+
+                            buildEmailValidationAnimator().start();
+                        });
                     }
                 }
             }
