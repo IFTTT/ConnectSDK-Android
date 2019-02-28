@@ -9,7 +9,6 @@ import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -199,6 +198,12 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         worksWithIfttt.setSpan(new AvenirTypefaceSpan(boldTypeface), 0, worksWithIfttt.length(),
                 Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         helperTxt.setText(worksWithIfttt);
+        helperTxt.setOnClickListener(new DebouncingOnClickListener() {
+            @Override
+            void doClick(View v) {
+                getContext().startActivity(IftttAboutActivity.intent(context, connection));
+            }
+        });
 
         iconDragHelperCallback = new IconDragHelperCallback();
         viewDragHelper = buttonRoot.getViewDragHelperCallback(iconDragHelperCallback);
@@ -287,6 +292,31 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
      */
     public void setOnDarkBackground(boolean onDarkBackground) {
         this.onDarkBackground = onDarkBackground;
+
+        TextView currentHelperTextView = (TextView) helperTxt.getCurrentView();
+        TextView nextHelperTextView = (TextView) helperTxt.getNextView();
+
+        if (onDarkBackground) {
+            // Add a border.
+            buttonRoot.setForeground(ContextCompat.getDrawable(getContext(), R.drawable.ifttt_button_border));
+
+            // Set helper text to white.
+            currentHelperTextView.setTextColor(WHITE);
+            nextHelperTextView.setTextColor(WHITE);
+
+            // Tint the logo Drawable within the text to white.
+            DrawableCompat.setTint(DrawableCompat.wrap(iftttLogo), WHITE);
+        } else {
+            // Remove border.
+            buttonRoot.setForeground(null);
+
+            // Set helper text to black.
+            currentHelperTextView.setTextColor(BLACK);
+            nextHelperTextView.setTextColor(BLACK);
+
+            // Tint the logo Drawable within the text to black.
+            DrawableCompat.setTint(DrawableCompat.wrap(iftttLogo), BLACK);
+        }
     }
 
     /**
@@ -352,31 +382,6 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
 
         buttonRoot.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.background_button_selector));
 
-        TextView currentHelperTextView = (TextView) helperTxt.getCurrentView();
-        TextView nextHelperTextView = (TextView) helperTxt.getNextView();
-
-        if (onDarkBackground) {
-            // Add a border.
-            buttonRoot.setForeground(ContextCompat.getDrawable(getContext(), R.drawable.ifttt_button_border));
-
-            // Set helper text to white.
-            currentHelperTextView.setTextColor(WHITE);
-            nextHelperTextView.setTextColor(WHITE);
-
-            // Tint the logo Drawable within the text to white.
-            DrawableCompat.setTint(DrawableCompat.wrap(iftttLogo), WHITE);
-        } else {
-            // Remove border.
-            buttonRoot.setForeground(null);
-
-            // Set helper text to black.
-            currentHelperTextView.setTextColor(BLACK);
-            nextHelperTextView.setTextColor(BLACK);
-
-            // Tint the logo Drawable within the text to black.
-            DrawableCompat.setTint(DrawableCompat.wrap(iftttLogo), BLACK);
-        }
-
         connectStateTxt.setAlpha(1f);
         iconImg.setVisibility(VISIBLE);
         if (connection.status != Connection.Status.enabled) {
@@ -390,13 +395,6 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                         getResources().getString(R.string.ifttt_connect_to, worksWithService.shortName));
                 ButtonUiHelper.adjustPadding(connectStateTxt);
             }
-
-            helperTxt.setOnClickListener(new DebouncingOnClickListener() {
-                @Override
-                void doClick(View v) {
-                    getContext().startActivity(new Intent(getContext(), IftttAboutActivity.class));
-                }
-            });
         } else {
             dispatchState(Enabled);
             connectStateTxt.setText(getResources().getString(R.string.ifttt_connected));
@@ -478,13 +476,6 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         }
 
         StartIconDrawable.setPressListener(iconImg);
-
-        helperTxt.setOnClickListener(new DebouncingOnClickListener() {
-            @Override
-            void doClick(View v) {
-                getContext().startActivity(IftttAboutActivity.intent(getContext(), connection));
-            }
-        });
     }
 
     private void setServiceIconImage(@Nullable Bitmap bitmap) {

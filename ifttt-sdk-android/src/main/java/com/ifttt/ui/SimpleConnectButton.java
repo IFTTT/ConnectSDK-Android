@@ -78,7 +78,6 @@ public final class SimpleConnectButton extends FrameLayout implements LifecycleO
                     connection = result;
 
                     connectButton.setConnection(result);
-                    connectButton.setVisibility(VISIBLE);
                     loadingView.setVisibility(GONE);
                     ((Animator) loadingView.getTag()).cancel();
                 }
@@ -102,6 +101,11 @@ public final class SimpleConnectButton extends FrameLayout implements LifecycleO
      * @param onDarkBackground True if the button is used in a dark background, false otherwise.
      */
     public void setOnDarkBackground(boolean onDarkBackground) {
+        if (onDarkBackground) {
+            loadingView.setBackgroundResource(R.drawable.ifttt_loading_background_dark);
+        } else {
+            loadingView.setBackgroundResource(R.drawable.button_background_default);
+        }
         connectButton.setOnDarkBackground(onDarkBackground);
     }
 
