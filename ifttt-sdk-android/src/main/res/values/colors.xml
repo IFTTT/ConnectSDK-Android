@@ -8,4 +8,5 @@
     <color name="ifttt_about_button_color">#222222</color>
     <color name="ifttt_about_button_pressed_color">#666666</color>
     <color name="ifttt_start_icon_background_on_dark">#FFFFFF</color>
+    <color name="ifttt_disabled_background">#666666</color>
 </resources>

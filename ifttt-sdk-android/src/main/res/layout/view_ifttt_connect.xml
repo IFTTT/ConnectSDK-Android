@@ -6,8 +6,7 @@
         android:id="@+id/ifttt_button_root"
         android:layout_width="@dimen/ifttt_connect_button_width"
         android:layout_height="@dimen/ifttt_connect_button_height"
-        android:layout_marginTop="@dimen/ifttt_space_med"
-        android:alpha="0">
+        android:layout_marginTop="@dimen/ifttt_space_med">
 
         <EditText
             android:id="@+id/ifttt_email"
