@@ -10,7 +10,7 @@
     <dimen name="ifttt_start_icon_elevation_dark_mode">2dp</dimen>
     <dimen name="ifttt_check_mark_size">40dp</dimen>
     <dimen name="ifttt_about_drawable_padding">16dp</dimen>
-    <dimen name="connect_button_height">64dp</dimen>
+    <dimen name="ifttt_connect_button_height">64dp</dimen>
     <dimen name="connect_button_radius">32dp</dimen>
     <dimen name="ifttt_about_button_radius">18sp</dimen>
     <dimen name="ifttt_about_button_height">34sp</dimen>

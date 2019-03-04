@@ -5,7 +5,7 @@
     <com.ifttt.ui.DragParentView
         android:id="@+id/ifttt_button_root"
         android:layout_width="@dimen/ifttt_connect_button_width"
-        android:layout_height="@dimen/connect_button_height"
+        android:layout_height="@dimen/ifttt_connect_button_height"
         android:layout_marginTop="@dimen/ifttt_space_med"
         android:alpha="0">
 
@@ -60,7 +60,7 @@
 
         <ImageView
             android:id="@+id/ifttt_icon"
-            android:layout_width="@dimen/connect_button_height"
+            android:layout_width="@dimen/ifttt_connect_button_height"
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical"
             android:alpha="0"

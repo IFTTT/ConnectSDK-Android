@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.ifttt.ui.IftttConnectButton
+        android:id="@+id/ifttt_connect_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"/>
+
+    <TextView
+        android:id="@+id/ifttt_loading_view"
+        android:layout_width="@dimen/ifttt_connect_button_width"
+        android:layout_height="@dimen/ifttt_connect_button_height"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/ifttt_space_med"
+        android:background="@drawable/button_background_default"
+        android:gravity="center"
+        android:text="@string/ifttt_loading"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/ifttt_connect_text_size"
+        app:fontFamily="@font/avenir_next_ltpro_bold"/>
+
+</merge>

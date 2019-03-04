@@ -28,4 +28,5 @@
     <string name="ifttt_authorize_with">Authorize with IFTTT. <u>Learn more</u></string>
     <string name="ifttt_manage_connection">Manage this Connection</string>
     <string name="ifttt_no_activity_to_open">Could not find an app to open this link.</string>
+    <string name="ifttt_loading">Loading…</string>
 </resources>
