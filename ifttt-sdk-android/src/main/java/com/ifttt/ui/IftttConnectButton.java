@@ -9,7 +9,6 @@ import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -121,6 +120,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
 
     private static final float FADE_OUT_PROGRESS = 0.5f;
 
+    private static final long ANIM_DURATION_SHORT = 400L;
     private static final long ANIM_DURATION_MEDIUM = 700L;
     private static final long ANIM_DURATION_LONG = 1500L;
     private static final long AUTO_ADVANCE_DELAY = 2400L;
@@ -205,12 +205,6 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         worksWithIfttt.setSpan(new AvenirTypefaceSpan(boldTypeface), 0, worksWithIfttt.length(),
                 Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         helperTxt.setText(worksWithIfttt);
-        helperTxt.setOnClickListener(new DebouncingOnClickListener() {
-            @Override
-            void doClick(View v) {
-                getContext().startActivity(IftttAboutActivity.intent(context, connection));
-            }
-        });
 
         iconDragHelperCallback = new IconDragHelperCallback();
         viewDragHelper = buttonRoot.getViewDragHelperCallback(iconDragHelperCallback);
@@ -500,7 +494,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             helperTxt.setOnClickListener(new DebouncingOnClickListener() {
                 @Override
                 void doClick(View v) {
-                    getContext().startActivity(new Intent(getContext(), IftttAboutActivity.class));
+                    getContext().startActivity(IftttAboutActivity.intent(getContext(), connection));
                 }
             });
 
@@ -517,7 +511,19 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                     if (!iftttApiClient.isUserAuthenticated()) {
                         buildEmailTransitionAnimator(0).start();
                     } else {
-                        buildEmailValidationAnimator().start();
+                        int startPosition = iconImg.getLeft();
+                        int endPosition = buttonRoot.getWidth() - iconImg.getWidth();
+                        ValueAnimator moveToggle = ValueAnimator.ofFloat(startPosition, endPosition);
+                        moveToggle.setDuration(ANIM_DURATION_MEDIUM);
+                        moveToggle.setInterpolator(EASE_INTERPOLATOR);
+                        moveToggle.addUpdateListener(animation -> {
+                            setProgressStateText(animation.getAnimatedFraction());
+                            iconImg.setTranslationX((Float) animation.getAnimatedValue());
+                        });
+                        Animator emailValidation = buildEmailValidationAnimator();
+                        AnimatorSet set = new AnimatorSet();
+                        set.playSequentially(moveToggle, emailValidation);
+                        set.start();
                     }
                 }
             };
@@ -734,6 +740,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         // Adjust duration based on the dragging velocity.
         long duration = xvel > 0 ? (long) ((endPosition - startPosition) / xvel * 1000L) : ANIM_DURATION_MEDIUM;
         ObjectAnimator slideIcon = ObjectAnimator.ofFloat(iconImg, "translationX", startPosition, endPosition);
+        slideIcon.setDuration(duration);
 
         // Fade in email EditText.
         ObjectAnimator fadeOutButtonRootBackground = ObjectAnimator.ofInt(buttonRoot.getBackground(), "alpha", 255, 0);
@@ -765,6 +772,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
 
         // Fade in email text.
         ValueAnimator fadeInEmailText = ValueAnimator.ofFloat(0f, 1f);
+        fadeInEmailText.setStartDelay(duration / 2);
         fadeInEmailText.addUpdateListener(animation -> {
             int textColor = (int) EVALUATOR.evaluate(animation.getAnimatedFraction(), Color.TRANSPARENT, BLACK);
             emailEdt.setTextColor(textColor);
@@ -778,12 +786,18 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                 animation -> ViewCompat.setElevation(iconImg, (Float) animation.getAnimatedValue()));
 
         AnimatorSet set = new AnimatorSet();
-        set.playTogether(fadeOutConnect, fadeInEmailEdit, slideIcon, elevationChange, fadeOutButtonRootBackground);
-        set.playSequentially(slideIcon, fadeInEmailText);
+        set.playTogether(fadeOutConnect, fadeInEmailText, fadeInEmailEdit, slideIcon, elevationChange,
+                fadeOutButtonRootBackground);
 
         // Morph service icon into the start button.
         Animator iconMorphing = ((StartIconDrawable) iconImg.getBackground()).getMorphAnimator();
-        iconMorphing.setDuration(Math.max(300L, duration));
+        if (xvel == 0) {
+            // Add a slight delay if the icon is stationary before the animation starts.
+            iconMorphing.setDuration(Math.max(ANIM_DURATION_SHORT, duration * 2 / 3));
+            iconMorphing.setStartDelay(duration / 3);
+        } else {
+            iconMorphing.setDuration(Math.max(ANIM_DURATION_SHORT, duration));
+        }
         set.playTogether(iconMorphing, fadeOutConnect);
 
         set.setInterpolator(EASE_INTERPOLATOR);
@@ -863,9 +877,8 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             }
         });
 
-        Animator animator =
-                progressView.progress(0f, 1f, getResources().getString(R.string.ifttt_continue_to, service.shortName),
-                        AUTO_ADVANCE_DELAY);
+        Animator animator = progressView.progress(0f, 1f, getResources().getString(R.string.ifttt_authenticating),
+                AUTO_ADVANCE_DELAY);
         animator.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
             @Override
             public void onAnimationStart(Animator animation) {
