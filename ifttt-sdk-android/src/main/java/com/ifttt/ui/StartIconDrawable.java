@@ -19,6 +19,7 @@ import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RoundRectShape;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.widget.ImageView;
 import androidx.annotation.ColorInt;
 import androidx.annotation.RequiresApi;
@@ -228,6 +229,13 @@ final class StartIconDrawable extends Drawable {
 
             @Nullable private Animator ongoingAnimator;
 
+            private float downX;
+            private float downY;
+
+            private int getDistance(float x, float y) {
+                return (int) Math.sqrt(Math.pow(x - downX, 2) + Math.pow(y - downY, 2));
+            }
+
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (!(view.getBackground() instanceof StartIconDrawable)) {
@@ -240,6 +248,8 @@ final class StartIconDrawable extends Drawable {
                     case MotionEvent.ACTION_DOWN:
                         ongoingAnimator = drawable.getPressedAnimator(true);
                         ongoingAnimator.start();
+                        downX = event.getX();
+                        downY = event.getY();
                         return true;
                     case MotionEvent.ACTION_UP:
                         // Fall through
@@ -253,18 +263,11 @@ final class StartIconDrawable extends Drawable {
                         ongoingAnimator = null;
 
                         if (event.getAction() == MotionEvent.ACTION_UP) {
-                            v.performClick();
+                            int slop = ViewConfiguration.get(view.getContext()).getScaledTouchSlop();
+                            if (getDistance(event.getX(), event.getY()) < slop) {
+                                v.performClick();
+                            }
                         }
-                        return true;
-                    case MotionEvent.ACTION_MOVE:
-                        // Revert the animation and dismiss click.
-                        if (ongoingAnimator == null) {
-                            return true;
-                        }
-
-                        ongoingAnimator.cancel();
-                        drawable.getPressedAnimator(false).start();
-                        ongoingAnimator = null;
                         return true;
                     default:
                         return false;
