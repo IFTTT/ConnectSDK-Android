@@ -15,9 +15,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.graphics.drawable.DrawableCompat
 import com.google.android.material.textfield.TextInputLayout
-import com.ifttt.ui.ConnectResult
 import com.ifttt.api.demo.ApiHelper.REDIRECT_URI
 import com.ifttt.api.demo.ApiHelper.SERVICE_ID
+import com.ifttt.ui.ConnectResult
 import com.ifttt.ui.SimpleConnectButton
 
 class MainActivity : AppCompatActivity() {
@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
 
-        emailPreferencesHelper = EmailPreferencesHelper(this, EMAIL)
+        emailPreferencesHelper = EmailPreferencesHelper(this)
         uiPreferencesHelper = UiPreferencesHelper(this)
 
         toolbar = findViewById(R.id.toolbar)
@@ -50,7 +50,7 @@ class MainActivity : AppCompatActivity() {
 
             override fun getRedirectUri() = REDIRECT_URI
         }
-        iftttConnectButton.setup(CONNECTION_ID, emailPreferencesHelper.getEmail(), SERVICE_ID, config)
+        iftttConnectButton.setup(CONNECTION_ID, emailPreferencesHelper.getEmail() ?: EMAIL, SERVICE_ID, config)
 
         toggleValuePropColor()
     }
@@ -81,7 +81,9 @@ class MainActivity : AppCompatActivity() {
                 .setPositiveButton(R.string.login) { _, _ ->
                     val newEmail = emailView.editText!!.text.toString()
                     emailPreferencesHelper.setEmail(newEmail)
+                    recreate()
                 }.setNegativeButton(R.string.logout) { _, _ ->
+                    emailPreferencesHelper.clear()
                     recreate()
                 }
                 .show()
