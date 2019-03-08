@@ -81,10 +81,10 @@ class MainActivity : AppCompatActivity() {
                 .setPositiveButton(R.string.login) { _, _ ->
                     val newEmail = emailView.editText!!.text.toString()
                     emailPreferencesHelper.setEmail(newEmail)
-                    recreate()
+                    iftttConnectButton.setup(CONNECTION_ID, newEmail, SERVICE_ID, config)
                 }.setNegativeButton(R.string.logout) { _, _ ->
                     emailPreferencesHelper.clear()
-                    recreate()
+                    iftttConnectButton.setup(CONNECTION_ID, EMAIL, SERVICE_ID, config)
                 }
                 .show()
             return true
