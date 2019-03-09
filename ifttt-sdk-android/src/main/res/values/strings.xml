@@ -12,9 +12,8 @@
     <string name="ifttt_about_4">Unplug any time</string>
     <string name="ifttt_validating_email">Checking for IFTTT account…</string>
     <string name="ifttt_creating_account">Creating account…</string>
-    <string name="ifttt_continue_to">Continue to %1$s</string>
+    <string name="ifttt_continue_to">Going to %1$s</string>
     <string name="ifttt_connected">Connected</string>
-    <string name="ifttt_reconnect">Reconnect %1$s</string>
     <string name="ifttt_connecting_account">Connecting account…</string>
     <string name="ifttt_connection_off">Disconnect</string>
     <string name="ifttt_sign_in_to_ifttt_or_create_new_account"><![CDATA[You are creating or using your IFTTT account subject to <a href=\"https://ifttt.com/terms\">Terms</a> & <a href=\"https://ifttt.com/privacy\">Privacy Policy</a>.]]></string>
@@ -29,5 +28,5 @@
     <string name="ifttt_manage_connection">Manage this Connection</string>
     <string name="ifttt_no_activity_to_open">Could not find an app to open this link.</string>
     <string name="ifttt_loading">Loading…</string>
-    <string name="ifttt_authenticating">Authenticating…</string>
+
 </resources>
