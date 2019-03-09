@@ -45,6 +45,9 @@ final class ButtonApiHelper {
     // to help simplify the flow by setting an aggressive timeout for account checking requests.
     private boolean accountFound = true;
 
+    // Reference to the ongoing disable connection call.
+    @Nullable private PendingResult<Connection> disableConnectionCall;
+
     ButtonApiHelper(IftttApi iftttApi, String redirectUri, @Nullable String inviteCode, OAuthCodeProvider provider,
             Lifecycle lifecycle) {
         this.lifecycle = lifecycle;
@@ -55,21 +58,32 @@ final class ButtonApiHelper {
     }
 
     void disableConnection(Lifecycle lifecycle, String id, ResultCallback<Connection> resultCallback) {
-        PendingResult<Connection> pendingResult = iftttApi.disableConnection(id);
-        lifecycle.addObserver(new PendingResultLifecycleObserver<>(pendingResult));
-        pendingResult.execute(new ResultCallback<Connection>() {
+        disableConnectionCall = iftttApi.disableConnection(id);
+        lifecycle.addObserver(new PendingResultLifecycleObserver<>(disableConnectionCall));
+        disableConnectionCall.execute(new ResultCallback<Connection>() {
             @Override
             public void onSuccess(Connection result) {
+                disableConnectionCall = null;
                 resultCallback.onSuccess(result);
             }
 
             @Override
             public void onFailure(ErrorResponse errorResponse) {
+                disableConnectionCall = null;
                 resultCallback.onFailure(errorResponse);
             }
         });
 
-        lifecycle.addObserver(new PendingResultLifecycleObserver<>(pendingResult));
+        lifecycle.addObserver(new PendingResultLifecycleObserver<>(disableConnectionCall));
+    }
+
+    void cancelDisconnect() {
+        if (disableConnectionCall == null) {
+            return;
+        }
+
+        disableConnectionCall.cancel();
+        disableConnectionCall = null;
     }
 
     @SuppressLint("HardwareIds")
