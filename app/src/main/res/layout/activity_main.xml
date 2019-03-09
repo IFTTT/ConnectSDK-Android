@@ -36,7 +36,6 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/toolbar_protection"
                 android:theme="@style/ThemeOverlay.AppCompat.Dark"/>
 
         </FrameLayout>
