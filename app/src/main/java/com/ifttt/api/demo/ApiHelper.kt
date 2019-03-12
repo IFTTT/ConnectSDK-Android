@@ -36,7 +36,11 @@ object ApiHelper {
      * This method simulates the process of returning an IFTTT user token given a user's OAuth credential. This request
      * should happen between your application and your backend server, as it involves IFTTT service key.
      */
-    fun getUserToken(oAuthCode: String): String? {
+    fun getUserToken(oAuthCode: String?): String? {
+        if (oAuthCode == null) {
+            return null
+        }
+
         return try {
             val response = tokenApi.getUserToken(oAuthCode).execute()
             if (response.isSuccessful) {

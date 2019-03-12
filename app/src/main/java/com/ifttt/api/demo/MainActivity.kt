@@ -15,9 +15,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.graphics.drawable.DrawableCompat
 import com.google.android.material.textfield.TextInputLayout
-import com.ifttt.ui.ConnectResult
 import com.ifttt.api.demo.ApiHelper.REDIRECT_URI
 import com.ifttt.api.demo.ApiHelper.SERVICE_ID
+import com.ifttt.ui.ConnectResult
 import com.ifttt.ui.SimpleConnectButton
 
 class MainActivity : AppCompatActivity() {
@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
 
-        emailPreferencesHelper = EmailPreferencesHelper(this, EMAIL)
+        emailPreferencesHelper = EmailPreferencesHelper(this)
         uiPreferencesHelper = UiPreferencesHelper(this)
 
         toolbar = findViewById(R.id.toolbar)
@@ -50,9 +50,13 @@ class MainActivity : AppCompatActivity() {
 
             override fun getRedirectUri() = REDIRECT_URI
         }
-        iftttConnectButton.setup(CONNECTION_ID, emailPreferencesHelper.getEmail(), SERVICE_ID, config)
+        iftttConnectButton.setup(CONNECTION_ID, emailPreferencesHelper.getEmail() ?: EMAIL, SERVICE_ID, config)
 
         toggleValuePropColor()
+
+        if (emailPreferencesHelper.getEmail() == null) {
+            promptLogin()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -64,27 +68,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.set_email) {
-            // For development and testing purpose: this dialog simulates a login process, where the user enters their
-            // email, and the app tries to fetch the IFTTT user token for the user. In the case where the user token
-            // is empty, we treat it as the user have never connected the service to IFTTT before.
-            val emailView =
-                LayoutInflater.from(this).inflate(
-                    R.layout.view_email,
-                    findViewById(Window.ID_ANDROID_CONTENT),
-                    false
-                ) as TextInputLayout
-            emailView.editText!!.setText(emailPreferencesHelper.getEmail())
-
-            AlertDialog.Builder(this)
-                .setView(emailView)
-                .setTitle(R.string.email_title)
-                .setPositiveButton(R.string.login) { _, _ ->
-                    val newEmail = emailView.editText!!.text.toString()
-                    emailPreferencesHelper.setEmail(newEmail)
-                }.setNegativeButton(R.string.logout) { _, _ ->
-                    recreate()
-                }
-                .show()
+            promptLogin()
             return true
         } else if (item.itemId == R.id.dark_mode) {
             val toggled = !item.isChecked
@@ -132,6 +116,32 @@ class MainActivity : AppCompatActivity() {
             valueProp3.setTextColor(textColor)
             DrawableCompat.setTint(DrawableCompat.wrap(valueProp3.compoundDrawables[0]), textColor)
         }
+    }
+
+    // For development and testing purpose: this dialog simulates a login process, where the user enters their
+    // email, and the app tries to fetch the IFTTT user token for the user. In the case where the user token
+    // is empty, we treat it as the user have never connected the service to IFTTT before.
+    private fun promptLogin() {
+        val emailView =
+            LayoutInflater.from(this).inflate(
+                R.layout.view_email,
+                findViewById(Window.ID_ANDROID_CONTENT),
+                false
+            ) as TextInputLayout
+        emailView.editText!!.setText(emailPreferencesHelper.getEmail())
+
+        AlertDialog.Builder(this)
+            .setView(emailView)
+            .setTitle(R.string.email_title)
+            .setPositiveButton(R.string.login) { _, _ ->
+                val newEmail = emailView.editText!!.text.toString()
+                emailPreferencesHelper.setEmail(newEmail)
+                iftttConnectButton.setup(CONNECTION_ID, newEmail, SERVICE_ID, config)
+            }.setNegativeButton(R.string.logout) { _, _ ->
+                emailPreferencesHelper.clear()
+                iftttConnectButton.setup(CONNECTION_ID, EMAIL, SERVICE_ID, config)
+            }
+            .show()
     }
 
     private companion object {
