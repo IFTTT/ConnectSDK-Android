@@ -4,12 +4,20 @@ import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
+import android.widget.TextSwitcher;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.core.text.HtmlCompat;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
@@ -22,6 +30,8 @@ import com.ifttt.R;
 import com.ifttt.api.PendingResult;
 
 import static android.animation.ValueAnimator.INFINITE;
+import static androidx.core.text.HtmlCompat.FROM_HTML_MODE_COMPACT;
+import static com.ifttt.ui.ButtonUiHelper.replaceKeyWithImage;
 
 /**
  * A wrapper of a {@link IftttConnectButton} that provides some default configurations. Users of this class only need to
@@ -35,9 +45,13 @@ public final class SimpleConnectButton extends FrameLayout implements LifecycleO
 
     private final IftttConnectButton connectButton;
     private final TextView loadingView;
+    private final TextSwitcher statusTextSwitcher;
 
     private Config config;
     private Connection connection;
+
+    private final CharSequence worksWithIfttt;
+    private final Drawable iftttLogo;
 
     private final LifecycleRegistry lifecycleRegistry = new LifecycleRegistry(this);
 
@@ -57,6 +71,12 @@ public final class SimpleConnectButton extends FrameLayout implements LifecycleO
         inflate(context, R.layout.view_ifttt_simple_connect_button, this);
         connectButton = findViewById(R.id.ifttt_connect_button);
         loadingView = findViewById(R.id.ifttt_loading_view);
+        statusTextSwitcher = findViewById(R.id.ifttt_status_text);
+
+        iftttLogo = ContextCompat.getDrawable(getContext(), R.drawable.ic_ifttt_logo_black).mutate();
+        iftttLogo.setAlpha((int) (0.3f * 255));
+        worksWithIfttt = new SpannableString(replaceKeyWithImage((TextView) statusTextSwitcher.getCurrentView(),
+                context.getString(R.string.ifttt_powered_by_ifttt), "IFTTT", iftttLogo));
     }
 
     public void setup(String connectionId, String email, String ownerServiceId, Config config) {
@@ -78,12 +98,29 @@ public final class SimpleConnectButton extends FrameLayout implements LifecycleO
 
                     connectButton.setConnection(result);
                     loadingView.setVisibility(GONE);
+                    statusTextSwitcher.setVisibility(GONE);
                     ((Animator) loadingView.getTag()).cancel();
                 }
 
                 @Override
                 public void onFailure(ErrorResponse errorResponse) {
-                    // TODO: Surface errors.
+                    CharSequence errorText =
+                            HtmlCompat.fromHtml(getResources().getString(R.string.ifttt_error_fetching_connection),
+                                    FROM_HTML_MODE_COMPACT);
+                    SpannableString errorSpan = new SpannableString(errorText);
+                    errorSpan.setSpan(
+                            new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.ifttt_error_red)), 0,
+                            errorText.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                    statusTextSwitcher.setText(errorSpan);
+                    statusTextSwitcher.setOnClickListener(v -> {
+                        PendingResult<Connection> pendingResult = API_CLIENT.api().showConnection(connectionId);
+                        pendingResult.execute(this);
+                        lifecycleRegistry.addObserver(new PendingResultLifecycleObserver<>(pendingResult));
+
+                        statusTextSwitcher.setClickable(false);
+                        statusTextSwitcher.setText(worksWithIfttt);
+                    });
                 }
             });
 
@@ -91,6 +128,8 @@ public final class SimpleConnectButton extends FrameLayout implements LifecycleO
         });
         task.execute();
         lifecycleRegistry.addObserver(new AsyncTaskObserver(task));
+
+        statusTextSwitcher.setCurrentText(worksWithIfttt);
     }
 
     /**
@@ -106,6 +145,25 @@ public final class SimpleConnectButton extends FrameLayout implements LifecycleO
             loadingView.setBackgroundResource(R.drawable.button_background_default);
         }
         connectButton.setOnDarkBackground(onDarkBackground);
+
+        TextView currentHelperTextView = (TextView) statusTextSwitcher.getCurrentView();
+        TextView nextHelperTextView = (TextView) statusTextSwitcher.getNextView();
+
+        if (onDarkBackground) {
+            int semiTransparentWhite = ContextCompat.getColor(getContext(), R.color.ifttt_footer_text_white);
+            currentHelperTextView.setTextColor(semiTransparentWhite);
+            nextHelperTextView.setTextColor(semiTransparentWhite);
+
+            // Tint the logo Drawable within the text to white.
+            DrawableCompat.setTint(DrawableCompat.wrap(iftttLogo), Color.WHITE);
+        } else {
+            int semiTransparentBlack = ContextCompat.getColor(getContext(), R.color.ifttt_footer_text_black);
+            currentHelperTextView.setTextColor(semiTransparentBlack);
+            nextHelperTextView.setTextColor(semiTransparentBlack);
+
+            // Tint the logo Drawable within the text to black.
+            DrawableCompat.setTint(DrawableCompat.wrap(iftttLogo), Color.BLACK);
+        }
     }
 
     /**
@@ -195,7 +253,6 @@ public final class SimpleConnectButton extends FrameLayout implements LifecycleO
         /**
          * @return Your service's OAuth code. The OAuth code will be used to automatically authenticate user to your
          * service on IFTTT platform.
-         *
          * @see IftttConnectButton#setup(String, String, IftttApiClient, String, OAuthCodeProvider).
          */
         String getOAuthCode();
@@ -203,7 +260,6 @@ public final class SimpleConnectButton extends FrameLayout implements LifecycleO
         /**
          * @return URL string that will be used when the Connection authentication flow is completed on web view, in
          * order to return the result to the app.
-         *
          * @see IftttConnectButton#setup(String, String, IftttApiClient, String, OAuthCodeProvider).
          */
         String getRedirectUri();

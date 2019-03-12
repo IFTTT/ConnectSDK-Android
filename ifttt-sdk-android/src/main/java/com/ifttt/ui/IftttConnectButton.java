@@ -11,14 +11,12 @@ import android.app.Application;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.SpannableString;
-import android.text.Spanned;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
@@ -35,7 +33,6 @@ import androidx.annotation.CallSuper;
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.core.view.ViewCompat;
 import androidx.customview.widget.ViewDragHelper;
@@ -187,8 +184,6 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         inflate(context, R.layout.view_ifttt_connect, this);
         buttonRoot = findViewById(R.id.ifttt_button_root);
 
-        Typeface boldTypeface = ResourcesCompat.getFont(context, R.font.avenir_next_ltpro_bold);
-
         emailEdt = findViewById(R.id.ifttt_email);
         emailEdt.setBackground(ButtonUiHelper.buildButtonBackground(context,
                 ContextCompat.getColor(getContext(), R.color.ifttt_button_background)));
@@ -198,13 +193,10 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
 
         // Initialize SpannableString that replaces text with logo, using the current TextView in the TextSwitcher as
         // measurement, the CharSequence will only be used there.
-        iftttLogo = ContextCompat.getDrawable(getContext(), R.drawable.ic_ifttt_logo_black);
         helperTxt = findViewById(R.id.ifttt_helper_text);
+        iftttLogo = ContextCompat.getDrawable(getContext(), R.drawable.ic_ifttt_logo_black);
         worksWithIfttt = new SpannableString(replaceKeyWithImage((TextView) helperTxt.getCurrentView(),
                 getResources().getString(R.string.ifttt_powered_by_ifttt), "IFTTT", iftttLogo));
-        worksWithIfttt.setSpan(new AvenirTypefaceSpan(boldTypeface), 0, worksWithIfttt.length(),
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        helperTxt.setText(worksWithIfttt);
 
         iconDragHelperCallback = new IconDragHelperCallback();
         viewDragHelper = buttonRoot.getViewDragHelperCallback(iconDragHelperCallback);
@@ -302,21 +294,23 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             buttonRoot.setForeground(ContextCompat.getDrawable(getContext(), R.drawable.ifttt_button_border));
 
             // Set helper text to white.
-            currentHelperTextView.setTextColor(WHITE);
-            nextHelperTextView.setTextColor(WHITE);
+            int semiTransparentWhite = ContextCompat.getColor(getContext(), R.color.ifttt_footer_text_white);
+            currentHelperTextView.setTextColor(semiTransparentWhite);
+            nextHelperTextView.setTextColor(semiTransparentWhite);
 
             // Tint the logo Drawable within the text to white.
-            DrawableCompat.setTint(DrawableCompat.wrap(iftttLogo), WHITE);
+            DrawableCompat.setTint(DrawableCompat.wrap(iftttLogo), semiTransparentWhite);
         } else {
             // Remove border.
             buttonRoot.setForeground(null);
 
             // Set helper text to black.
-            currentHelperTextView.setTextColor(BLACK);
-            nextHelperTextView.setTextColor(BLACK);
+            int semiTransparentBlack = ContextCompat.getColor(getContext(), R.color.ifttt_footer_text_black);
+            currentHelperTextView.setTextColor(semiTransparentBlack);
+            nextHelperTextView.setTextColor(semiTransparentBlack);
 
             // Tint the logo Drawable within the text to black.
-            DrawableCompat.setTint(DrawableCompat.wrap(iftttLogo), BLACK);
+            DrawableCompat.setTint(DrawableCompat.wrap(iftttLogo), semiTransparentBlack);
         }
     }
 
@@ -384,6 +378,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         emailEdt.setVisibility(GONE);
         iconImg.setTranslationX(0);
 
+        helperTxt.setCurrentText(worksWithIfttt);
         TextView currentHelperTextView = (TextView) helperTxt.getCurrentView();
         TextView nextHelperTextView = (TextView) helperTxt.getNextView();
 

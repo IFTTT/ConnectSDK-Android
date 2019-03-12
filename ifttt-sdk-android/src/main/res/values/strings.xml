@@ -28,5 +28,5 @@
     <string name="ifttt_manage_connection">Manage this Connection</string>
     <string name="ifttt_no_activity_to_open">Could not find an app to open this link.</string>
     <string name="ifttt_loading">Loading…</string>
-
+    <string name="ifttt_error_fetching_connection"><![CDATA[Make sure your phone has internet connection. <u>Retry</u>]]></string>
 </resources>

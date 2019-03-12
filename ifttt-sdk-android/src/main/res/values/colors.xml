@@ -9,4 +9,7 @@
     <color name="ifttt_about_button_pressed_color">#666666</color>
     <color name="ifttt_start_icon_background_on_dark">#FFFFFF</color>
     <color name="ifttt_disabled_background">#666666</color>
+    <color name="ifttt_error_red">#FF2121</color>
+    <color name="ifttt_footer_text_white">#4CFFFFFF</color>
+    <color name="ifttt_footer_text_black">#4C000000</color>
 </resources>
