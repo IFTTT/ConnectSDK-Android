@@ -37,4 +37,5 @@
     <dimen name="ifttt_continue_icon_margin_end">16dp</dimen>
     <dimen name="ifttt_continue_icon_padding">4dp</dimen>
     <dimen name="ifttt_about_icon_size">48dp</dimen>
+    <dimen name="ifttt_loading_status_margin_top">88dp</dimen>
 </resources>

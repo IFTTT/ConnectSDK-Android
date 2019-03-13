@@ -1,11 +1,11 @@
 package com.ifttt.ui;
 
 import android.app.Activity;
-import android.graphics.Color;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
+import androidx.core.content.ContextCompat;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import com.ifttt.Connection;
 import com.ifttt.ErrorResponse;
@@ -50,7 +50,7 @@ public final class IftttConnectButtonTest {
 
         TextSwitcher helperText = button.findViewById(R.id.ifttt_helper_text);
         assertThat(helperText.getCurrentView()).isInstanceOf(TextView.class);
-        assertThat(((TextView) helperText.getCurrentView()).getText().toString()).isEqualTo("WORKS WITH IFTTT");
+        assertThat(((TextView) helperText.getCurrentView()).getText().toString()).isEqualTo("");
     }
 
     @Test(expected = IllegalStateException.class)
@@ -94,13 +94,13 @@ public final class IftttConnectButtonTest {
         FrameLayout buttonRoot = button.findViewById(R.id.ifttt_button_root);
 
         button.setOnDarkBackground(true);
-        assertThat(currentHelperTextView.getCurrentTextColor()).isEqualTo(Color.WHITE);
-        assertThat(nextHelperTextView.getCurrentTextColor()).isEqualTo(Color.WHITE);
+        assertThat(currentHelperTextView.getCurrentTextColor()).isEqualTo(ContextCompat.getColor(activity, R.color.ifttt_footer_text_white));
+        assertThat(nextHelperTextView.getCurrentTextColor()).isEqualTo(ContextCompat.getColor(activity, R.color.ifttt_footer_text_white));
         assertThat(buttonRoot.getForeground()).isNotNull();
 
         button.setOnDarkBackground(false);
-        assertThat(currentHelperTextView.getCurrentTextColor()).isEqualTo(Color.BLACK);
-        assertThat(nextHelperTextView.getCurrentTextColor()).isEqualTo(Color.BLACK);
+        assertThat(currentHelperTextView.getCurrentTextColor()).isEqualTo(ContextCompat.getColor(activity, R.color.ifttt_footer_text_black));
+        assertThat(nextHelperTextView.getCurrentTextColor()).isEqualTo(ContextCompat.getColor(activity, R.color.ifttt_footer_text_black));
         assertThat(buttonRoot.getForeground()).isNull();
     }
 
