@@ -87,6 +87,7 @@ public final class SimpleConnectButton extends FrameLayout implements LifecycleO
         }
 
         connectButton.setup(email, ownerServiceId, API_CLIENT, config.getRedirectUri(), config::getOAuthCode);
+        connectButton.resetFooterText();
 
         pulseLoading();
         UserTokenAsyncTask task = new UserTokenAsyncTask(config, () -> {

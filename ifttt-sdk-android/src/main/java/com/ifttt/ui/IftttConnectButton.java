@@ -237,6 +237,13 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
     }
 
     /**
+     * Clear the footer text. This should only be used internally, coordinating with {@link SimpleConnectButton}.
+     */
+    void resetFooterText() {
+        helperTxt.setCurrentText(null);
+    }
+
+    /**
      * Enable the Connect Button's Connection authentication and configuration features with an {@link IftttApiClient}
      * instance and a user email.
      *
