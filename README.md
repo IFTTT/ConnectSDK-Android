@@ -29,11 +29,11 @@ To start, add the View to your layout xml file,
 ```xml
 <!-- Other views -->
 
-	<com.ifttt.ui.SimpleConnectButton 
-	  android:id="@+id/ifttt_connect_button"  
-	  android:layout_width="match_parent"  
-	  android:layout_height="wrap_content"/>
-	  	  
+<com.ifttt.ui.SimpleConnectButton 
+  android:id="@+id/ifttt_connect_button"  
+  android:layout_width="match_parent"  
+  android:layout_height="wrap_content"/>
+  	  
 <!-- Other views -->
 ``` 
 
@@ -87,6 +87,8 @@ public final class YourActivity extends Activity {
 	}
 }	
 ```
+
+For more details about setting up Connect Button SDK for authentication, see [Enable a Connection](https://github.com/IFTTT/IFTTTSDK-Android-v2/blob/master/README.md#enable-a-connection).
 
 ## Advanced
 The SDK also exposes the core UI widget, `IftttConnectButton`, in case the pre-defined `SimpleConnectButton` doesn't suit your need. 
