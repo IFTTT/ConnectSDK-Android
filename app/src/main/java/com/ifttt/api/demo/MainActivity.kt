@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.graphics.drawable.DrawableCompat
 import com.google.android.material.textfield.TextInputLayout
+import com.ifttt.Connection
 import com.ifttt.api.demo.ApiHelper.REDIRECT_URI
 import com.ifttt.api.demo.ApiHelper.SERVICE_ID
 import com.ifttt.ui.ConnectResult
@@ -27,7 +28,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var emailPreferencesHelper: EmailPreferencesHelper
     private lateinit var uiPreferencesHelper: UiPreferencesHelper
 
-    private lateinit var config: SimpleConnectButton.Config
+    private lateinit var callback: SimpleConnectButton.Callback
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,14 +44,22 @@ class MainActivity : AppCompatActivity() {
 
         iftttConnectButton = findViewById(R.id.connect_button)
 
-        config = object : SimpleConnectButton.Config {
+        callback = object : SimpleConnectButton.Callback {
+            override fun onFetchConnectionSuccessful(connection: Connection) {
+                findViewById<TextView>(R.id.connection_title).text = connection.name
+            }
+
             override fun getUserToken() = ApiHelper.getUserToken(emailPreferencesHelper.getEmail())
 
             override fun getOAuthCode() = emailPreferencesHelper.getEmail()
-
-            override fun getRedirectUri() = REDIRECT_URI
         }
-        iftttConnectButton.setup(CONNECTION_ID, emailPreferencesHelper.getEmail() ?: EMAIL, SERVICE_ID, config)
+        iftttConnectButton.setup(
+            CONNECTION_ID,
+            emailPreferencesHelper.getEmail() ?: EMAIL,
+            SERVICE_ID,
+            REDIRECT_URI,
+            callback
+        )
 
         toggleValuePropColor()
 
@@ -136,10 +145,10 @@ class MainActivity : AppCompatActivity() {
             .setPositiveButton(R.string.login) { _, _ ->
                 val newEmail = emailView.editText!!.text.toString()
                 emailPreferencesHelper.setEmail(newEmail)
-                iftttConnectButton.setup(CONNECTION_ID, newEmail, SERVICE_ID, config)
+                iftttConnectButton.setup(CONNECTION_ID, newEmail, SERVICE_ID, REDIRECT_URI, callback)
             }.setNegativeButton(R.string.logout) { _, _ ->
                 emailPreferencesHelper.clear()
-                iftttConnectButton.setup(CONNECTION_ID, EMAIL, SERVICE_ID, config)
+                iftttConnectButton.setup(CONNECTION_ID, EMAIL, SERVICE_ID, REDIRECT_URI, callback)
             }
             .show()
     }
