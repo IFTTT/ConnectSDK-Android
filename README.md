@@ -22,10 +22,79 @@ This SDK uses the following libraries as dependencies:
 * Android SDK version 19 or higher.
 
 ## Get started
-To get started, after setting up the dependency, you can instantiate an `IftttApiClient` and add an `IftttConnectButton` to show your users the UI for a Connection. For example, in your Activity,
+The easiest way to set up the SDK is to use a `SimpleConnectButton` in your UI. This class wraps the UI component as well as the necessary API calls to support authentication.
+
+To start, add the View to your layout xml file,
+
+```xml
+<!-- Other views -->
+
+	<com.ifttt.ui.SimpleConnectButton 
+	  android:id="@+id/ifttt_connect_button"  
+	  android:layout_width="match_parent"  
+	  android:layout_height="wrap_content"/>
+	  	  
+<!-- Other views -->
+``` 
+
+and then in your Activity, set up the View by
 
 ```java
-IftttApiClient iftttApiClient = new IftttApiClient.Builder().build()
+SimpleConnectButton connectButton = findViewById(R.id.ifttt_connect_button);
+connectButton.setup("connection_id", "user_email", "your_service_id", "redirect_uri", new SimpleConnectButton.Callback() {
+    @Override
+    public String getUserToken() {
+        return "user_token";
+    }
+    
+    @Override
+    public String getOAuthCode() {
+        return "oauth_code";
+    }
+    
+    @Override
+    public void onFetchConnectionSuccessful(Connection connection) {
+        // Set up your custom UI with the Connection data.
+    }
+});
+```
+
+The SimpleConnectButton handles loading, failure and success states automatically for you.
+
+To set up the View to handle authentication, set up your Activity with launch mode "singleTask", and then override `onNewIntent` method in your Activity class,
+
+```java
+public final class YourActivity extends Activity {
+
+	private SimpleConnectButton iftttConnectButton;
+	
+	@Override  
+	protected void onCreate(@Nullable Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);	
+		
+		// Activity implementations
+		...
+		
+		iftttConnectButton = findViewById(R.id.ifttt_connect_button);
+		
+		...
+	}
+	
+	@Override  
+	protected void onNewIntent(Intent intent) {  
+		ConnectResult result = ConnectResult.fromIntent(intent);  
+		iftttConnectButton.setConnectResult(result);  
+	}
+}	
+```
+
+## Advanced
+The SDK also exposes the core UI widget, `IftttConnectButton`, in case the pre-defined `SimpleConnectButton` doesn't suit your need. 
+
+To use the `IftttConnectButton`, you need to instantiate an `IftttApiClient` and add an `IftttConnectButton` View to show your users the UI for a Connection. For example, in your Activity,
+
+```java
+IftttApiClient iftttApiClient = new IftttApiClient.Builder(context).build()
 OAuthCodeProvider provider = new OAuthCodeProvider() {
 	@Override
 	String getOAuthCode() {
@@ -39,7 +108,7 @@ iftttApiClient.api().showConnection("id")
         @Override
         public void onSuccess(Connection connection) {
             // Show Connection UI using IftttConnectButton.
-            iftttConnectButton.setup("user_email", iftttApiClient, "redirect_uri", provider);
+            iftttConnectButton.setup("user_email", "your_service_id", iftttApiClient, "redirect_uri", provider);
             iftttConnectButton.setConnection(connection);
         }
 
@@ -78,7 +147,7 @@ In addition, you can also use the `Connection` object returned from the API to r
 
 With the instance, you can use `IftttApiClient#api()` to get access to the APIs for Connection data.
 ```java
-IftttApiClient iftttApiClient = new IftttApiClient.Builder()  
+IftttApiClient iftttApiClient = new IftttApiClient.Builder(context)  
         .setInviteCode("invite_code") // Optional, only needed if your service is not published on the IFTTT Platform..
         .build();
 

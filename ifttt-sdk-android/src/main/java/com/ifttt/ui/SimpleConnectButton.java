@@ -35,7 +35,7 @@ import static com.ifttt.ui.ButtonUiHelper.replaceKeyWithImage;
 
 /**
  * A wrapper of a {@link IftttConnectButton} that provides some default configurations. Users of this class only need to
- * provide a {@link Config} instance, as well as the Connection id, and this view will handle both the loading state and
+ * provide a {@link Callback} instance, as well as the Connection id, and this view will handle both the loading state and
  * other UI states accordingly.
  */
 public final class SimpleConnectButton extends FrameLayout implements LifecycleOwner {
@@ -47,7 +47,7 @@ public final class SimpleConnectButton extends FrameLayout implements LifecycleO
     private final TextView loadingView;
     private final TextSwitcher statusTextSwitcher;
 
-    private Config config;
+    private Callback callback;
     private Connection connection;
 
     private final CharSequence worksWithIfttt;
@@ -79,23 +79,38 @@ public final class SimpleConnectButton extends FrameLayout implements LifecycleO
                 context.getString(R.string.ifttt_powered_by_ifttt), "IFTTT", iftttLogo));
     }
 
-    public void setup(String connectionId, String email, String ownerServiceId, Config config) {
-        this.config = config;
+    /**
+     * Set up the Connect Button to fetch the Connection data with the given id and set up the View to be able to do
+     * authentication.
+     *
+     * @param connectionId ID of the Connection that you want to show on this View.
+     * @param email This is used to pre-fill the email EditText when the user is doing Connection authentication.
+     * @param ownerServiceId The id of the service that this Connect Button is used for. To ensure the Connection flow
+     * works with your IFTTT user token, you should make sure the Connection that you are embedding is owned by your
+     * service.
+     * @param redirectUri string that will be used when the Connection authentication flow is completed on web view, in
+     * * order to return the result to the app.
+     * @param callback A callback that supports Connection authentication as well as provide Connection data when the
+     * fetch is successful.
+     */
+    public void setup(String connectionId, String email, String ownerServiceId, String redirectUri, Callback callback) {
+        this.callback = callback;
 
         if (API_CLIENT == null) {
             API_CLIENT = new IftttApiClient.Builder(getContext()).build();
         }
 
-        connectButton.setup(email, ownerServiceId, API_CLIENT, config.getRedirectUri(), config::getOAuthCode);
+        connectButton.setup(email, ownerServiceId, API_CLIENT, redirectUri, callback::getOAuthCode);
         connectButton.resetFooterText();
 
         pulseLoading();
-        UserTokenAsyncTask task = new UserTokenAsyncTask(config, () -> {
+        UserTokenAsyncTask task = new UserTokenAsyncTask(callback, () -> {
             PendingResult<Connection> pendingResult = API_CLIENT.api().showConnection(connectionId);
             pendingResult.execute(new PendingResult.ResultCallback<Connection>() {
                 @Override
                 public void onSuccess(Connection result) {
                     connection = result;
+                    callback.onFetchConnectionSuccessful(result);
 
                     connectButton.setConnection(result);
                     loadingView.setVisibility(GONE);
@@ -181,14 +196,14 @@ public final class SimpleConnectButton extends FrameLayout implements LifecycleO
      * @param result Authentication flow redirect result from the web view.
      */
     public void setConnectResult(ConnectResult result) {
-        if (connection == null || config == null) {
+        if (connection == null || callback == null) {
             return;
         }
 
         connectButton.setConnectResult(result);
 
         if (result.nextStep == ConnectResult.NextStep.Complete) {
-            UserTokenAsyncTask task = new UserTokenAsyncTask(config, () -> {
+            UserTokenAsyncTask task = new UserTokenAsyncTask(callback, () -> {
                 PendingResult<Connection> pendingResult = API_CLIENT.api().showConnection(connection.id);
                 pendingResult.execute(new PendingResult.ResultCallback<Connection>() {
                     @Override
@@ -243,7 +258,7 @@ public final class SimpleConnectButton extends FrameLayout implements LifecycleO
      * Configuration interface for this class. It provides all of the necessary information for the
      * {@link IftttConnectButton} to render UI, handle different states and perform API calls.
      */
-    public interface Config {
+    public interface Callback {
         /**
          * @return An IFTTT user token for this user. This token is going to be used to set up the {@link IftttApiClient}
          * to fetch Connection data with regard to this user.
@@ -259,36 +274,36 @@ public final class SimpleConnectButton extends FrameLayout implements LifecycleO
         String getOAuthCode();
 
         /**
-         * @return URL string that will be used when the Connection authentication flow is completed on web view, in
-         * order to return the result to the app.
-         * @see IftttConnectButton#setup(String, String, IftttApiClient, String, OAuthCodeProvider).
+         * Called when the request to fetch a {@link Connection} data is successful.
+         *
+         * @param connection Connection data object associated with the Connection ID passed to the View.
          */
-        String getRedirectUri();
+        void onFetchConnectionSuccessful(Connection connection);
     }
 
     private static final class UserTokenAsyncTask extends android.os.AsyncTask<Void, Void, String> {
 
-        private interface Callback {
+        private interface UserTokenCallback {
             void onUserTokenSet();
         }
 
-        private final Config config;
-        private final Callback callback;
+        private final SimpleConnectButton.Callback callback;
+        private final UserTokenCallback userTokenCallback;
 
-        private UserTokenAsyncTask(Config config, Callback callback) {
-            this.config = config;
+        private UserTokenAsyncTask(SimpleConnectButton.Callback callback, UserTokenCallback userTokenCallback) {
             this.callback = callback;
+            this.userTokenCallback = userTokenCallback;
         }
 
         @Override
         protected String doInBackground(Void... voids) {
-            return config.getUserToken();
+            return callback.getUserToken();
         }
 
         @Override
         protected void onPostExecute(String s) {
             API_CLIENT.setUserToken(s);
-            callback.onUserTokenSet();
+            userTokenCallback.onUserTokenSet();
         }
     }
 
