@@ -711,6 +711,12 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                     completeProgress.setInterpolator(LINEAR_INTERPOLATOR);
                     completeProgress.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
                         @Override
+                        public void onAnimationStart(Animator animation) {
+                            super.onAnimationStart(animation);
+                            buttonApiHelper.prepareAuthentication(emailEdt.getText().toString());
+                        }
+
+                        @Override
                         public void onAnimationEnd(Animator animation) {
                             super.onAnimationEnd(animation);
                             if (isCanceled()) {
