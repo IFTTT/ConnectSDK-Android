@@ -19,9 +19,9 @@ final class RedirectPrepAsyncTask extends AsyncTask<Void, Void, RedirectPrepAsyn
 
     private final OAuthCodeProvider provider;
     private final OnTokenExchangeListener listener;
-    @Nullable private final String email;
+    private final String email;
 
-    RedirectPrepAsyncTask(OAuthCodeProvider provider, @Nullable String email, OnTokenExchangeListener listener) {
+    RedirectPrepAsyncTask(OAuthCodeProvider provider, String email, OnTokenExchangeListener listener) {
         this.provider = provider;
         this.email = email;
         this.listener = listener;
@@ -31,13 +31,8 @@ final class RedirectPrepAsyncTask extends AsyncTask<Void, Void, RedirectPrepAsyn
     protected PrepResult doInBackground(Void... voids) {
         try {
             String oAuthCode = provider.getOAuthCode();
-            boolean accountFound;
-            if (email != null) {
-                Response<Void> accountMatchResponse = AccountApiHelper.get().findAccount(email).execute();
-                accountFound = accountMatchResponse.code() != 404;
-            } else {
-                accountFound = true;
-            }
+            Response<Void> accountMatchResponse = AccountApiHelper.get().findAccount(email).execute();
+            boolean accountFound = accountMatchResponse.code() != 404;
             return new PrepResult(oAuthCode, accountFound);
         } catch (IOException e) {
             // Intentionally set the flag to true, so that the SDK will know to bring users to the web flow
