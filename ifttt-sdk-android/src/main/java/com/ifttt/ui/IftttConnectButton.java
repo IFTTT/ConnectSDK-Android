@@ -342,17 +342,23 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             activityLifecycleCallbacks = null;
         }
 
+        cleanUpViews(ProgressView.class);
         switch (result.nextStep) {
             case ServiceAuthentication:
                 worksWithService = findNextServiceToConnect(result);
-
-                cleanUpViews(ProgressView.class);
                 getStartServiceAuthAnimator(worksWithService).start();
                 dispatchState(ServiceAuthentication);
                 break;
             case Complete:
-                cleanUpViews(ProgressView.class);
                 complete(result.completeFromConfig);
+                break;
+            case Error:
+                if (result.errorType == null) {
+                    dispatchError(UNKNOWN_STATE);
+                    break;
+                }
+
+                dispatchError(new ErrorResponse(result.errorType, ""));
                 break;
             default:
                 if (buttonState == Login) {
