@@ -3,9 +3,7 @@ package com.ifttt.ui;
 import android.content.pm.PackageManager;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import javax.annotation.CheckReturnValue;
 
 /**
@@ -14,15 +12,15 @@ import javax.annotation.CheckReturnValue;
  */
 final class EmailAppsChecker {
 
-    private static final Map<String, String> MAP;
+    private static final List<String> APP_LIST;
 
     static {
-        LinkedHashMap<String, String> map = new LinkedHashMap<>(4);
-        map.put("com.google.android.gm", "gmail");
-        map.put("com.microsoft.office.outlook", "ms-outlook");
-        map.put("com.samsung.android.email.provider", "samsung-mail");
-        map.put("com.yahoo.mobile.client.android.mail", "yahoo-mail");
-        MAP = Collections.unmodifiableMap(map);
+        ArrayList<String> list = new ArrayList<>(4);
+        list.add("com.google.android.gm");
+        list.add("com.microsoft.office.outlook");
+        list.add("com.samsung.android.email.provider");
+        list.add("com.yahoo.mobile.client.android.mail");
+        APP_LIST = Collections.unmodifiableList(list);
     }
 
     private final PackageManager packageManager;
@@ -34,10 +32,10 @@ final class EmailAppsChecker {
     @CheckReturnValue
     List<String> detectEmailApps() {
         ArrayList<String> detected = new ArrayList<>();
-        for (Map.Entry<String, String> entry : MAP.entrySet()) {
+        for (String app : APP_LIST) {
             try {
-                packageManager.getApplicationInfo(entry.getKey(), 0);
-                detected.add(entry.getValue());
+                packageManager.getApplicationInfo(app, 0);
+                detected.add(app);
             } catch (PackageManager.NameNotFoundException e) {
                 // Could not find email app installed.
             }
