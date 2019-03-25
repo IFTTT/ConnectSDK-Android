@@ -19,6 +19,7 @@ import com.ifttt.api.IftttApi;
 import com.ifttt.api.PendingResult;
 import com.ifttt.api.PendingResult.ResultCallback;
 import com.ifttt.ui.IftttConnectButton.ButtonState;
+import java.util.List;
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 
@@ -88,8 +89,10 @@ final class ButtonApiHelper {
 
     @SuppressLint("HardwareIds")
     void redirectToWeb(Context context, Connection connection, String email, ButtonState buttonState) {
+        EmailAppsChecker checker = new EmailAppsChecker(context.getPackageManager());
         String anonymousId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
-        Uri uri = getEmbedUri(connection, buttonState, redirectUri, email, anonymousId, oAuthCode, inviteCode);
+        Uri uri = getEmbedUri(connection, buttonState, redirectUri, checker.detectEmailApps(), email, anonymousId,
+                oAuthCode, inviteCode);
         CustomTabsIntent intent = new CustomTabsIntent.Builder().build();
         intent.launchUrl(context, uri);
     }
@@ -114,7 +117,8 @@ final class ButtonApiHelper {
      */
     @VisibleForTesting
     static Uri getEmbedUri(Connection connection, IftttConnectButton.ButtonState buttonState, String redirectUri,
-            String email, String anonymousId, @Nullable String oAuthCode, @Nullable String inviteCode) {
+            List<String> emailApps, String email, String anonymousId, @Nullable String oAuthCode,
+            @Nullable String inviteCode) {
         Uri.Builder builder = Uri.parse(SHOW_CONNECTION_API_URL + connection.id)
                 .buildUpon()
                 .appendQueryParameter("sdk_version", BuildConfig.VERSION_NAME)
@@ -136,6 +140,13 @@ final class ButtonApiHelper {
         if ((buttonState == CreateAccount || buttonState == Login) && oAuthCode != null) {
             // Only append the opaque token if we are creating a new account or logging into an existing account.
             builder.appendQueryParameter("code", oAuthCode);
+        }
+
+        // Append detected email apps to facilitate returning user flow.
+        if (buttonState == Login && !emailApps.isEmpty()) {
+            for (String emailApp : emailApps) {
+                builder.appendQueryParameter("available_email_app_schemes[]", emailApp);
+            }
         }
 
         return builder.build();
