@@ -674,6 +674,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             @Override
             public void onAnimationStart(Animator animation) {
                 super.onAnimationStart(animation);
+                buttonApiHelper.prepareAuthentication(emailEdt.getText().toString());
 
                 // When the animation starts, disable the click on buttonRoot, so that the flow will not be started
                 // again.
@@ -716,12 +717,6 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                     Animator completeProgress = progressView.progress(0.5f, 1f, text, ANIM_DURATION_MEDIUM);
                     completeProgress.setInterpolator(LINEAR_INTERPOLATOR);
                     completeProgress.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
-                        @Override
-                        public void onAnimationStart(Animator animation) {
-                            super.onAnimationStart(animation);
-                            buttonApiHelper.prepareAuthentication(emailEdt.getText().toString());
-                        }
-
                         @Override
                         public void onAnimationEnd(Animator animation) {
                             super.onAnimationEnd(animation);
