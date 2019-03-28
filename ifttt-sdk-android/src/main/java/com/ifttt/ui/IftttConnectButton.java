@@ -158,6 +158,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
     private boolean onDarkBackground = false;
 
     @Nullable private Call ongoingImageCall;
+    @Nullable private Runnable resetTextRunnable;
 
     public IftttConnectButton(Context context) {
         this(context, null);
@@ -385,6 +386,11 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             throw new IllegalStateException("The Connection is not owned by " + ownerServiceId);
         }
 
+        if (resetTextRunnable != null) {
+            removeCallbacks(resetTextRunnable);
+            resetTextRunnable = null;
+        }
+
         this.connection = connection;
         worksWithService = findWorksWithService(connection);
 
@@ -467,10 +473,12 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                     helperTxt.setClickable(false);
 
                     // Delay and switch back.
-                    postDelayed(() -> {
+                    resetTextRunnable = () -> {
+                        resetTextRunnable = null;
                         connectStateTxt.setText(getResources().getString(R.string.ifttt_connected));
                         helperTxt.setClickable(true);
-                    }, ANIM_DURATION_LONG);
+                    };
+                    postDelayed(resetTextRunnable, ANIM_DURATION_LONG);
                 }
             };
             buttonRoot.setOnClickListener(onClickListener);
