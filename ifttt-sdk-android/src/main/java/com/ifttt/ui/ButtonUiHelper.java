@@ -131,18 +131,24 @@ final class ButtonUiHelper {
 
     static void adjustPadding(TextSwitcher switcher) {
         Resources resources = switcher.getResources();
-        int paddingHorizontal = resources.getDimensionPixelSize(R.dimen.ifttt_text_padding_horizontal);
-        int paddingSmall = resources.getDimensionPixelSize(R.dimen.ifttt_text_padding_horizontal_small);
+        int largePadding = resources.getDimensionPixelSize(R.dimen.ifttt_text_padding_horizontal);
+        int smallPadding = resources.getDimensionPixelSize(R.dimen.ifttt_text_padding_horizontal_small);
 
         TextView currentView = (TextView) switcher.getCurrentView();
-        float textWidth = StaticLayout.getDesiredWidth(currentView.getText(), currentView.getPaint());
-        float maxWidth = switcher.getWidth() - paddingHorizontal * 2;
+        TextView nextView = (TextView) switcher.getNextView();
+        adjustTextViewPadding(currentView, largePadding, smallPadding);
+        adjustTextViewPadding(nextView, largePadding, smallPadding);
+    }
+
+    private static void adjustTextViewPadding(TextView textView, int largePadding, int smallPadding) {
+        float textWidth = StaticLayout.getDesiredWidth(textView.getText(), textView.getPaint());
+        float maxWidth = textView.getWidth() - largePadding * 2;
         if (textWidth > maxWidth) {
             // Reduce the right padding if the original text is longer than the available space in this View. This is to
             // keep the text "center" visually.
-            switcher.setPadding(paddingHorizontal, 0, paddingSmall, 0);
+            textView.setPadding(largePadding, 0, smallPadding, 0);
         } else {
-            switcher.setPadding(paddingHorizontal, 0, paddingHorizontal, 0);
+            textView.setPadding(largePadding, 0, largePadding, 0);
         }
     }
 
