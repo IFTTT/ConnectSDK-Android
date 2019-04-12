@@ -13,11 +13,13 @@ import android.text.StaticLayout;
 import android.text.TextUtils;
 import android.text.style.ImageSpan;
 import android.util.Patterns;
+import android.view.ViewTreeObserver;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
 import androidx.annotation.ColorInt;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.core.view.ViewCompat;
 import com.ifttt.Connection;
 import com.ifttt.R;
 import com.ifttt.Service;
@@ -136,8 +138,32 @@ final class ButtonUiHelper {
 
         TextView currentView = (TextView) switcher.getCurrentView();
         TextView nextView = (TextView) switcher.getNextView();
-        adjustTextViewPadding(currentView, largePadding, smallPadding);
-        adjustTextViewPadding(nextView, largePadding, smallPadding);
+
+        if (ViewCompat.isLaidOut(currentView)) {
+            adjustTextViewPadding(currentView, largePadding, smallPadding);
+        } else {
+            currentView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+                @Override
+                public boolean onPreDraw() {
+                    currentView.getViewTreeObserver().removeOnPreDrawListener(this);
+                    adjustTextViewPadding(currentView, largePadding, smallPadding);
+                    return false;
+                }
+            });
+        }
+
+        if (ViewCompat.isLaidOut(nextView)) {
+            adjustTextViewPadding(nextView, largePadding, smallPadding);
+        } else {
+            nextView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+                @Override
+                public boolean onPreDraw() {
+                    nextView.getViewTreeObserver().removeOnPreDrawListener(this);
+                    adjustTextViewPadding(nextView, largePadding, smallPadding);
+                    return false;
+                }
+            });
+        }
     }
 
     private static void adjustTextViewPadding(TextView textView, int largePadding, int smallPadding) {
