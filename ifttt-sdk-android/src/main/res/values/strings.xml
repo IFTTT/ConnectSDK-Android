@@ -10,7 +10,6 @@
     <string name="ifttt_about_2">Control which services access your data and how they use it</string>
     <string name="ifttt_about_3">Protect and monitor your data</string>
     <string name="ifttt_about_4">Unplug any time</string>
-    <string name="ifttt_validating_email">Checking for IFTTT account…</string>
     <string name="ifttt_creating_account">Creating account…</string>
     <string name="ifttt_continue_to">Going to %1$s</string>
     <string name="ifttt_connected">Connected</string>
@@ -18,8 +17,8 @@
     <string name="ifttt_connection_off">Disconnect</string>
     <string name="ifttt_sign_in_to_ifttt_or_create_new_account"><![CDATA[You are creating or using your IFTTT account subject to <a href=\"https://ifttt.com/terms\">Terms</a> & <a href=\"https://ifttt.com/privacy\">Privacy Policy</a>.]]></string>
     <string name="ifttt_all_set">You\'re all set. Manage connection with IFTTT</string>
-    <string name="slide_to_turn_off">Slide to disconnect</string>
-    <string name="ifttt_accessing_account">Accessing IFTTT account…</string>
+    <string name="ifttt_slide_to_turn_off">Slide to disconnect</string>
+    <string name="ifttt_verifying">Verifying…</string>
     <string name="ifttt_enter_valid_email">Please enter a valid email address</string>
     <string name="ifttt_save_settings">Saving settings</string>
     <string name="terms_and_privacy"><![CDATA[By using this connection you agree to our <a href=\"https://ifttt.com/terms\">Privacy & Terms</a>.]]></string>
