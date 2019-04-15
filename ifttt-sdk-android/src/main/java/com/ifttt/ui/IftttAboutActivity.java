@@ -76,6 +76,8 @@ public final class IftttAboutActivity extends AppCompatActivity {
             if (storeIntent != null) {
                 googlePlayView.setVisibility(View.VISIBLE);
                 googlePlayView.setOnClickListener(v -> startActivity(storeIntent));
+            } else {
+                googlePlayView.setVisibility(View.GONE);
             }
         }
     }
