@@ -20,7 +20,6 @@
     <string name="ifttt_slide_to_turn_off">Slide to disconnect</string>
     <string name="ifttt_verifying">Verifying…</string>
     <string name="ifttt_enter_valid_email">Please enter a valid email address</string>
-    <string name="ifttt_save_settings">Saving settings</string>
     <string name="terms_and_privacy"><![CDATA[By using this connection you agree to our <a href=\"https://ifttt.com/terms\">Privacy & Terms</a>.]]></string>
     <string name="disconnecting">Disconnecting…</string>
     <string name="ifttt_authorize_with">Authorize with IFTTT. <u>Learn more</u></string>

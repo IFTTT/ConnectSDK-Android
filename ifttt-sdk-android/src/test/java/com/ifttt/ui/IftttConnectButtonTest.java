@@ -94,13 +94,17 @@ public final class IftttConnectButtonTest {
         FrameLayout buttonRoot = button.findViewById(R.id.ifttt_button_root);
 
         button.setOnDarkBackground(true);
-        assertThat(currentHelperTextView.getCurrentTextColor()).isEqualTo(ContextCompat.getColor(activity, R.color.ifttt_footer_text_white));
-        assertThat(nextHelperTextView.getCurrentTextColor()).isEqualTo(ContextCompat.getColor(activity, R.color.ifttt_footer_text_white));
+        assertThat(currentHelperTextView.getCurrentTextColor()).isEqualTo(
+                ContextCompat.getColor(activity, R.color.ifttt_footer_text_white));
+        assertThat(nextHelperTextView.getCurrentTextColor()).isEqualTo(
+                ContextCompat.getColor(activity, R.color.ifttt_footer_text_white));
         assertThat(buttonRoot.getForeground()).isNotNull();
 
         button.setOnDarkBackground(false);
-        assertThat(currentHelperTextView.getCurrentTextColor()).isEqualTo(ContextCompat.getColor(activity, R.color.ifttt_footer_text_black));
-        assertThat(nextHelperTextView.getCurrentTextColor()).isEqualTo(ContextCompat.getColor(activity, R.color.ifttt_footer_text_black));
+        assertThat(currentHelperTextView.getCurrentTextColor()).isEqualTo(
+                ContextCompat.getColor(activity, R.color.ifttt_footer_text_black));
+        assertThat(nextHelperTextView.getCurrentTextColor()).isEqualTo(
+                ContextCompat.getColor(activity, R.color.ifttt_footer_text_black));
         assertThat(buttonRoot.getForeground()).isNull();
     }
 
@@ -129,15 +133,15 @@ public final class IftttConnectButtonTest {
         assertThat(currentStateRef.get()).isEqualTo(ButtonState.Initial);
 
         button.setConnectResult(
-                new ConnectResult(ConnectResult.NextStep.ServiceAuthentication, false, "instagram", null));
+                new ConnectResult(ConnectResult.NextStep.ServiceAuthentication, null, "instagram", null));
         assertThat(currentStateRef.get()).isEqualTo(ButtonState.ServiceAuthentication);
 
-        button.setConnectResult(new ConnectResult(ConnectResult.NextStep.Error, false, null, "error"));
+        button.setConnectResult(new ConnectResult(ConnectResult.NextStep.Error, null, null, "error"));
         assertThat(currentStateRef.get()).isEqualTo(ButtonState.Initial);
         assertThat(errorRef.get()).isNotNull();
 
         errorRef.set(null);
-        button.setConnectResult(new ConnectResult(ConnectResult.NextStep.Complete, false, null, null));
+        button.setConnectResult(new ConnectResult(ConnectResult.NextStep.Complete, "token", null, null));
         assertThat(currentStateRef.get()).isEqualTo(ButtonState.Enabled);
     }
 }

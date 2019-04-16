@@ -203,25 +203,14 @@ public final class SimpleConnectButton extends FrameLayout implements LifecycleO
         connectButton.setConnectResult(result);
 
         if (result.nextStep == ConnectResult.NextStep.Complete) {
-            UserTokenAsyncTask task = new UserTokenAsyncTask(callback, () -> {
-                PendingResult<Connection> pendingResult = API_CLIENT.api().showConnection(connection.id);
-                pendingResult.execute(new PendingResult.ResultCallback<Connection>() {
-                    @Override
-                    public void onSuccess(Connection result1) {
-                        connectButton.setConnection(result1);
-                    }
-
-                    @Override
-                    public void onFailure(ErrorResponse errorResponse) {
-                        connectButton.setConnection(connection);
-                    }
-                });
-
-                lifecycleRegistry.addObserver(new PendingResultLifecycleObserver<>(pendingResult));
-            });
-
-            task.execute();
-            lifecycleRegistry.addObserver(new AsyncTaskObserver(task));
+            if (result.userToken != null) {
+                API_CLIENT.setUserToken(result.userToken);
+                refreshConnection();
+            } else {
+                UserTokenAsyncTask task = new UserTokenAsyncTask(callback, this::refreshConnection);
+                task.execute();
+                lifecycleRegistry.addObserver(new AsyncTaskObserver(task));
+            }
         }
     }
 
@@ -241,6 +230,23 @@ public final class SimpleConnectButton extends FrameLayout implements LifecycleO
     @Override
     public Lifecycle getLifecycle() {
         return lifecycleRegistry;
+    }
+
+    private void refreshConnection() {
+        PendingResult<Connection> pendingResult = API_CLIENT.api().showConnection(connection.id);
+        pendingResult.execute(new PendingResult.ResultCallback<Connection>() {
+            @Override
+            public void onSuccess(Connection result1) {
+                connectButton.setConnection(result1);
+            }
+
+            @Override
+            public void onFailure(ErrorResponse errorResponse) {
+                connectButton.setConnection(connection);
+            }
+        });
+
+        lifecycleRegistry.addObserver(new PendingResultLifecycleObserver<>(pendingResult));
     }
 
     private void pulseLoading() {

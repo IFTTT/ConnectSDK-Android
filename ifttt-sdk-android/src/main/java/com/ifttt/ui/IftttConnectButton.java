@@ -351,7 +351,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                 dispatchState(ServiceAuthentication);
                 break;
             case Complete:
-                complete(result.completeFromConfig);
+                complete();
                 break;
             case Error:
                 if (result.errorType == null) {
@@ -592,15 +592,14 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         fadeInIconImg.start();
     }
 
-    private void complete(boolean hasConfig) {
+    private void complete() {
         buttonRoot.setBackground(buildButtonBackground(getContext(), BLACK));
 
         ProgressView progressView = ProgressView.create(buttonRoot, worksWithService.brandColor,
                 getDarkerColor(worksWithService.brandColor));
         CheckMarkView checkMarkView = CheckMarkView.create(buttonRoot);
 
-        CharSequence text = hasConfig ? getResources().getString(R.string.ifttt_save_settings)
-                : getResources().getString(R.string.ifttt_connecting_account);
+        CharSequence text = getResources().getString(R.string.ifttt_connecting_account);
         Animator progress = progressView.progress(0f, 1f, text, ANIM_DURATION_LONG);
         Animator check = checkMarkView.getAnimator(ENABLE);
         check.setStartDelay(100L);
