@@ -469,7 +469,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             DebouncingOnClickListener onClickListener = new DebouncingOnClickListener() {
                 @Override
                 void doClick(View v) {
-                    connectStateTxt.setText(getResources().getString(R.string.slide_to_turn_off));
+                    connectStateTxt.setText(getResources().getString(R.string.ifttt_slide_to_turn_off));
                     helperTxt.setClickable(false);
 
                     // Delay and switch back.
@@ -668,13 +668,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         int primaryProgressColor = ContextCompat.getColor(getContext(), R.color.ifttt_progress_background_color);
         ProgressView progressView = ProgressView.create(buttonRoot, primaryProgressColor, BLACK);
 
-        CharSequence text;
-        if (iftttApiClient.isUserAuthenticated()) {
-            text = getResources().getString(R.string.ifttt_accessing_account);
-        } else {
-            text = getResources().getString(R.string.ifttt_validating_email);
-        }
-
+        CharSequence text = getResources().getString(R.string.ifttt_verifying);
         Animator showProgress = progressView.progress(0f, 0.5f, text, ANIM_DURATION_LONG);
         showProgress.setInterpolator(LINEAR_INTERPOLATOR);
         showProgress.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
