@@ -709,6 +709,17 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                     completeProgress.setInterpolator(LINEAR_INTERPOLATOR);
                     dispatchState(CreateAccount);
                     AnimatorSet createAccountCompleteSet = new AnimatorSet();
+                    createAccountCompleteSet.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
+                        @Override
+                        public void onAnimationStart(Animator animation) {
+                            super.onAnimationStart(animation);
+                            CharSequence emailPrompt = new SpannableString(
+                                    replaceKeyWithImage((TextView) helperTxt.getCurrentView(),
+                                            getContext().getString(R.string.ifttt_new_account_with, emailEdt.getText()),
+                                            "IFTTT", iftttLogo));
+                            helperTxt.setText(emailPrompt);
+                        }
+                    });
 
                     // Play fading out progress bar and its bundled animations after the progress bar has been filled.
                     createAccountCompleteSet.playSequentially(completeProgress,
@@ -848,7 +859,6 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                 String email = emailEdt.getText().toString();
                 buttonApiHelper.prepareAuthentication(email);
                 helperTxt.setClickable(false);
-                helperTxt.setText(worksWithIfttt);
             }
         };
 
@@ -858,7 +868,11 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             @Override
             public void onAnimationStart(Animator animation) {
                 super.onAnimationStart(animation);
-                helperTxt.setText(getResources().getText(R.string.ifttt_authorize_with));
+
+                CharSequence authorizePrompt = new SpannableString(
+                        replaceKeyWithImage((TextView) helperTxt.getCurrentView(),
+                                getContext().getString(R.string.ifttt_authorize_with), "IFTTT", iftttLogo));
+                helperTxt.setText(authorizePrompt);
             }
 
             @Override
@@ -902,6 +916,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             public void onAnimationStart(Animator animation) {
                 super.onAnimationStart(animation);
                 helperTxt.setClickable(false);
+                helperTxt.setText(worksWithIfttt);
             }
 
             @Override

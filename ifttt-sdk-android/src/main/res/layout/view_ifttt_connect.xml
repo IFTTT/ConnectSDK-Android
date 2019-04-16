@@ -87,6 +87,8 @@
             android:lineSpacingExtra="@dimen/ifttt_helper_text_line_spacing"
             android:textColor="@android:color/black"
             android:textColorLink="@android:color/black"
+            android:lines="1"
+            android:ellipsize="end"
             android:textSize="@dimen/ifttt_helper_text_size"/>
 
         <androidx.appcompat.widget.AppCompatTextView
@@ -97,6 +99,8 @@
             android:lineSpacingExtra="@dimen/ifttt_helper_text_line_spacing"
             android:textColor="@android:color/black"
             android:textColorLink="@android:color/black"
+            android:lines="1"
+            android:ellipsize="end"
             android:textSize="@dimen/ifttt_helper_text_size"/>
 
     </TextSwitcher>
