@@ -166,6 +166,11 @@ final class ButtonUiHelper {
         }
     }
 
+    static void setTextSwitcherTextColor(TextSwitcher switcher, @ColorInt int color) {
+        ((TextView) switcher.getCurrentView()).setTextColor(color);
+        ((TextView) switcher.getNextView()).setTextColor(color);
+    }
+
     private static void adjustTextViewPadding(TextView textView, int largePadding, int smallPadding) {
         float textWidth = StaticLayout.getDesiredWidth(textView.getText(), textView.getPaint());
         float maxWidth = textView.getWidth() - largePadding * 2;

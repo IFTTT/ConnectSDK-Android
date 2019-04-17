@@ -89,36 +89,6 @@ final class ImageLoader {
         return call;
     }
 
-    void fetch(Lifecycle lifecycle, String url) {
-        Bitmap cached = cache.get(url);
-        if (cached != null) {
-            // Cache hit, skip fetching image.
-            return;
-        }
-
-        Request request = new Request.Builder().url(url).build();
-        Call call = client.newCall(request);
-        lifecycle.addObserver(new CallLifecycleObserver(call));
-        call.enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                // No-op.
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (!response.isSuccessful()) {
-                    // No-op
-                    return;
-                }
-
-                InputStream inputStream = response.body().byteStream();
-                Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                cache.put(url, bitmap);
-            }
-        });
-    }
-
     interface OnBitmapLoadedListener {
         @MainThread
         void onComplete(@Nullable Bitmap bitmap);
