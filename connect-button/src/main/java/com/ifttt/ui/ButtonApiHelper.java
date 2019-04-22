@@ -140,7 +140,7 @@ final class ButtonApiHelper {
     }
 
     boolean shouldPresentCreateAccount(Context context) {
-        return shouldPresentEmail(context) && accountFound;
+        return shouldPresentEmail(context) && !accountFound;
     }
 
     @MainThread
