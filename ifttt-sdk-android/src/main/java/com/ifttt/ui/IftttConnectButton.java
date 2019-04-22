@@ -148,7 +148,6 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
     @Nullable private ButtonStateChangeListener buttonStateChangeListener;
     @Nullable private Application.ActivityLifecycleCallbacks activityLifecycleCallbacks;
     private ButtonApiHelper buttonApiHelper;
-    private IftttApiClient iftttApiClient;
     private String ownerServiceId;
 
     // Toggle drag events.
@@ -278,10 +277,10 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             throw new IllegalStateException("Owner service id cannot be null.");
         }
 
-        this.iftttApiClient = iftttApiClient;
         this.ownerServiceId = ownerServiceId;
-        buttonApiHelper = new ButtonApiHelper(iftttApiClient.api(), redirectUri, iftttApiClient.getInviteCode(),
-                oAuthCodeProvider, getLifecycle());
+        buttonApiHelper =
+                new ButtonApiHelper(iftttApiClient, redirectUri, iftttApiClient.getInviteCode(), oAuthCodeProvider,
+                        getLifecycle());
         emailEdt.setText(email);
     }
 
@@ -477,7 +476,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
 
                 buttonRoot.setBackground(buildButtonBackground(getContext(), BLACK));
                 // Depending on whether we need to show the email field, use different track colors.
-                int trackEndColor = iftttApiClient.isUserAuthenticated() ? BLACK
+                int trackEndColor = !buttonApiHelper.shouldPresentEmail(getContext()) ? BLACK
                         : ContextCompat.getColor(getContext(), R.color.ifttt_button_background);
 
                 iconDragHelperCallback.setTrackColor(BLACK, trackEndColor);
@@ -499,7 +498,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                 // Cancel potential disable connection API call.
                 buttonApiHelper.cancelDisconnect();
 
-                if (!iftttApiClient.isUserAuthenticated()) {
+                if (buttonApiHelper.shouldPresentEmail(getContext())) {
                     buildEmailTransitionAnimator(0).start();
                 } else {
                     int startPosition = iconImg.getLeft();
@@ -647,7 +646,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                 ((StartIconDrawable) iconImg.getBackground()).reset();
                 ((StartIconDrawable) iconImg.getBackground()).setBackgroundColor(worksWithService.brandColor);
 
-                if (!buttonApiHelper.isAccountFound()) {
+                if (buttonApiHelper.shouldPresentCreateAccount(getContext())) {
                     Animator completeProgress =
                             progressView.progress(0.5f, 1f, getResources().getString(R.string.ifttt_creating_account),
                                     ANIM_DURATION_LONG);
@@ -682,7 +681,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                             }
 
                             dispatchState(Login);
-                            buttonApiHelper.redirectToWeb(getContext(), connection, emailEdt.getText().toString(),
+                            buttonApiHelper.connect(getContext(), connection, emailEdt.getText().toString(),
                                     buttonState);
                             monitorRedirect();
                         }
@@ -821,7 +820,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             // Cancel auto advance.
             removeCallbacks(clickRunnable);
 
-            buttonApiHelper.redirectToWeb(getContext(), connection, emailEdt.getText().toString(), buttonState);
+            buttonApiHelper.connect(getContext(), connection, emailEdt.getText().toString(), buttonState);
             monitorRedirect();
         });
 
@@ -846,7 +845,8 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                 // Automatically advance to next step.
                 clickRunnable.run();
             }
-        }); return animator;
+        });
+        return animator;
     }
 
     private void cleanUpViews(Class<? extends View> clazz) {
@@ -916,7 +916,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                     cleanUpViews(ProgressView.class);
                     cleanUpViews(CheckMarkView.class);
 
-                    if (!iftttApiClient.isUserAuthenticated()) {
+                    if (buttonApiHelper.shouldPresentEmail(getContext())) {
                         Animator animator = buildEmailTransitionAnimator(0);
                         animator.start();
                         // Immediately end the animation and move to the email field state.
@@ -1024,7 +1024,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
                     // Connection is already in enabled status.
                     settleView(left, null);
                 } else {
-                    if (!iftttApiClient.isUserAuthenticated()) {
+                    if (buttonApiHelper.shouldPresentEmail(getContext())) {
                         settledAt = left;
                         buildEmailTransitionAnimator(xvel).start();
                     } else {

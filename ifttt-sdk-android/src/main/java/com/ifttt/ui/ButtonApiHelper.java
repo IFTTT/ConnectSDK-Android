@@ -15,7 +15,7 @@ import androidx.lifecycle.OnLifecycleEvent;
 import com.ifttt.BuildConfig;
 import com.ifttt.Connection;
 import com.ifttt.ErrorResponse;
-import com.ifttt.api.IftttApi;
+import com.ifttt.IftttApiClient;
 import com.ifttt.api.PendingResult;
 import com.ifttt.api.PendingResult.ResultCallback;
 import com.ifttt.ui.IftttConnectButton.ButtonState;
@@ -33,8 +33,9 @@ import static com.ifttt.ui.IftttConnectButton.ButtonState.ServiceAuthentication;
 final class ButtonApiHelper {
 
     private static final String SHOW_CONNECTION_API_URL = "https://ifttt.com/access/api/";
+    private static final String PACKAGE_NAME_IFTTT = "com.ifttt.ifttt.debug";
 
-    private final IftttApi iftttApi;
+    private final IftttApiClient iftttApiClient;
     private final OAuthCodeProvider oAuthCodeProvider;
     private final Lifecycle lifecycle;
     private final String redirectUri;
@@ -49,17 +50,17 @@ final class ButtonApiHelper {
     // Reference to the ongoing disable connection call.
     @Nullable private PendingResult<Connection> disableConnectionCall;
 
-    ButtonApiHelper(IftttApi iftttApi, String redirectUri, @Nullable String inviteCode, OAuthCodeProvider provider,
+    ButtonApiHelper(IftttApiClient client, String redirectUri, @Nullable String inviteCode, OAuthCodeProvider provider,
             Lifecycle lifecycle) {
         this.lifecycle = lifecycle;
         this.redirectUri = redirectUri;
         this.inviteCode = inviteCode;
-        this.iftttApi = iftttApi;
+        this.iftttApiClient = client;
         oAuthCodeProvider = provider;
     }
 
     void disableConnection(Lifecycle lifecycle, String id, ResultCallback<Connection> resultCallback) {
-        disableConnectionCall = iftttApi.disableConnection(id);
+        disableConnectionCall = iftttApiClient.api().disableConnection(id);
         lifecycle.addObserver(new PendingResultLifecycleObserver<>(disableConnectionCall));
         disableConnectionCall.execute(new ResultCallback<Connection>() {
             @Override
@@ -87,8 +88,31 @@ final class ButtonApiHelper {
         disableConnectionCall = null;
     }
 
+    @CheckReturnValue
+    boolean shouldPresentEmail(Context context) {
+        Intent launchAppIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(SHOW_CONNECTION_API_URL));
+        launchAppIntent.setPackage(PACKAGE_NAME_IFTTT);
+
+        if (hasActivityToLaunch(context, launchAppIntent)) {
+            // If the new IFTTT app is installed, always try to redirect there instead of prompting email field.
+            return false;
+        }
+
+        return !iftttApiClient.isUserAuthenticated();
+    }
+
+    void connect(Context context, Connection connection, String email, ButtonState buttonState) {
+        Intent launchAppIntent = getIntentToApp(context, connection, email, buttonState);
+        if (launchAppIntent != null) {
+            context.startActivity(launchAppIntent);
+        } else {
+            redirectToWeb(context, connection, email, buttonState);
+        }
+    }
+
     @SuppressLint("HardwareIds")
-    void redirectToWeb(Context context, Connection connection, String email, ButtonState buttonState) {
+    @CheckReturnValue
+    private void redirectToWeb(Context context, Connection connection, String email, ButtonState buttonState) {
         EmailAppsChecker checker = new EmailAppsChecker(context.getPackageManager());
         String anonymousId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
         Uri uri = getEmbedUri(connection, buttonState, redirectUri, checker.detectEmailApps(), email, anonymousId,
@@ -97,8 +121,26 @@ final class ButtonApiHelper {
         intent.launchUrl(context, uri);
     }
 
-    boolean isAccountFound() {
-        return accountFound;
+    @SuppressLint("HardwareIds")
+    @CheckReturnValue
+    @Nullable
+    private Intent getIntentToApp(Context context, Connection connection, String email, ButtonState buttonState) {
+        EmailAppsChecker checker = new EmailAppsChecker(context.getPackageManager());
+        String anonymousId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+        Intent launchIntent = new Intent(Intent.ACTION_VIEW,
+                getEmbedUri(connection, buttonState, redirectUri, checker.detectEmailApps(), email, anonymousId,
+                        oAuthCode, inviteCode));
+        launchIntent.setPackage(PACKAGE_NAME_IFTTT);
+
+        if (!hasActivityToLaunch(context, launchIntent)) {
+            return null;
+        }
+
+        return launchIntent;
+    }
+
+    boolean shouldPresentCreateAccount(Context context) {
+        return shouldPresentEmail(context) && accountFound;
     }
 
     @MainThread
