@@ -29,7 +29,7 @@ dependencies {
     // Including the library as an aar file doesn't come with any transitive dependencies,
     // you will need to include them manually.
     // This is temporary, and can be removed when the library is live in jcenter,
-    implementation project(':ifttt-sdk-android')
+    implementation project(':connect-button')
     implementation "com.squareup.okhttp3:okhttp:$okHttpVersion"
     implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
     implementation "com.squareup.retrofit2:converter-moshi:$retrofitVersion"

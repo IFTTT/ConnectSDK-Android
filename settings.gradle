@@ -1,1 +1,1 @@
-include ':app', ':ifttt-sdk-android'
+include ':app', ':connect-button'
