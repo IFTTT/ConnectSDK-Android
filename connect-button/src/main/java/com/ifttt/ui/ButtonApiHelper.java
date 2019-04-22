@@ -14,18 +14,17 @@ import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.OnLifecycleEvent;
 import com.ifttt.BuildConfig;
 import com.ifttt.Connection;
+import com.ifttt.ConnectionApiClient;
 import com.ifttt.ErrorResponse;
-import com.ifttt.IftttApiClient;
 import com.ifttt.api.PendingResult;
 import com.ifttt.api.PendingResult.ResultCallback;
-import com.ifttt.ui.IftttConnectButton.ButtonState;
 import java.util.List;
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 
-import static com.ifttt.ui.IftttConnectButton.ButtonState.CreateAccount;
-import static com.ifttt.ui.IftttConnectButton.ButtonState.Login;
-import static com.ifttt.ui.IftttConnectButton.ButtonState.ServiceAuthentication;
+import static com.ifttt.ui.ButtonState.CreateAccount;
+import static com.ifttt.ui.ButtonState.Login;
+import static com.ifttt.ui.ButtonState.ServiceAuthentication;
 
 /**
  * Helper class that handles all API call and non-UI specific tasks for the {@link IftttConnectButton}.
@@ -35,10 +34,10 @@ final class ButtonApiHelper {
     private static final String SHOW_CONNECTION_API_URL = "https://ifttt.com/access/api/";
     private static final String PACKAGE_NAME_IFTTT = "com.ifttt.ifttt.debug";
 
-    private final IftttApiClient iftttApiClient;
-    private final OAuthCodeProvider oAuthCodeProvider;
+    private final ConnectionApiClient connectionApiClient;
+    private final CredentialsProvider credentialsProvider;
     private final Lifecycle lifecycle;
-    private final String redirectUri;
+    private final Uri redirectUri;
     @Nullable private final String inviteCode;
 
     @Nullable private String oAuthCode;
@@ -50,17 +49,17 @@ final class ButtonApiHelper {
     // Reference to the ongoing disable connection call.
     @Nullable private PendingResult<Connection> disableConnectionCall;
 
-    ButtonApiHelper(IftttApiClient client, String redirectUri, @Nullable String inviteCode, OAuthCodeProvider provider,
-            Lifecycle lifecycle) {
+    ButtonApiHelper(ConnectionApiClient client, Uri redirectUri, @Nullable String inviteCode,
+            CredentialsProvider provider, Lifecycle lifecycle) {
         this.lifecycle = lifecycle;
         this.redirectUri = redirectUri;
         this.inviteCode = inviteCode;
-        this.iftttApiClient = client;
-        oAuthCodeProvider = provider;
+        this.connectionApiClient = client;
+        credentialsProvider = provider;
     }
 
     void disableConnection(Lifecycle lifecycle, String id, ResultCallback<Connection> resultCallback) {
-        disableConnectionCall = iftttApiClient.api().disableConnection(id);
+        disableConnectionCall = connectionApiClient.api().disableConnection(id);
         lifecycle.addObserver(new PendingResultLifecycleObserver<>(disableConnectionCall));
         disableConnectionCall.execute(new ResultCallback<Connection>() {
             @Override
@@ -98,7 +97,7 @@ final class ButtonApiHelper {
             return false;
         }
 
-        return !iftttApiClient.isUserAuthenticated();
+        return !connectionApiClient.isUserAuthenticated();
     }
 
     void connect(Context context, Connection connection, String email, ButtonState buttonState) {
@@ -145,7 +144,7 @@ final class ButtonApiHelper {
 
     @MainThread
     void prepareAuthentication(String email) {
-        RedirectPrepAsyncTask task = new RedirectPrepAsyncTask(oAuthCodeProvider, email, prepResult -> {
+        RedirectPrepAsyncTask task = new RedirectPrepAsyncTask(credentialsProvider, email, prepResult -> {
             this.oAuthCode = prepResult.opaqueToken;
             this.accountFound = prepResult.accountFound;
         });
@@ -158,14 +157,13 @@ final class ButtonApiHelper {
      * option invite code for the service.
      */
     @VisibleForTesting
-    static Uri getEmbedUri(Connection connection, IftttConnectButton.ButtonState buttonState, String redirectUri,
-            List<String> emailApps, String email, String anonymousId, @Nullable String oAuthCode,
-            @Nullable String inviteCode) {
+    static Uri getEmbedUri(Connection connection, ButtonState buttonState, Uri redirectUri, List<String> emailApps,
+            String email, String anonymousId, @Nullable String oAuthCode, @Nullable String inviteCode) {
         Uri.Builder builder = Uri.parse(SHOW_CONNECTION_API_URL + connection.id)
                 .buildUpon()
                 .appendQueryParameter("sdk_version", BuildConfig.VERSION_NAME)
                 .appendQueryParameter("sdk_platform", "android")
-                .appendQueryParameter("sdk_return_to", redirectUri)
+                .appendQueryParameter("sdk_return_to", redirectUri.toString())
                 .appendQueryParameter("sdk_anonymous_id", anonymousId)
                 .appendQueryParameter("email", email);
 

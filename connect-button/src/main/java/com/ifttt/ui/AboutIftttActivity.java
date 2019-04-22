@@ -23,7 +23,7 @@ import static com.ifttt.ui.ButtonUiHelper.findWorksWithService;
 /**
  * A static Activity for more information about IFTTT.
  */
-public final class IftttAboutActivity extends AppCompatActivity {
+public final class AboutIftttActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -85,6 +85,6 @@ public final class IftttAboutActivity extends AppCompatActivity {
     private static final String EXTRA_CONNECTION = "extra_connection";
 
     public static Intent intent(Context context, Connection connection) {
-        return new Intent(context, IftttAboutActivity.class).putExtra(EXTRA_CONNECTION, connection);
+        return new Intent(context, AboutIftttActivity.class).putExtra(EXTRA_CONNECTION, connection);
     }
 }

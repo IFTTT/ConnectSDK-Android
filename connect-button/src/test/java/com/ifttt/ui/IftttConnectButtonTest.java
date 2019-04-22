@@ -1,5 +1,6 @@
 package com.ifttt.ui;
 
+import android.net.Uri;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextSwitcher;
@@ -8,11 +9,9 @@ import androidx.core.content.ContextCompat;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import com.ifttt.Connection;
+import com.ifttt.ConnectionApiClient;
 import com.ifttt.ErrorResponse;
-import com.ifttt.IftttApiClient;
 import com.ifttt.R;
-import com.ifttt.TestActivity;
-import com.ifttt.ui.IftttConnectButton.ButtonState;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.Before;
@@ -27,15 +26,28 @@ import static org.junit.Assert.fail;
 public final class IftttConnectButtonTest {
 
     private IftttConnectButton button;
-    private IftttApiClient client;
+    private ConnectionApiClient client;
+    private CredentialsProvider credentialsProvider;
 
     @Before
     public void setUp() {
         ActivityScenario<TestActivity> scenario = ActivityScenario.launch(TestActivity.class);
         scenario.onActivity(activity -> {
             button = activity.findViewById(R.id.ifttt_connect_button_test);
-            client = new IftttApiClient.Builder(activity).build();
+            client = new ConnectionApiClient.Builder(activity).build();
         });
+
+        credentialsProvider = new CredentialsProvider() {
+            @Override
+            public String getOAuthCode() {
+                return null;
+            }
+
+            @Override
+            public String getUserToken() {
+                return null;
+            }
+        };
     }
 
     @Test
@@ -63,7 +75,7 @@ public final class IftttConnectButtonTest {
     public void setConnection() throws IOException {
         Connection connection = loadConnection(getClass().getClassLoader());
 
-        button.setup("a@b.com", "instagram", client, "", () -> "");
+        button.setup("a@b.com", client, Uri.parse("https://google.com"), credentialsProvider);
         button.setConnection(connection);
 
         TextSwitcher connectText = button.findViewById(R.id.connect_with_ifttt);
@@ -72,16 +84,6 @@ public final class IftttConnectButtonTest {
 
         TextSwitcher helperText = button.findViewById(R.id.ifttt_helper_text);
         assertThat(helperText.getCurrentView()).isInstanceOf(TextView.class);
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void testOwnerServiceCheck() throws IOException {
-        Connection connection = loadConnection(getClass().getClassLoader());
-
-        button.setup("a@b.com", "not_owner_service", client, "", () -> "");
-        button.setConnection(connection);
-
-        fail();
     }
 
     @Test
@@ -109,7 +111,7 @@ public final class IftttConnectButtonTest {
 
     @Test
     public void testDispatchStates() throws IOException {
-        button.setup("a@b.com", "instagram", client, "", () -> "");
+        button.setup("a@b.com", client, Uri.parse("https://google.com"), credentialsProvider);
 
         AtomicReference<ButtonState> currentStateRef = new AtomicReference<>(ButtonState.Initial);
         AtomicReference<ButtonState> prevStateRef = new AtomicReference<>();

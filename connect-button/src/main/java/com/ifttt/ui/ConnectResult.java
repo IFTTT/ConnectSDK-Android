@@ -5,7 +5,7 @@ import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 import androidx.annotation.VisibleForTesting;
-import com.ifttt.IftttApiClient;
+import com.ifttt.ConnectionApiClient;
 import javax.annotation.Nullable;
 
 import static com.ifttt.ui.ConnectResult.NextStep.Complete;
@@ -57,7 +57,7 @@ public final class ConnectResult implements Parcelable {
 
     /**
      * Additional information when {@link #nextStep} is {@link NextStep#Complete}. This is used to authenticate API
-     * calls in {@link IftttApiClient}.
+     * calls in {@link ConnectionApiClient}.
      */
     @Nullable public final String userToken;
 

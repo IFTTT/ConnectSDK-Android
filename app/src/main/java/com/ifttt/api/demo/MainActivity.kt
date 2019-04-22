@@ -15,20 +15,19 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.graphics.drawable.DrawableCompat
 import com.google.android.material.textfield.TextInputLayout
-import com.ifttt.Connection
 import com.ifttt.api.demo.ApiHelper.REDIRECT_URI
-import com.ifttt.api.demo.ApiHelper.SERVICE_ID
+import com.ifttt.ui.ConnectButton
 import com.ifttt.ui.ConnectResult
-import com.ifttt.ui.SimpleConnectButton
+import com.ifttt.ui.CredentialsProvider
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var iftttConnectButton: SimpleConnectButton
+    private lateinit var connectButton: ConnectButton
     private lateinit var toolbar: Toolbar
     private lateinit var emailPreferencesHelper: EmailPreferencesHelper
     private lateinit var uiPreferencesHelper: UiPreferencesHelper
 
-    private lateinit var callback: SimpleConnectButton.Callback
+    private lateinit var configuration: ConnectButton.Configuration
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,24 +41,24 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         title = null
 
-        iftttConnectButton = findViewById(R.id.connect_button)
+        connectButton = findViewById(R.id.connect_button)
 
-        callback = object : SimpleConnectButton.Callback {
-            override fun onFetchConnectionSuccessful(connection: Connection) {
-                findViewById<TextView>(R.id.connection_title).text = connection.name
-            }
-
+        val credentialsProvider = object : CredentialsProvider {
             override fun getUserToken() = ApiHelper.getUserToken(emailPreferencesHelper.getEmail())
 
             override fun getOAuthCode() = emailPreferencesHelper.getEmail()
         }
-        iftttConnectButton.setup(
+
+        configuration = ConnectButton.Configuration.Builder.withConnectionId(
             CONNECTION_ID,
             emailPreferencesHelper.getEmail() ?: EMAIL,
-            SERVICE_ID,
-            REDIRECT_URI,
-            callback
-        )
+            credentialsProvider
+            , REDIRECT_URI
+        ) { connection ->
+            findViewById<TextView>(R.id.connection_title).text = connection.name
+        }.build()
+
+        connectButton.setup(configuration)
 
         toggleValuePropColor()
 
@@ -92,7 +91,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        iftttConnectButton.setConnectResult(ConnectResult.fromIntent(intent))
+        connectButton.setConnectResult(ConnectResult.fromIntent(intent))
     }
 
     private fun toggleValuePropColor() {
@@ -111,7 +110,7 @@ class MainActivity : AppCompatActivity() {
 
         // If the Activity that Connect Button is displayed on has a dark background, call this function to toggle
         // its look to adapt the UI.
-        iftttConnectButton.setOnDarkBackground(darkMode)
+        connectButton.setOnDarkBackground(darkMode)
 
         window.setBackgroundDrawable(ColorDrawable(backgroundColor))
         findViewById<ViewGroup>(Window.ID_ANDROID_CONTENT).post {
@@ -145,10 +144,10 @@ class MainActivity : AppCompatActivity() {
             .setPositiveButton(R.string.login) { _, _ ->
                 val newEmail = emailView.editText!!.text.toString()
                 emailPreferencesHelper.setEmail(newEmail)
-                iftttConnectButton.setup(CONNECTION_ID, newEmail, SERVICE_ID, REDIRECT_URI, callback)
+                connectButton.setup(configuration)
             }.setNegativeButton(R.string.logout) { _, _ ->
                 emailPreferencesHelper.clear()
-                iftttConnectButton.setup(CONNECTION_ID, EMAIL, SERVICE_ID, REDIRECT_URI, callback)
+                connectButton.setup(configuration)
             }
             .show()
     }

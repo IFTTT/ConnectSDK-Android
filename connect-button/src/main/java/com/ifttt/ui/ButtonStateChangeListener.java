@@ -1,7 +1,6 @@
 package com.ifttt.ui;
 
 import com.ifttt.ErrorResponse;
-import com.ifttt.ui.IftttConnectButton.ButtonState;
 
 /**
  * Callback interface for listening to state changes of the {@link IftttConnectButton}.

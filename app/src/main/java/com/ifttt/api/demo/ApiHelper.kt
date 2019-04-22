@@ -1,5 +1,6 @@
 package com.ifttt.api.demo
 
+import android.net.Uri
 import com.squareup.moshi.Moshi
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -16,8 +17,7 @@ import java.io.IOException
  * to demonstrate the process of exchanging IFTTT user token.
  */
 object ApiHelper {
-    const val REDIRECT_URI = "groceryexpress://connectcallback"
-    const val SERVICE_ID = "grocery_express"
+    val REDIRECT_URI = Uri.parse("groceryexpress://connectcallback")
 
     private val tokenApi: TokenApi
 

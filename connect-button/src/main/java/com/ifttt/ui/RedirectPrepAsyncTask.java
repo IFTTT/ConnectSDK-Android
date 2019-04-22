@@ -17,11 +17,11 @@ final class RedirectPrepAsyncTask extends AsyncTask<Void, Void, RedirectPrepAsyn
         void onExchanged(PrepResult result);
     }
 
-    private final OAuthCodeProvider provider;
+    private final CredentialsProvider provider;
     private final OnTokenExchangeListener listener;
     private final String email;
 
-    RedirectPrepAsyncTask(OAuthCodeProvider provider, String email, OnTokenExchangeListener listener) {
+    RedirectPrepAsyncTask(CredentialsProvider provider, String email, OnTokenExchangeListener listener) {
         this.provider = provider;
         this.email = email;
         this.listener = listener;

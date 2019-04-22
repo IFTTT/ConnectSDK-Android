@@ -4,7 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.provider.Settings;
 import androidx.annotation.MainThread;
-import com.ifttt.api.IftttApi;
+import com.ifttt.api.ConnectionApi;
 import com.ifttt.api.PendingResult;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
@@ -17,29 +17,29 @@ import retrofit2.Retrofit;
 import retrofit2.converter.moshi.MoshiConverterFactory;
 
 /**
- * A wrapper class for IFTTT API. It exposes the API wrapper {@link IftttApi}, as well as providing a way to set the
+ * A wrapper class for IFTTT API. It exposes the API wrapper {@link ConnectionApi}, as well as providing a way to set the
  * user token.
  *
- * You can use a {@link Builder} to get an instance of IftttApiClient.
+ * You can use a {@link Builder} to get an instance of ConnectionApiClient.
  */
-public final class IftttApiClient {
+public final class ConnectionApiClient {
 
     @Nullable private final String inviteCode;
-    private final IftttApi iftttApi;
+    private final ConnectionApi connectionApi;
     private final TokenInterceptor tokenInterceptor;
 
-    private IftttApiClient(@Nullable String inviteCode, RetrofitIftttApi retrofitIftttApi,
+    private ConnectionApiClient(@Nullable String inviteCode, RetrofitIftttApi retrofitIftttApi,
             JsonAdapter<ErrorResponse> errorResponseJsonAdapter, TokenInterceptor tokenInterceptor) {
         this.inviteCode = inviteCode;
         this.tokenInterceptor = tokenInterceptor;
-        iftttApi = new IftttApiImpl(retrofitIftttApi, errorResponseJsonAdapter);
+        connectionApi = new ConnectionApiImpl(retrofitIftttApi, errorResponseJsonAdapter);
     }
 
     /**
      * @return Instance of the IFTTT API wrapper. You can use the instance to make various API calls.
      */
-    public IftttApi api() {
-        return iftttApi;
+    public ConnectionApi api() {
+        return connectionApi;
     }
 
     /**
@@ -54,7 +54,7 @@ public final class IftttApiClient {
      * Pass in a non-null String as the user token. A user token may be used to make API calls to IFTTT API, so that
      * the response will contain user-specific information.
      *
-     * After setting the user token, the same IftttApiClient will start using it in all of the subsequent API calls.
+     * After setting the user token, the same ConnectionApiClient will start using it in all of the subsequent API calls.
      *
      * @param userToken A user token String, cannot be null.
      */
@@ -64,7 +64,7 @@ public final class IftttApiClient {
     }
 
     /**
-     * @return true if this instance of IftttApiClient has a user token, or false otherwise.
+     * @return true if this instance of ConnectionApiClient has a user token, or false otherwise.
      */
     @MainThread
     @CheckReturnValue
@@ -73,7 +73,7 @@ public final class IftttApiClient {
     }
 
     /**
-     * Builder class to get an {@link IftttApiClient} instance.
+     * Builder class to get an {@link ConnectionApiClient} instance.
      */
     public static final class Builder {
 
@@ -101,7 +101,7 @@ public final class IftttApiClient {
             return this;
         }
 
-        public IftttApiClient build() {
+        public ConnectionApiClient build() {
             Moshi moshi = new Moshi.Builder().add(new HexColorJsonAdapter())
                     .add(Date.class, new Rfc3339DateJsonAdapter().nullSafe())
                     .add(new ConnectionJsonAdapter())
@@ -125,16 +125,16 @@ public final class IftttApiClient {
 
             RetrofitIftttApi retrofitIftttApi = retrofit.create(RetrofitIftttApi.class);
 
-            return new IftttApiClient(inviteCode, retrofitIftttApi, errorResponseJsonAdapter, tokenInterceptor);
+            return new ConnectionApiClient(inviteCode, retrofitIftttApi, errorResponseJsonAdapter, tokenInterceptor);
         }
     }
 
-    private static final class IftttApiImpl implements IftttApi {
+    private static final class ConnectionApiImpl implements ConnectionApi {
 
         private final RetrofitIftttApi retrofitIftttApi;
         private final JsonAdapter<ErrorResponse> errorResponseJsonAdapter;
 
-        IftttApiImpl(RetrofitIftttApi retrofitIftttApi, JsonAdapter<ErrorResponse> errorResponseJsonAdapter) {
+        ConnectionApiImpl(RetrofitIftttApi retrofitIftttApi, JsonAdapter<ErrorResponse> errorResponseJsonAdapter) {
             this.retrofitIftttApi = retrofitIftttApi;
             this.errorResponseJsonAdapter = errorResponseJsonAdapter;
         }

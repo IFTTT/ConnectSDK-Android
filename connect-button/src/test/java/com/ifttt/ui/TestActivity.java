@@ -1,10 +1,10 @@
-package com.ifttt;
+package com.ifttt.ui;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.widget.FrameLayout;
 import androidx.annotation.Nullable;
-import com.ifttt.ui.IftttConnectButton;
+import com.ifttt.R;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
