@@ -12,7 +12,7 @@ public interface ButtonStateChangeListener {
      * @param currentState Current state of the button.
      * @param previousState Previous state of the button.
      */
-    void onStateChanged(ButtonState currentState, ButtonState previousState);
+    void onStateChanged(ConnectButtonState currentState, ConnectButtonState previousState);
 
     /**
      * Called when the button state change encounters an errorResponse.

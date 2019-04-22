@@ -10,10 +10,10 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 
 import static com.google.common.truth.Truth.assertThat;
-import static com.ifttt.ui.ButtonState.CreateAccount;
-import static com.ifttt.ui.ButtonState.Initial;
-import static com.ifttt.ui.ButtonState.Login;
-import static com.ifttt.ui.ButtonState.ServiceAuthentication;
+import static com.ifttt.ui.ConnectButtonState.CreateAccount;
+import static com.ifttt.ui.ConnectButtonState.Initial;
+import static com.ifttt.ui.ConnectButtonState.Login;
+import static com.ifttt.ui.ConnectButtonState.ServiceAuthentication;
 import static java.util.Collections.emptyList;
 
 @RunWith(RobolectricTestRunner.class)

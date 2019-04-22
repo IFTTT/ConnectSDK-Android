@@ -1,6 +1,6 @@
 package com.ifttt.ui;
 
-public enum ButtonState {
+public enum ConnectButtonState {
     /**
      * A button state for displaying an Connection in its initial state, the user has never authenticated this Connection
      * before.

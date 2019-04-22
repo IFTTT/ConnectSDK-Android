@@ -113,12 +113,12 @@ public final class IftttConnectButtonTest {
     public void testDispatchStates() throws IOException {
         button.setup("a@b.com", client, Uri.parse("https://google.com"), credentialsProvider);
 
-        AtomicReference<ButtonState> currentStateRef = new AtomicReference<>(ButtonState.Initial);
-        AtomicReference<ButtonState> prevStateRef = new AtomicReference<>();
+        AtomicReference<ConnectButtonState> currentStateRef = new AtomicReference<>(ConnectButtonState.Initial);
+        AtomicReference<ConnectButtonState> prevStateRef = new AtomicReference<>();
         AtomicReference<ErrorResponse> errorRef = new AtomicReference<>();
         button.setButtonStateChangeListener(new ButtonStateChangeListener() {
             @Override
-            public void onStateChanged(ButtonState currentState, ButtonState previousState) {
+            public void onStateChanged(ConnectButtonState currentState, ConnectButtonState previousState) {
                 currentStateRef.set(currentState);
                 prevStateRef.set(previousState);
             }
@@ -131,18 +131,18 @@ public final class IftttConnectButtonTest {
 
         Connection connection = loadConnection(getClass().getClassLoader());
         button.setConnection(connection);
-        assertThat(currentStateRef.get()).isEqualTo(ButtonState.Initial);
+        assertThat(currentStateRef.get()).isEqualTo(ConnectButtonState.Initial);
 
         button.setConnectResult(
                 new ConnectResult(ConnectResult.NextStep.ServiceAuthentication, null, "instagram", null));
-        assertThat(currentStateRef.get()).isEqualTo(ButtonState.ServiceAuthentication);
+        assertThat(currentStateRef.get()).isEqualTo(ConnectButtonState.ServiceAuthentication);
 
         button.setConnectResult(new ConnectResult(ConnectResult.NextStep.Error, null, null, "error"));
-        assertThat(currentStateRef.get()).isEqualTo(ButtonState.Initial);
+        assertThat(currentStateRef.get()).isEqualTo(ConnectButtonState.Initial);
         assertThat(errorRef.get()).isNotNull();
 
         errorRef.set(null);
         button.setConnectResult(new ConnectResult(ConnectResult.NextStep.Complete, "token", null, null));
-        assertThat(currentStateRef.get()).isEqualTo(ButtonState.Enabled);
+        assertThat(currentStateRef.get()).isEqualTo(ConnectButtonState.Enabled);
     }
 }

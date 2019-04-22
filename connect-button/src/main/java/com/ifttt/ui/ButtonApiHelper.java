@@ -22,9 +22,9 @@ import java.util.List;
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 
-import static com.ifttt.ui.ButtonState.CreateAccount;
-import static com.ifttt.ui.ButtonState.Login;
-import static com.ifttt.ui.ButtonState.ServiceAuthentication;
+import static com.ifttt.ui.ConnectButtonState.CreateAccount;
+import static com.ifttt.ui.ConnectButtonState.Login;
+import static com.ifttt.ui.ConnectButtonState.ServiceAuthentication;
 
 /**
  * Helper class that handles all API call and non-UI specific tasks for the {@link IftttConnectButton}.
@@ -100,7 +100,7 @@ final class ButtonApiHelper {
         return !connectionApiClient.isUserAuthenticated();
     }
 
-    void connect(Context context, Connection connection, String email, ButtonState buttonState) {
+    void connect(Context context, Connection connection, String email, ConnectButtonState buttonState) {
         Intent launchAppIntent = getIntentToApp(context, connection, email, buttonState);
         if (launchAppIntent != null) {
             context.startActivity(launchAppIntent);
@@ -111,7 +111,7 @@ final class ButtonApiHelper {
 
     @SuppressLint("HardwareIds")
     @CheckReturnValue
-    private void redirectToWeb(Context context, Connection connection, String email, ButtonState buttonState) {
+    private void redirectToWeb(Context context, Connection connection, String email, ConnectButtonState buttonState) {
         EmailAppsChecker checker = new EmailAppsChecker(context.getPackageManager());
         String anonymousId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
         Uri uri = getEmbedUri(connection, buttonState, redirectUri, checker.detectEmailApps(), email, anonymousId,
@@ -123,7 +123,7 @@ final class ButtonApiHelper {
     @SuppressLint("HardwareIds")
     @CheckReturnValue
     @Nullable
-    private Intent getIntentToApp(Context context, Connection connection, String email, ButtonState buttonState) {
+    private Intent getIntentToApp(Context context, Connection connection, String email, ConnectButtonState buttonState) {
         EmailAppsChecker checker = new EmailAppsChecker(context.getPackageManager());
         String anonymousId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
         Intent launchIntent = new Intent(Intent.ACTION_VIEW,
@@ -157,7 +157,7 @@ final class ButtonApiHelper {
      * option invite code for the service.
      */
     @VisibleForTesting
-    static Uri getEmbedUri(Connection connection, ButtonState buttonState, Uri redirectUri, List<String> emailApps,
+    static Uri getEmbedUri(Connection connection, ConnectButtonState buttonState, Uri redirectUri, List<String> emailApps,
             String email, String anonymousId, @Nullable String oAuthCode, @Nullable String inviteCode) {
         Uri.Builder builder = Uri.parse(SHOW_CONNECTION_API_URL + connection.id)
                 .buildUpon()

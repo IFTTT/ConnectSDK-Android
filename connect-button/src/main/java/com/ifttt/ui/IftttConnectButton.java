@@ -59,12 +59,12 @@ import static androidx.lifecycle.Lifecycle.State.CREATED;
 import static androidx.lifecycle.Lifecycle.State.DESTROYED;
 import static androidx.lifecycle.Lifecycle.State.STARTED;
 import static com.ifttt.Connection.Status.enabled;
-import static com.ifttt.ui.ButtonState.CreateAccount;
-import static com.ifttt.ui.ButtonState.Disabled;
-import static com.ifttt.ui.ButtonState.Enabled;
-import static com.ifttt.ui.ButtonState.Initial;
-import static com.ifttt.ui.ButtonState.Login;
-import static com.ifttt.ui.ButtonState.ServiceAuthentication;
+import static com.ifttt.ui.ConnectButtonState.CreateAccount;
+import static com.ifttt.ui.ConnectButtonState.Disabled;
+import static com.ifttt.ui.ConnectButtonState.Enabled;
+import static com.ifttt.ui.ConnectButtonState.Initial;
+import static com.ifttt.ui.ConnectButtonState.Login;
+import static com.ifttt.ui.ConnectButtonState.ServiceAuthentication;
 import static com.ifttt.ui.ButtonUiHelper.adjustPadding;
 import static com.ifttt.ui.ButtonUiHelper.buildButtonBackground;
 import static com.ifttt.ui.ButtonUiHelper.findWorksWithService;
@@ -106,7 +106,7 @@ final class IftttConnectButton extends LinearLayout implements LifecycleOwner {
     private final LifecycleRegistry lifecycleRegistry;
     private final AnimatorLifecycleObserver animatorLifecycleObserver = new AnimatorLifecycleObserver();
 
-    private ButtonState buttonState = Initial;
+    private ConnectButtonState buttonState = Initial;
     private Connection connection;
     private Service worksWithService;
 
@@ -817,7 +817,7 @@ final class IftttConnectButton extends LinearLayout implements LifecycleOwner {
         connectStateTxt.setAlpha(1 - fadeOutProgress);
     }
 
-    private void dispatchState(ButtonState newState) {
+    private void dispatchState(ConnectButtonState newState) {
         if (buttonStateChangeListener != null && newState != buttonState) {
             buttonStateChangeListener.onStateChanged(newState, buttonState);
         }
@@ -1066,10 +1066,10 @@ final class IftttConnectButton extends LinearLayout implements LifecycleOwner {
 
     private static final class SavedState implements Parcelable {
         @Nullable final Parcelable superState;
-        final ButtonState buttonState;
+        final ConnectButtonState buttonState;
         final Connection connection;
 
-        SavedState(@Nullable Parcelable superState, ButtonState buttonState, Connection connection) {
+        SavedState(@Nullable Parcelable superState, ConnectButtonState buttonState, Connection connection) {
             this.superState = superState;
             this.buttonState = buttonState;
             this.connection = connection;
@@ -1077,7 +1077,7 @@ final class IftttConnectButton extends LinearLayout implements LifecycleOwner {
 
         protected SavedState(Parcel in) {
             superState = in.readParcelable(IftttConnectButton.class.getClassLoader());
-            buttonState = (ButtonState) in.readSerializable();
+            buttonState = (ConnectButtonState) in.readSerializable();
             connection = in.readParcelable(Connection.class.getClassLoader());
         }
 
