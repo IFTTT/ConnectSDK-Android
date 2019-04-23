@@ -17,6 +17,7 @@
             android:fontFamily="@font/avenir_next_ltpro_demi"
             android:hint="@string/ifttt_email"
             android:inputType="textEmailAddress"
+            android:imeOptions="actionGo"
             android:paddingEnd="@dimen/ifttt_text_padding_horizontal"
             android:paddingStart="@dimen/ifttt_space_large"
             android:textColor="@android:color/black"

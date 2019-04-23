@@ -22,6 +22,7 @@ import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -59,12 +60,6 @@ import static androidx.lifecycle.Lifecycle.State.CREATED;
 import static androidx.lifecycle.Lifecycle.State.DESTROYED;
 import static androidx.lifecycle.Lifecycle.State.STARTED;
 import static com.ifttt.Connection.Status.enabled;
-import static com.ifttt.ui.ConnectButtonState.CreateAccount;
-import static com.ifttt.ui.ConnectButtonState.Disabled;
-import static com.ifttt.ui.ConnectButtonState.Enabled;
-import static com.ifttt.ui.ConnectButtonState.Initial;
-import static com.ifttt.ui.ConnectButtonState.Login;
-import static com.ifttt.ui.ConnectButtonState.ServiceAuthentication;
 import static com.ifttt.ui.ButtonUiHelper.adjustPadding;
 import static com.ifttt.ui.ButtonUiHelper.buildButtonBackground;
 import static com.ifttt.ui.ButtonUiHelper.findWorksWithService;
@@ -72,6 +67,12 @@ import static com.ifttt.ui.ButtonUiHelper.getDarkerColor;
 import static com.ifttt.ui.ButtonUiHelper.replaceKeyWithImage;
 import static com.ifttt.ui.ButtonUiHelper.setTextSwitcherTextColor;
 import static com.ifttt.ui.CheckMarkDrawable.AnimatorType.ENABLE;
+import static com.ifttt.ui.ConnectButtonState.CreateAccount;
+import static com.ifttt.ui.ConnectButtonState.Disabled;
+import static com.ifttt.ui.ConnectButtonState.Enabled;
+import static com.ifttt.ui.ConnectButtonState.Initial;
+import static com.ifttt.ui.ConnectButtonState.Login;
+import static com.ifttt.ui.ConnectButtonState.ServiceAuthentication;
 
 /**
  * Internal implementation of a Connect Button widget, all of the states and transitions are implemented here.
@@ -752,6 +753,12 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                 }
 
                 iconImg.setOnClickListener(startAuthOnClickListener);
+                emailEdt.setOnEditorActionListener((v, actionId, event) -> {
+                    if (actionId == EditorInfo.IME_ACTION_GO) {
+                        startAuthOnClickListener.onClick(v);
+                    }
+                    return false;
+                });
             }
         });
 
