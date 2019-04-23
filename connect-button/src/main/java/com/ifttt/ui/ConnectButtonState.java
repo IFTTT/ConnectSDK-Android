@@ -31,7 +31,7 @@ public enum ConnectButtonState {
     Enabled,
 
     /**
-     * A button stat efor displaying a Connection that is disabled.
+     * A button stat for displaying a Connection that is disabled.
      */
     Disabled
 }

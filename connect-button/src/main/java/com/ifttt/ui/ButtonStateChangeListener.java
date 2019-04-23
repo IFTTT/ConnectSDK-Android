@@ -3,7 +3,7 @@ package com.ifttt.ui;
 import com.ifttt.ErrorResponse;
 
 /**
- * Callback interface for listening to state changes of the {@link IftttConnectButton}.
+ * Callback interface for listening to state changes of the {@link BaseConnectButton}.
  */
 public interface ButtonStateChangeListener {
     /**

@@ -27,7 +27,7 @@ import static com.ifttt.ui.ConnectButtonState.Login;
 import static com.ifttt.ui.ConnectButtonState.ServiceAuthentication;
 
 /**
- * Helper class that handles all API call and non-UI specific tasks for the {@link IftttConnectButton}.
+ * Helper class that handles all API call and non-UI specific tasks for the {@link BaseConnectButton}.
  */
 final class ButtonApiHelper {
 

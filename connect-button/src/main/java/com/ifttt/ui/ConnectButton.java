@@ -4,7 +4,6 @@ import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.text.SpannableString;
@@ -12,12 +11,10 @@ import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
-import android.widget.TextSwitcher;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.core.text.HtmlCompat;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
@@ -32,7 +29,6 @@ import com.ifttt.api.PendingResult;
 
 import static android.animation.ValueAnimator.INFINITE;
 import static androidx.core.text.HtmlCompat.FROM_HTML_MODE_COMPACT;
-import static com.ifttt.ui.ButtonUiHelper.replaceKeyWithImage;
 
 /**
  *
@@ -42,15 +38,11 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
     private static final long ANIM_DURATION = 1000L;
     private static ConnectionApiClient API_CLIENT;
 
-    private final IftttConnectButton connectButton;
+    private final BaseConnectButton connectButton;
     private final TextView loadingView;
-    private final TextSwitcher statusTextSwitcher;
 
     private CredentialsProvider credentialsProvider;
     private Connection connection;
-
-    private final CharSequence worksWithIfttt;
-    private final Drawable iftttLogo;
 
     private final LifecycleRegistry lifecycleRegistry = new LifecycleRegistry(this);
 
@@ -70,12 +62,6 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
         inflate(context, R.layout.view_ifttt_simple_connect_button, this);
         connectButton = findViewById(R.id.ifttt_connect_button);
         loadingView = findViewById(R.id.ifttt_loading_view);
-        statusTextSwitcher = findViewById(R.id.ifttt_status_text);
-
-        iftttLogo = ContextCompat.getDrawable(getContext(), R.drawable.ic_ifttt_logo_black).mutate();
-        iftttLogo.setAlpha((int) (0.3f * 255));
-        worksWithIfttt = new SpannableString(replaceKeyWithImage((TextView) statusTextSwitcher.getCurrentView(),
-                context.getString(R.string.ifttt_powered_by_ifttt), "IFTTT", iftttLogo));
     }
 
     /**
@@ -88,7 +74,11 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
         ConnectionApiClient clientToUse;
         if (configuration.connectionApiClient == null) {
             if (API_CLIENT == null) {
-                API_CLIENT = new ConnectionApiClient.Builder(getContext()).build();
+                ConnectionApiClient.Builder clientBuilder = new ConnectionApiClient.Builder(getContext());
+                if (configuration.inviteCode != null) {
+                    clientBuilder.setInviteCode(configuration.inviteCode);
+                }
+                API_CLIENT = clientBuilder.build();
             }
 
             clientToUse = API_CLIENT;
@@ -98,8 +88,7 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
 
         credentialsProvider = configuration.credentialsProvider;
         connectButton.setup(configuration.suggestedUserEmail, clientToUse, configuration.connectRedirectUri,
-                configuration.credentialsProvider);
-        connectButton.resetFooterText();
+                configuration.credentialsProvider, configuration.inviteCode);
 
         pulseLoading();
         UserTokenAsyncTask task = new UserTokenAsyncTask(credentialsProvider, () -> {
@@ -111,7 +100,6 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
 
                 connectButton.setConnection(connection);
                 loadingView.setVisibility(GONE);
-                statusTextSwitcher.setVisibility(GONE);
                 ((Animator) loadingView.getTag()).cancel();
                 return;
             }
@@ -131,7 +119,6 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
 
                     connectButton.setConnection(result);
                     loadingView.setVisibility(GONE);
-                    statusTextSwitcher.setVisibility(GONE);
                     ((Animator) loadingView.getTag()).cancel();
                 }
 
@@ -145,15 +132,11 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
                             new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.ifttt_error_red)), 0,
                             errorText.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-                    statusTextSwitcher.setText(errorSpan);
-                    statusTextSwitcher.setOnClickListener(v -> {
+                    connectButton.setErrorMessage(errorSpan, v -> {
                         PendingResult<Connection> pendingResult =
                                 API_CLIENT.api().showConnection(configuration.connectionId);
                         pendingResult.execute(this);
                         lifecycleRegistry.addObserver(new PendingResultLifecycleObserver<>(pendingResult));
-
-                        statusTextSwitcher.setClickable(false);
-                        statusTextSwitcher.setText(worksWithIfttt);
                     });
                 }
             });
@@ -162,13 +145,11 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
         });
         task.execute();
         lifecycleRegistry.addObserver(new AsyncTaskObserver(task));
-
-        statusTextSwitcher.setCurrentText(worksWithIfttt);
     }
 
     /**
      * If the button is used in a dark background, set this flag to true so that the button can adapt the UI. This
-     * method must be called before {@link IftttConnectButton#setConnection(Connection)} to apply the change.
+     * method must be called before {@link BaseConnectButton#setConnection(Connection)} to apply the change.
      *
      * @param onDarkBackground True if the button is used in a dark background, false otherwise.
      */
@@ -179,25 +160,6 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
             loadingView.setBackgroundResource(R.drawable.button_background_default);
         }
         connectButton.setOnDarkBackground(onDarkBackground);
-
-        TextView currentHelperTextView = (TextView) statusTextSwitcher.getCurrentView();
-        TextView nextHelperTextView = (TextView) statusTextSwitcher.getNextView();
-
-        if (onDarkBackground) {
-            int semiTransparentWhite = ContextCompat.getColor(getContext(), R.color.ifttt_footer_text_white);
-            currentHelperTextView.setTextColor(semiTransparentWhite);
-            nextHelperTextView.setTextColor(semiTransparentWhite);
-
-            // Tint the logo Drawable within the text to white.
-            DrawableCompat.setTint(DrawableCompat.wrap(iftttLogo), Color.WHITE);
-        } else {
-            int semiTransparentBlack = ContextCompat.getColor(getContext(), R.color.ifttt_footer_text_black);
-            currentHelperTextView.setTextColor(semiTransparentBlack);
-            nextHelperTextView.setTextColor(semiTransparentBlack);
-
-            // Tint the logo Drawable within the text to black.
-            DrawableCompat.setTint(DrawableCompat.wrap(iftttLogo), Color.BLACK);
-        }
     }
 
     /**
@@ -280,7 +242,7 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
 
     /**
      * Configuration interface for this class. It provides all of the necessary information for the
-     * {@link IftttConnectButton} to render UI, handle different states and perform API calls.
+     * {@link BaseConnectButton} to render UI, handle different states and perform API calls.
      */
     public interface OnFetchConnectionListener {
         /**
@@ -301,6 +263,7 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
         @Nullable private String connectionId;
         @Nullable private Connection connection;
         @Nullable private OnFetchConnectionListener listener;
+        @Nullable private String inviteCode;
 
         public static final class Builder {
             private final String suggestedUserEmail;
@@ -311,6 +274,7 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
             @Nullable private String connectionId;
             @Nullable private OnFetchConnectionListener listener;
             @Nullable private Connection connection;
+            @Nullable private String inviteCode;
 
             public static Builder withConnection(Connection connection, String suggestedUserEmail,
                     CredentialsProvider credentialsProvider, Uri connectRedirectUri) {
@@ -325,7 +289,7 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
 
             public static Builder withConnectionId(String connectionId, String suggestedUserEmail,
                     CredentialsProvider credentialsProvider, Uri connectRedirectUri,
-                    OnFetchConnectionListener onFetchConnectionListener) {
+                    @Nullable OnFetchConnectionListener onFetchConnectionListener) {
                 if (ButtonUiHelper.isEmailInvalid(suggestedUserEmail)) {
                     throw new IllegalStateException(suggestedUserEmail + " is not a valid email address.");
                 }
@@ -348,6 +312,11 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
                 return this;
             }
 
+            public Builder setInviteCode(String inviteCode) {
+                this.inviteCode = inviteCode;
+                return this;
+            }
+
             public Configuration build() {
                 if (connection == null && connectionId == null) {
                     throw new IllegalStateException("Either connection or connectionId must be non-null.");
@@ -359,6 +328,7 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
                 configuration.connection = connection;
                 configuration.connectionId = connectionId;
                 configuration.listener = listener;
+                configuration.inviteCode = inviteCode;
                 return configuration;
             }
         }

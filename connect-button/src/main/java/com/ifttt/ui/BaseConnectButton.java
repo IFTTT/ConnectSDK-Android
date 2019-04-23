@@ -76,7 +76,7 @@ import static com.ifttt.ui.CheckMarkDrawable.AnimatorType.ENABLE;
 /**
  * Internal implementation of a Connect Button widget, all of the states and transitions are implemented here.
  */
-final class IftttConnectButton extends LinearLayout implements LifecycleOwner {
+final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
     private static final ErrorResponse UNKNOWN_STATE = new ErrorResponse("unknown_state", "Cannot verify Button state");
 
@@ -123,15 +123,15 @@ final class IftttConnectButton extends LinearLayout implements LifecycleOwner {
     @Nullable private Call ongoingImageCall;
     @Nullable private Runnable resetTextRunnable;
 
-    public IftttConnectButton(Context context) {
+    public BaseConnectButton(Context context) {
         this(context, null);
     }
 
-    public IftttConnectButton(Context context, @Nullable AttributeSet attrs) {
+    public BaseConnectButton(Context context, @Nullable AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public IftttConnectButton(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public BaseConnectButton(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
         setOrientation(VERTICAL);
@@ -200,11 +200,18 @@ final class IftttConnectButton extends LinearLayout implements LifecycleOwner {
         return lifecycleRegistry;
     }
 
-    /**
-     * Clear the footer text. This should only be used internally, coordinating with {@link ConnectButton}.
-     */
-    void resetFooterText() {
-        helperTxt.setCurrentText(null);
+    void setErrorMessage(CharSequence text, OnClickListener listener) {
+        float currentAlpha = helperTxt.getAlpha();
+        helperTxt.setText(text);
+        helperTxt.setAlpha(1f);
+        helperTxt.setOnClickListener(v -> {
+            listener.onClick(v);
+
+            // Revert back to the original text.
+            helperTxt.setOnClickListener(null);
+            helperTxt.setText(worksWithIfttt);
+            helperTxt.setAlpha(currentAlpha);
+        });
     }
 
     /**
@@ -217,15 +224,16 @@ final class IftttConnectButton extends LinearLayout implements LifecycleOwner {
      *
      * @param connectionApiClient ConnectionApiClient instance.
      * @param email This is used to pre-fill the email EditText when the user is doing Connection authentication.
-     * @param redirectUri URL string that will be used when the Connection authentication flow is completed on web view, in
+     * @param redirectUri Uri that will be used when the Connection authentication flow is completed on web view, in
      * order to return the result to the app.
      * @param credentialsProvider CredentialsProvider implementation that returns your user's OAuth code. The code will be
      * used to automatically connect your service on IFTTT for this user.
+     * @param inviteCode Optional invite code to access an IFTTT service that has not yet published.
      */
     void setup(String email, ConnectionApiClient connectionApiClient, Uri redirectUri,
-            CredentialsProvider credentialsProvider) {
-        buttonApiHelper = new ButtonApiHelper(connectionApiClient, redirectUri, connectionApiClient.getInviteCode(),
-                credentialsProvider, getLifecycle());
+            CredentialsProvider credentialsProvider, @Nullable String inviteCode) {
+        buttonApiHelper =
+                new ButtonApiHelper(connectionApiClient, redirectUri, inviteCode, credentialsProvider, getLifecycle());
         emailEdt.setText(email);
     }
 
@@ -1076,7 +1084,7 @@ final class IftttConnectButton extends LinearLayout implements LifecycleOwner {
         }
 
         protected SavedState(Parcel in) {
-            superState = in.readParcelable(IftttConnectButton.class.getClassLoader());
+            superState = in.readParcelable(BaseConnectButton.class.getClassLoader());
             buttonState = (ConnectButtonState) in.readSerializable();
             connection = in.readParcelable(Connection.class.getClassLoader());
         }

@@ -23,9 +23,9 @@ import static com.ifttt.TestUtils.loadConnection;
 import static org.junit.Assert.fail;
 
 @RunWith(AndroidJUnit4.class)
-public final class IftttConnectButtonTest {
+public final class BaseConnectButtonTest {
 
-    private IftttConnectButton button;
+    private BaseConnectButton button;
     private ConnectionApiClient client;
     private CredentialsProvider credentialsProvider;
 

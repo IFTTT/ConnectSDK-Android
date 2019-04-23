@@ -15,7 +15,7 @@ public final class TestActivity extends Activity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        IftttConnectButton button = new IftttConnectButton(this);
+        BaseConnectButton button = new BaseConnectButton(this);
         button.setId(R.id.ifttt_connect_button_test);
         button.setLayoutParams(new FrameLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
 

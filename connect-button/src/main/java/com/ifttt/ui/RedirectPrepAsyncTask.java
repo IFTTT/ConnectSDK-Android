@@ -57,7 +57,7 @@ final class RedirectPrepAsyncTask extends AsyncTask<Void, Void, RedirectPrepAsyn
     }
 
     /**
-     * API helper class that handles APIs that {@link IftttConnectButton} needs for the Connection authentication flow.
+     * API helper class that handles APIs that {@link BaseConnectButton} needs for the Connection authentication flow.
      */
     private static final class AccountApiHelper {
 
