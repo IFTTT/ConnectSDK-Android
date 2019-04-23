@@ -11,7 +11,7 @@ public interface CredentialsProvider {
 
     /**
      * @return Your users' OAuth code for your service. This is to be used to automatically authenticate the
-     * user to your service on IFTTT during the
+     * user to your service on IFTTT during the connection enable flow.
      */
     @WorkerThread
     String getOAuthCode();
