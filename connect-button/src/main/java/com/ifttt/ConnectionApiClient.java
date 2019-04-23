@@ -27,10 +27,10 @@ public final class ConnectionApiClient {
     private final ConnectionApi connectionApi;
     private final TokenInterceptor tokenInterceptor;
 
-    private ConnectionApiClient(RetrofitIftttApi retrofitIftttApi, JsonAdapter<ErrorResponse> errorResponseJsonAdapter,
+    private ConnectionApiClient(RetrofitConnectionApi retrofitConnectionApi, JsonAdapter<ErrorResponse> errorResponseJsonAdapter,
             TokenInterceptor tokenInterceptor) {
         this.tokenInterceptor = tokenInterceptor;
-        connectionApi = new ConnectionApiImpl(retrofitIftttApi, errorResponseJsonAdapter);
+        connectionApi = new ConnectionApiImpl(retrofitConnectionApi, errorResponseJsonAdapter);
     }
 
     /**
@@ -113,40 +113,40 @@ public final class ConnectionApiClient {
                     .client(okHttpClient)
                     .build();
 
-            RetrofitIftttApi retrofitIftttApi = retrofit.create(RetrofitIftttApi.class);
+            RetrofitConnectionApi retrofitConnectionApi = retrofit.create(RetrofitConnectionApi.class);
 
-            return new ConnectionApiClient(retrofitIftttApi, errorResponseJsonAdapter, tokenInterceptor);
+            return new ConnectionApiClient(retrofitConnectionApi, errorResponseJsonAdapter, tokenInterceptor);
         }
     }
 
     private static final class ConnectionApiImpl implements ConnectionApi {
 
-        private final RetrofitIftttApi retrofitIftttApi;
+        private final RetrofitConnectionApi retrofitConnectionApi;
         private final JsonAdapter<ErrorResponse> errorResponseJsonAdapter;
 
-        ConnectionApiImpl(RetrofitIftttApi retrofitIftttApi, JsonAdapter<ErrorResponse> errorResponseJsonAdapter) {
-            this.retrofitIftttApi = retrofitIftttApi;
+        ConnectionApiImpl(RetrofitConnectionApi retrofitConnectionApi, JsonAdapter<ErrorResponse> errorResponseJsonAdapter) {
+            this.retrofitConnectionApi = retrofitConnectionApi;
             this.errorResponseJsonAdapter = errorResponseJsonAdapter;
         }
 
         @Override
         public PendingResult<Connection> showConnection(String id) {
-            return new ApiPendingResult<>(retrofitIftttApi.showConnection(id), errorResponseJsonAdapter);
+            return new ApiPendingResult<>(retrofitConnectionApi.showConnection(id), errorResponseJsonAdapter);
         }
 
         @Override
         public PendingResult<Connection> disableConnection(String id) {
-            return new ApiPendingResult<>(retrofitIftttApi.disableConnection(id), errorResponseJsonAdapter);
+            return new ApiPendingResult<>(retrofitConnectionApi.disableConnection(id), errorResponseJsonAdapter);
         }
 
         @Override
         public PendingResult<User> user() {
-            return new ApiPendingResult<>(retrofitIftttApi.user(), errorResponseJsonAdapter);
+            return new ApiPendingResult<>(retrofitConnectionApi.user(), errorResponseJsonAdapter);
         }
 
         @Override
         public PendingResult<String> userToken(String oAuthToken, String userId, String serviceKey) {
-            return new ApiPendingResult<>(retrofitIftttApi.getUserToken(oAuthToken, userId, serviceKey),
+            return new ApiPendingResult<>(retrofitConnectionApi.getUserToken(oAuthToken, userId, serviceKey),
                     errorResponseJsonAdapter);
         }
     }

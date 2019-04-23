@@ -12,7 +12,7 @@ import retrofit2.http.Query;
 /**
  * Connection API endpoints.
  */
-interface RetrofitIftttApi {
+interface RetrofitConnectionApi {
 
     @GET("/v2/connections/{id}")
     Call<Connection> showConnection(@Path("id") String id);
