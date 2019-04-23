@@ -1,10 +1,9 @@
 package com.ifttt.ui;
 
 import com.ifttt.ErrorResponse;
-import com.ifttt.ui.IftttConnectButton.ButtonState;
 
 /**
- * Callback interface for listening to state changes of the {@link IftttConnectButton}.
+ * Callback interface for listening to state changes of the {@link BaseConnectButton}.
  */
 public interface ButtonStateChangeListener {
     /**
@@ -13,7 +12,7 @@ public interface ButtonStateChangeListener {
      * @param currentState Current state of the button.
      * @param previousState Previous state of the button.
      */
-    void onStateChanged(ButtonState currentState, ButtonState previousState);
+    void onStateChanged(ConnectButtonState currentState, ConnectButtonState previousState);
 
     /**
      * Called when the button state change encounters an errorResponse.

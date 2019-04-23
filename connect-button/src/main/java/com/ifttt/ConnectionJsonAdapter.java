@@ -1,6 +1,6 @@
 package com.ifttt;
 
-import com.ifttt.api.IftttApi;
+import com.ifttt.api.ConnectionApi;
 import com.squareup.moshi.FromJson;
 import com.squareup.moshi.JsonWriter;
 import com.squareup.moshi.ToJson;
@@ -10,7 +10,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 /**
- * JSON adapter for single Connection object from {@link IftttApi#showConnection(String)}.
+ * JSON adapter for single Connection object from {@link ConnectionApi#showConnection(String)}.
  */
 final class ConnectionJsonAdapter {
 

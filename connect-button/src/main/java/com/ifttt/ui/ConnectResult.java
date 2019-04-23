@@ -5,7 +5,7 @@ import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 import androidx.annotation.VisibleForTesting;
-import com.ifttt.IftttApiClient;
+import com.ifttt.ConnectionApiClient;
 import javax.annotation.Nullable;
 
 import static com.ifttt.ui.ConnectResult.NextStep.Complete;
@@ -16,10 +16,10 @@ import static com.ifttt.ui.ConnectResult.NextStep.Unknown;
  * Data structure for Connection enable flow status from the web view. To get an instance, use
  * {@link ConnectResult#fromIntent(Intent)} on your deep link handler Activity.
  *
- * An instance of the class is used to communicate to an {@link IftttConnectButton} instance, so that the View can
+ * An instance of the class is used to communicate to an {@link BaseConnectButton} instance, so that the View can
  * properly display the Connection status to your users.
  *
- * @see IftttConnectButton#setConnectResult(ConnectResult)
+ * @see BaseConnectButton#setConnectResult(ConnectResult)
  */
 public final class ConnectResult implements Parcelable {
 
@@ -50,14 +50,14 @@ public final class ConnectResult implements Parcelable {
     }
 
     /**
-     * Status for {@link IftttConnectButton}. It is used to help the View reflect the current status
+     * Status for {@link BaseConnectButton}. It is used to help the View reflect the current status
      * of the Connection enable flow and show guidance to users.
      */
     public final NextStep nextStep;
 
     /**
      * Additional information when {@link #nextStep} is {@link NextStep#Complete}. This is used to authenticate API
-     * calls in {@link IftttApiClient}.
+     * calls in {@link ConnectionApiClient}.
      */
     @Nullable public final String userToken;
 
@@ -79,7 +79,7 @@ public final class ConnectResult implements Parcelable {
      * Retrieve an instance of {@link ConnectResult} from a deep link Intent.
      *
      * @param intent Intent object that should come from your deep link handler Activity.
-     * @return An instance of ConnectResult that can be used in setting up {@link IftttConnectButton}.
+     * @return An instance of ConnectResult that can be used in setting up {@link BaseConnectButton}.
      */
     public static ConnectResult fromIntent(Intent intent) {
         Uri data = intent.getData();

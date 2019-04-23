@@ -14,6 +14,7 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.SpannableString;
@@ -42,8 +43,8 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LifecycleRegistry;
 import androidx.lifecycle.OnLifecycleEvent;
 import com.ifttt.Connection;
+import com.ifttt.ConnectionApiClient;
 import com.ifttt.ErrorResponse;
-import com.ifttt.IftttApiClient;
 import com.ifttt.R;
 import com.ifttt.Service;
 import com.ifttt.api.PendingResult;
@@ -58,6 +59,12 @@ import static androidx.lifecycle.Lifecycle.State.CREATED;
 import static androidx.lifecycle.Lifecycle.State.DESTROYED;
 import static androidx.lifecycle.Lifecycle.State.STARTED;
 import static com.ifttt.Connection.Status.enabled;
+import static com.ifttt.ui.ConnectButtonState.CreateAccount;
+import static com.ifttt.ui.ConnectButtonState.Disabled;
+import static com.ifttt.ui.ConnectButtonState.Enabled;
+import static com.ifttt.ui.ConnectButtonState.Initial;
+import static com.ifttt.ui.ConnectButtonState.Login;
+import static com.ifttt.ui.ConnectButtonState.ServiceAuthentication;
 import static com.ifttt.ui.ButtonUiHelper.adjustPadding;
 import static com.ifttt.ui.ButtonUiHelper.buildButtonBackground;
 import static com.ifttt.ui.ButtonUiHelper.findWorksWithService;
@@ -65,53 +72,11 @@ import static com.ifttt.ui.ButtonUiHelper.getDarkerColor;
 import static com.ifttt.ui.ButtonUiHelper.replaceKeyWithImage;
 import static com.ifttt.ui.ButtonUiHelper.setTextSwitcherTextColor;
 import static com.ifttt.ui.CheckMarkDrawable.AnimatorType.ENABLE;
-import static com.ifttt.ui.IftttConnectButton.ButtonState.CreateAccount;
-import static com.ifttt.ui.IftttConnectButton.ButtonState.Disabled;
-import static com.ifttt.ui.IftttConnectButton.ButtonState.Enabled;
-import static com.ifttt.ui.IftttConnectButton.ButtonState.Initial;
-import static com.ifttt.ui.IftttConnectButton.ButtonState.Login;
-import static com.ifttt.ui.IftttConnectButton.ButtonState.ServiceAuthentication;
 
 /**
- *
+ * Internal implementation of a Connect Button widget, all of the states and transitions are implemented here.
  */
-public final class IftttConnectButton extends LinearLayout implements LifecycleOwner {
-
-    public enum ButtonState {
-        /**
-         * A button state for displaying an Connection in its initial state, the user has never authenticated this Connection
-         * before.
-         */
-        Initial,
-
-        /**
-         * A button state for the create account authentication step. In this step, the user is going to be redirected
-         * to web to create an account and continue with service connection.
-         */
-        CreateAccount,
-
-        /**
-         * A button state for the login authentication step. In this step, the user is going to be redirected to web
-         * to login to IFTTT.
-         */
-        Login,
-
-        /**
-         * A button state for service connection step. In this step, the user is going to be redirected to web to
-         * login to the service and connect to IFTTT.
-         */
-        ServiceAuthentication,
-
-        /**
-         * A button state for displaying a Connection that is enabled.
-         */
-        Enabled,
-
-        /**
-         * A button stat efor displaying a Connection that is disabled.
-         */
-        Disabled
-    }
+final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
     private static final ErrorResponse UNKNOWN_STATE = new ErrorResponse("unknown_state", "Cannot verify Button state");
 
@@ -141,14 +106,13 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
     private final LifecycleRegistry lifecycleRegistry;
     private final AnimatorLifecycleObserver animatorLifecycleObserver = new AnimatorLifecycleObserver();
 
-    private ButtonState buttonState = Initial;
+    private ConnectButtonState buttonState = Initial;
     private Connection connection;
     private Service worksWithService;
 
     @Nullable private ButtonStateChangeListener buttonStateChangeListener;
     @Nullable private Application.ActivityLifecycleCallbacks activityLifecycleCallbacks;
     private ButtonApiHelper buttonApiHelper;
-    private String ownerServiceId;
 
     // Toggle drag events.
     private ViewDragHelper viewDragHelper;
@@ -159,15 +123,15 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
     @Nullable private Call ongoingImageCall;
     @Nullable private Runnable resetTextRunnable;
 
-    public IftttConnectButton(Context context) {
+    public BaseConnectButton(Context context) {
         this(context, null);
     }
 
-    public IftttConnectButton(Context context, @Nullable AttributeSet attrs) {
+    public BaseConnectButton(Context context, @Nullable AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public IftttConnectButton(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public BaseConnectButton(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
         setOrientation(VERTICAL);
@@ -236,51 +200,40 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         return lifecycleRegistry;
     }
 
-    /**
-     * Clear the footer text. This should only be used internally, coordinating with {@link SimpleConnectButton}.
-     */
-    void resetFooterText() {
-        helperTxt.setCurrentText(null);
+    void setErrorMessage(CharSequence text, OnClickListener listener) {
+        float currentAlpha = helperTxt.getAlpha();
+        helperTxt.setText(text);
+        helperTxt.setAlpha(1f);
+        helperTxt.setOnClickListener(v -> {
+            listener.onClick(v);
+
+            // Revert back to the original text.
+            helperTxt.setOnClickListener(null);
+            helperTxt.setText(worksWithIfttt);
+            helperTxt.setAlpha(currentAlpha);
+        });
     }
 
     /**
-     * Enable the Connect Button's Connection authentication and configuration features with an {@link IftttApiClient}
+     * Enable the Connect Button's Connection authentication and configuration features with an {@link ConnectionApiClient}
      * instance and a user email.
      *
      * Note:
-     * - The redirect URI must be set for the {@link IftttApiClient} instance here.
+     * - The redirect URI must be set for the {@link ConnectionApiClient} instance here.
      * - User email is a required parameter, the Button will crash if the value is not a valid email in DEBUG build.
      *
-     * @param iftttApiClient IftttApiClient instance.
+     * @param connectionApiClient ConnectionApiClient instance.
      * @param email This is used to pre-fill the email EditText when the user is doing Connection authentication.
-     * @param ownerServiceId The id of the service that this Connect Button is used for. To ensure the Connection flow
-     * works with your IFTTT user token, you should make sure the Connection that you are embedding is owned by your
-     * service.
-     * @param redirectUri URL string that will be used when the Connection authentication flow is completed on web view, in
+     * @param redirectUri Uri that will be used when the Connection authentication flow is completed on web view, in
      * order to return the result to the app.
-     * @param oAuthCodeProvider OAuthCodeProvider implementation that returns your user's OAuth code. The code will be
+     * @param credentialsProvider CredentialsProvider implementation that returns your user's OAuth code. The code will be
      * used to automatically connect your service on IFTTT for this user.
+     * @param inviteCode Optional invite code to access an IFTTT service that has not yet published.
      */
-    public void setup(String email, String ownerServiceId, IftttApiClient iftttApiClient, String redirectUri,
-            OAuthCodeProvider oAuthCodeProvider) {
-        if (ButtonUiHelper.isEmailInvalid(email)) {
-            // Crash in debug build to inform developers.
-            throw new IllegalStateException(email
-                    + " is not a valid email address, please make sure you pass in a valid user email string to set up IftttConnectButton.");
-        }
-
-        if (oAuthCodeProvider == null) {
-            throw new IllegalStateException("OAuth token provider cannot be null.");
-        }
-
-        if (ownerServiceId == null) {
-            throw new IllegalStateException("Owner service id cannot be null.");
-        }
-
-        this.ownerServiceId = ownerServiceId;
+    void setup(String email, ConnectionApiClient connectionApiClient, Uri redirectUri,
+            CredentialsProvider credentialsProvider, @Nullable String inviteCode) {
         buttonApiHelper =
-                new ButtonApiHelper(iftttApiClient, redirectUri, iftttApiClient.getInviteCode(), oAuthCodeProvider,
-                        getLifecycle());
+                new ButtonApiHelper(connectionApiClient, redirectUri, inviteCode, credentialsProvider, getLifecycle());
         emailEdt.setText(email);
     }
 
@@ -290,7 +243,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
      *
      * @param onDarkBackground True if the button is used in a dark background, false otherwise.
      */
-    public void setOnDarkBackground(boolean onDarkBackground) {
+    void setOnDarkBackground(boolean onDarkBackground) {
         this.onDarkBackground = onDarkBackground;
 
         TextView currentHelperTextView = (TextView) helperTxt.getCurrentView();
@@ -324,7 +277,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
     /**
      * Set a listener to be notified when the button's state has changed.
      */
-    public void setButtonStateChangeListener(ButtonStateChangeListener listener) {
+    void setButtonStateChangeListener(ButtonStateChangeListener listener) {
         buttonStateChangeListener = listener;
     }
 
@@ -334,7 +287,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
      *
      * @param result Authentication flow redirect result from the web view.
      */
-    public void setConnectResult(ConnectResult result) {
+    void setConnectResult(ConnectResult result) {
         if (activityLifecycleCallbacks != null) {
             // Unregister existing ActivityLifecycleCallbacks and let the AuthenticationResult handle the button
             // state change.
@@ -376,13 +329,9 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
      *
      * @param connection Connection instance to be displayed.
      */
-    public void setConnection(Connection connection) {
+    void setConnection(Connection connection) {
         if (buttonApiHelper == null) {
             throw new IllegalStateException("Connect Button is not set up, please call setup() first.");
-        }
-
-        if (!connection.getPrimaryService().id.equals(ownerServiceId)) {
-            throw new IllegalStateException("The Connection is not owned by " + ownerServiceId);
         }
 
         if (resetTextRunnable != null) {
@@ -483,7 +432,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
             }
 
             helperTxt.setOnClickListener(
-                    v -> getContext().startActivity(IftttAboutActivity.intent(getContext(), connection)));
+                    v -> getContext().startActivity(AboutIftttActivity.intent(getContext(), connection)));
 
             OnClickListener onClickListener = v -> {
                 buttonRoot.setOnClickListener(null);
@@ -876,7 +825,7 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
         connectStateTxt.setAlpha(1 - fadeOutProgress);
     }
 
-    private void dispatchState(ButtonState newState) {
+    private void dispatchState(ConnectButtonState newState) {
         if (buttonStateChangeListener != null && newState != buttonState) {
             buttonStateChangeListener.onStateChanged(newState, buttonState);
         }
@@ -1125,18 +1074,18 @@ public final class IftttConnectButton extends LinearLayout implements LifecycleO
 
     private static final class SavedState implements Parcelable {
         @Nullable final Parcelable superState;
-        final ButtonState buttonState;
+        final ConnectButtonState buttonState;
         final Connection connection;
 
-        SavedState(@Nullable Parcelable superState, ButtonState buttonState, Connection connection) {
+        SavedState(@Nullable Parcelable superState, ConnectButtonState buttonState, Connection connection) {
             this.superState = superState;
             this.buttonState = buttonState;
             this.connection = connection;
         }
 
         protected SavedState(Parcel in) {
-            superState = in.readParcelable(IftttConnectButton.class.getClassLoader());
-            buttonState = (ButtonState) in.readSerializable();
+            superState = in.readParcelable(BaseConnectButton.class.getClassLoader());
+            buttonState = (ConnectButtonState) in.readSerializable();
             connection = in.readParcelable(Connection.class.getClassLoader());
         }
 

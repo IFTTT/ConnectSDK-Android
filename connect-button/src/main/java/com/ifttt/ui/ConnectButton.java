@@ -4,19 +4,17 @@ import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
-import android.widget.TextSwitcher;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.core.text.HtmlCompat;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
@@ -24,46 +22,39 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LifecycleRegistry;
 import androidx.lifecycle.OnLifecycleEvent;
 import com.ifttt.Connection;
+import com.ifttt.ConnectionApiClient;
 import com.ifttt.ErrorResponse;
-import com.ifttt.IftttApiClient;
 import com.ifttt.R;
 import com.ifttt.api.PendingResult;
 
 import static android.animation.ValueAnimator.INFINITE;
 import static androidx.core.text.HtmlCompat.FROM_HTML_MODE_COMPACT;
-import static com.ifttt.ui.ButtonUiHelper.replaceKeyWithImage;
 
 /**
- * A wrapper of a {@link IftttConnectButton} that provides some default configurations. Users of this class only need to
- * provide a {@link Callback} instance, as well as the Connection id, and this view will handle both the loading state and
- * other UI states accordingly.
+ *
  */
-public final class SimpleConnectButton extends FrameLayout implements LifecycleOwner {
+public class ConnectButton extends FrameLayout implements LifecycleOwner {
 
     private static final long ANIM_DURATION = 1000L;
-    private static IftttApiClient API_CLIENT;
+    private static ConnectionApiClient API_CLIENT;
 
-    private final IftttConnectButton connectButton;
+    private final BaseConnectButton connectButton;
     private final TextView loadingView;
-    private final TextSwitcher statusTextSwitcher;
 
-    private Callback callback;
+    private CredentialsProvider credentialsProvider;
     private Connection connection;
-
-    private final CharSequence worksWithIfttt;
-    private final Drawable iftttLogo;
 
     private final LifecycleRegistry lifecycleRegistry = new LifecycleRegistry(this);
 
-    public SimpleConnectButton(@NonNull Context context) {
+    public ConnectButton(@NonNull Context context) {
         this(context, null);
     }
 
-    public SimpleConnectButton(@NonNull Context context, @Nullable AttributeSet attrs) {
+    public ConnectButton(@NonNull Context context, @Nullable AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public SimpleConnectButton(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public ConnectButton(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
         lifecycleRegistry.markState(Lifecycle.State.CREATED);
@@ -71,50 +62,63 @@ public final class SimpleConnectButton extends FrameLayout implements LifecycleO
         inflate(context, R.layout.view_ifttt_simple_connect_button, this);
         connectButton = findViewById(R.id.ifttt_connect_button);
         loadingView = findViewById(R.id.ifttt_loading_view);
-        statusTextSwitcher = findViewById(R.id.ifttt_status_text);
-
-        iftttLogo = ContextCompat.getDrawable(getContext(), R.drawable.ic_ifttt_logo_black).mutate();
-        iftttLogo.setAlpha((int) (0.3f * 255));
-        worksWithIfttt = new SpannableString(replaceKeyWithImage((TextView) statusTextSwitcher.getCurrentView(),
-                context.getString(R.string.ifttt_powered_by_ifttt), "IFTTT", iftttLogo));
     }
 
     /**
      * Set up the Connect Button to fetch the Connection data with the given id and set up the View to be able to do
      * authentication.
      *
-     * @param connectionId ID of the Connection that you want to show on this View.
-     * @param email This is used to pre-fill the email EditText when the user is doing Connection authentication.
-     * @param ownerServiceId The id of the service that this Connect Button is used for. To ensure the Connection flow
-     * works with your IFTTT user token, you should make sure the Connection that you are embedding is owned by your
-     * service.
-     * @param redirectUri string that will be used when the Connection authentication flow is completed on web view, in
-     * * order to return the result to the app.
-     * @param callback A callback that supports Connection authentication as well as provide Connection data when the
-     * fetch is successful.
+     * @param configuration Configuration object that helps set up the Connect Button.
      */
-    public void setup(String connectionId, String email, String ownerServiceId, String redirectUri, Callback callback) {
-        this.callback = callback;
+    public void setup(Configuration configuration) {
+        ConnectionApiClient clientToUse;
+        if (configuration.connectionApiClient == null) {
+            if (API_CLIENT == null) {
+                ConnectionApiClient.Builder clientBuilder = new ConnectionApiClient.Builder(getContext());
+                if (configuration.inviteCode != null) {
+                    clientBuilder.setInviteCode(configuration.inviteCode);
+                }
+                API_CLIENT = clientBuilder.build();
+            }
 
-        if (API_CLIENT == null) {
-            API_CLIENT = new IftttApiClient.Builder(getContext()).build();
+            clientToUse = API_CLIENT;
+        } else {
+            clientToUse = configuration.connectionApiClient;
         }
 
-        connectButton.setup(email, ownerServiceId, API_CLIENT, redirectUri, callback::getOAuthCode);
-        connectButton.resetFooterText();
+        credentialsProvider = configuration.credentialsProvider;
+        connectButton.setup(configuration.suggestedUserEmail, clientToUse, configuration.connectRedirectUri,
+                configuration.credentialsProvider, configuration.inviteCode);
 
         pulseLoading();
-        UserTokenAsyncTask task = new UserTokenAsyncTask(callback, () -> {
-            PendingResult<Connection> pendingResult = API_CLIENT.api().showConnection(connectionId);
+        UserTokenAsyncTask task = new UserTokenAsyncTask(credentialsProvider, () -> {
+            if (configuration.connection != null) {
+                connection = configuration.connection;
+                if (configuration.listener != null) {
+                    configuration.listener.onFetchConnectionSuccessful(connection);
+                }
+
+                connectButton.setConnection(connection);
+                loadingView.setVisibility(GONE);
+                ((Animator) loadingView.getTag()).cancel();
+                return;
+            }
+
+            if (configuration.connectionId == null) {
+                throw new IllegalStateException("Connection id cannot be null.");
+            }
+
+            PendingResult<Connection> pendingResult = API_CLIENT.api().showConnection(configuration.connectionId);
             pendingResult.execute(new PendingResult.ResultCallback<Connection>() {
                 @Override
                 public void onSuccess(Connection result) {
                     connection = result;
-                    callback.onFetchConnectionSuccessful(result);
+                    if (configuration.listener != null) {
+                        configuration.listener.onFetchConnectionSuccessful(result);
+                    }
 
                     connectButton.setConnection(result);
                     loadingView.setVisibility(GONE);
-                    statusTextSwitcher.setVisibility(GONE);
                     ((Animator) loadingView.getTag()).cancel();
                 }
 
@@ -128,14 +132,11 @@ public final class SimpleConnectButton extends FrameLayout implements LifecycleO
                             new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.ifttt_error_red)), 0,
                             errorText.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-                    statusTextSwitcher.setText(errorSpan);
-                    statusTextSwitcher.setOnClickListener(v -> {
-                        PendingResult<Connection> pendingResult = API_CLIENT.api().showConnection(connectionId);
+                    connectButton.setErrorMessage(errorSpan, v -> {
+                        PendingResult<Connection> pendingResult =
+                                API_CLIENT.api().showConnection(configuration.connectionId);
                         pendingResult.execute(this);
                         lifecycleRegistry.addObserver(new PendingResultLifecycleObserver<>(pendingResult));
-
-                        statusTextSwitcher.setClickable(false);
-                        statusTextSwitcher.setText(worksWithIfttt);
                     });
                 }
             });
@@ -144,13 +145,11 @@ public final class SimpleConnectButton extends FrameLayout implements LifecycleO
         });
         task.execute();
         lifecycleRegistry.addObserver(new AsyncTaskObserver(task));
-
-        statusTextSwitcher.setCurrentText(worksWithIfttt);
     }
 
     /**
      * If the button is used in a dark background, set this flag to true so that the button can adapt the UI. This
-     * method must be called before {@link IftttConnectButton#setConnection(Connection)} to apply the change.
+     * method must be called before {@link BaseConnectButton#setConnection(Connection)} to apply the change.
      *
      * @param onDarkBackground True if the button is used in a dark background, false otherwise.
      */
@@ -161,25 +160,6 @@ public final class SimpleConnectButton extends FrameLayout implements LifecycleO
             loadingView.setBackgroundResource(R.drawable.button_background_default);
         }
         connectButton.setOnDarkBackground(onDarkBackground);
-
-        TextView currentHelperTextView = (TextView) statusTextSwitcher.getCurrentView();
-        TextView nextHelperTextView = (TextView) statusTextSwitcher.getNextView();
-
-        if (onDarkBackground) {
-            int semiTransparentWhite = ContextCompat.getColor(getContext(), R.color.ifttt_footer_text_white);
-            currentHelperTextView.setTextColor(semiTransparentWhite);
-            nextHelperTextView.setTextColor(semiTransparentWhite);
-
-            // Tint the logo Drawable within the text to white.
-            DrawableCompat.setTint(DrawableCompat.wrap(iftttLogo), Color.WHITE);
-        } else {
-            int semiTransparentBlack = ContextCompat.getColor(getContext(), R.color.ifttt_footer_text_black);
-            currentHelperTextView.setTextColor(semiTransparentBlack);
-            nextHelperTextView.setTextColor(semiTransparentBlack);
-
-            // Tint the logo Drawable within the text to black.
-            DrawableCompat.setTint(DrawableCompat.wrap(iftttLogo), Color.BLACK);
-        }
     }
 
     /**
@@ -196,7 +176,7 @@ public final class SimpleConnectButton extends FrameLayout implements LifecycleO
      * @param result Authentication flow redirect result from the web view.
      */
     public void setConnectResult(ConnectResult result) {
-        if (connection == null || callback == null) {
+        if (connection == null || credentialsProvider == null) {
             return;
         }
 
@@ -207,7 +187,7 @@ public final class SimpleConnectButton extends FrameLayout implements LifecycleO
                 API_CLIENT.setUserToken(result.userToken);
                 refreshConnection();
             } else {
-                UserTokenAsyncTask task = new UserTokenAsyncTask(callback, this::refreshConnection);
+                UserTokenAsyncTask task = new UserTokenAsyncTask(credentialsProvider, this::refreshConnection);
                 task.execute();
                 lifecycleRegistry.addObserver(new AsyncTaskObserver(task));
             }
@@ -262,23 +242,9 @@ public final class SimpleConnectButton extends FrameLayout implements LifecycleO
 
     /**
      * Configuration interface for this class. It provides all of the necessary information for the
-     * {@link IftttConnectButton} to render UI, handle different states and perform API calls.
+     * {@link BaseConnectButton} to render UI, handle different states and perform API calls.
      */
-    public interface Callback {
-        /**
-         * @return An IFTTT user token for this user. This token is going to be used to set up the {@link IftttApiClient}
-         * to fetch Connection data with regard to this user.
-         */
-        @Nullable
-        String getUserToken();
-
-        /**
-         * @return Your service's OAuth code. The OAuth code will be used to automatically authenticate user to your
-         * service on IFTTT platform.
-         * @see IftttConnectButton#setup(String, String, IftttApiClient, String, OAuthCodeProvider).
-         */
-        String getOAuthCode();
-
+    public interface OnFetchConnectionListener {
         /**
          * Called when the request to fetch a {@link Connection} data is successful.
          *
@@ -287,16 +253,105 @@ public final class SimpleConnectButton extends FrameLayout implements LifecycleO
         void onFetchConnectionSuccessful(Connection connection);
     }
 
+    public static final class Configuration {
+
+        private final String suggestedUserEmail;
+        private final CredentialsProvider credentialsProvider;
+        private final Uri connectRedirectUri;
+
+        @Nullable private final ConnectionApiClient connectionApiClient;
+        @Nullable private String connectionId;
+        @Nullable private Connection connection;
+        @Nullable private OnFetchConnectionListener listener;
+        @Nullable private String inviteCode;
+
+        public static final class Builder {
+            private final String suggestedUserEmail;
+            private final CredentialsProvider credentialsProvider;
+            private final Uri connectRedirectUri;
+            @Nullable private ConnectionApiClient connectionApiClient;
+
+            @Nullable private String connectionId;
+            @Nullable private OnFetchConnectionListener listener;
+            @Nullable private Connection connection;
+            @Nullable private String inviteCode;
+
+            public static Builder withConnection(Connection connection, String suggestedUserEmail,
+                    CredentialsProvider credentialsProvider, Uri connectRedirectUri) {
+                if (ButtonUiHelper.isEmailInvalid(suggestedUserEmail)) {
+                    throw new IllegalStateException(suggestedUserEmail + " is not a valid email address.");
+                }
+
+                Builder builder = new Builder(suggestedUserEmail, credentialsProvider, connectRedirectUri);
+                builder.connection = connection;
+                return builder;
+            }
+
+            public static Builder withConnectionId(String connectionId, String suggestedUserEmail,
+                    CredentialsProvider credentialsProvider, Uri connectRedirectUri,
+                    @Nullable OnFetchConnectionListener onFetchConnectionListener) {
+                if (ButtonUiHelper.isEmailInvalid(suggestedUserEmail)) {
+                    throw new IllegalStateException(suggestedUserEmail + " is not a valid email address.");
+                }
+
+                Builder builder = new Builder(suggestedUserEmail, credentialsProvider, connectRedirectUri);
+                builder.connectionId = connectionId;
+                builder.listener = onFetchConnectionListener;
+                return builder;
+            }
+
+            private Builder(String suggestedUserEmail, CredentialsProvider credentialsProvider,
+                    Uri connectRedirectUri) {
+                this.suggestedUserEmail = suggestedUserEmail;
+                this.credentialsProvider = credentialsProvider;
+                this.connectRedirectUri = connectRedirectUri;
+            }
+
+            public Builder setConnectionApiClient(ConnectionApiClient connectionApiClient) {
+                this.connectionApiClient = connectionApiClient;
+                return this;
+            }
+
+            public Builder setInviteCode(String inviteCode) {
+                this.inviteCode = inviteCode;
+                return this;
+            }
+
+            public Configuration build() {
+                if (connection == null && connectionId == null) {
+                    throw new IllegalStateException("Either connection or connectionId must be non-null.");
+                }
+
+                Configuration configuration =
+                        new Configuration(suggestedUserEmail, credentialsProvider, connectRedirectUri,
+                                connectionApiClient);
+                configuration.connection = connection;
+                configuration.connectionId = connectionId;
+                configuration.listener = listener;
+                configuration.inviteCode = inviteCode;
+                return configuration;
+            }
+        }
+
+        private Configuration(String suggestedUserEmail, CredentialsProvider credentialsProvider,
+                Uri connectRedirectUri, @Nullable ConnectionApiClient connectionApiClient) {
+            this.suggestedUserEmail = suggestedUserEmail;
+            this.credentialsProvider = credentialsProvider;
+            this.connectRedirectUri = connectRedirectUri;
+            this.connectionApiClient = connectionApiClient;
+        }
+    }
+
     private static final class UserTokenAsyncTask extends android.os.AsyncTask<Void, Void, String> {
 
         private interface UserTokenCallback {
             void onUserTokenSet();
         }
 
-        private final SimpleConnectButton.Callback callback;
+        private final CredentialsProvider callback;
         private final UserTokenCallback userTokenCallback;
 
-        private UserTokenAsyncTask(SimpleConnectButton.Callback callback, UserTokenCallback userTokenCallback) {
+        private UserTokenAsyncTask(CredentialsProvider callback, UserTokenCallback userTokenCallback) {
             this.callback = callback;
             this.userTokenCallback = userTokenCallback;
         }

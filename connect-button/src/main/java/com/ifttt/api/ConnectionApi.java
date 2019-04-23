@@ -1,16 +1,16 @@
 package com.ifttt.api;
 
 import com.ifttt.Connection;
-import com.ifttt.IftttApiClient;
+import com.ifttt.ConnectionApiClient;
 import com.ifttt.User;
 
 /**
- * IFTTT API wrapper interface. You may use the instance from {@link IftttApiClient#api()} to make API calls
+ * IFTTT API wrapper interface. You may use the instance from {@link ConnectionApiClient#api()} to make API calls
  * asynchronously.
  *
- * @see IftttApiClient#api()
+ * @see ConnectionApiClient#api()
  */
-public interface IftttApi {
+public interface ConnectionApi {
 
     /**
      * API for fetching a Connection's metadata.
@@ -30,7 +30,7 @@ public interface IftttApi {
 
     /**
      * API for retrieving information about the IFTTT user, as well as the authentication level of the current
-     * IftttApiClient.
+     * ConnectionApiClient.
      *
      * @return A {@link PendingResult} for the API call execution.
      */
