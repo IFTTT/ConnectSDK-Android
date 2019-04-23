@@ -96,7 +96,7 @@ public class YourActivity extends Activity {
 For more information about the user token used in `CredentialProvider`, please see [Advanced](https://github.com/IFTTT/IFTTTSDK-Android-v2#Advanced) authentication section.
 
 ### Listen to Connection status
-ConnectButton helps initiate connection enable flows for users, which involve opening web views within your app. Currently, we are using [Chrome Custom Tabs](https://developer.chrome.com/multidevice/android/customtabs](https://developer.chrome.com/multidevice/android/customtabs) for the web views. 
+ConnectButton helps initiate connection enable flows for users, which involve opening web views within your app. Currently, we are using [Chrome Custom Tabs](https://developer.chrome.com/multidevice/android/customtabs) for the web views. 
 
 During the flow, the web view will redirect back to your app using the Uri that you pass in to the `Configuration` object when setting up the ConnectButton. To set up the redirect, in your AndroidManifest.xml, 
 
