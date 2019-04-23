@@ -24,13 +24,11 @@ import retrofit2.converter.moshi.MoshiConverterFactory;
  */
 public final class ConnectionApiClient {
 
-    @Nullable private final String inviteCode;
     private final ConnectionApi connectionApi;
     private final TokenInterceptor tokenInterceptor;
 
-    private ConnectionApiClient(@Nullable String inviteCode, RetrofitIftttApi retrofitIftttApi,
-            JsonAdapter<ErrorResponse> errorResponseJsonAdapter, TokenInterceptor tokenInterceptor) {
-        this.inviteCode = inviteCode;
+    private ConnectionApiClient(RetrofitIftttApi retrofitIftttApi, JsonAdapter<ErrorResponse> errorResponseJsonAdapter,
+            TokenInterceptor tokenInterceptor) {
         this.tokenInterceptor = tokenInterceptor;
         connectionApi = new ConnectionApiImpl(retrofitIftttApi, errorResponseJsonAdapter);
     }
@@ -40,14 +38,6 @@ public final class ConnectionApiClient {
      */
     public ConnectionApi api() {
         return connectionApi;
-    }
-
-    /**
-     * @return The invite code that is set through {@link Builder#setInviteCode(String)}.
-     */
-    @Nullable
-    public String getInviteCode() {
-        return inviteCode;
     }
 
     /**
@@ -125,7 +115,7 @@ public final class ConnectionApiClient {
 
             RetrofitIftttApi retrofitIftttApi = retrofit.create(RetrofitIftttApi.class);
 
-            return new ConnectionApiClient(inviteCode, retrofitIftttApi, errorResponseJsonAdapter, tokenInterceptor);
+            return new ConnectionApiClient(retrofitIftttApi, errorResponseJsonAdapter, tokenInterceptor);
         }
     }
 
