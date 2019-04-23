@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity() {
             emailPreferencesHelper.getEmail() ?: EMAIL,
             credentialsProvider
             , REDIRECT_URI
-        ) { connection ->
+        ).setOnFetchCompleteListener { connection ->
             findViewById<TextView>(R.id.connection_title).text = connection.name
         }.build()
 

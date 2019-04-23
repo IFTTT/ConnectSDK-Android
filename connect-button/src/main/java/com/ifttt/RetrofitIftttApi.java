@@ -10,7 +10,7 @@ import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 /**
- * IFTTT API endpoints.
+ * Connection API endpoints.
  */
 interface RetrofitIftttApi {
 

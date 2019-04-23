@@ -31,7 +31,8 @@ import static android.animation.ValueAnimator.INFINITE;
 import static androidx.core.text.HtmlCompat.FROM_HTML_MODE_COMPACT;
 
 /**
- *
+ * The main UI component for the Connect Button SDK. This class handles both displaying {@link Connection} status for a
+ * given user, as well as initiating a Connection enable flow.
  */
 public class ConnectButton extends FrameLayout implements LifecycleOwner {
 
@@ -253,6 +254,12 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
         void onFetchConnectionSuccessful(Connection connection);
     }
 
+    /**
+     * Configuration for a {@link ConnectButton}, it encapsulates the information needed to set up a ConnectButton
+     * instance, to enable it to
+     * - display Connection status, and
+     * - initiate Connection enable flow.
+     */
     public static final class Configuration {
 
         private final String suggestedUserEmail;
@@ -265,6 +272,9 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
         @Nullable private OnFetchConnectionListener listener;
         @Nullable private String inviteCode;
 
+        /**
+         * Builder class for constructing a Configuration object.
+         */
         public static final class Builder {
             private final String suggestedUserEmail;
             private final CredentialsProvider credentialsProvider;
@@ -276,6 +286,19 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
             @Nullable private Connection connection;
             @Nullable private String inviteCode;
 
+            /**
+             * Factory method for creating a new Configuration builder.
+             *
+             * @param connection    {@link Connection} object.
+             * @param suggestedUserEmail    Email address string provided as the suggested email for the user. Must be a
+             * valid email address.
+             * @param credentialsProvider   {@link CredentialsProvider} object that helps facilitate connection enable
+             * flow from a ConnectButton.
+             * @param connectRedirectUri    Redirect {@link Uri} object that the ConnectButton is going to use to
+             * redirect users back to your app after the connection enable flow is completed or failed.
+             *
+             * @return The Builder object itself for chaining.
+             */
             public static Builder withConnection(Connection connection, String suggestedUserEmail,
                     CredentialsProvider credentialsProvider, Uri connectRedirectUri) {
                 if (ButtonUiHelper.isEmailInvalid(suggestedUserEmail)) {
@@ -287,16 +310,28 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
                 return builder;
             }
 
+            /**
+             * Factory method for creating a new Configuration builder.
+             *
+             * @param connectionId    A Connection id that the {@link ConnectionApiClient} can use to fetch the
+             * associated Connection object.
+             * @param suggestedUserEmail    Email address string provided as the suggested email for the user. Must be a
+             * valid email address.
+             * @param credentialsProvider   {@link CredentialsProvider} object that helps facilitate connection enable
+             * flow from a ConnectButton.
+             * @param connectRedirectUri    Redirect {@link Uri} object that the ConnectButton is going to use to
+             * redirect users back to your app after the connection enable flow is completed or failed.
+             *
+             * @return The Builder object itself for chaining.
+             */
             public static Builder withConnectionId(String connectionId, String suggestedUserEmail,
-                    CredentialsProvider credentialsProvider, Uri connectRedirectUri,
-                    @Nullable OnFetchConnectionListener onFetchConnectionListener) {
+                    CredentialsProvider credentialsProvider, Uri connectRedirectUri) {
                 if (ButtonUiHelper.isEmailInvalid(suggestedUserEmail)) {
                     throw new IllegalStateException(suggestedUserEmail + " is not a valid email address.");
                 }
 
                 Builder builder = new Builder(suggestedUserEmail, credentialsProvider, connectRedirectUri);
                 builder.connectionId = connectionId;
-                builder.listener = onFetchConnectionListener;
                 return builder;
             }
 
@@ -307,11 +342,38 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
                 this.connectRedirectUri = connectRedirectUri;
             }
 
+            /**
+             * @param onFetchCompleteListener an optional {@link OnFetchConnectionListener}.
+             *
+             * Note that this callback will not be invoked if the Configuration is built through
+             * {@link #withConnection(Connection, String, CredentialsProvider, Uri)}.
+             *
+             * @return The Builder object itself for chaining.
+             */
+            public Builder setOnFetchCompleteListener(OnFetchConnectionListener onFetchCompleteListener) {
+                this.listener = onFetchCompleteListener;
+                return this;
+            }
+
+            /**
+             * @param connectionApiClient an optional {@link ConnectionApiClient} that will be used for the ConnectButton
+             * instead of the default one.
+             *
+             * @return The Builder object itself for chaining.
+             */
             public Builder setConnectionApiClient(ConnectionApiClient connectionApiClient) {
                 this.connectionApiClient = connectionApiClient;
                 return this;
             }
 
+            /**
+             * @param inviteCode an optional string as the invite code, this is needed if your service is not yet
+             * published on IFTTT Platform.
+             *
+             * @see ConnectionApiClient.Builder#setInviteCode(String)
+             *
+             * @return The Builder object itself for chaining.
+             */
             public Builder setInviteCode(String inviteCode) {
                 this.inviteCode = inviteCode;
                 return this;
