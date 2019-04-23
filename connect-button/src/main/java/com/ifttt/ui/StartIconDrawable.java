@@ -33,7 +33,7 @@ import static android.os.Build.VERSION_CODES.LOLLIPOP;
 final class StartIconDrawable extends Drawable {
 
     private static final ArgbEvaluator EVALUATOR = new ArgbEvaluator();
-    private static final int PRESSED_ALPHA = 150;
+    private static final int PRESSED_ALPHA = 200;
 
     private final ShapeDrawable background = new ShapeDrawable();
     private final Drawable serviceIcon;
