@@ -154,6 +154,8 @@ The SDK provides the basic data structure for the data returned from the Connect
 		* `enabled`: the Connection is enabled.
 		* `disabled`: the Connection is disabled.
 		* `unknown`: the ConnectionApiClient doesn't have the user token set, therefore cannot get the Connection status for the user. You should treat this status as `never_enabled`.
+	* coverImage: a set of image URLs for the cover image associated with the Connection in different dimensions.
+	* valuePropositions: a list of value propositions associated with the Connection.
     * `getPrimaryService` : a method that returns the primary service for the Connection.
 * Service: 
 	* id

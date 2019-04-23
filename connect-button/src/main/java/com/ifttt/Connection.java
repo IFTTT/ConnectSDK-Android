@@ -2,6 +2,7 @@ package com.ifttt;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import com.squareup.moshi.Json;
 import java.util.List;
 import javax.annotation.Nullable;
 
@@ -51,16 +52,22 @@ public final class Connection implements Parcelable {
     public final String url;
     public final List<Service> services;
 
+    @Nullable @Json(name = "cover_image") public final CoverImage coverImage;
+    @Json(name = "value_propositions") public final List<ValueProposition> valuePropositions;
+
     // Cached primary service object.
     @Nullable private Service primaryService;
 
-    public Connection(String id, String name, String description, Status status, String url, List<Service> services) {
+    public Connection(String id, String name, String description, Status status, String url, List<Service> services,
+            @Nullable CoverImage coverImage, List<ValueProposition> valuePropositions) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.status = status;
         this.url = url;
         this.services = services;
+        this.coverImage = coverImage;
+        this.valuePropositions = valuePropositions;
     }
 
     /**
@@ -92,6 +99,8 @@ public final class Connection implements Parcelable {
 
         url = in.readString();
         services = in.createTypedArrayList(Service.CREATOR);
+        coverImage = in.readParcelable(CoverImage.class.getClassLoader());
+        valuePropositions = in.createTypedArrayList(ValueProposition.CREATOR);
     }
 
     public static final Creator<Connection> CREATOR = new Creator<Connection>() {
@@ -112,12 +121,14 @@ public final class Connection implements Parcelable {
     }
 
     @Override
-    public void writeToParcel(Parcel parcel, int i) {
+    public void writeToParcel(Parcel parcel, int flags) {
         parcel.writeString(id);
         parcel.writeString(name);
         parcel.writeString(description);
         parcel.writeString(status.name());
         parcel.writeString(url);
         parcel.writeTypedList(services);
+        parcel.writeParcelable(coverImage, flags);
+        parcel.writeTypedList(valuePropositions);
     }
 }
