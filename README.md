@@ -205,4 +205,4 @@ After setting the user token, subsequent API calls will be user-specific:
 * `ConnectionApi#showConnection` will return Connection status for the user, whether it is `never_enabled`, `enabled` or `disabled`.
 * `ConnectionApi#disableConnection` can be used to disable a Connection. 
 
-**Note: ** by default, ConnectButton handles the user authentication automatically with the help of a `CredentialProvider`. 
+**Note:** by default, ConnectButton handles the user authentication automatically with the help of a `CredentialProvider`. 
