@@ -2,7 +2,7 @@
 
 # IFTTT Connect Button SDK for Android
 
-IFTTT Connect Button SDK is an Android library that helps facilitate the integration of the Connect Button and [Connection API](https://platform.ifttt.com/docs/connection_api).
+IFTTT Connect Button SDK is a library that helps facilitate the integration of the Connect Button and [Connection API](https://platform.ifttt.com/docs/connection_api).
 
 * [Features](https://github.com/IFTTT/IFTTTSDK-Android-v2#Features)
 * [Dependencies](https://github.com/IFTTT/IFTTTSDK-Android-v2#Dependencies)
@@ -170,7 +170,7 @@ The SDK provides the basic data structure for the data returned from the Connect
 With the instance, you can use `ConnectionApiClient#api()` to get access to the APIs for Connection data.
 ```java
 ConnectionApiClient apiClient = new ConnectionApiClient.Builder()  
-        .setInviteCode("invite_code") // Optional, only needed if your service is not yet published.
+        .setInviteCode("invite_code") // Optional, only needed if your service is not yet published on IFTTT Platform.
         .build();
 
 ConnectionApi api = apiClient.api();
