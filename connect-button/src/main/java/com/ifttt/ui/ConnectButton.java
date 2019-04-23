@@ -1,6 +1,7 @@
 package com.ifttt.ui;
 
 import android.animation.Animator;
+import android.animation.LayoutTransition;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Color;
@@ -57,6 +58,10 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
 
     public ConnectButton(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+
+        setClipToPadding(false);
+        setClipChildren(false);
+        setLayoutTransition(new LayoutTransition());
 
         lifecycleRegistry.markState(Lifecycle.State.CREATED);
 
