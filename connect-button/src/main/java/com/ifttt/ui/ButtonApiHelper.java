@@ -31,7 +31,7 @@ import static com.ifttt.ui.ConnectButtonState.ServiceAuthentication;
  */
 final class ButtonApiHelper {
 
-    private static final String SHOW_CONNECTION_API_URL = "https://web-rehearsal.ifttt.com/access/api/";
+    private static final String SHOW_CONNECTION_API_URL = "https://ifttt.com/access/api/";
     private static final String PACKAGE_NAME_IFTTT = "com.ifttt.ifttt.debug";
 
     private final ConnectionApiClient connectionApiClient;
@@ -170,8 +170,7 @@ final class ButtonApiHelper {
                 .appendQueryParameter("sdk_version", BuildConfig.VERSION_NAME)
                 .appendQueryParameter("sdk_platform", "android")
                 .appendQueryParameter("sdk_return_to", redirectUri.toString())
-                .appendQueryParameter("sdk_anonymous_id", anonymousId)
-                .appendQueryParameter("email", email);
+                .appendQueryParameter("sdk_anonymous_id", anonymousId);
 
         if (inviteCode != null) {
             builder.appendQueryParameter("invite_code", inviteCode);
@@ -197,6 +196,8 @@ final class ButtonApiHelper {
 
         if (userLogin != null) {
             builder.appendQueryParameter("username", userLogin);
+        } else {
+            builder.appendQueryParameter("email", email);
         }
 
         return builder.build();
