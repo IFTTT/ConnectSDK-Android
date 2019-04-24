@@ -1,6 +1,7 @@
 package com.ifttt.ui;
 
 import android.animation.Animator;
+import android.animation.LayoutTransition;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Color;
@@ -57,6 +58,10 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
 
     public ConnectButton(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+
+        setClipToPadding(false);
+        setClipChildren(false);
+        setLayoutTransition(new LayoutTransition());
 
         lifecycleRegistry.markState(Lifecycle.State.CREATED);
 
@@ -164,10 +169,21 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
     }
 
     /**
-     * Set a listener to be notified when the button's state has changed.
+     * Add a listener to be notified when the button's state has changed.
+     *
+     * @param listener {@link ButtonStateChangeListener} to be registered.
      */
-    public void setButtonStateChangeListener(ButtonStateChangeListener listener) {
-        connectButton.setButtonStateChangeListener(listener);
+    public void addButtonStateChangeListener(ButtonStateChangeListener listener) {
+        connectButton.addButtonStateChangeListener(listener);
+    }
+
+    /**
+     * Remove a previously registered listener.
+     *
+     * @param listener {@link ButtonStateChangeListener} to be removed.
+     */
+    public void removeButtonStateChangeListener(ButtonStateChangeListener listener) {
+        connectButton.removeButtonStateChangeListener(listener);
     }
 
     /**
@@ -181,18 +197,31 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
             return;
         }
 
-        connectButton.setConnectResult(result);
-
-        if (result.nextStep == ConnectResult.NextStep.Complete) {
-            if (result.userToken != null) {
-                API_CLIENT.setUserToken(result.userToken);
-                refreshConnection();
-            } else {
-                UserTokenAsyncTask task = new UserTokenAsyncTask(credentialsProvider, this::refreshConnection);
-                task.execute();
-                lifecycleRegistry.addObserver(new AsyncTaskObserver(task));
+        ButtonStateChangeListener listener = new ButtonStateChangeListener() {
+            @Override
+            public void onStateChanged(ConnectButtonState currentState, ConnectButtonState previousState) {
+                connectButton.removeButtonStateChangeListener(this);
+                if (currentState == ConnectButtonState.Enabled && result.nextStep == ConnectResult.NextStep.Complete) {
+                    if (result.userToken != null) {
+                        API_CLIENT.setUserToken(result.userToken);
+                        refreshConnection();
+                    } else {
+                        UserTokenAsyncTask task =
+                                new UserTokenAsyncTask(credentialsProvider, ConnectButton.this::refreshConnection);
+                        task.execute();
+                        lifecycleRegistry.addObserver(new AsyncTaskObserver(task));
+                    }
+                }
             }
-        }
+
+            @Override
+            public void onError(ErrorResponse errorResponse) {
+                // No-op.
+            }
+        };
+
+        connectButton.addButtonStateChangeListener(listener);
+        connectButton.setConnectResult(result);
     }
 
     @Override
@@ -217,8 +246,8 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
         PendingResult<Connection> pendingResult = API_CLIENT.api().showConnection(connection.id);
         pendingResult.execute(new PendingResult.ResultCallback<Connection>() {
             @Override
-            public void onSuccess(Connection result1) {
-                connectButton.setConnection(result1);
+            public void onSuccess(Connection result) {
+                connectButton.setConnection(result);
             }
 
             @Override
@@ -289,14 +318,13 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
             /**
              * Factory method for creating a new Configuration builder.
              *
-             * @param connection    {@link Connection} object.
-             * @param suggestedUserEmail    Email address string provided as the suggested email for the user. Must be a
+             * @param connection {@link Connection} object.
+             * @param suggestedUserEmail Email address string provided as the suggested email for the user. Must be a
              * valid email address.
-             * @param credentialsProvider   {@link CredentialsProvider} object that helps facilitate connection enable
+             * @param credentialsProvider {@link CredentialsProvider} object that helps facilitate connection enable
              * flow from a ConnectButton.
-             * @param connectRedirectUri    Redirect {@link Uri} object that the ConnectButton is going to use to
+             * @param connectRedirectUri Redirect {@link Uri} object that the ConnectButton is going to use to
              * redirect users back to your app after the connection enable flow is completed or failed.
-             *
              * @return The Builder object itself for chaining.
              */
             public static Builder withConnection(Connection connection, String suggestedUserEmail,
@@ -313,15 +341,14 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
             /**
              * Factory method for creating a new Configuration builder.
              *
-             * @param connectionId    A Connection id that the {@link ConnectionApiClient} can use to fetch the
+             * @param connectionId A Connection id that the {@link ConnectionApiClient} can use to fetch the
              * associated Connection object.
-             * @param suggestedUserEmail    Email address string provided as the suggested email for the user. Must be a
+             * @param suggestedUserEmail Email address string provided as the suggested email for the user. Must be a
              * valid email address.
-             * @param credentialsProvider   {@link CredentialsProvider} object that helps facilitate connection enable
+             * @param credentialsProvider {@link CredentialsProvider} object that helps facilitate connection enable
              * flow from a ConnectButton.
-             * @param connectRedirectUri    Redirect {@link Uri} object that the ConnectButton is going to use to
+             * @param connectRedirectUri Redirect {@link Uri} object that the ConnectButton is going to use to
              * redirect users back to your app after the connection enable flow is completed or failed.
-             *
              * @return The Builder object itself for chaining.
              */
             public static Builder withConnectionId(String connectionId, String suggestedUserEmail,
@@ -347,7 +374,6 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
              *
              * Note that this callback will not be invoked if the Configuration is built through
              * {@link #withConnection(Connection, String, CredentialsProvider, Uri)}.
-             *
              * @return The Builder object itself for chaining.
              */
             public Builder setOnFetchCompleteListener(OnFetchConnectionListener onFetchCompleteListener) {
@@ -358,7 +384,6 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
             /**
              * @param connectionApiClient an optional {@link ConnectionApiClient} that will be used for the ConnectButton
              * instead of the default one.
-             *
              * @return The Builder object itself for chaining.
              */
             public Builder setConnectionApiClient(ConnectionApiClient connectionApiClient) {
@@ -369,10 +394,8 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
             /**
              * @param inviteCode an optional string as the invite code, this is needed if your service is not yet
              * published on IFTTT Platform.
-             *
-             * @see ConnectionApiClient.Builder#setInviteCode(String)
-             *
              * @return The Builder object itself for chaining.
+             * @see ConnectionApiClient.Builder#setInviteCode(String)
              */
             public Builder setInviteCode(String inviteCode) {
                 this.inviteCode = inviteCode;

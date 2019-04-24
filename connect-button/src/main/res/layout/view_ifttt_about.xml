@@ -11,6 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/black"
+        android:theme="@style/Theme.AppCompat"
         app:navigationIcon="@drawable/ic_close_black_24dp"/>
 
     <ScrollView
@@ -63,6 +64,7 @@
                 android:gravity="center"
                 android:lineSpacingExtra="@dimen/ifttt_about_text_line_space"
                 android:text="@string/ifttt_about_title"
+                android:textSize="@dimen/ifttt_about_title_size"
                 android:textAppearance="@style/AboutIfttt.Title"/>
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -146,7 +148,7 @@
                 android:gravity="center"
                 android:lineSpacingExtra="@dimen/ifttt_about_text_line_space"
                 android:textColor="@android:color/white"
-                android:textSize="12sp"/>
+                android:textAppearance="@style/AboutIfttt.Description"/>
 
         </LinearLayout>
 

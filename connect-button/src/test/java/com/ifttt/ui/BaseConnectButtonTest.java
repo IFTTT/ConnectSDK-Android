@@ -116,7 +116,7 @@ public final class BaseConnectButtonTest {
         AtomicReference<ConnectButtonState> currentStateRef = new AtomicReference<>(ConnectButtonState.Initial);
         AtomicReference<ConnectButtonState> prevStateRef = new AtomicReference<>();
         AtomicReference<ErrorResponse> errorRef = new AtomicReference<>();
-        button.setButtonStateChangeListener(new ButtonStateChangeListener() {
+        button.addButtonStateChangeListener(new ButtonStateChangeListener() {
             @Override
             public void onStateChanged(ConnectButtonState currentState, ConnectButtonState previousState) {
                 currentStateRef.set(currentState);

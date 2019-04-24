@@ -4,8 +4,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.Html;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.view.View;
 import android.widget.ImageView;
@@ -14,6 +18,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
 import com.ifttt.Connection;
 import com.ifttt.R;
 import com.ifttt.Service;
@@ -43,9 +48,20 @@ public final class AboutIftttActivity extends AppCompatActivity {
                 .load(getLifecycle(), secondaryService.monochromeIconUrl, secondaryServiceIcon::setImageBitmap);
 
         TextView title = findViewById(R.id.ifttt_about_title);
-        title.setText(getString(R.string.ifttt_about_title, secondaryService.name, primaryService.name));
-        title.setText(ButtonUiHelper.replaceKeyWithImage(title, title.getText().toString(), "IFTTT",
-                ContextCompat.getDrawable(this, R.drawable.ic_ifttt_logo_white)));
+        String aboutTitleString = getString(R.string.ifttt_about_title, secondaryService.name, primaryService.name);
+        CharSequence replacedWithIftttLogo = ButtonUiHelper.replaceKeyWithImage(title, aboutTitleString, "IFTTT",
+                ContextCompat.getDrawable(this, R.drawable.ic_ifttt_logo_white));
+        Typeface bold = ResourcesCompat.getFont(this, R.font.avenir_next_ltpro_bold);
+        Spannable highlightServiceNames = new SpannableString(replacedWithIftttLogo);
+        int secondaryServiceNameStart = aboutTitleString.indexOf(secondaryService.name);
+        int secondaryServiceNameEnd = secondaryServiceNameStart + secondaryService.name.length();
+        int primaryServiceNameStart = aboutTitleString.indexOf(primaryService.name);
+        int primaryServiceNameEnd = primaryServiceNameStart + primaryService.name.length();
+        highlightServiceNames.setSpan(new AvenirTypefaceSpan(bold), secondaryServiceNameStart, secondaryServiceNameEnd,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        highlightServiceNames.setSpan(new AvenirTypefaceSpan(bold), primaryServiceNameStart, primaryServiceNameEnd,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        title.setText(highlightServiceNames);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setNavigationOnClickListener(v -> finish());
