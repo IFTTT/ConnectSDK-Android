@@ -100,7 +100,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
     private final TextSwitcher connectStateTxt;
     private final ImageView iconImg;
     private final TextSwitcher helperTxt;
-    private final DragParentView buttonRoot;
+    private final ButtonParentView buttonRoot;
 
     private final int iconSize;
 
