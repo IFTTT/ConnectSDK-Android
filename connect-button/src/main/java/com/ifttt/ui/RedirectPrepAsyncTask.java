@@ -1,6 +1,8 @@
 package com.ifttt.ui;
 
 import android.os.AsyncTask;
+import com.ifttt.User;
+import com.ifttt.api.PendingResult;
 import java.io.IOException;
 import javax.annotation.Nullable;
 import retrofit2.Call;
@@ -20,9 +22,13 @@ final class RedirectPrepAsyncTask extends AsyncTask<Void, Void, RedirectPrepAsyn
     private final CredentialsProvider provider;
     private final OnTokenExchangeListener listener;
     private final String email;
+    @Nullable private final PendingResult<User> userPendingResult;
 
-    RedirectPrepAsyncTask(CredentialsProvider provider, String email, OnTokenExchangeListener listener) {
+    // Null userPendingResult means we don't want to try to fetch the user information.
+    RedirectPrepAsyncTask(CredentialsProvider provider, @Nullable PendingResult<User> userPendingResult, String email,
+            OnTokenExchangeListener listener) {
         this.provider = provider;
+        this.userPendingResult = userPendingResult;
         this.email = email;
         this.listener = listener;
     }
@@ -32,12 +38,20 @@ final class RedirectPrepAsyncTask extends AsyncTask<Void, Void, RedirectPrepAsyn
         try {
             String oAuthCode = provider.getOAuthCode();
             Response<Void> accountMatchResponse = AccountApiHelper.get().findAccount(email).execute();
+            String username = null;
+            if (userPendingResult != null) {
+                Response<User> userResponse = userPendingResult.getCall().execute();
+                User user = userResponse.body();
+                if (userResponse.isSuccessful() && user != null) {
+                    username = user.userLogin;
+                }
+            }
             boolean accountFound = accountMatchResponse.code() != 404;
-            return new PrepResult(oAuthCode, accountFound);
+            return new PrepResult(oAuthCode, accountFound, username);
         } catch (IOException e) {
             // Intentionally set the flag to true, so that the SDK will know to bring users to the web flow
             // to continue Connection authentication.
-            return new PrepResult(null, true);
+            return new PrepResult(null, true, null);
         }
     }
 
@@ -49,10 +63,12 @@ final class RedirectPrepAsyncTask extends AsyncTask<Void, Void, RedirectPrepAsyn
     static final class PrepResult {
         @Nullable final String opaqueToken;
         final boolean accountFound;
+        @Nullable final String userLogin;
 
-        PrepResult(@Nullable String opaqueToken, boolean accountFound) {
+        PrepResult(@Nullable String opaqueToken, boolean accountFound, @Nullable String userLogin) {
             this.opaqueToken = opaqueToken;
             this.accountFound = accountFound;
+            this.userLogin = userLogin;
         }
     }
 

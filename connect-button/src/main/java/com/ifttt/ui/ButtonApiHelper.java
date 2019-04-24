@@ -31,7 +31,7 @@ import static com.ifttt.ui.ConnectButtonState.ServiceAuthentication;
  */
 final class ButtonApiHelper {
 
-    private static final String SHOW_CONNECTION_API_URL = "https://ifttt.com/access/api/";
+    private static final String SHOW_CONNECTION_API_URL = "https://web-rehearsal.ifttt.com/access/api/";
     private static final String PACKAGE_NAME_IFTTT = "com.ifttt.ifttt.debug";
 
     private final ConnectionApiClient connectionApiClient;
@@ -41,6 +41,7 @@ final class ButtonApiHelper {
     @Nullable private final String inviteCode;
 
     @Nullable private String oAuthCode;
+    @Nullable private String userLogin;
 
     // Default to account existed, so that we don't create unnecessary account through the automatic flow. This is used
     // to help simplify the flow by setting an aggressive timeout for account checking requests.
@@ -114,8 +115,8 @@ final class ButtonApiHelper {
     private void redirectToWeb(Context context, Connection connection, String email, ConnectButtonState buttonState) {
         EmailAppsChecker checker = new EmailAppsChecker(context.getPackageManager());
         String anonymousId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
-        Uri uri = getEmbedUri(connection, buttonState, redirectUri, checker.detectEmailApps(), email, anonymousId,
-                oAuthCode, inviteCode);
+        Uri uri = getEmbedUri(connection, buttonState, redirectUri, checker.detectEmailApps(), email, userLogin,
+                anonymousId, oAuthCode, inviteCode);
         CustomTabsIntent intent = new CustomTabsIntent.Builder().build();
         intent.launchUrl(context, uri);
     }
@@ -123,12 +124,13 @@ final class ButtonApiHelper {
     @SuppressLint("HardwareIds")
     @CheckReturnValue
     @Nullable
-    private Intent getIntentToApp(Context context, Connection connection, String email, ConnectButtonState buttonState) {
+    private Intent getIntentToApp(Context context, Connection connection, String email,
+            ConnectButtonState buttonState) {
         EmailAppsChecker checker = new EmailAppsChecker(context.getPackageManager());
         String anonymousId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
         Intent launchIntent = new Intent(Intent.ACTION_VIEW,
-                getEmbedUri(connection, buttonState, redirectUri, checker.detectEmailApps(), email, anonymousId,
-                        oAuthCode, inviteCode));
+                getEmbedUri(connection, buttonState, redirectUri, checker.detectEmailApps(), email, userLogin,
+                        anonymousId, oAuthCode, inviteCode));
         launchIntent.setPackage(PACKAGE_NAME_IFTTT);
 
         if (!hasActivityToLaunch(context, launchIntent)) {
@@ -144,10 +146,13 @@ final class ButtonApiHelper {
 
     @MainThread
     void prepareAuthentication(String email) {
-        RedirectPrepAsyncTask task = new RedirectPrepAsyncTask(credentialsProvider, email, prepResult -> {
-            this.oAuthCode = prepResult.opaqueToken;
-            this.accountFound = prepResult.accountFound;
-        });
+        RedirectPrepAsyncTask task = new RedirectPrepAsyncTask(credentialsProvider,
+                connectionApiClient.isUserAuthenticated() ? connectionApiClient.api().user() : null, email,
+                prepResult -> {
+                    this.oAuthCode = prepResult.opaqueToken;
+                    this.accountFound = prepResult.accountFound;
+                    this.userLogin = prepResult.userLogin;
+                });
         lifecycle.addObserver(new OAuthTokenExchangeTaskObserver(task));
         task.execute();
     }
@@ -157,8 +162,9 @@ final class ButtonApiHelper {
      * option invite code for the service.
      */
     @VisibleForTesting
-    static Uri getEmbedUri(Connection connection, ConnectButtonState buttonState, Uri redirectUri, List<String> emailApps,
-            String email, String anonymousId, @Nullable String oAuthCode, @Nullable String inviteCode) {
+    static Uri getEmbedUri(Connection connection, ConnectButtonState buttonState, Uri redirectUri,
+            List<String> emailApps, String email, @Nullable String userLogin, String anonymousId,
+            @Nullable String oAuthCode, @Nullable String inviteCode) {
         Uri.Builder builder = Uri.parse(SHOW_CONNECTION_API_URL + connection.id)
                 .buildUpon()
                 .appendQueryParameter("sdk_version", BuildConfig.VERSION_NAME)
@@ -187,6 +193,10 @@ final class ButtonApiHelper {
             for (String emailApp : emailApps) {
                 builder.appendQueryParameter("available_email_app_schemes[]", emailApp);
             }
+        }
+
+        if (userLogin != null) {
+            builder.appendQueryParameter("username", userLogin);
         }
 
         return builder.build();
