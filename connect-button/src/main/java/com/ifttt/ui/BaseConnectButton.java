@@ -60,7 +60,7 @@ import static androidx.lifecycle.Lifecycle.State.CREATED;
 import static androidx.lifecycle.Lifecycle.State.DESTROYED;
 import static androidx.lifecycle.Lifecycle.State.STARTED;
 import static com.ifttt.Connection.Status.enabled;
-import static com.ifttt.ui.ButtonUiHelper.adjustPadding;
+import static com.ifttt.ui.ButtonUiHelper.adjustTextViewLayout;
 import static com.ifttt.ui.ButtonUiHelper.buildButtonBackground;
 import static com.ifttt.ui.ButtonUiHelper.findWorksWithService;
 import static com.ifttt.ui.ButtonUiHelper.getDarkerColor;
@@ -107,11 +107,12 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
     private final LifecycleRegistry lifecycleRegistry;
     private final AnimatorLifecycleObserver animatorLifecycleObserver = new AnimatorLifecycleObserver();
 
+    private final ArrayList<ButtonStateChangeListener> listeners = new ArrayList<>();
+
     private ConnectButtonState buttonState = Initial;
     private Connection connection;
     private Service worksWithService;
 
-    @Nullable private ButtonStateChangeListener buttonStateChangeListener;
     @Nullable private Application.ActivityLifecycleCallbacks activityLifecycleCallbacks;
     private ButtonApiHelper buttonApiHelper;
 
@@ -276,10 +277,17 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
     }
 
     /**
-     * Set a listener to be notified when the button's state has changed.
+     * Add a listener to be notified when the button's state has changed.
      */
-    void setButtonStateChangeListener(ButtonStateChangeListener listener) {
-        buttonStateChangeListener = listener;
+    void addButtonStateChangeListener(ButtonStateChangeListener listener) {
+        listeners.add(listener);
+    }
+
+    /**
+     * Remove a previously registered listener.
+     */
+    void removeButtonStateChangeListener(ButtonStateChangeListener listener) {
+        listeners.remove(listener);
     }
 
     /**
@@ -385,20 +393,23 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
         if (connection.status == enabled) {
             dispatchState(Enabled);
-            connectStateTxt.setText(getResources().getString(R.string.ifttt_connected));
-            adjustPadding(connectStateTxt);
+            connectStateTxt.setCurrentText(getResources().getString(R.string.ifttt_connected));
+            adjustTextViewLayout(connectStateTxt, buttonState);
 
             buttonRoot.setBackground(buildButtonBackground(getContext(), BLACK));
 
             OnClickListener onClickListener = v -> {
+                if (resetTextRunnable != null) {
+                    return;
+                }
+
                 connectStateTxt.setText(getResources().getString(R.string.ifttt_slide_to_turn_off));
-                helperTxt.setClickable(false);
+                adjustTextViewLayout(connectStateTxt, buttonState);
 
                 // Delay and switch back.
                 resetTextRunnable = () -> {
                     resetTextRunnable = null;
-                    connectStateTxt.setText(getResources().getString(R.string.ifttt_connected));
-                    helperTxt.setClickable(true);
+                    connectStateTxt.showNext();
                 };
                 postDelayed(resetTextRunnable, ANIM_DURATION_LONG);
             };
@@ -410,9 +421,9 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         } else {
             if (connection.status == Connection.Status.disabled) {
                 dispatchState(Disabled);
-                connectStateTxt.setText(
+                connectStateTxt.setCurrentText(
                         getResources().getString(R.string.ifttt_connect_to, worksWithService.shortName));
-                adjustPadding(connectStateTxt);
+                adjustTextViewLayout(connectStateTxt, buttonState);
 
                 buttonRoot.setBackground(buildButtonBackground(getContext(),
                         ContextCompat.getColor(getContext(), R.color.ifttt_disabled_background)));
@@ -420,9 +431,9 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                         ContextCompat.getColor(getContext(), R.color.ifttt_disabled_background), BLACK);
             } else {
                 dispatchState(Initial);
-                connectStateTxt.setText(
+                connectStateTxt.setCurrentText(
                         getResources().getString(R.string.ifttt_connect_to, worksWithService.shortName));
-                ButtonUiHelper.adjustPadding(connectStateTxt);
+                adjustTextViewLayout(connectStateTxt, buttonState);
 
                 buttonRoot.setBackground(buildButtonBackground(getContext(), BLACK));
                 // Depending on whether we need to show the email field, use different track colors.
@@ -512,9 +523,10 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
             }
         });
 
+        int iconMargin = getResources().getDimensionPixelSize(R.dimen.ifttt_icon_margin);
         int fullDistance = buttonRoot.getWidth() - iconImg.getWidth();
         ValueAnimator iconMovement =
-                ValueAnimator.ofInt(fullDistance / 2, fullDistance).setDuration(ANIM_DURATION_MEDIUM);
+                ValueAnimator.ofInt(fullDistance / 2 + iconMargin, fullDistance).setDuration(ANIM_DURATION_MEDIUM);
         iconMovement.setInterpolator(EASE_INTERPOLATOR);
         iconMovement.addUpdateListener(anim -> {
             ViewCompat.offsetLeftAndRight(iconImg, ((Integer) anim.getAnimatedValue()) - iconImg.getLeft());
@@ -544,6 +556,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
                 cleanUpViews(ProgressView.class);
                 cleanUpViews(CheckMarkView.class);
+                dispatchState(Enabled);
             }
         });
 
@@ -551,8 +564,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
         connectStateTxt.setAlpha(1f);
         connectStateTxt.setText(getResources().getString(R.string.ifttt_connected));
-        ButtonUiHelper.adjustPadding(connectStateTxt);
-        dispatchState(Enabled);
+        adjustTextViewLayout(connectStateTxt, buttonState);
     }
 
     private Animator buildEmailValidationAnimator() {
@@ -833,16 +845,18 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
     }
 
     private void dispatchState(ConnectButtonState newState) {
-        if (buttonStateChangeListener != null && newState != buttonState) {
-            buttonStateChangeListener.onStateChanged(newState, buttonState);
+        if (newState != buttonState) {
+            for (ButtonStateChangeListener listener : listeners) {
+                listener.onStateChanged(newState, buttonState);
+            }
         }
 
         buttonState = newState;
     }
 
     private void dispatchError(ErrorResponse errorResponse) {
-        if (buttonStateChangeListener != null) {
-            buttonStateChangeListener.onError(errorResponse);
+        for (ButtonStateChangeListener listener : listeners) {
+            listener.onError(errorResponse);
         }
 
         // Reset the button state.
@@ -947,6 +961,12 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
             setProgressStateText(textFadingProgress);
 
             buttonApiHelper.cancelDisconnect();
+
+            if (resetTextRunnable != null) {
+                removeCallbacks(resetTextRunnable);
+                connectStateTxt.showNext();
+                resetTextRunnable = null;
+            }
         }
 
         @Override
@@ -1029,7 +1049,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                     // Assume the network call will be successful, change the text before the animation starts.
                     connectStateTxt.setCurrentText(
                             getResources().getString(R.string.ifttt_connect_to, worksWithService.shortName));
-                    adjustPadding(connectStateTxt);
+                    adjustTextViewLayout(connectStateTxt, Disabled);
                 }
             });
             processing.playTogether(fadeInConnect, moveIcon);
@@ -1046,8 +1066,8 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
                         @Override
                         public void onFailure(ErrorResponse errorResponse) {
-                            if (buttonStateChangeListener != null) {
-                                buttonStateChangeListener.onError(errorResponse);
+                            for (ButtonStateChangeListener listener : listeners) {
+                                listener.onError(errorResponse);
                             }
 
                             processAndRun(() -> {

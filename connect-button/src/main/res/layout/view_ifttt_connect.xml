@@ -39,8 +39,8 @@
                 android:gravity="center"
                 android:lines="1"
                 android:textColor="@android:color/white"
-                android:textSize="@dimen/ifttt_connect_text_size"
-                app:autoSizeMaxTextSize="@dimen/ifttt_connect_text_size"
+                android:textSize="@dimen/ifttt_service_name_max_text_size"
+                app:autoSizeMaxTextSize="@dimen/ifttt_service_name_max_text_size"
                 app:autoSizeTextType="uniform"
                 android:drawablePadding="@dimen/ifttt_continue_icon_padding"/>
 
@@ -51,8 +51,8 @@
                 android:gravity="center"
                 android:lines="1"
                 android:textColor="@android:color/white"
-                android:textSize="@dimen/ifttt_connect_text_size"
-                app:autoSizeMaxTextSize="@dimen/ifttt_connect_text_size"
+                android:textSize="@dimen/ifttt_service_name_max_text_size"
+                app:autoSizeMaxTextSize="@dimen/ifttt_service_name_max_text_size"
                 app:autoSizeTextType="uniform"
                 android:drawablePadding="@dimen/ifttt_continue_icon_padding"/>
 

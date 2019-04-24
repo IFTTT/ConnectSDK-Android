@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.StaticLayout;
+import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.style.ImageSpan;
 import android.util.Patterns;
@@ -20,11 +21,14 @@ import androidx.annotation.ColorInt;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.core.view.ViewCompat;
+import androidx.core.widget.TextViewCompat;
 import com.ifttt.Connection;
 import com.ifttt.R;
 import com.ifttt.Service;
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
+
+import static android.util.TypedValue.COMPLEX_UNIT_PX;
 
 final class ButtonUiHelper {
 
@@ -131,7 +135,7 @@ final class ButtonUiHelper {
         return otherService;
     }
 
-    static void adjustPadding(TextSwitcher switcher) {
+    static void adjustTextViewLayout(TextSwitcher switcher, ConnectButtonState state) {
         Resources resources = switcher.getResources();
         int largePadding = resources.getDimensionPixelSize(R.dimen.ifttt_text_padding_horizontal);
         int smallPadding = resources.getDimensionPixelSize(R.dimen.ifttt_text_padding_horizontal_small);
@@ -140,26 +144,26 @@ final class ButtonUiHelper {
         TextView nextView = (TextView) switcher.getNextView();
 
         if (ViewCompat.isLaidOut(currentView)) {
-            adjustTextViewPadding(currentView, largePadding, smallPadding);
+            adjustTextViewPadding(currentView, largePadding, smallPadding, state);
         } else {
             currentView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
                 @Override
                 public boolean onPreDraw() {
                     currentView.getViewTreeObserver().removeOnPreDrawListener(this);
-                    adjustTextViewPadding(currentView, largePadding, smallPadding);
+                    adjustTextViewPadding(currentView, largePadding, smallPadding, state);
                     return false;
                 }
             });
         }
 
         if (ViewCompat.isLaidOut(nextView)) {
-            adjustTextViewPadding(nextView, largePadding, smallPadding);
+            adjustTextViewPadding(nextView, largePadding, smallPadding, state);
         } else {
             nextView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
                 @Override
                 public boolean onPreDraw() {
                     nextView.getViewTreeObserver().removeOnPreDrawListener(this);
-                    adjustTextViewPadding(nextView, largePadding, smallPadding);
+                    adjustTextViewPadding(nextView, largePadding, smallPadding, state);
                     return false;
                 }
             });
@@ -171,15 +175,32 @@ final class ButtonUiHelper {
         ((TextView) switcher.getNextView()).setTextColor(color);
     }
 
-    private static void adjustTextViewPadding(TextView textView, int largePadding, int smallPadding) {
-        float textWidth = StaticLayout.getDesiredWidth(textView.getText(), textView.getPaint());
+    private static void adjustTextViewPadding(TextView textView, int largePadding, int smallPadding,
+            ConnectButtonState buttonState) {
+        int maxSize = textView.getResources().getDimensionPixelSize(R.dimen.ifttt_service_name_max_text_size);
+        int minSize = textView.getResources().getDimensionPixelSize(R.dimen.ifttt_service_name_min_text_size);
+
+        // Test the TextView using the max size.
+        TextPaint textPaint = textView.getPaint();
+        textPaint.setTextSize(maxSize);
+        float textWidth = StaticLayout.getDesiredWidth(textView.getText(), textPaint);
         float maxWidth = textView.getWidth() - largePadding * 2;
         if (textWidth > maxWidth) {
             // Reduce the right padding if the original text is longer than the available space in this View. This is to
             // keep the text "center" visually.
-            textView.setPadding(largePadding, 0, smallPadding, 0);
+            if (buttonState == ConnectButtonState.Enabled) {
+                textView.setPadding(smallPadding, 0, largePadding, 0);
+            } else {
+                textView.setPadding(largePadding, 0, smallPadding, 0);
+            }
+
+            TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(textView, minSize, maxSize, 1, COMPLEX_UNIT_PX);
         } else {
             textView.setPadding(largePadding, 0, largePadding, 0);
+
+            // Disable auto resizing and use the maximum size.
+            TextViewCompat.setAutoSizeTextTypeWithDefaults(textView, TextViewCompat.AUTO_SIZE_TEXT_TYPE_NONE);
+            textView.setTextSize(COMPLEX_UNIT_PX, maxSize);
         }
     }
 
