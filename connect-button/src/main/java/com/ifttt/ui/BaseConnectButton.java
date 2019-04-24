@@ -556,7 +556,6 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
                 cleanUpViews(ProgressView.class);
                 cleanUpViews(CheckMarkView.class);
-                dispatchState(Enabled);
             }
         });
 
@@ -565,6 +564,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         connectStateTxt.setAlpha(1f);
         connectStateTxt.setText(getResources().getString(R.string.ifttt_connected));
         adjustTextViewLayout(connectStateTxt, buttonState);
+        dispatchState(Enabled);
     }
 
     private Animator buildEmailValidationAnimator() {
