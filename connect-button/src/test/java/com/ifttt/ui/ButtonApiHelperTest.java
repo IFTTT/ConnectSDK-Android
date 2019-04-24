@@ -82,6 +82,7 @@ public final class ButtonApiHelperTest {
         Uri uri = ButtonApiHelper.getEmbedUri(connection, Initial, redirectUri, Collections.emptyList(), "abc@efg.com",
                 "user_name", "", "auth_code", "abcd");
         assertThat(uri.getQueryParameter("username")).isEqualTo("user_name");
+        assertThat(uri.getQueryParameter("email")).isNull();
     }
 
     @Test
