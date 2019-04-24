@@ -11,6 +11,9 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.util.AttributeSet;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -68,6 +71,20 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
         inflate(context, R.layout.view_ifttt_simple_connect_button, this);
         connectButton = findViewById(R.id.ifttt_connect_button);
         loadingView = findViewById(R.id.ifttt_loading_view);
+
+        // Make sure the loading view has the same size as the connect button.
+        loadingView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+            @Override
+            public boolean onPreDraw() {
+                loadingView.getViewTreeObserver().removeOnPreDrawListener(this);
+                View buttonRoot = connectButton.findViewById(R.id.ifttt_button_root);
+                ViewGroup.LayoutParams lp = loadingView.getLayoutParams();
+                lp.width = buttonRoot.getWidth();
+                lp.height = buttonRoot.getHeight();
+                loadingView.setLayoutParams(lp);
+                return false;
+            }
+        });
     }
 
     /**

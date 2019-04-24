@@ -119,7 +119,7 @@
                 android:id="@+id/ifttt_manage_connection"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/ifttt_space_large"
+                android:layout_marginTop="@dimen/ifttt_space_med"
                 android:background="@drawable/ifttt_about_button_background"
                 android:fontFamily="@font/avenir_next_ltpro_bold"
                 android:paddingBottom="@dimen/ifttt_space_small"
@@ -134,7 +134,7 @@
                 android:id="@+id/google_play_link"
                 android:layout_width="@dimen/ifttt_about_google_play_badge_width"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/ifttt_space_large"
+                android:layout_marginTop="@dimen/ifttt_space_med"
                 android:adjustViewBounds="true"
                 android:src="@drawable/google_play_badge"/>
 
@@ -142,7 +142,7 @@
                 android:id="@+id/term_and_privacy"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/ifttt_space_large"
+                android:layout_marginTop="@dimen/ifttt_space_med"
                 android:alpha="0.5"
                 android:fontFamily="@font/avenir_next_ltpro_demi"
                 android:gravity="center"

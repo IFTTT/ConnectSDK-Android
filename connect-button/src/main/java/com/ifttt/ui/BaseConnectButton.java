@@ -100,7 +100,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
     private final TextSwitcher connectStateTxt;
     private final ImageView iconImg;
     private final TextSwitcher helperTxt;
-    private final DragParentView buttonRoot;
+    private final ButtonParentView buttonRoot;
 
     private final int iconSize;
 
@@ -390,13 +390,12 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         iconImg.setLayoutParams(lp);
 
         connectStateTxt.setAlpha(1f);
+        buttonRoot.setBackground(buildButtonBackground(getContext(), BLACK));
 
         if (connection.status == enabled) {
             dispatchState(Enabled);
             connectStateTxt.setCurrentText(getResources().getString(R.string.ifttt_connected));
             adjustTextViewLayout(connectStateTxt, buttonState);
-
-            buttonRoot.setBackground(buildButtonBackground(getContext(), BLACK));
 
             OnClickListener onClickListener = v -> {
                 if (resetTextRunnable != null) {
@@ -416,31 +415,25 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
             buttonRoot.setOnClickListener(onClickListener);
             iconImg.setOnClickListener(onClickListener);
 
-            iconDragHelperCallback.setTrackColor(BLACK,
-                    ContextCompat.getColor(getContext(), R.color.ifttt_disabled_background));
+            iconDragHelperCallback.setTrackEndColor(BLACK);
         } else {
             if (connection.status == Connection.Status.disabled) {
                 dispatchState(Disabled);
                 connectStateTxt.setCurrentText(
-                        getResources().getString(R.string.ifttt_connect_to, worksWithService.shortName));
+                        getResources().getString(R.string.ifttt_reconnect_to, worksWithService.shortName));
                 adjustTextViewLayout(connectStateTxt, buttonState);
-
-                buttonRoot.setBackground(buildButtonBackground(getContext(),
-                        ContextCompat.getColor(getContext(), R.color.ifttt_disabled_background)));
-                iconDragHelperCallback.setTrackColor(
-                        ContextCompat.getColor(getContext(), R.color.ifttt_disabled_background), BLACK);
+                iconDragHelperCallback.setTrackEndColor(BLACK);
             } else {
                 dispatchState(Initial);
                 connectStateTxt.setCurrentText(
                         getResources().getString(R.string.ifttt_connect_to, worksWithService.shortName));
                 adjustTextViewLayout(connectStateTxt, buttonState);
 
-                buttonRoot.setBackground(buildButtonBackground(getContext(), BLACK));
                 // Depending on whether we need to show the email field, use different track colors.
                 int trackEndColor = !buttonApiHelper.shouldPresentEmail(getContext()) ? BLACK
                         : ContextCompat.getColor(getContext(), R.color.ifttt_button_background);
 
-                iconDragHelperCallback.setTrackColor(BLACK, trackEndColor);
+                iconDragHelperCallback.setTrackEndColor(trackEndColor);
             }
 
             helperTxt.setOnClickListener(
@@ -934,8 +927,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
             }
         }
 
-        void setTrackColor(@ColorInt int startColor, @ColorInt int endColor) {
-            this.trackStartColor = startColor;
+        void setTrackEndColor(@ColorInt int endColor) {
             this.trackEndColor = endColor;
         }
 
