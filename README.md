@@ -15,6 +15,8 @@ IFTTT Connect Button SDK is a library that helps facilitate the integration of t
 * A lightweight wrapper around the IFTTT Connection API, with predefined data structures and JSON adapters.
 * Connect Button UI representation.
 
+<img width="494" alt="connect_button_screenshot" src="https://user-images.githubusercontent.com/1761573/56772956-fec78f00-6770-11e9-91ca-4e875a2df5c0.png">
+
 ## Dependencies
 This SDK uses the following libraries as dependencies:
 * [Retrofit v2.4.0](http://square.github.io/retrofit/)
