@@ -18,6 +18,8 @@ import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
@@ -95,6 +97,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
     // Spannable text that replaces the text "IFTTT" with IFTTT logo.
     private final SpannableString worksWithIfttt;
     private final Drawable iftttLogo;
+    private final RevertableHandler revertableHandler = new RevertableHandler();
 
     private final EditText emailEdt;
     private final TextSwitcher connectStateTxt;
@@ -123,7 +126,6 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
     private boolean onDarkBackground = false;
 
     @Nullable private Call ongoingImageCall;
-    @Nullable private Runnable resetTextRunnable;
 
     public BaseConnectButton(Context context) {
         this(context, null);
@@ -163,6 +165,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         iftttLogo = ContextCompat.getDrawable(getContext(), R.drawable.ic_ifttt_logo_black);
         worksWithIfttt = new SpannableString(replaceKeyWithImage((TextView) helperTxt.getCurrentView(),
                 getResources().getString(R.string.ifttt_powered_by_ifttt), "IFTTT", iftttLogo));
+        helperTxt.setText(worksWithIfttt);
 
         iconDragHelperCallback = new IconDragHelperCallback();
         viewDragHelper = buttonRoot.getViewDragHelperCallback(iconDragHelperCallback);
@@ -178,6 +181,8 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         lifecycleRegistry.markState(DESTROYED);
+
+        revertableHandler.clear();
     }
 
     @Override
@@ -203,16 +208,16 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
     }
 
     void setErrorMessage(CharSequence text, OnClickListener listener) {
-        float currentAlpha = helperTxt.getAlpha();
+        float currentAlpha = helperTxt.getCurrentView().getAlpha();
         helperTxt.setText(text);
-        helperTxt.setAlpha(1f);
+        helperTxt.getCurrentView().setAlpha(1f);
         helperTxt.setOnClickListener(v -> {
             listener.onClick(v);
 
             // Revert back to the original text.
             helperTxt.setOnClickListener(null);
-            helperTxt.setText(worksWithIfttt);
-            helperTxt.setAlpha(currentAlpha);
+            helperTxt.showNext();
+            helperTxt.getNextView().setAlpha(currentAlpha);
         });
     }
 
@@ -343,10 +348,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
             throw new IllegalStateException("Connect Button is not set up, please call setup() first.");
         }
 
-        if (resetTextRunnable != null) {
-            removeCallbacks(resetTextRunnable);
-            resetTextRunnable = null;
-        }
+        revertableHandler.revertAll();
 
         this.connection = connection;
         worksWithService = findWorksWithService(connection);
@@ -398,20 +400,25 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
             adjustTextViewLayout(connectStateTxt, buttonState);
 
             OnClickListener onClickListener = v -> {
-                if (resetTextRunnable != null) {
-                    return;
-                }
-
-                connectStateTxt.setText(getResources().getString(R.string.ifttt_slide_to_turn_off));
-                adjustTextViewLayout(connectStateTxt, buttonState);
+                revertableHandler.revertAll();
 
                 // Delay and switch back.
-                resetTextRunnable = () -> {
-                    resetTextRunnable = null;
-                    connectStateTxt.showNext();
+                Revertable revertable = new Revertable() {
+                    @Override
+                    public void run() {
+                        connectStateTxt.setText(getResources().getString(R.string.ifttt_slide_to_turn_off));
+                        adjustTextViewLayout(connectStateTxt, buttonState);
+                    }
+
+                    @Override
+                    public void revert() {
+                        connectStateTxt.showNext();
+                    }
                 };
-                postDelayed(resetTextRunnable, ANIM_DURATION_LONG);
+
+                revertableHandler.run(revertable, ANIM_DURATION_LONG);
             };
+
             buttonRoot.setOnClickListener(onClickListener);
             iconImg.setOnClickListener(onClickListener);
 
@@ -439,6 +446,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
             OnClickListener onClickListener = v -> {
                 buttonRoot.setOnClickListener(null);
                 iconImg.setOnClickListener(null);
+                revertableHandler.revertAll();
                 // Cancel potential ongoing image loading task. Users have already click the button and the service
                 // icon will not be used in the next UI state.
                 if (ongoingImageCall != null) {
@@ -719,8 +727,32 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         set.setInterpolator(EASE_INTERPOLATOR);
 
         OnClickListener startAuthOnClickListener = v -> {
+            revertableHandler.revertAll();
             if (ButtonUiHelper.isEmailInvalid(emailEdt.getText())) {
-                helperTxt.setText(getResources().getString(R.string.ifttt_enter_valid_email));
+                float currentAlpha = helperTxt.getNextView().getAlpha();
+                Revertable revertable = new Revertable() {
+                    @Override
+                    public void revert() {
+                        helperTxt.showNext();
+                        helperTxt.getNextView().setAlpha(currentAlpha);
+                        helperTxt.setOnClickListener(
+                                v -> getContext().startActivity(AboutIftttActivity.intent(getContext(), connection)));
+                    }
+
+                    @Override
+                    public void run() {
+                        SpannableString errorMessage =
+                                new SpannableString(getResources().getString(R.string.ifttt_enter_valid_email));
+                        errorMessage.setSpan(
+                                new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.ifttt_error_red)),
+                                0, errorMessage.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        helperTxt.setText(errorMessage);
+                        helperTxt.getCurrentView().setAlpha(1f);
+                        helperTxt.setOnClickListener(null);
+                    }
+                };
+
+                revertableHandler.run(revertable, ANIM_DURATION_LONG);
                 return;
             }
 
@@ -953,12 +985,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
             setProgressStateText(textFadingProgress);
 
             buttonApiHelper.cancelDisconnect();
-
-            if (resetTextRunnable != null) {
-                removeCallbacks(resetTextRunnable);
-                connectStateTxt.showNext();
-                resetTextRunnable = null;
-            }
+            revertableHandler.revertAll();
         }
 
         @Override
