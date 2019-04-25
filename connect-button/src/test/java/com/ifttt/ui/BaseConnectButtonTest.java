@@ -61,7 +61,7 @@ public final class BaseConnectButtonTest {
 
         TextSwitcher helperText = button.findViewById(R.id.ifttt_helper_text);
         assertThat(helperText.getCurrentView()).isInstanceOf(TextView.class);
-        assertThat(((TextView) helperText.getCurrentView()).getText().toString()).isEqualTo("");
+        assertThat(((TextView) helperText.getCurrentView()).getText().toString()).isEqualTo("WORKS WITH IFTTT");
     }
 
     @Test(expected = IllegalStateException.class)
