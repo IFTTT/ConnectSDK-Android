@@ -12,17 +12,20 @@ import com.ifttt.Connection;
 import com.ifttt.ConnectionApiClient;
 import com.ifttt.ErrorResponse;
 import com.ifttt.R;
+import com.ifttt.ShadowAnimatorSet;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.annotation.Config;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.ifttt.TestUtils.loadConnection;
 import static org.junit.Assert.fail;
 
 @RunWith(AndroidJUnit4.class)
+@Config(shadows = { ShadowAnimatorSet.class })
 public final class BaseConnectButtonTest {
 
     private BaseConnectButton button;

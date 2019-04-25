@@ -163,6 +163,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         iftttLogo = ContextCompat.getDrawable(getContext(), R.drawable.ic_ifttt_logo_black);
         worksWithIfttt = new SpannableString(replaceKeyWithImage((TextView) helperTxt.getCurrentView(),
                 getResources().getString(R.string.ifttt_powered_by_ifttt), "IFTTT", iftttLogo));
+        helperTxt.setCurrentText(worksWithIfttt);
 
         iconDragHelperCallback = new IconDragHelperCallback();
         viewDragHelper = buttonRoot.getViewDragHelperCallback(iconDragHelperCallback);
@@ -541,6 +542,20 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         checkMarkAnimator.playTogether(iconMovement, fadeOutProgress);
         checkMarkAnimator.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
             @Override
+            public void onAnimationStart(Animator animation) {
+                super.onAnimationStart(animation);
+
+                connectStateTxt.setAlpha(1f);
+                connectStateTxt.setText(getResources().getString(R.string.ifttt_connected));
+                adjustTextViewLayout(connectStateTxt, buttonState);
+
+                // Update icon view gravity.
+                FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) iconImg.getLayoutParams();
+                lp.gravity = Gravity.END;
+                iconImg.setLayoutParams(lp);
+            }
+
+            @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
                 if (isCanceled()) {
@@ -549,15 +564,12 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
                 cleanUpViews(ProgressView.class);
                 cleanUpViews(CheckMarkView.class);
+
+                dispatchState(Enabled);
             }
         });
 
         checkMarkAnimator.start();
-
-        connectStateTxt.setAlpha(1f);
-        connectStateTxt.setText(getResources().getString(R.string.ifttt_connected));
-        adjustTextViewLayout(connectStateTxt, buttonState);
-        dispatchState(Enabled);
     }
 
     private Animator buildEmailValidationAnimator() {
@@ -1040,7 +1052,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                 public void onAnimationStart(Animator animation) {
                     // Assume the network call will be successful, change the text before the animation starts.
                     connectStateTxt.setCurrentText(
-                            getResources().getString(R.string.ifttt_connect_to, worksWithService.shortName));
+                            getResources().getString(R.string.ifttt_reconnect_to, worksWithService.shortName));
                     adjustTextViewLayout(connectStateTxt, Disabled);
                 }
             });
