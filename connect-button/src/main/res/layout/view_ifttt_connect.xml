@@ -74,7 +74,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/ifttt_space_small"
-        android:alpha="0.3"
         android:background="?selectableItemBackground"
         android:inAnimation="@anim/ifttt_helper_text_in"
         android:outAnimation="@anim/ifttt_helper_text_out"
@@ -83,6 +82,7 @@
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:alpha="0.3"
             android:ellipsize="end"
             android:fontFamily="@font/avenir_next_ltpro_demi"
             android:gravity="center"
@@ -95,6 +95,7 @@
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:alpha="0.3"
             android:ellipsize="end"
             android:fontFamily="@font/avenir_next_ltpro_demi"
             android:gravity="center"
