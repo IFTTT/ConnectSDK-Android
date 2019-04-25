@@ -436,9 +436,6 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                 iconDragHelperCallback.setTrackEndColor(trackEndColor);
             }
 
-            helperTxt.setOnClickListener(
-                    v -> getContext().startActivity(AboutIftttActivity.intent(getContext(), connection)));
-
             OnClickListener onClickListener = v -> {
                 buttonRoot.setOnClickListener(null);
                 iconImg.setOnClickListener(null);
@@ -477,6 +474,9 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         }
 
         StartIconDrawable.setPressListener(iconImg);
+
+        helperTxt.setOnClickListener(
+                v -> getContext().startActivity(AboutIftttActivity.intent(getContext(), connection)));
     }
 
     private void setServiceIconImage(@Nullable Bitmap bitmap) {
