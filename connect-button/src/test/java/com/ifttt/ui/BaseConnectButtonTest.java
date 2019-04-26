@@ -136,10 +136,6 @@ public final class BaseConnectButtonTest {
         button.setConnection(connection);
         assertThat(currentStateRef.get()).isEqualTo(ConnectButtonState.Initial);
 
-        button.setConnectResult(
-                new ConnectResult(ConnectResult.NextStep.ServiceAuthentication, null, "instagram", null));
-        assertThat(currentStateRef.get()).isEqualTo(ConnectButtonState.ServiceAuthentication);
-
         button.setConnectResult(new ConnectResult(ConnectResult.NextStep.Error, null, null, "error"));
         assertThat(currentStateRef.get()).isEqualTo(ConnectButtonState.Initial);
         assertThat(errorRef.get()).isNotNull();

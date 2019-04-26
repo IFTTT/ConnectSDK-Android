@@ -24,7 +24,6 @@ import javax.annotation.Nullable;
 
 import static com.ifttt.ui.ConnectButtonState.CreateAccount;
 import static com.ifttt.ui.ConnectButtonState.Login;
-import static com.ifttt.ui.ConnectButtonState.ServiceAuthentication;
 
 /**
  * Helper class that handles all API call and non-UI specific tasks for the {@link BaseConnectButton}.
@@ -176,9 +175,7 @@ final class ButtonApiHelper {
             builder.appendQueryParameter("invite_code", inviteCode);
         }
 
-        if (buttonState == ServiceAuthentication) {
-            builder.appendQueryParameter("skip_sdk_redirect", "true");
-        } else if (buttonState == CreateAccount) {
+        if (buttonState == CreateAccount) {
             builder.appendQueryParameter("sdk_create_account", "true");
         }
 

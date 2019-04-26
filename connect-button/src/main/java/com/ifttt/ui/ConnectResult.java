@@ -9,7 +9,6 @@ import com.ifttt.ConnectionApiClient;
 import javax.annotation.Nullable;
 
 import static com.ifttt.ui.ConnectResult.NextStep.Complete;
-import static com.ifttt.ui.ConnectResult.NextStep.ServiceAuthentication;
 import static com.ifttt.ui.ConnectResult.NextStep.Unknown;
 
 /**
@@ -26,13 +25,6 @@ public final class ConnectResult implements Parcelable {
     public static final ConnectResult UNKNOWN = new ConnectResult(Unknown, null, null, null);
 
     public enum NextStep {
-        /**
-         * A status that indicates the next step is a service authentication. A service authentication means that the
-         * user will go through an OAuth flow on a web view (via Chrome Custom Tabs). The result will come back as a
-         * deep link into your app and can be handled by {@link ConnectResult}.
-         */
-        ServiceAuthentication,
-
         /**
          * A status that indicates the Connection enable flow has been completed, and the Connection has been enabled.
          */
@@ -62,15 +54,6 @@ public final class ConnectResult implements Parcelable {
     @Nullable public final String userToken;
 
     /**
-     * Additional information when {@link #nextStep} is {@link NextStep#ServiceAuthentication}. This is used to help the
-     * IftttConnectButton show proper service information to guide users in the enable flow.
-     *
-     * When {@link ConnectResult#nextStep} is ServiceAuthentication, the {@link ConnectResult#serviceId}
-     * will be non-null, and the value is the service id to be connected next.
-     */
-    @Nullable public final String serviceId;
-
-    /**
      * Additional information when {@link #nextStep} is {@link NextStep#Error}. In other cases this field is null.
      */
     @Nullable public final String errorType;
@@ -88,14 +71,7 @@ public final class ConnectResult implements Parcelable {
         }
 
         String nextStepParam = data.getQueryParameter("next_step");
-        if ("service_authentication".equals(nextStepParam)) {
-            String serviceId = data.getQueryParameter("service_id");
-            if (serviceId == null || serviceId.length() == 0) {
-                return UNKNOWN;
-            }
-
-            return new ConnectResult(ServiceAuthentication, null, serviceId, null);
-        } else if ("complete".equals(nextStepParam)) {
+        if ("complete".equals(nextStepParam)) {
             String userToken = data.getQueryParameter("user_token");
             return new ConnectResult(Complete, userToken, null, null);
         } else if ("error".equals(nextStepParam)) {
@@ -111,12 +87,10 @@ public final class ConnectResult implements Parcelable {
             @Nullable String errorType) {
         this.nextStep = nextStep;
         this.userToken = userToken;
-        this.serviceId = serviceId;
         this.errorType = errorType;
     }
 
     protected ConnectResult(Parcel in) {
-        serviceId = in.readString();
         userToken = in.readString();
         nextStep = (NextStep) in.readSerializable();
         errorType = in.readString();
@@ -141,7 +115,6 @@ public final class ConnectResult implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(serviceId);
         dest.writeSerializable(nextStep);
         dest.writeString(errorType);
     }
