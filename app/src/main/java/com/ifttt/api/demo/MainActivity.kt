@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
@@ -49,9 +50,16 @@ class MainActivity : AppCompatActivity() {
             override fun getOAuthCode() = emailPreferencesHelper.getEmail()
         }
 
+        val hasEmailSet = !TextUtils.isEmpty(emailPreferencesHelper.getEmail())
+        val suggestedEmail = if (!hasEmailSet) {
+            EMAIL
+        } else {
+            emailPreferencesHelper.getEmail()!!
+        }
+
         configuration = ConnectButton.Configuration.Builder.withConnectionId(
             CONNECTION_ID,
-            emailPreferencesHelper.getEmail() ?: EMAIL,
+            suggestedEmail,
             credentialsProvider
             , REDIRECT_URI
         ).setOnFetchCompleteListener { connection ->
@@ -62,7 +70,7 @@ class MainActivity : AppCompatActivity() {
 
         toggleValuePropColor()
 
-        if (emailPreferencesHelper.getEmail() == null) {
+        if (!hasEmailSet) {
             promptLogin()
         }
     }
