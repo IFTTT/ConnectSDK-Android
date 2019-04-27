@@ -217,7 +217,7 @@ final class ButtonApiHelper {
     @Nullable
     static Intent redirectToManage(Context context, String id) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(Uri.parse("https://ifttt.com/connections/" + id));
+        intent.setData(Uri.parse("https://ifttt.com/applets/" + id));
         if (!hasActivityToLaunch(context, intent)) {
             return null;
         }
