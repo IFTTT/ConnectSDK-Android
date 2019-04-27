@@ -413,17 +413,23 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
             iconDragHelperCallback.setTrackEndColor(BLACK);
 
             // Set button position.
-            buttonRoot.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-                @Override
-                public boolean onPreDraw() {
-                    buttonRoot.getViewTreeObserver().removeOnPreDrawListener(this);
+            if (ViewCompat.isLaidOut(buttonRoot)) {
+                int iconPosition = buttonRoot.getWidth() - iconImg.getWidth();
+                ViewCompat.offsetLeftAndRight(iconImg, iconPosition);
+                buttonRoot.trackViewLeftAndRightOffset(iconImg, iconPosition);
+            } else {
+                buttonRoot.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+                    @Override
+                    public boolean onPreDraw() {
+                        buttonRoot.getViewTreeObserver().removeOnPreDrawListener(this);
 
-                    int iconPosition = buttonRoot.getWidth() - iconImg.getWidth();
-                    ViewCompat.offsetLeftAndRight(iconImg, iconPosition);
-                    buttonRoot.trackViewLeftAndRightOffset(iconImg, iconPosition);
-                    return false;
-                }
-            });
+                        int iconPosition = buttonRoot.getWidth() - iconImg.getWidth();
+                        ViewCompat.offsetLeftAndRight(iconImg, iconPosition);
+                        buttonRoot.trackViewLeftAndRightOffset(iconImg, iconPosition);
+                        return false;
+                    }
+                });
+            }
         } else {
             if (connection.status == Connection.Status.disabled) {
                 dispatchState(Disabled);
