@@ -23,11 +23,11 @@ import android.text.style.ForegroundColorSpan;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.animation.LinearInterpolator;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextSwitcher;
@@ -50,7 +50,7 @@ import com.ifttt.ConnectionApiClient;
 import com.ifttt.ErrorResponse;
 import com.ifttt.R;
 import com.ifttt.Service;
-import com.ifttt.api.PendingResult;
+import com.ifttt.api.PendingResult.ResultCallback;
 import java.util.ArrayList;
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
@@ -354,7 +354,6 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         worksWithService = findWorksWithService(connection);
 
         emailEdt.setVisibility(GONE);
-        iconImg.setTranslationX(0);
 
         helperTxt.setCurrentText(worksWithIfttt);
 
@@ -385,11 +384,6 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
             ongoingImageCall = null;
             setServiceIconImage(bitmap);
         });
-
-        // Move the icon to the right if the Connection has already been authenticated and enabled.
-        FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) iconImg.getLayoutParams();
-        lp.gravity = connection.status == enabled ? Gravity.END : Gravity.START;
-        iconImg.setLayoutParams(lp);
 
         connectStateTxt.setAlpha(1f);
         buttonRoot.setBackground(buildButtonBackground(getContext(), BLACK));
@@ -423,6 +417,19 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
             iconImg.setOnClickListener(onClickListener);
 
             iconDragHelperCallback.setTrackEndColor(BLACK);
+
+            // Set button position.
+            buttonRoot.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+                @Override
+                public boolean onPreDraw() {
+                    buttonRoot.getViewTreeObserver().removeOnPreDrawListener(this);
+
+                    int iconPosition = buttonRoot.getWidth() - iconImg.getWidth();
+                    ViewCompat.offsetLeftAndRight(iconImg, iconPosition);
+                    buttonRoot.trackViewLeftAndRightOffset(iconImg, iconPosition);
+                    return false;
+                }
+            });
         } else {
             if (connection.status == Connection.Status.disabled) {
                 dispatchState(Disabled);
@@ -462,12 +469,15 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                 } else {
                     int startPosition = iconImg.getLeft();
                     int endPosition = buttonRoot.getWidth() - iconImg.getWidth();
-                    ValueAnimator moveToggle = ValueAnimator.ofFloat(startPosition, endPosition);
+                    ValueAnimator moveToggle = ValueAnimator.ofInt(startPosition, endPosition);
                     moveToggle.setDuration(ANIM_DURATION_MEDIUM);
                     moveToggle.setInterpolator(EASE_INTERPOLATOR);
-                    moveToggle.addUpdateListener(animation -> {
-                        setProgressStateText(animation.getAnimatedFraction());
-                        iconImg.setTranslationX((Float) animation.getAnimatedValue());
+                    moveToggle.addUpdateListener(new SlideIconAnimatorUpdateListener() {
+                        @Override
+                        public void onAnimationUpdate(ValueAnimator animation) {
+                            setProgressStateText(animation.getAnimatedFraction());
+                            super.onAnimationUpdate(animation);
+                        }
                     });
                     Animator emailValidation = buildEmailValidationAnimator();
                     AnimatorSet set = new AnimatorSet();
@@ -479,6 +489,9 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
             // Clicking both the button or the icon ImageView starts the flow.
             buttonRoot.setOnClickListener(onClickListener);
             iconImg.setOnClickListener(onClickListener);
+
+            ViewCompat.offsetLeftAndRight(iconImg, 0);
+            buttonRoot.trackViewLeftAndRightOffset(iconImg, 0);
         }
 
         StartIconDrawable.setPressListener(iconImg);
@@ -529,12 +542,17 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         ValueAnimator iconMovement =
                 ValueAnimator.ofInt(fullDistance / 2 + iconMargin, fullDistance).setDuration(ANIM_DURATION_MEDIUM);
         iconMovement.setInterpolator(EASE_INTERPOLATOR);
-        iconMovement.addUpdateListener(anim -> {
-            ViewCompat.offsetLeftAndRight(iconImg, ((Integer) anim.getAnimatedValue()) - iconImg.getLeft());
-            ViewCompat.offsetLeftAndRight(checkMarkView, ((Integer) anim.getAnimatedValue()) - checkMarkView.getLeft());
+        iconMovement.addUpdateListener(new SlideIconAnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                super.onAnimationUpdate(animation);
 
-            int color = (int) EVALUATOR.evaluate(anim.getAnimatedFraction(), BLACK, worksWithService.brandColor);
-            ((StartIconDrawable) iconImg.getBackground()).setBackgroundColor(color);
+                ViewCompat.offsetLeftAndRight(checkMarkView,
+                        ((Integer) animation.getAnimatedValue()) - checkMarkView.getLeft());
+                int color =
+                        (int) EVALUATOR.evaluate(animation.getAnimatedFraction(), BLACK, worksWithService.brandColor);
+                ((StartIconDrawable) iconImg.getBackground()).setBackgroundColor(color);
+            }
         });
 
         ValueAnimator fadeOutProgress = ValueAnimator.ofFloat(1f, 0f).setDuration(ANIM_DURATION_MEDIUM);
@@ -544,9 +562,16 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
             checkMarkView.setAlpha(alpha);
         });
 
+        int elevation = getResources().getDimensionPixelSize(R.dimen.ifttt_icon_elevation);
+        ValueAnimator changeElevation = ValueAnimator.ofFloat(ViewCompat.getElevation(iconImg), elevation);
+        changeElevation.addUpdateListener(
+                animation -> ViewCompat.setElevation(iconImg, (Float) animation.getAnimatedValue()));
+        changeElevation.setInterpolator(EASE_INTERPOLATOR);
+        changeElevation.setDuration(ANIM_DURATION_MEDIUM);
+
         AnimatorSet checkMarkAnimator = new AnimatorSet();
         checkMarkAnimator.playSequentially(progress, check, iconMovement);
-        checkMarkAnimator.playTogether(iconMovement, fadeOutProgress);
+        checkMarkAnimator.playTogether(iconMovement, fadeOutProgress, changeElevation);
         checkMarkAnimator.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
             @Override
             public void onAnimationStart(Animator animation) {
@@ -555,11 +580,6 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                 connectStateTxt.setAlpha(1f);
                 connectStateTxt.setText(getResources().getString(R.string.ifttt_connected));
                 adjustTextViewLayout(connectStateTxt, buttonState);
-
-                // Update icon view gravity.
-                FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) iconImg.getLayoutParams();
-                lp.gravity = Gravity.END;
-                iconImg.setLayoutParams(lp);
             }
 
             @Override
@@ -615,8 +635,6 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                     return;
                 }
 
-                // Reset the icon's StartIconDrawable back to initial state.
-                iconImg.setTranslationX(0f);
                 ((StartIconDrawable) iconImg.getBackground()).reset();
                 ((StartIconDrawable) iconImg.getBackground()).setBackgroundColor(worksWithService.brandColor);
 
@@ -684,8 +702,10 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         int endPosition = buttonRoot.getWidth() - iconImg.getWidth();
 
         // Adjust duration based on the dragging velocity.
-        long duration = xvel > 0 ? (long) ((endPosition - startPosition) / xvel * 1000L) : ANIM_DURATION_MEDIUM;
-        ObjectAnimator slideIcon = ObjectAnimator.ofFloat(iconImg, "translationX", startPosition, endPosition);
+        long duration = xvel > 0 ? (long) ((endPosition - startPosition) / xvel * 1000L)
+                : (long) (ANIM_DURATION_MEDIUM * (1f - startPosition / (float) endPosition));
+        ValueAnimator slideIcon = ValueAnimator.ofInt(startPosition, endPosition);
+        slideIcon.addUpdateListener(new SlideIconAnimatorUpdateListener());
         slideIcon.setDuration(duration);
 
         // Fade in email EditText.
@@ -997,6 +1017,8 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
             buttonApiHelper.cancelDisconnect();
             revertableHandler.revertAll();
+
+            buttonRoot.trackViewLeftAndRightOffset(changedView, left);
         }
 
         @Override
@@ -1013,40 +1035,27 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
             if ((releasedChild.getLeft() + releasedChild.getWidth() / 2) / (float) buttonRoot.getWidth() <= 0.5f) {
                 if (connection.status != enabled) {
                     // Connection is already in disabled status.
-                    settleView(0, null);
+                    settleView(releasedChild, 0, null);
                 } else {
-                    settleView(0, () -> {
-                        // Record the settled position for the view. The animation for disabling Connection will involve
-                        // adding/removing views.
-                        FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) releasedChild.getLayoutParams();
-                        lp.gravity = Gravity.START;
-                        releasedChild.setLayoutParams(lp);
-                        disableConnection();
-                    });
+                    settleView(releasedChild, 0, this::disableConnection);
                 }
             } else {
                 int left = buttonRoot.getWidth() - iconImg.getWidth();
                 if (connection.status == enabled) {
                     // Connection is already in enabled status.
-                    settleView(left, null);
+                    settleView(releasedChild, left, null);
                 } else {
                     if (buttonApiHelper.shouldPresentEmail(getContext())) {
                         settledAt = left;
                         buildEmailTransitionAnimator(xvel).start();
                     } else {
-                        settleView(left, () -> {
-                            FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) releasedChild.getLayoutParams();
-                            lp.gravity = Gravity.END;
-                            releasedChild.setLayoutParams(lp);
-
-                            buildEmailValidationAnimator().start();
-                        });
+                        settleView(releasedChild, left, () -> buildEmailValidationAnimator().start());
                     }
                 }
             }
         }
 
-        private void settleView(int left, @Nullable Runnable endAction) {
+        private void settleView(View changedView, int left, @Nullable Runnable endAction) {
             Runnable settlingAnimation = new Runnable() {
                 @Override
                 public void run() {
@@ -1054,6 +1063,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                         post(this);
                     } else {
                         settledAt = left;
+                        buttonRoot.trackViewLeftAndRightOffset(changedView, left);
                         if (endAction != null) {
                             endAction.run();
                         }
@@ -1070,8 +1080,10 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
         private void disableConnection() {
             AnimatorSet processing = new AnimatorSet();
-            ObjectAnimator moveIcon = ObjectAnimator.ofFloat(iconImg, "translationX", iconImg.getLeft(), 0);
+            ValueAnimator moveIcon = ValueAnimator.ofInt(iconImg.getLeft(), 0);
+            moveIcon.addUpdateListener(new SlideIconAnimatorUpdateListener());
             moveIcon.setInterpolator(EASE_INTERPOLATOR);
+
             ObjectAnimator fadeInConnect = ObjectAnimator.ofFloat(connectStateTxt, "alpha", 0f, 0.5f);
             fadeInConnect.addListener(new AnimatorListenerAdapter() {
                 @Override
@@ -1085,47 +1097,46 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
             processing.playTogether(fadeInConnect, moveIcon);
             processing.setDuration(ANIM_DURATION_SHORT);
             processing.start();
-            buttonApiHelper.disableConnection(getLifecycle(), connection.id,
-                    new PendingResult.ResultCallback<Connection>() {
-                        @Override
-                        public void onSuccess(Connection result) {
-                            connectStateTxt.animate().alpha(1f).start();
-                            setConnection(result);
-                            processAndRun(() -> cleanUpViews(ProgressView.class));
-                        }
+            buttonApiHelper.disableConnection(getLifecycle(), connection.id, new ResultCallback<Connection>() {
+                @Override
+                public void onSuccess(Connection result) {
+                    connectStateTxt.animate().alpha(1f).start();
+                    setConnection(result);
+                    processAndRun(() -> cleanUpViews(ProgressView.class));
+                }
 
-                        @Override
-                        public void onFailure(ErrorResponse errorResponse) {
-                            for (ButtonStateChangeListener listener : listeners) {
-                                listener.onError(errorResponse);
-                            }
+                @Override
+                public void onFailure(ErrorResponse errorResponse) {
+                    for (ButtonStateChangeListener listener : listeners) {
+                        listener.onError(errorResponse);
+                    }
 
-                            processAndRun(() -> {
-                                connectStateTxt.animate().alpha(1f).start();
-                                cleanUpViews(ProgressView.class);
-                                dispatchError(errorResponse);
-                            });
-                        }
+                    processAndRun(() -> {
+                        connectStateTxt.animate().alpha(1f).start();
+                        cleanUpViews(ProgressView.class);
+                        dispatchError(errorResponse);
+                    });
+                }
 
-                        private void processAndRun(Runnable runnable) {
-                            if (processing.isRunning()) {
-                                processing.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
-                                    @Override
-                                    public void onAnimationEnd(Animator animation) {
-                                        super.onAnimationEnd(animation);
-                                        if (isCanceled()) {
-                                            return;
-                                        }
+                private void processAndRun(Runnable runnable) {
+                    if (processing.isRunning()) {
+                        processing.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                super.onAnimationEnd(animation);
+                                if (isCanceled()) {
+                                    return;
+                                }
 
-                                        runnable.run();
-                                    }
-                                });
-                            } else {
-                                cleanUpViews(ProgressView.class);
                                 runnable.run();
                             }
-                        }
-                    });
+                        });
+                    } else {
+                        cleanUpViews(ProgressView.class);
+                        runnable.run();
+                    }
+                }
+            });
         }
     }
 
@@ -1231,6 +1242,21 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
         boolean isCanceled() {
             return isCanceled;
+        }
+    }
+
+    /**
+     * {@link ValueAnimator.AnimatorUpdateListener} used on ValueAnimators that moves the button position.
+     */
+    private class SlideIconAnimatorUpdateListener implements ValueAnimator.AnimatorUpdateListener {
+
+        @CallSuper
+        @Override
+        public void onAnimationUpdate(ValueAnimator animation) {
+            int value = (Integer) animation.getAnimatedValue();
+            int offset = value - iconImg.getLeft();
+            ViewCompat.offsetLeftAndRight(iconImg, offset);
+            buttonRoot.trackViewLeftAndRightOffset(iconImg, value);
         }
     }
 }
