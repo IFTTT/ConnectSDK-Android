@@ -12,22 +12,11 @@ import static com.google.common.truth.Truth.assertThat;
 public final class ConnectResultTest {
 
     @Test
-    public void fromServiceConnection() {
-        Intent intent = new Intent().setData(Uri.parse("test://url?next_step=service_authentication&service_id=service"));
-        ConnectResult result = ConnectResult.fromIntent(intent);
-
-        assertThat(result.nextStep).isEqualTo(ConnectResult.NextStep.ServiceAuthentication);
-        assertThat(result.serviceId).isEqualTo("service");
-        assertThat(result.errorType).isNull();
-    }
-
-    @Test
     public void fromInvalidServiceConnection() {
         Intent intent = new Intent().setData(Uri.parse("test://url?next_step=service_connection"));
         ConnectResult result = ConnectResult.fromIntent(intent);
 
         assertThat(result.nextStep).isEqualTo(ConnectResult.NextStep.Unknown);
-        assertThat(result.serviceId).isNull();
         assertThat(result.errorType).isNull();
     }
 
@@ -37,7 +26,6 @@ public final class ConnectResultTest {
         ConnectResult result = ConnectResult.fromIntent(intent);
 
         assertThat(result.nextStep).isEqualTo(ConnectResult.NextStep.Complete);
-        assertThat(result.serviceId).isNull();
         assertThat(result.errorType).isNull();
     }
 
@@ -47,7 +35,6 @@ public final class ConnectResultTest {
         ConnectResult result = ConnectResult.fromIntent(intent);
 
         assertThat(result.nextStep).isEqualTo(ConnectResult.NextStep.Unknown);
-        assertThat(result.serviceId).isNull();
         assertThat(result.errorType).isNull();
     }
 
@@ -57,7 +44,6 @@ public final class ConnectResultTest {
         ConnectResult result = ConnectResult.fromIntent(intent);
 
         assertThat(result.nextStep).isEqualTo(ConnectResult.NextStep.Error);
-        assertThat(result.serviceId).isNull();
         assertThat(result.errorType).isEqualTo("account_creation");
     }
 }

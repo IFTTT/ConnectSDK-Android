@@ -13,7 +13,6 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.ifttt.ui.ConnectButtonState.CreateAccount;
 import static com.ifttt.ui.ConnectButtonState.Initial;
 import static com.ifttt.ui.ConnectButtonState.Login;
-import static com.ifttt.ui.ConnectButtonState.ServiceAuthentication;
 import static java.util.Collections.emptyList;
 
 @RunWith(RobolectricTestRunner.class)
@@ -53,17 +52,6 @@ public final class ButtonApiHelperTest {
         Uri uri2 = ButtonApiHelper.getEmbedUri(connection, Login, redirectUri, Collections.emptyList(), "abc@efg.com",
                 null, "", "auth_code", "abcd");
         assertThat(uri2.getQueryParameter("code")).isEqualTo("auth_code");
-    }
-
-    @Test
-    public void testServiceAuthentication() {
-        Uri uri = ButtonApiHelper.getEmbedUri(connection, Initial, redirectUri, Collections.emptyList(), "abc@efg.com",
-                null, "", "auth_code", "abcd");
-        assertThat(uri.getQueryParameter("skip_sdk_redirect")).isNull();
-
-        Uri uri1 = ButtonApiHelper.getEmbedUri(connection, ServiceAuthentication, redirectUri, Collections.emptyList(),
-                "abc@efg.com", null, "", "auth_code", "abcd");
-        assertThat(uri1.getQueryParameter("skip_sdk_redirect")).isEqualTo("true");
     }
 
     @Test

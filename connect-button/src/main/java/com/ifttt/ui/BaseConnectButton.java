@@ -74,7 +74,6 @@ import static com.ifttt.ui.ConnectButtonState.Disabled;
 import static com.ifttt.ui.ConnectButtonState.Enabled;
 import static com.ifttt.ui.ConnectButtonState.Initial;
 import static com.ifttt.ui.ConnectButtonState.Login;
-import static com.ifttt.ui.ConnectButtonState.ServiceAuthentication;
 
 /**
  * Internal implementation of a Connect Button widget, all of the states and transitions are implemented here.
@@ -311,11 +310,6 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
         cleanUpViews(ProgressView.class);
         switch (result.nextStep) {
-            case ServiceAuthentication:
-                worksWithService = findNextServiceToConnect(result);
-                getStartServiceAuthAnimator(worksWithService).start();
-                dispatchState(ServiceAuthentication);
-                break;
             case Complete:
                 complete();
                 break;
@@ -957,20 +951,6 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
             }
         };
         application.registerActivityLifecycleCallbacks(activityLifecycleCallbacks);
-    }
-
-    @Nullable
-    private Service findNextServiceToConnect(ConnectResult result) {
-        // Find the next service to connect.
-        Service nextService = null;
-        for (Service service : connection.services) {
-            if (service.id.equals(result.serviceId)) {
-                nextService = service;
-                break;
-            }
-        }
-
-        return nextService;
     }
 
     /**

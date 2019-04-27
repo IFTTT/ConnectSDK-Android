@@ -20,12 +20,6 @@ public enum ConnectButtonState {
     Login,
 
     /**
-     * A button state for service connection step. In this step, the user is going to be redirected to web to
-     * login to the service and connect to IFTTT.
-     */
-    ServiceAuthentication,
-
-    /**
      * A button state for displaying a Connection that is enabled.
      */
     Enabled,
