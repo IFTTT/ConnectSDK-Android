@@ -22,7 +22,7 @@ import static com.ifttt.ui.ConnectResult.NextStep.Unknown;
  */
 public final class ConnectResult implements Parcelable {
 
-    public static final ConnectResult UNKNOWN = new ConnectResult(Unknown, null, null, null);
+    public static final ConnectResult UNKNOWN = new ConnectResult(Unknown, null, null);
 
     public enum NextStep {
         /**
@@ -73,18 +73,17 @@ public final class ConnectResult implements Parcelable {
         String nextStepParam = data.getQueryParameter("next_step");
         if ("complete".equals(nextStepParam)) {
             String userToken = data.getQueryParameter("user_token");
-            return new ConnectResult(Complete, userToken, null, null);
+            return new ConnectResult(Complete, userToken, null);
         } else if ("error".equals(nextStepParam)) {
             String errorType = data.getQueryParameter("error_type");
-            return new ConnectResult(NextStep.Error, null, null, errorType);
+            return new ConnectResult(NextStep.Error, null, errorType);
         }
 
         return UNKNOWN;
     }
 
     @VisibleForTesting
-    ConnectResult(NextStep nextStep, @Nullable String userToken, @Nullable String serviceId,
-            @Nullable String errorType) {
+    ConnectResult(NextStep nextStep, @Nullable String userToken, @Nullable String errorType) {
         this.nextStep = nextStep;
         this.userToken = userToken;
         this.errorType = errorType;
