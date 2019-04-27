@@ -137,33 +137,25 @@ final class ButtonParentView extends FrameLayout {
 
         int horizontalOffset;
 
-        public LayoutParams(@NonNull Context c, @Nullable AttributeSet attrs) {
+        LayoutParams(@NonNull Context c, @Nullable AttributeSet attrs) {
             super(c, attrs);
         }
 
-        public LayoutParams(int width, int height) {
-            super(width, height);
-        }
-
-        public LayoutParams(int width, int height, int gravity) {
-            super(width, height, gravity);
-        }
-
-        public LayoutParams(@NonNull ViewGroup.LayoutParams source) {
+        LayoutParams(@NonNull ViewGroup.LayoutParams source) {
             super(source);
         }
 
-        public LayoutParams(@NonNull MarginLayoutParams source) {
+        LayoutParams(@NonNull MarginLayoutParams source) {
             super(source);
         }
 
         @RequiresApi(api = KITKAT)
-        public LayoutParams(@NonNull FrameLayout.LayoutParams source) {
+        LayoutParams(@NonNull FrameLayout.LayoutParams source) {
             super(source);
         }
 
         @RequiresApi(api = KITKAT)
-        public LayoutParams(@NonNull LayoutParams source) {
+        LayoutParams(@NonNull LayoutParams source) {
             super(source);
 
             this.horizontalOffset = source.horizontalOffset;
