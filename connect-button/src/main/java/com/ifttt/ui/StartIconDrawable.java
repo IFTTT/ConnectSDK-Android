@@ -13,6 +13,7 @@ import android.graphics.Outline;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
@@ -33,7 +34,6 @@ import static android.os.Build.VERSION_CODES.LOLLIPOP;
 final class StartIconDrawable extends Drawable {
 
     private static final ArgbEvaluator EVALUATOR = new ArgbEvaluator();
-    private static final int PRESSED_ALPHA = 200;
 
     private final ShapeDrawable background = new ShapeDrawable();
     private final Drawable serviceIcon;
@@ -175,6 +175,8 @@ final class StartIconDrawable extends Drawable {
 
             Integer color = (Integer) EVALUATOR.evaluate(progress, backgroundColor, startIconBackgroundColor);
             background.getPaint().setColor(color);
+            // Remove any press state color filter.
+            background.getPaint().setColorFilter(null);
 
             float animatedSize = (float) animation.getAnimatedValue();
             int bgWidthDiff = (int) Math.max(0, width - animatedSize);
@@ -198,11 +200,19 @@ final class StartIconDrawable extends Drawable {
     }
 
     private Animator getPressedAnimator(boolean pressed) {
-        int startAlpha = pressed ? 255 : PRESSED_ALPHA;
-        int endAlpha = pressed ? PRESSED_ALPHA : 255;
-        ValueAnimator pressAnimator = ValueAnimator.ofInt(startAlpha, endAlpha);
+        int originalColor = background.getPaint().getColor();
+        int darkerColor = ButtonUiHelper.getDarkerColor(originalColor);
+        ValueAnimator pressAnimator;
+        if (pressed) {
+            pressAnimator = ValueAnimator.ofFloat(0f, 1f);
+        } else {
+            pressAnimator = ValueAnimator.ofFloat(1f, 0f);
+        }
         pressAnimator.addUpdateListener(animation -> {
-            background.setAlpha((Integer) animation.getAnimatedValue());
+            background.getPaint()
+                    .setColorFilter(new PorterDuffColorFilter(
+                            (Integer) EVALUATOR.evaluate((Float) animation.getAnimatedValue(), originalColor,
+                                    darkerColor), PorterDuff.Mode.SRC_IN));
             invalidateSelf();
         });
         return pressAnimator;
@@ -259,12 +269,15 @@ final class StartIconDrawable extends Drawable {
                         }
 
                         ongoingAnimator.cancel();
-                        drawable.getPressedAnimator(false).start();
+                        Animator animator = drawable.getPressedAnimator(false);
+                        animator.start();
                         ongoingAnimator = null;
 
                         if (event.getAction() == MotionEvent.ACTION_UP) {
                             int slop = ViewConfiguration.get(view.getContext()).getScaledTouchSlop();
                             if (getDistance(event.getX(), event.getY()) < slop) {
+                                // Immediately end the animation.
+                                animator.end();
                                 v.performClick();
                             }
                         }
