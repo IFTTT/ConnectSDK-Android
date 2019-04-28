@@ -23,7 +23,6 @@ import android.text.style.ForegroundColorSpan;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.view.animation.LinearInterpolator;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -354,20 +353,12 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         if (onDarkBackground) {
             // Add a border.
             buttonRoot.setForeground(ContextCompat.getDrawable(getContext(), R.drawable.ifttt_button_border));
-
-            // Set helper text to white.
             setTextSwitcherTextColor(helperTxt, WHITE);
-
-            // Tint the logo Drawable within the text to white.
             DrawableCompat.setTint(DrawableCompat.wrap(iftttLogo), WHITE);
         } else {
             // Remove border.
             buttonRoot.setForeground(null);
-
-            // Set helper text to black.
             setTextSwitcherTextColor(helperTxt, BLACK);
-
-            // Tint the logo Drawable within the text to black.
             DrawableCompat.setTint(DrawableCompat.wrap(iftttLogo), BLACK);
         }
 
@@ -415,18 +406,15 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
             // Set button position.
             if (ViewCompat.isLaidOut(buttonRoot)) {
                 int iconPosition = buttonRoot.getWidth() - iconImg.getWidth();
-                ViewCompat.offsetLeftAndRight(iconImg, iconPosition);
                 buttonRoot.trackViewLeftAndRightOffset(iconImg, iconPosition);
             } else {
-                buttonRoot.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+                buttonRoot.addOnLayoutChangeListener(new OnLayoutChangeListener() {
                     @Override
-                    public boolean onPreDraw() {
-                        buttonRoot.getViewTreeObserver().removeOnPreDrawListener(this);
-
+                    public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft,
+                            int oldTop, int oldRight, int oldBottom) {
+                        buttonRoot.removeOnLayoutChangeListener(this);
                         int iconPosition = buttonRoot.getWidth() - iconImg.getWidth();
-                        ViewCompat.offsetLeftAndRight(iconImg, iconPosition);
                         buttonRoot.trackViewLeftAndRightOffset(iconImg, iconPosition);
-                        return false;
                     }
                 });
             }
@@ -490,7 +478,6 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
             buttonRoot.setOnClickListener(onClickListener);
             iconImg.setOnClickListener(onClickListener);
 
-            ViewCompat.offsetLeftAndRight(iconImg, 0);
             buttonRoot.trackViewLeftAndRightOffset(iconImg, 0);
         }
 
