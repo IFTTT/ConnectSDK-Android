@@ -78,11 +78,11 @@ final class ImageLoader {
                     return;
                 }
 
-                InputStream inputStream = response.body().byteStream();
-                Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-
-                cache.put(url, bitmap);
-                handler.post(() -> listener.onComplete(bitmap));
+                try (InputStream inputStream = response.body().byteStream()) {
+                    Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                    cache.put(url, bitmap);
+                    handler.post(() -> listener.onComplete(bitmap));
+                }
             }
         });
 
