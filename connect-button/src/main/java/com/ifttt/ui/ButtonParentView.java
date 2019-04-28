@@ -4,15 +4,18 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.core.view.ViewCompat;
 import androidx.customview.widget.ViewDragHelper;
 import com.ifttt.R;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import javax.annotation.CheckReturnValue;
+
+import static android.os.Build.VERSION.SDK_INT;
+import static android.os.Build.VERSION_CODES.KITKAT;
 
 /**
  * Custom view used to handle dragging gesture with a {@link ViewDragHelper} as well as setting maximum width for the
@@ -24,8 +27,6 @@ final class ButtonParentView extends FrameLayout {
     private final int minWidth = getResources().getDimensionPixelSize(R.dimen.ifttt_connect_button_min_width);
 
     private ViewDragHelper helper;
-
-    private final Map<View, Integer> viewOffsets = new LinkedHashMap<>();
 
     public ButtonParentView(@NonNull Context context) {
         super(context);
@@ -56,8 +57,10 @@ final class ButtonParentView extends FrameLayout {
         super.onLayout(changed, left, top, right, bottom);
 
         // Re-apply all targeted views' horizontal offset.
-        for (Map.Entry<View, Integer> entry : viewOffsets.entrySet()) {
-            ViewCompat.offsetLeftAndRight(entry.getKey(), entry.getValue());
+        for (int i = 0; i < getChildCount(); i++) {
+            View child = getChildAt(i);
+            int offset = ((LayoutParams) child.getLayoutParams()).horizontalOffset;
+            ViewCompat.offsetLeftAndRight(child, offset);
         }
     }
 
@@ -74,7 +77,39 @@ final class ButtonParentView extends FrameLayout {
      * @param left Offset pixels that is applied to the target view.
      */
     void trackViewLeftAndRightOffset(View target, int left) {
-        viewOffsets.put(target, left);
+        ((LayoutParams) target.getLayoutParams()).horizontalOffset = left;
+    }
+
+    @Override
+    protected FrameLayout.LayoutParams generateDefaultLayoutParams() {
+        if (SDK_INT >= KITKAT) {
+            return new LayoutParams(super.generateDefaultLayoutParams());
+        }
+
+        return new LayoutParams((MarginLayoutParams) super.generateDefaultLayoutParams());
+    }
+
+    @Override
+    public FrameLayout.LayoutParams generateLayoutParams(AttributeSet attrs) {
+        return new LayoutParams(getContext(), attrs);
+    }
+
+    @Override
+    protected boolean checkLayoutParams(ViewGroup.LayoutParams p) {
+        return p instanceof LayoutParams;
+    }
+
+    @Override
+    protected ViewGroup.LayoutParams generateLayoutParams(ViewGroup.LayoutParams lp) {
+        if (SDK_INT >= KITKAT && lp instanceof LayoutParams) {
+            return new LayoutParams((LayoutParams) lp);
+        } else if (SDK_INT >= KITKAT && lp instanceof FrameLayout.LayoutParams) {
+            return new LayoutParams((FrameLayout.LayoutParams) lp);
+        } else if (lp instanceof MarginLayoutParams) {
+            return new LayoutParams((MarginLayoutParams) lp);
+        } else {
+            return new LayoutParams(lp);
+        }
     }
 
     @Override
@@ -96,5 +131,34 @@ final class ButtonParentView extends FrameLayout {
         }
         helper.processTouchEvent(event);
         return super.onTouchEvent(event);
+    }
+
+    private static final class LayoutParams extends FrameLayout.LayoutParams {
+
+        int horizontalOffset;
+
+        LayoutParams(@NonNull Context c, @Nullable AttributeSet attrs) {
+            super(c, attrs);
+        }
+
+        LayoutParams(@NonNull ViewGroup.LayoutParams source) {
+            super(source);
+        }
+
+        LayoutParams(@NonNull MarginLayoutParams source) {
+            super(source);
+        }
+
+        @RequiresApi(api = KITKAT)
+        LayoutParams(@NonNull FrameLayout.LayoutParams source) {
+            super(source);
+        }
+
+        @RequiresApi(api = KITKAT)
+        LayoutParams(@NonNull LayoutParams source) {
+            super(source);
+
+            this.horizontalOffset = source.horizontalOffset;
+        }
     }
 }
