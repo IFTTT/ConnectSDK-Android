@@ -50,18 +50,18 @@ dependencies {
 
 ext {
     bintrayRepo = 'maven'
-    bintrayName = 'ifttt-sdk-android'
+    bintrayName = 'connect-button'
 
     publishedGroupId = 'com.ifttt'
-    libraryName = 'ifttt-sdk-android'
-    artifact = 'ifttt-sdk-android'
+    libraryName = 'connect-button'
+    artifact = 'connect-button'
 
-    libraryDescription = 'IFTTT Android SDK is a library that helps facilitate the integration of the IFTTT API.'
+    libraryDescription = 'Connect Button SDK is a library that helps facilitate the integration of the Connect Button and Connection API.'
 
     siteUrl = 'https://github.com/IFTTT/IFTTTSDK-Android'
     gitUrl = 'https://github.com/IFTTT/IFTTTSDK-Android.git'
 
-    libraryVersion = '0.0.1'
+    libraryVersion = '2.0.0'
 
     developerId = 'lzanita09'
     developerName = 'Zhe Lu'
