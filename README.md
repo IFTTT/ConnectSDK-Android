@@ -21,7 +21,7 @@ IFTTT Connect Button SDK is a library that helps facilitate the integration of t
 This SDK uses the following libraries as dependencies:
 * [Retrofit v2.4.0](http://square.github.io/retrofit/)
 * [OkHttp v3.11.0](http://square.github.io/okhttp/)
-* [Moshi v1.6.0](https://github.com/square/moshi)
+* [Moshi v1.8.0](https://github.com/square/moshi)
 * [Android X](https://developer.android.com/topic/libraries/support-library/androidx-overview)
 	* Chrome Custom Tabs
 	* AppCompat
@@ -40,8 +40,8 @@ implementation(name: 'connect-button-release', ext: 'aar')
 implementation 'com.squareup.okhttp3:okhttp:3.11.0'
 implementation 'com.squareup.retrofit2:retrofit:2.4.0'
 implementation 'com.squareup.retrofit2:converter-moshi:2.4.0'
-implementation 'com.squareup.moshi:moshi:1.6.0'
-implementation 'com.squareup.moshi:moshi-adapters:1.6.0'
+implementation 'com.squareup.moshi:moshi:1.8.0'
+implementation 'com.squareup.moshi:moshi-adapters:1.8.0'
 implementation 'androidx.browser:browser:1.0.0'
 ```
 Including the library as an aar file doesn't come with any transitive dependencies, you will need to include them manually.
