@@ -15,8 +15,6 @@ IFTTT Connect Button SDK is a library that helps facilitate the integration of t
 * A lightweight wrapper around the IFTTT Connection API, with predefined data structures and JSON adapters.
 * Connect Button UI representation.
 
-<img width="469" alt="connect_button_screenshot" src="https://user-images.githubusercontent.com/1761573/56773012-45b58480-6771-11e9-9958-b0965f5518a3.png">
-
 ## Dependencies
 This SDK uses the following libraries as dependencies:
 * [Retrofit v2.4.0](http://square.github.io/retrofit/)
@@ -165,6 +163,23 @@ The SDK provides the basic data structure for the data returned from the Connect
 	* color icon URL
 	* monochrome icon URL
 	* brand color
+	
+### ConnectButton
+
+<img width="469" alt="connect_button_screenshot" src="https://user-images.githubusercontent.com/1761573/56773012-45b58480-6771-11e9-9958-b0965f5518a3.png">
+
+#### Dark mode
+`ConnectButton` provides dark theme for apps that want to display the View on a dark background. To toggle the dark theme on ConnectButton, call `ConnectButton#setOnDarkBackground`.
+
+<img width="469" alt="Screen Shot 2019-04-29 at 9 29 45 AM" src="https://user-images.githubusercontent.com/1761573/56911433-bb676c00-6a61-11e9-95fe-3055790067e5.png">
+
+#### Button state change listeners
+In case your app wants to listen to the button state changes, you can register a `ButtonStateChangeListener` via `ConnectButton#addButtonStateChangeListener`.
+
+To unregister the listener, call `ConnectButton#removeButtonStateChangeListener`.
+
+#### Layout limitation.
+Because the View is designed to be used to occupy the screen width, `ConnectButton` has a minimum width of 300dp and a maximum width 330dp. Please make sure to give enough space for the View on your UI. Between the minimum and the maximum width, the View will try to keep a set start and end margin on the button view.    
 
 ### ConnectionApiClient
 `ConnectionApiClient` is the IFTTT Connection API wrapper, it can be used to make API calls with pre-defined data structures mentioned above. To start, use the `ConnectionApiClient.Builder` to get an instance with the following methods:
