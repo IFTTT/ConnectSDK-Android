@@ -10,7 +10,7 @@ android {
         minSdkVersion 18
         targetSdkVersion 28
         versionCode 4
-        versionName "2.0.0"
+        versionName "2.0.0-rc1"
     }
 
     buildTypes {
@@ -60,7 +60,7 @@ ext {
     siteUrl = 'https://github.com/IFTTT/IFTTTSDK-Android'
     gitUrl = 'https://github.com/IFTTT/IFTTTSDK-Android.git'
 
-    libraryVersion = '2.0.0'
+    libraryVersion = '2.0.0-rc1'
 
     developerId = 'lzanita09'
     developerName = 'Zhe Lu'
