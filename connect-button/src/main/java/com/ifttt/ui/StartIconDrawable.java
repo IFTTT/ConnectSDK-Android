@@ -66,7 +66,7 @@ final class StartIconDrawable extends Drawable {
             startIcon.setColorFilter(null);
         }
 
-        int borderColor = ContextCompat.getColor(context, R.color.ifttt_semi_transparent_white);
+        int borderColor = ContextCompat.getColor(context, R.color.ifttt_button_border_color);
         int borderWidth = context.getResources().getDimensionPixelSize(R.dimen.ifttt_button_border_width);
         borderDrawable.getPaint().setColor(borderColor);
         borderDrawable.getPaint().setStyle(Paint.Style.STROKE);

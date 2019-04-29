@@ -10,6 +10,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
@@ -110,6 +111,9 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
     private final ArrayList<ButtonStateChangeListener> listeners = new ArrayList<>();
 
+    private final int borderSize = getResources().getDimensionPixelSize(R.dimen.ifttt_button_border_width);
+    private final Drawable borderDrawable = ContextCompat.getDrawable(getContext(), R.drawable.ifttt_button_border);
+
     private ConnectButtonState buttonState = Initial;
     private Connection connection;
     private Service worksWithService;
@@ -205,6 +209,24 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         return lifecycleRegistry;
     }
 
+    @Override
+    protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        super.onLayout(changed, l, t, r, b);
+
+        // Prepare the border Drawable to have the right size and positioning.
+        borderDrawable.setBounds(buttonRoot.getLeft() - borderSize, buttonRoot.getTop() - borderSize,
+                buttonRoot.getRight() + borderSize, buttonRoot.getBottom() + borderSize);
+    }
+
+    @Override
+    protected void dispatchDraw(Canvas canvas) {
+        super.dispatchDraw(canvas);
+
+        if (onDarkBackground) {
+            borderDrawable.draw(canvas);
+        }
+    }
+
     void setErrorMessage(CharSequence text, OnClickListener listener) {
         float currentAlpha = helperTxt.getCurrentView().getAlpha();
         helperTxt.setText(text);
@@ -249,15 +271,16 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
      * @param onDarkBackground True if the button is used in a dark background, false otherwise.
      */
     void setOnDarkBackground(boolean onDarkBackground) {
+        if (this.onDarkBackground == onDarkBackground) {
+            return;
+        }
+
         this.onDarkBackground = onDarkBackground;
 
         TextView currentHelperTextView = (TextView) helperTxt.getCurrentView();
         TextView nextHelperTextView = (TextView) helperTxt.getNextView();
 
         if (onDarkBackground) {
-            // Add a border.
-            buttonRoot.setForeground(ContextCompat.getDrawable(getContext(), R.drawable.ifttt_button_border));
-
             // Set helper text to white.
             int semiTransparentWhite = ContextCompat.getColor(getContext(), R.color.ifttt_footer_text_white);
             currentHelperTextView.setTextColor(semiTransparentWhite);
@@ -266,9 +289,6 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
             // Tint the logo Drawable within the text to white.
             DrawableCompat.setTint(DrawableCompat.wrap(iftttLogo), semiTransparentWhite);
         } else {
-            // Remove border.
-            buttonRoot.setForeground(null);
-
             // Set helper text to black.
             int semiTransparentBlack = ContextCompat.getColor(getContext(), R.color.ifttt_footer_text_black);
             currentHelperTextView.setTextColor(semiTransparentBlack);
@@ -277,6 +297,8 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
             // Tint the logo Drawable within the text to black.
             DrawableCompat.setTint(DrawableCompat.wrap(iftttLogo), semiTransparentBlack);
         }
+
+        invalidate();
     }
 
     /**
@@ -351,13 +373,9 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         helperTxt.setCurrentText(worksWithIfttt);
 
         if (onDarkBackground) {
-            // Add a border.
-            buttonRoot.setForeground(ContextCompat.getDrawable(getContext(), R.drawable.ifttt_button_border));
             setTextSwitcherTextColor(helperTxt, WHITE);
             DrawableCompat.setTint(DrawableCompat.wrap(iftttLogo), WHITE);
         } else {
-            // Remove border.
-            buttonRoot.setForeground(null);
             setTextSwitcherTextColor(helperTxt, BLACK);
             DrawableCompat.setTint(DrawableCompat.wrap(iftttLogo), BLACK);
         }
