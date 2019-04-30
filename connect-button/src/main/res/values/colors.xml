@@ -11,4 +11,5 @@
     <color name="ifttt_error_red">#FF2121</color>
     <color name="ifttt_footer_text_white">#4CFFFFFF</color>
     <color name="ifttt_footer_text_black">#4C000000</color>
+    <color name="ifttt_button_border_color">#4CFFFFFF</color>
 </resources>

@@ -1,7 +1,6 @@
 package com.ifttt.ui;
 
 import android.net.Uri;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
@@ -95,21 +94,17 @@ public final class BaseConnectButtonTest {
         TextView currentHelperTextView = (TextView) helperText.getCurrentView();
         TextView nextHelperTextView = (TextView) helperText.getNextView();
 
-        FrameLayout buttonRoot = button.findViewById(R.id.ifttt_button_root);
-
         button.setOnDarkBackground(true);
         assertThat(currentHelperTextView.getCurrentTextColor()).isEqualTo(
                 ContextCompat.getColor(button.getContext(), R.color.ifttt_footer_text_white));
         assertThat(nextHelperTextView.getCurrentTextColor()).isEqualTo(
                 ContextCompat.getColor(button.getContext(), R.color.ifttt_footer_text_white));
-        assertThat(buttonRoot.getForeground()).isNotNull();
 
         button.setOnDarkBackground(false);
         assertThat(currentHelperTextView.getCurrentTextColor()).isEqualTo(
                 ContextCompat.getColor(button.getContext(), R.color.ifttt_footer_text_black));
         assertThat(nextHelperTextView.getCurrentTextColor()).isEqualTo(
                 ContextCompat.getColor(button.getContext(), R.color.ifttt_footer_text_black));
-        assertThat(buttonRoot.getForeground()).isNull();
     }
 
     @Test
