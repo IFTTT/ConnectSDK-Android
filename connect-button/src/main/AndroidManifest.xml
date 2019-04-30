@@ -1,6 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.ifttt">
     <application>
-        <activity android:name=".ui.AboutIftttActivity" />
+        <activity android:name=".ui.AboutIftttActivity"
+            android:theme="@style/AboutIfttt"/>
     </application>
 </manifest>
