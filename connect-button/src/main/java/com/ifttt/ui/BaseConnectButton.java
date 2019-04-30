@@ -513,7 +513,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                 getDarkerColor(worksWithService.brandColor));
         CheckMarkView checkMarkView = CheckMarkView.create(buttonRoot);
 
-        CharSequence text = getResources().getString(R.string.ifttt_connecting_account);
+        CharSequence text = getResources().getString(R.string.ifttt_connecting_account, worksWithService.name);
         Animator progress = progressView.progress(0f, 1f, text, ANIM_DURATION_LONG);
         Animator check = checkMarkView.getAnimator(ENABLE);
         check.setStartDelay(100L);
