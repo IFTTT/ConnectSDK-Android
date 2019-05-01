@@ -235,7 +235,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
             listener.onClick(v);
 
             // Revert back to the original text.
-            helperTxt.setOnClickListener(null);
+            helperTxt.setClickable(false);
             helperTxt.showNext();
             helperTxt.getNextView().setAlpha(currentAlpha);
         });
@@ -771,8 +771,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                     public void revert() {
                         helperTxt.showNext();
                         helperTxt.getNextView().setAlpha(currentAlpha);
-                        helperTxt.setOnClickListener(
-                                v -> getContext().startActivity(AboutIftttActivity.intent(getContext(), connection)));
+                        helperTxt.setClickable(true);
                     }
 
                     @Override
@@ -784,7 +783,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                                 0, errorMessage.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                         helperTxt.setText(errorMessage);
                         helperTxt.getCurrentView().setAlpha(1f);
-                        helperTxt.setOnClickListener(null);
+                        helperTxt.setClickable(false);
                     }
                 };
 
@@ -802,7 +801,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
             emailValidation.start();
             String email = emailEdt.getText().toString();
             buttonApiHelper.prepareAuthentication(email);
-            helperTxt.setOnClickListener(null);
+            helperTxt.setClickable(false);
         };
 
         // Only enable the OnClickListener after the animation has completed.
@@ -832,6 +831,8 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                     }
                     return false;
                 });
+
+                helperTxt.setClickable(true);
             }
         });
 
@@ -861,7 +862,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
             public void onAnimationStart(Animator animation) {
                 super.onAnimationStart(animation);
                 helperTxt.setText(worksWithIfttt);
-                helperTxt.setOnClickListener(null);
+                helperTxt.setClickable(false);
             }
 
             @Override
