@@ -21,6 +21,7 @@ import android.os.Parcelable;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
+import android.text.style.UnderlineSpan;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
@@ -531,7 +532,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                 getDarkerColor(worksWithService.brandColor));
         CheckMarkView checkMarkView = CheckMarkView.create(buttonRoot);
 
-        CharSequence text = getResources().getString(R.string.ifttt_connecting_account, worksWithService.name);
+        CharSequence text = getResources().getString(R.string.ifttt_connecting_account);
         Animator progress = progressView.progress(0f, 1f, text, ANIM_DURATION_LONG);
         Animator check = checkMarkView.getAnimator(ENABLE);
         check.setStartDelay(100L);
@@ -811,9 +812,11 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
             public void onAnimationStart(Animator animation) {
                 super.onAnimationStart(animation);
 
-                CharSequence authorizePrompt = new SpannableString(
+                SpannableString authorizePrompt = new SpannableString(
                         replaceKeyWithImage((TextView) helperTxt.getCurrentView(),
                                 getContext().getString(R.string.ifttt_authorize_with), "IFTTT", iftttLogo));
+                authorizePrompt.setSpan(new UnderlineSpan(), authorizePrompt.length() - 10, authorizePrompt.length(),
+                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 helperTxt.setText(authorizePrompt);
             }
 
