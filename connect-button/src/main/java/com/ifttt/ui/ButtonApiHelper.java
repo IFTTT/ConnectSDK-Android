@@ -225,6 +225,17 @@ final class ButtonApiHelper {
         return intent;
     }
 
+    @CheckReturnValue
+    @Nullable
+    static Intent redirectToTerms(Context context) {
+        Intent intent = new Intent(Intent.ACTION_VIEW).setData(Uri.parse("https://ifttt.com/terms"));
+        if (!hasActivityToLaunch(context, intent)) {
+            return null;
+        }
+
+        return intent;
+    }
+
     private static boolean hasActivityToLaunch(Context context, Intent intent) {
         PackageManager packageManager = context.getPackageManager();
         return !packageManager.queryIntentActivities(intent, 0).isEmpty();
