@@ -143,11 +143,5 @@ public final class ConnectionApiClient {
         public PendingResult<User> user() {
             return new ApiPendingResult<>(retrofitConnectionApi.user(), errorResponseJsonAdapter);
         }
-
-        @Override
-        public PendingResult<String> userToken(String oAuthToken, String userId, String serviceKey) {
-            return new ApiPendingResult<>(retrofitConnectionApi.getUserToken(oAuthToken, userId, serviceKey),
-                    errorResponseJsonAdapter);
-        }
     }
 }
