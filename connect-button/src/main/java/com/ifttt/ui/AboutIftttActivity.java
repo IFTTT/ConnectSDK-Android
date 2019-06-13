@@ -76,12 +76,13 @@ public final class AboutIftttActivity extends AppCompatActivity {
         View googlePlayView = findViewById(R.id.google_play_link);
 
         PackageManager packageManager = getPackageManager();
-        if ((connection.status == Connection.Status.enabled || connection.status == Connection.Status.disabled)
-                && ButtonUiHelper.isIftttInstalled(packageManager)) {
+        boolean hasConnected =
+                connection.status == Connection.Status.enabled || connection.status == Connection.Status.disabled;
+        if (hasConnected || ButtonUiHelper.isIftttInstalled(packageManager)) {
             googlePlayView.setVisibility(View.GONE);
 
             Intent manageIntent = ButtonApiHelper.redirectToManage(this, connection.id);
-            if (manageIntent != null) {
+            if (manageIntent != null && hasConnected) {
                 manageConnectionView.setVisibility(View.VISIBLE);
                 manageConnectionView.setOnClickListener(v -> startActivity(manageIntent));
             }
