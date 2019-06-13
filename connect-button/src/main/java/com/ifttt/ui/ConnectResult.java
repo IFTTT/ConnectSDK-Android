@@ -24,6 +24,24 @@ public final class ConnectResult implements Parcelable {
 
     public static final ConnectResult UNKNOWN = new ConnectResult(Unknown, null, null);
 
+    /**
+     * Error type representing service authentication errors. This happens when there is an error occurred during the
+     * service authentication step and the user cannot authenticate the service with IFTTT.
+     */
+    public static final String ERROR_TYPE_AUTH = "auth_error";
+
+    /**
+     * Error type representing verification errors. This happens during the connection flow with the IFTTT app, where
+     * the user cannot verify their identity through the app.
+     */
+    public static final String ERROR_TYPE_VERIFICATION = "verification_failed";
+
+    /**
+     * Error type representing general connection errors. This happens during the connection flow with the IFTTT app,
+     * where the app cannot complete the flow.
+     */
+    public static final String ERROR_TYPE_CONNECTION = "connection_request_failed";
+
     public enum NextStep {
         /**
          * A status that indicates the Connection enable flow has been completed, and the Connection has been enabled.
@@ -55,6 +73,8 @@ public final class ConnectResult implements Parcelable {
 
     /**
      * Additional information when {@link #nextStep} is {@link NextStep#Error}. In other cases this field is null.
+     *
+     * Possible values may be {@link #ERROR_TYPE_AUTH}, {@link #ERROR_TYPE_CONNECTION} or {@link #ERROR_TYPE_VERIFICATION}.
      */
     @Nullable public final String errorType;
 
