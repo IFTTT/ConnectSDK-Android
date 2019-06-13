@@ -148,6 +148,8 @@
                 android:gravity="center"
                 android:lineSpacingExtra="@dimen/ifttt_about_text_line_space"
                 android:textColor="@android:color/white"
+                android:background="?selectableItemBackground"
+                android:padding="@dimen/ifttt_space_small"
                 android:textAppearance="@style/AboutIfttt.Description"/>
 
         </LinearLayout>

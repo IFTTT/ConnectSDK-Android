@@ -23,6 +23,7 @@ import com.ifttt.Connection;
 import com.ifttt.R;
 import com.ifttt.Service;
 
+import static com.ifttt.ui.ButtonApiHelper.redirectToTerms;
 import static com.ifttt.ui.ButtonUiHelper.findWorksWithService;
 
 /**
@@ -71,6 +72,13 @@ public final class AboutIftttActivity extends AppCompatActivity {
         termsAndPrivacy.setText(Html.fromHtml(getString(R.string.terms_and_privacy)));
         termsAndPrivacy.setLinkTextColor(Color.WHITE);
         termsAndPrivacy.setMovementMethod(LinkMovementMethod.getInstance());
+
+        Intent redirectToTermsIntent = redirectToTerms(this);
+        if (redirectToTermsIntent != null) {
+            termsAndPrivacy.setOnClickListener(v -> {
+                startActivity(redirectToTermsIntent);
+            });
+        }
 
         View manageConnectionView = findViewById(R.id.ifttt_manage_connection);
         View googlePlayView = findViewById(R.id.google_play_link);
