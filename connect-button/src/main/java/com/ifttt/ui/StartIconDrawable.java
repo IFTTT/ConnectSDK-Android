@@ -1,7 +1,6 @@
 package com.ifttt.ui;
 
 import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
@@ -10,7 +9,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Outline;
-import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
@@ -43,11 +41,9 @@ final class StartIconDrawable extends Drawable {
     private final int startIconWidth;
     private final int startIconHeight;
     private final int startIconBackgroundColor;
+    private final boolean onDarkBackground;
 
     private final ShapeDrawable borderDrawable = new ShapeDrawable();
-
-    // If true, add a border to the icon background if the service color is dark.
-    private boolean shouldDrawBorder;
 
     StartIconDrawable(Context context, Drawable serviceIcon, int iconSize, int initialBackgroundSize,
             boolean onDarkBackground) {
@@ -57,6 +53,7 @@ final class StartIconDrawable extends Drawable {
         startIconHeight = context.getResources().getDimensionPixelSize(R.dimen.ifttt_start_image_height);
         this.iconSize = iconSize;
         this.initialBackgroundSize = initialBackgroundSize;
+        this.onDarkBackground = onDarkBackground;
         this.startIconBackgroundColor =
                 onDarkBackground ? ContextCompat.getColor(context, R.color.ifttt_start_icon_background_on_dark)
                         : Color.BLACK;
@@ -65,12 +62,6 @@ final class StartIconDrawable extends Drawable {
         } else {
             startIcon.setColorFilter(null);
         }
-
-        int borderColor = ContextCompat.getColor(context, R.color.ifttt_button_border_color);
-        int borderWidth = context.getResources().getDimensionPixelSize(R.dimen.ifttt_button_border_width);
-        borderDrawable.getPaint().setColor(borderColor);
-        borderDrawable.getPaint().setStyle(Paint.Style.STROKE);
-        borderDrawable.getPaint().setStrokeWidth(borderWidth);
 
         this.startIcon.setAlpha(0);
         this.serviceIcon.setAlpha(255);
@@ -81,11 +72,6 @@ final class StartIconDrawable extends Drawable {
     @Override
     public void draw(Canvas canvas) {
         background.draw(canvas);
-
-        if (shouldDrawBorder) {
-            borderDrawable.draw(canvas);
-        }
-
         serviceIcon.draw(canvas);
         startIcon.draw(canvas);
     }
@@ -155,8 +141,12 @@ final class StartIconDrawable extends Drawable {
     }
 
     void setBackgroundColor(@ColorInt int color) {
-        background.getPaint().setColor(color);
-        shouldDrawBorder = isDarkColor(color);
+        if (onDarkBackground) {
+            background.getPaint().setColor(ButtonUiHelper.getDarkerColor(color));
+        } else {
+            background.getPaint().setColor(color);
+        }
+
         invalidateSelf();
     }
 
@@ -186,14 +176,6 @@ final class StartIconDrawable extends Drawable {
             serviceIcon.setAlpha((int) (255 * (1 - progress)));
             startIcon.setAlpha((int) (255 * progress));
             invalidateSelf();
-        });
-
-        iconMorphing.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                // As soon as the animation starts, remove the border.
-                shouldDrawBorder = false;
-            }
         });
 
         return iconMorphing;
