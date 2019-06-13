@@ -35,16 +35,4 @@ public interface ConnectionApi {
      * @return A {@link PendingResult} for the API call execution.
      */
     PendingResult<User> user();
-
-    /**
-     * API for exchanging an IFTTT user token. The IFTTT user token may be used to make user authenticated API calls,
-     * for example {@link #disableConnection(String)}.
-     *
-     * @param oAuthToken Your user's OAuth access token.
-     * @param serviceKey Your IFTTT service key.
-     * @param userId User's id in your service.
-     *
-     * @return A {@link PendingResult} for the API call execution.
-     */
-    PendingResult<String> userToken(String oAuthToken, String userId, String serviceKey);
 }
