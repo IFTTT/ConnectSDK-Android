@@ -5,7 +5,7 @@ android {
     compileSdkVersion 28
     buildToolsVersion '28.0.3'
     defaultConfig {
-        applicationId "com.ifttt.api.demo"
+        applicationId "com.ifttt.demo"
         minSdkVersion 18
         targetSdkVersion 28
         versionCode 1

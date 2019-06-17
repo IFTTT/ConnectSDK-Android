@@ -2,7 +2,7 @@
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <com.ifttt.ui.ButtonParentView
+    <com.ifttt.connect.ui.ButtonParentView
         android:id="@+id/ifttt_button_root"
         android:layout_width="match_parent"
         android:layout_height="@dimen/ifttt_connect_button_height"
@@ -67,7 +67,7 @@
             android:layout_gravity="center_vertical"
             android:scaleType="centerInside"/>
 
-    </com.ifttt.ui.ButtonParentView>
+    </com.ifttt.connect.ui.ButtonParentView>
 
     <TextSwitcher
         android:id="@+id/ifttt_helper_text"

@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.ifttt.api.demo">
+    package="com.ifttt.groceryexpress">
 
     <uses-permission android:name="android.permission.INTERNET"/>
 
@@ -12,7 +12,7 @@
         android:usesCleartextTraffic="true"> <!-- For the example web service -->
 
         <activity
-            android:name=".MainActivity"
+            android:name="com.ifttt.groceryexpress.MainActivity"
             android:exported="true"
             android:launchMode="singleTask">
             <intent-filter>

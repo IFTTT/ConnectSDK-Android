@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.ifttt">
+    package="com.ifttt.connect">
     <application>
         <activity android:name=".ui.TestActivity"
             android:theme="@style/Theme.AppCompat"/>
