@@ -9,6 +9,7 @@ IFTTT Connect Button SDK is a library that helps facilitate the integration of t
 * [Requirements](https://github.com/IFTTT/IFTTTSDK-Android-v2#Requirements)
 * [Installation](https://github.com/IFTTT/IFTTTSDK-Android-v2#Installation)
 * [Usage](https://github.com/IFTTT/IFTTTSDK-Android-v2#Usage)
+* [Authentication](https://github.com/IFTTT/IFTTTSDK-Android-v2#Authentication)
 * [Advanced](https://github.com/IFTTT/IFTTTSDK-Android-v2#Advanced)
 
 ## Features
@@ -93,7 +94,7 @@ public class YourActivity extends Activity {
 }
 ```
 
-For more information about the user token used in `CredentialProvider`, please see [Advanced](https://github.com/IFTTT/IFTTTSDK-Android-v2#Advanced) authentication section.
+For more information about the user token used in `CredentialProvider`, please see [Authentication](https://github.com/IFTTT/IFTTTSDK-Android-v2#Authentication) section.
 
 ### Listen to Connection status
 ConnectButton helps initiate connection enable flows for users, which involve opening web views within your app. Currently, we are using [Chrome Custom Tabs](https://developer.chrome.com/multidevice/android/customtabs) for the web views. 
@@ -139,6 +140,68 @@ public class YourActivity extends Activity {
 ```
 
 At this point, the ConnectButton is set up to display the connection status for a given user, as well as initiating a connection flow.
+
+## Authentication
+To enable the SDK to retrieve connection status for a specific user, as well as allowing the SDK to facilitate disabling a connection, it needs to be user-authenticated, which requires an IFTTT user token.
+
+A user-authenticated request is one that includes an `Authorization` header containing a user-specific token that IFTTT has issued to your service. This approach lets you make calls to the API from places like mobile apps or browsers where it would be inappropriate to expose your service key.
+
+### Exchange a user token
+**URL**: `POST https://connect.ifttt.com/v2/user_token`
+
+This endpoint can be used to obtain a token for a specific user, allowing you to make user-authenticated requests. 
+
+##### Example: Get a user token, Service-authenticated with user ID and OAuth token
+<div class="example-list">
+  <ul>
+    <li>
+      <span class="example-list-heading">HTTP Request</span>
+      <code>
+<pre>
+POST /v2/user_token?user_id=123&access_token=abc
+Host: connect.ifttt.com
+IFTTT-Service-Key: 6e7c8978c07a3b5918a237b9b5b1bb70
+Content-Type: application/json
+</pre>
+      </code>
+    </li>
+    <li>
+      <span class="example-list-heading">Response</span>
+      <code>
+<pre>
+{
+  "type": "user_token",
+  "user_token": "e1hMBWw44mJM902c6ye9mmuS3nd4A_8eTCU99D4a5KQW7cT1"
+}
+</pre>
+      </code>
+    </li>
+  </ul>
+</div>
+
+To clarify the variables used in this example:
+
+|Variable|Value|Details|
+|--------|-----|-------|
+| `user_id` | `123` | The id of the user on your service, which must match the id provided by your [User information] endpoint |
+| `access_token` | `abc` | The OAuth access token that you issued to IFTTT on behalf of the user when they connected their IFTTT account to your service |
+| `IFTTT-Service-Key` | `6e7...` |  Your secret service key |
+| `user_token` | `e1h...` | The new user token you'll use to make requests to the IFTTT API on behalf of the IFTTT user |
+
+Within these parameters,
+* You can find the `IFTTT-Service-Key` in the [API tab](https://platform.ifttt.com/mkt/api) of the IFTTT Platform under the Service Key heading. You can use this approach when you’re making calls from your backend servers to the API.
+* `access_token` is **the OAuth access token that you issued to IFTTT on behalf of this user** when they connected their IFTTT account to your service. This lets us verify the request more stringently than if you just provided your service key, without making the user go through a redundant OAuth flow.
+
+### Important note about exchanging user token
+Your IFTTT service key should be kept secret at all time. The service key can be used to make calls on behalf of any user, but a user token is limited to a single user. This makes user tokens much less sensitive. On the other hand, you’d never want to embed your service key into a mobile app because it could be read by end users. A similar concept is the AWS S3 credentials, you can find more details from [Google Play FAQs](https://support.google.com/faqs/answer/6032655?hl=en).
+
+Because of this, **we strongly encourage you to** call this API on your backend, and return the user token back to your application, instead of making the API call directly within your application.
+
+
+### Integrate with SDK
+To integrate the user token exchange process with your backend API and the SDK, you need to set up your [CredentialProvider](https://github.com/IFTTT/IFTTTSDK-Android-v2#set-up-connectbutton) so that the `CredentialProvider#getUserToken` will return the user token when the SDK needs it. 
+
+**Note:** the `getUserToken` method will be called on a background thread.
 
 ## Advanced
 This section describes some key components that are used in the SDK, and can be used separately to facilitate the integration.
@@ -203,12 +266,9 @@ The APIs available are:
 
 **Note:** When setting up a ConnectButton, if there is no ConnectionApiClient instance provided by the Configuration, a default one will be used.
 
-### Authentication
-The SDK supports two different types of API authentication: anonymous and user authentication. 
+### Authentication with IftttApiClient
 
-With anonymous authentication level, you will not be able to get Connection data about whether the user has a specific Connection enabled, nor can you make the API call to disable a Connection on behalf of the user. You will be able to retrieve Connection data that is publicly available. For example, Connection name, description and Service brand color, etc.
-
-To use user authentication level, you will need to retrieve an **IFTTT user token** from IFTTT API, and pass it to the `ConnectionApiClient` instance, before making any API calls. To do so,
+To setup authentication for an IftttApiClient instance, you will need to retrieve an [IFTTT user token](https://github.com/IFTTT/IFTTTSDK-Android-v2#Authentication), and call
 
 ```java
 // Fetch IFTTT user token.
@@ -220,8 +280,6 @@ connectionApiClient.setUserToken(userToken);
 ...
 ```
 
-After setting the user token, subsequent API calls will be user-specific:
+After that, subsequent API calls will be user-authenticated:
 * `ConnectionApi#showConnection` will return Connection status for the user, whether it is `never_enabled`, `enabled` or `disabled`.
 * `ConnectionApi#disableConnection` can be used to disable a Connection. 
-
-**Note:** by default, ConnectButton handles the user authentication automatically with the help of a `CredentialProvider`. 
