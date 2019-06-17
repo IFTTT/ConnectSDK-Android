@@ -185,8 +185,12 @@ To clarify the variables used in this example:
 |--------|-----|-------|
 | `user_id` | `123` | The id of the user on your service, which must match the id provided by your [User information] endpoint |
 | `access_token` | `abc` | The OAuth access token that you issued to IFTTT on behalf of the user when they connected their IFTTT account to your service |
-| `IFTTT-Service-Key` | `6e7...` |  Your secret service key, found in the [API tab] of the IFTTT Platform under the **Service Key** heading |
+| `IFTTT-Service-Key` | `6e7...` |  Your secret service key |
 | `user_token` | `e1h...` | The new user token you'll use to make requests to the IFTTT API on behalf of the IFTTT user |
+
+Within these parameters,
+* You can find the `IFTTT-Service-Key` in the [API tab](https://platform.ifttt.com/mkt/api) of the IFTTT Platform under the Service Key heading. You can use this approach when you’re making calls from your backend servers to the API.
+* `access_token` is **the OAuth access token that you issued to IFTTT on behalf of this user** when they connected their IFTTT account to your service. This lets us verify the request more stringently than if you just provided your service key, without making the user go through a redundant OAuth flow.
 
 ### Important note about exchanging user token
 Your IFTTT service key should be kept secret at all time. The service key can be used to make calls on behalf of any user, but a user token is limited to a single user. This makes user tokens much less sensitive. On the other hand, you’d never want to embed your service key into a mobile app because it could be read by end users. A similar concept is the AWS S3 credentials, you can find more details from [Google Play FAQs](https://support.google.com/faqs/answer/6032655?hl=en).
