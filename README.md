@@ -57,7 +57,7 @@ To get started, after setting up the dependency, add a `ConnectButton` to your l
   android:orientation="vertical">
 	<!-- Other views -->
 	
-	<com.ifttt.ui.ConnectButton  
+	<com.ifttt.connect.ui.ConnectButton  
 	  android:id="@+id/connect_button"  
 	  android:layout_width="match_parent"  
 	  android:layout_height="wrap_content"/>
