@@ -1,0 +1,117 @@
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'com.github.dcendents.android-maven'
+
+ext {
+    bintrayRepo = 'maven'
+    bintrayName = 'connect-button'
+
+    publishedGroupId = 'com.ifttt'
+    libraryName = 'connect-button'
+    artifact = 'connect-button'
+
+    libraryDescription = 'Connect Button SDK is a library that helps facilitate the integration of the Connect Button and Connection API.'
+
+    siteUrl = 'https://github.com/IFTTT/ConnectSDK-Android'
+    gitUrl = 'https://github.com/IFTTT/ConnectSDK-Android.git'
+
+    libraryVersion = '2.0.0-rc1'
+
+    developerId = 'lzanita09'
+    developerName = 'Zhe Lu'
+    developerEmail = 'zhe@ifttt.com'
+
+    licenseName = 'MIT'
+    licenseUrl = 'https://github.com/IFTTT/ConnectSDK-Android/blob/master/LICENSE'
+    allLicenses = ['MIT']
+}
+
+group = publishedGroupId
+
+install {
+    repositories.mavenInstaller {
+        // This generates POM.xml with proper parameters
+        pom {
+            project {
+                packaging 'aar'
+                groupId publishedGroupId
+                artifactId artifact
+
+                name libraryName
+                description libraryDescription
+                url siteUrl
+
+                licenses {
+                    license {
+                        name licenseName
+                        url licenseUrl }
+                }
+                developers {
+                    developer {
+                        id developerId
+                        name developerName
+                        email developerEmail
+                    }
+                }
+                scm {
+                    connection gitUrl
+                    developerConnection gitUrl
+                    url siteUrl
+
+                }
+            }
+        }
+    }
+}
+
+version = libraryVersion
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from android.sourceSets.main.java.srcDirs
+}
+
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+afterEvaluate {
+    javadoc.classpath += files(android.libraryVariants.collect { variant ->
+        variant.javaCompileProvider.get().classpath.files
+    })
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+bintray {
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
+
+    configurations = ['archives']
+    pkg {
+        repo = bintrayRepo
+        name = bintrayName
+        desc = libraryDescription
+        websiteUrl = siteUrl
+        vcsUrl = gitUrl
+        licenses = allLicenses
+        publish = false
+        version {
+            name = libraryVersion
+            desc = libraryDescription
+            released = new Date()
+            vcsTag = libraryVersion
+        }
+    }
+}
