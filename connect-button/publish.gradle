@@ -3,7 +3,7 @@ apply plugin: 'com.github.dcendents.android-maven'
 
 ext {
     bintrayRepo = 'maven'
-    bintrayName = 'connect-button'
+    bintrayName = 'ConnectSDK-Android'
 
     publishedGroupId = 'com.ifttt'
     libraryName = 'connect-button'
