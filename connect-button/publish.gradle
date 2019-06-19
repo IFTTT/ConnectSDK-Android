@@ -112,6 +112,10 @@ bintray {
             desc = libraryDescription
             released = new Date()
             vcsTag = libraryVersion
+            gpg {
+                sign = true
+                passphrase = properties.getProperty("bintray.gpg.passphrase")
+            }
         }
     }
 }
