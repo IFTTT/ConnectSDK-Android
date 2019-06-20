@@ -171,16 +171,6 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
     }
 
     /**
-     * If the button is used in a dark background, set this flag to true so that the button can adapt the UI. This
-     * method must be called before {@link BaseConnectButton#setConnection(Connection)} to apply the change.
-     *
-     * @param onDarkBackground True if the button is used in a dark background, false otherwise.
-     */
-    public void setOnDarkBackground(boolean onDarkBackground) {
-        connectButton.setOnDarkBackground(onDarkBackground);
-    }
-
-    /**
      * Add a listener to be notified when the button's state has changed.
      *
      * @param listener {@link ButtonStateChangeListener} to be registered.
