@@ -12,7 +12,7 @@
     <string name="ifttt_about_3">Protect and monitor your data</string>
     <string name="ifttt_about_4">Unplug any time</string>
     <string name="ifttt_creating_account">Creating account…</string>
-    <string name="ifttt_continue_to">Going to %1$s</string>
+    <string name="ifttt_continue_to">Going to %1$s…</string>
     <string name="ifttt_connected">Connected</string>
     <string name="ifttt_connecting_account">Connecting…</string>
     <string name="ifttt_connection_off">Disconnect</string>
