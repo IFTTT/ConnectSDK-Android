@@ -520,7 +520,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
             iconImg.setBackground(drawable);
             drawable.setBackgroundColor(worksWithService.brandColor);
-            iconImg.setContentDescription(getContext().getString(R.string.service_icon_content_description));
+            iconImg.setContentDescription(getContext().getString(R.string.service_icon_content_description, worksWithService.name));
         }
 
         // Set elevation.
