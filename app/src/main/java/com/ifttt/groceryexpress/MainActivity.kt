@@ -1,20 +1,16 @@
 package com.ifttt.groceryexpress
 
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
-import android.view.ViewGroup
 import android.view.Window
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.core.graphics.drawable.DrawableCompat
 import com.google.android.material.textfield.TextInputLayout
 import com.ifttt.connect.ui.ConnectButton
 import com.ifttt.connect.ui.ConnectResult
@@ -26,7 +22,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var connectButton: ConnectButton
     private lateinit var toolbar: Toolbar
     private lateinit var emailPreferencesHelper: EmailPreferencesHelper
-    private lateinit var uiPreferencesHelper: UiPreferencesHelper
 
     private lateinit var configuration: ConnectButton.Configuration
 
@@ -36,7 +31,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         emailPreferencesHelper = EmailPreferencesHelper(this)
-        uiPreferencesHelper = UiPreferencesHelper(this)
 
         toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -68,8 +62,6 @@ class MainActivity : AppCompatActivity() {
 
         connectButton.setup(configuration)
 
-        toggleValuePropColor()
-
         if (!hasEmailSet) {
             promptLogin()
         }
@@ -77,7 +69,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu, menu)
-        menu.findItem(R.id.dark_mode).isChecked = uiPreferencesHelper.getDarkMode()
 
         return super.onCreateOptionsMenu(menu)
     }
@@ -85,12 +76,6 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.set_email) {
             promptLogin()
-            return true
-        } else if (item.itemId == R.id.dark_mode) {
-            val toggled = !item.isChecked
-            uiPreferencesHelper.setDarkMode(toggled)
-
-            recreate()
             return true
         }
 
@@ -100,38 +85,6 @@ class MainActivity : AppCompatActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         connectButton.setConnectResult(ConnectResult.fromIntent(intent))
-    }
-
-    private fun toggleValuePropColor() {
-        // For testing and debugging purpose: toggling this changes the UI of the app as well as the Connect Button.
-        val darkMode = uiPreferencesHelper.getDarkMode()
-
-        val textColor: Int
-        val backgroundColor: Int
-        if (darkMode) {
-            textColor = Color.WHITE
-            backgroundColor = Color.BLACK
-        } else {
-            textColor = Color.BLACK
-            backgroundColor = Color.WHITE
-        }
-
-        // If the Activity that Connect Button is displayed on has a dark background, call this function to toggle
-        // its look to adapt the UI.
-        connectButton.setOnDarkBackground(darkMode)
-
-        window.setBackgroundDrawable(ColorDrawable(backgroundColor))
-        findViewById<ViewGroup>(Window.ID_ANDROID_CONTENT).post {
-            val valueProp1 = findViewById<TextView>(R.id.value_prop_1)
-            valueProp1.setTextColor(textColor)
-            DrawableCompat.setTint(DrawableCompat.wrap(valueProp1.compoundDrawables[0]), textColor)
-            val valueProp2 = findViewById<TextView>(R.id.value_prop_2)
-            valueProp2.setTextColor(textColor)
-            DrawableCompat.setTint(DrawableCompat.wrap(valueProp2.compoundDrawables[0]), textColor)
-            val valueProp3 = findViewById<TextView>(R.id.value_prop_3)
-            valueProp3.setTextColor(textColor)
-            DrawableCompat.setTint(DrawableCompat.wrap(valueProp3.compoundDrawables[0]), textColor)
-        }
     }
 
     // For development and testing purpose: this dialog simulates a login process, where the user enters their

@@ -15,7 +15,6 @@
     <string name="value_props_2">Add delivery date and time to your calendar</string>
     <string name="value_props_3">Unlock discount delivery rates</string>
     <string name="email_title">Please enter your email</string>
-    <string name="dark_mode">Dark mode</string>
     <string name="logout">Logout</string>
     <string name="login">Login</string>
 </resources>

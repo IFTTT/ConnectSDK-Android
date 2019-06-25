@@ -36,9 +36,9 @@ TODO
 ### AAR
 ```groovy
 implementation(name: 'connect-button-release', ext: 'aar')
-implementation 'com.squareup.okhttp3:okhttp:3.11.0'
-implementation 'com.squareup.retrofit2:retrofit:2.4.0'
-implementation 'com.squareup.retrofit2:converter-moshi:2.4.0'
+implementation 'com.squareup.okhttp3:okhttp:3.14.2'
+implementation 'com.squareup.retrofit2:retrofit:2.6.0'
+implementation 'com.squareup.retrofit2:converter-moshi:2.6.0'
 implementation 'com.squareup.moshi:moshi:1.8.0'
 implementation 'com.squareup.moshi:moshi-adapters:1.8.0'
 implementation 'androidx.browser:browser:1.0.0'
@@ -230,11 +230,6 @@ The SDK provides the basic data structure for the data returned from the Connect
 ### ConnectButton
 
 <img width="469" alt="connect_button_screenshot" src="https://user-images.githubusercontent.com/1761573/56773012-45b58480-6771-11e9-9958-b0965f5518a3.png">
-
-#### Dark mode
-`ConnectButton` provides dark theme for apps that want to display the View on a dark background. To toggle the dark theme on ConnectButton, call `ConnectButton#setOnDarkBackground`.
-
-<img width="469" alt="Screen Shot 2019-04-29 at 9 29 45 AM" src="https://user-images.githubusercontent.com/1761573/56911433-bb676c00-6a61-11e9-95fe-3055790067e5.png">
 
 #### Button state change listeners
 In case your app wants to listen to the button state changes, you can register a `ButtonStateChangeListener` via `ConnectButton#addButtonStateChangeListener`.
