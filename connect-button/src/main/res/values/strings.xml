@@ -29,4 +29,9 @@
     <string name="ifttt_loading">Loading…</string>
     <string name="ifttt_error_fetching_connection"><![CDATA[Make sure your phone has internet connection. <u>Retry</u>]]></string>
     <string name="ifttt_new_account_with">New IFTTT account for %1$s</string>
+
+    <!-- Content description string -->
+
+    <string name="service_icon_content_description">%1$s service icon</string>
+    <string name="start_button_content_description">Start icon</string>
 </resources>

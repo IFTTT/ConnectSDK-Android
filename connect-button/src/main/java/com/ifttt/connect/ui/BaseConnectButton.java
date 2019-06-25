@@ -511,6 +511,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         if (bitmap == null) {
             StartIconDrawable placeHolderImage = new StartIconDrawable(getContext(), new ColorDrawable(), 0, 0, false);
             iconImg.setBackground(placeHolderImage);
+            iconImg.setContentDescription(getContext().getString(R.string.start_button_content_description));
         } else {
             int iconBackgroundMargin = getResources().getDimensionPixelSize(R.dimen.ifttt_icon_margin);
             BitmapDrawable serviceIcon = new BitmapDrawable(getResources(), bitmap);
@@ -519,6 +520,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
             iconImg.setBackground(drawable);
             drawable.setBackgroundColor(worksWithService.brandColor);
+            iconImg.setContentDescription(getContext().getString(R.string.service_icon_content_description, worksWithService.name));
         }
 
         // Set elevation.
