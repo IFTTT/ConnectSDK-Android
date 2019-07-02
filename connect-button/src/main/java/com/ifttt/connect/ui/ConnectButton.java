@@ -11,6 +11,7 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -94,6 +95,16 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
      * @param configuration Configuration object that helps set up the Connect Button.
      */
     public void setup(Configuration configuration) {
+        if (ButtonUiHelper.isEmailInvalid(configuration.suggestedUserEmail) && !ButtonUiHelper.isIftttInstalled(
+                getContext().getPackageManager())) {
+            connectButton.setVisibility(View.GONE);
+            loadingView.setVisibility(View.GONE);
+            Log.e(ConnectButton.class.getSimpleName(), configuration.suggestedUserEmail + " is invalid.");
+            return;
+        }
+
+        connectButton.setVisibility(View.VISIBLE);
+        loadingView.setVisibility(View.VISIBLE);
         ConnectionApiClient clientToUse;
         if (configuration.connectionApiClient == null) {
             if (API_CLIENT == null) {
@@ -147,6 +158,7 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
 
                 @Override
                 public void onFailure(ErrorResponse errorResponse) {
+                    Log.w(ConnectButton.class.getSimpleName(), errorResponse.message);
                     CharSequence errorText =
                             HtmlCompat.fromHtml(getResources().getString(R.string.ifttt_error_fetching_connection),
                                     FROM_HTML_MODE_COMPACT);
@@ -331,10 +343,6 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
              */
             public static Builder withConnection(Connection connection, String suggestedUserEmail,
                     CredentialsProvider credentialsProvider, Uri connectRedirectUri) {
-                if (ButtonUiHelper.isEmailInvalid(suggestedUserEmail)) {
-                    throw new IllegalStateException(suggestedUserEmail + " is not a valid email address.");
-                }
-
                 Builder builder = new Builder(suggestedUserEmail, credentialsProvider, connectRedirectUri);
                 builder.connection = connection;
                 return builder;
@@ -355,10 +363,6 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
              */
             public static Builder withConnectionId(String connectionId, String suggestedUserEmail,
                     CredentialsProvider credentialsProvider, Uri connectRedirectUri) {
-                if (ButtonUiHelper.isEmailInvalid(suggestedUserEmail)) {
-                    throw new IllegalStateException(suggestedUserEmail + " is not a valid email address.");
-                }
-
                 Builder builder = new Builder(suggestedUserEmail, credentialsProvider, connectRedirectUri);
                 builder.connectionId = connectionId;
                 return builder;
