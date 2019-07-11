@@ -21,6 +21,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.core.text.HtmlCompat;
+import androidx.core.view.ViewCompat;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
@@ -48,7 +49,6 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
     private final TextView loadingView;
 
     private CredentialsProvider credentialsProvider;
-    private Connection connection;
 
     private final LifecycleRegistry lifecycleRegistry = new LifecycleRegistry(this);
 
@@ -127,12 +127,11 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
         pulseLoading();
         UserTokenAsyncTask task = new UserTokenAsyncTask(credentialsProvider, () -> {
             if (configuration.connection != null) {
-                connection = configuration.connection;
                 if (configuration.listener != null) {
-                    configuration.listener.onFetchConnectionSuccessful(connection);
+                    configuration.listener.onFetchConnectionSuccessful(configuration.connection);
                 }
 
-                connectButton.setConnection(connection);
+                connectButton.setConnection(configuration.connection);
                 loadingView.setVisibility(GONE);
                 ((Animator) loadingView.getTag()).cancel();
                 return;
@@ -146,7 +145,6 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
             pendingResult.execute(new PendingResult.ResultCallback<Connection>() {
                 @Override
                 public void onSuccess(Connection result) {
-                    connection = result;
                     if (configuration.listener != null) {
                         configuration.listener.onFetchConnectionSuccessful(result);
                     }
@@ -206,7 +204,7 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
      * @param result Authentication flow redirect result from the web view.
      */
     public void setConnectResult(ConnectResult result) {
-        if (connection == null || credentialsProvider == null) {
+        if (credentialsProvider == null) {
             return;
         }
 
@@ -234,7 +232,19 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
         };
 
         connectButton.addButtonStateChangeListener(listener);
-        connectButton.setConnectResult(result);
+
+        if (ViewCompat.isLaidOut(connectButton)) {
+            connectButton.setConnectResult(result);
+        } else {
+            connectButton.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+                @Override
+                public boolean onPreDraw() {
+                    connectButton.getViewTreeObserver().removeOnPreDrawListener(this);
+                    connectButton.setConnectResult(result);
+                    return false;
+                }
+            });
+        }
     }
 
     @Override
@@ -256,6 +266,7 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
     }
 
     private void refreshConnection() {
+        Connection connection = connectButton.getConnection();
         PendingResult<Connection> pendingResult = API_CLIENT.api().showConnection(connection.id);
         pendingResult.execute(new PendingResult.ResultCallback<Connection>() {
             @Override
