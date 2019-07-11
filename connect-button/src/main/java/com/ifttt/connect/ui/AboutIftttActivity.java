@@ -93,6 +93,8 @@ public final class AboutIftttActivity extends AppCompatActivity {
             if (manageIntent != null && hasConnected) {
                 manageConnectionView.setVisibility(View.VISIBLE);
                 manageConnectionView.setOnClickListener(v -> startActivity(manageIntent));
+            } else {
+                manageConnectionView.setVisibility(View.GONE);
             }
         } else {
             manageConnectionView.setVisibility(View.GONE);
