@@ -506,6 +506,10 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                 v -> getContext().startActivity(AboutIftttActivity.intent(getContext(), connection)));
     }
 
+    Connection getConnection() {
+        return connection;
+    }
+
     private void setServiceIconImage(@Nullable Bitmap bitmap) {
         // Set a placeholder for the image.
         if (bitmap == null) {
@@ -927,7 +931,12 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         }
 
         // Reset the button state.
-        if (connection != null) {
+        if (buttonApiHelper.shouldPresentEmail(getContext())) {
+            Animator animator = buildEmailTransitionAnimator(0);
+            animator.start();
+            // Immediately end the animation and move to the email field state.
+            animator.end();
+        } else if (connection != null) {
             setConnection(connection);
         }
     }
