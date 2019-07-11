@@ -933,7 +933,6 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         // Reset the button state.
         if (buttonApiHelper.shouldPresentEmail(getContext())) {
             Animator animator = buildEmailTransitionAnimator(0);
-            animator.start();
             // Immediately end the animation and move to the email field state.
             animator.end();
         } else if (connection != null) {
@@ -964,7 +963,6 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
                     if (buttonApiHelper.shouldPresentEmail(getContext())) {
                         Animator animator = buildEmailTransitionAnimator(0);
-                        animator.start();
                         // Immediately end the animation and move to the email field state.
                         animator.end();
                     } else if (connection != null) {
