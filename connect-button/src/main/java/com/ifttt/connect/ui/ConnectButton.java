@@ -158,7 +158,6 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
 
                 @Override
                 public void onFailure(ErrorResponse errorResponse) {
-                    Log.w(ConnectButton.class.getSimpleName(), errorResponse.message);
                     CharSequence errorText =
                             HtmlCompat.fromHtml(getResources().getString(R.string.ifttt_error_fetching_connection),
                                     FROM_HTML_MODE_COMPACT);
