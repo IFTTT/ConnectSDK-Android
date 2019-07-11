@@ -524,7 +524,8 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
             iconImg.setBackground(drawable);
             drawable.setBackgroundColor(worksWithService.brandColor);
-            iconImg.setContentDescription(getContext().getString(R.string.service_icon_content_description, worksWithService.name));
+            iconImg.setContentDescription(
+                    getContext().getString(R.string.service_icon_content_description, worksWithService.name));
         }
 
         // Set elevation.
@@ -934,6 +935,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         if (buttonApiHelper.shouldPresentEmail(getContext())) {
             Animator animator = buildEmailTransitionAnimator(0);
             // Immediately end the animation and move to the email field state.
+            animator.start();
             animator.end();
         } else if (connection != null) {
             setConnection(connection);
@@ -964,6 +966,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                     if (buttonApiHelper.shouldPresentEmail(getContext())) {
                         Animator animator = buildEmailTransitionAnimator(0);
                         // Immediately end the animation and move to the email field state.
+                        animator.start();
                         animator.end();
                     } else if (connection != null) {
                         setConnection(connection);
