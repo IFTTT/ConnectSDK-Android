@@ -514,6 +514,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         // Set a placeholder for the image.
         if (bitmap == null) {
             StartIconDrawable placeHolderImage = new StartIconDrawable(getContext(), new ColorDrawable(), 0, 0, false);
+            placeHolderImage.setBackgroundColor(worksWithService.brandColor);
             iconImg.setBackground(placeHolderImage);
             iconImg.setContentDescription(getContext().getString(R.string.start_button_content_description));
         } else {
