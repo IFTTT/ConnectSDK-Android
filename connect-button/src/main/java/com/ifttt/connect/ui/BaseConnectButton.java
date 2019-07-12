@@ -988,7 +988,6 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
         private int settledAt = 0;
         private int trackEndColor = Color.BLACK;
-        private int trackStartColor = Color.BLACK;
 
         void setSettledAt(Connection.Status status) {
             if (status == enabled) {
@@ -1018,7 +1017,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
             float progress = Math.abs((left - settledAt) / (float) (buttonRoot.getWidth() - iconImg.getWidth()));
 
             DrawableCompat.setTint(DrawableCompat.wrap(buttonRoot.getBackground()),
-                    (Integer) EVALUATOR.evaluate(progress, trackStartColor, trackEndColor));
+                    (Integer) EVALUATOR.evaluate(progress, Color.BLACK, trackEndColor));
 
             float textFadingProgress = Math.max(Math.min(1f, progress * 1.5f), 0f);
             setProgressStateText(textFadingProgress);
@@ -1040,7 +1039,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
         @Override
         public void onViewReleased(@NonNull View releasedChild, float xvel, float yvel) {
-            if ((releasedChild.getLeft() + releasedChild.getWidth() / 2) / (float) buttonRoot.getWidth() <= 0.5f) {
+            if ((releasedChild.getLeft() + releasedChild.getWidth() / 2f) / (float) buttonRoot.getWidth() <= 0.5f) {
                 if (connection.status != enabled) {
                     // Connection is already in disabled status.
                     settleView(releasedChild, 0, null);
