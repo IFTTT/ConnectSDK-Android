@@ -506,10 +506,15 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                 v -> getContext().startActivity(AboutIftttActivity.intent(getContext(), connection)));
     }
 
+    Connection getConnection() {
+        return connection;
+    }
+
     private void setServiceIconImage(@Nullable Bitmap bitmap) {
         // Set a placeholder for the image.
         if (bitmap == null) {
             StartIconDrawable placeHolderImage = new StartIconDrawable(getContext(), new ColorDrawable(), 0, 0, false);
+            placeHolderImage.setBackgroundColor(worksWithService.brandColor);
             iconImg.setBackground(placeHolderImage);
             iconImg.setContentDescription(getContext().getString(R.string.start_button_content_description));
         } else {
@@ -520,7 +525,8 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
             iconImg.setBackground(drawable);
             drawable.setBackgroundColor(worksWithService.brandColor);
-            iconImg.setContentDescription(getContext().getString(R.string.service_icon_content_description, worksWithService.name));
+            iconImg.setContentDescription(
+                    getContext().getString(R.string.service_icon_content_description, worksWithService.name));
         }
 
         // Set elevation.
@@ -927,7 +933,12 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         }
 
         // Reset the button state.
-        if (connection != null) {
+        if (buttonApiHelper.shouldPresentEmail(getContext())) {
+            Animator animator = buildEmailTransitionAnimator(0);
+            // Immediately end the animation and move to the email field state.
+            animator.start();
+            animator.end();
+        } else if (connection != null) {
             setConnection(connection);
         }
     }
@@ -955,8 +966,8 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
                     if (buttonApiHelper.shouldPresentEmail(getContext())) {
                         Animator animator = buildEmailTransitionAnimator(0);
-                        animator.start();
                         // Immediately end the animation and move to the email field state.
+                        animator.start();
                         animator.end();
                     } else if (connection != null) {
                         setConnection(connection);
@@ -977,7 +988,6 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
         private int settledAt = 0;
         private int trackEndColor = Color.BLACK;
-        private int trackStartColor = Color.BLACK;
 
         void setSettledAt(Connection.Status status) {
             if (status == enabled) {
@@ -1007,7 +1017,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
             float progress = Math.abs((left - settledAt) / (float) (buttonRoot.getWidth() - iconImg.getWidth()));
 
             DrawableCompat.setTint(DrawableCompat.wrap(buttonRoot.getBackground()),
-                    (Integer) EVALUATOR.evaluate(progress, trackStartColor, trackEndColor));
+                    (Integer) EVALUATOR.evaluate(progress, Color.BLACK, trackEndColor));
 
             float textFadingProgress = Math.max(Math.min(1f, progress * 1.5f), 0f);
             setProgressStateText(textFadingProgress);
@@ -1029,7 +1039,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
         @Override
         public void onViewReleased(@NonNull View releasedChild, float xvel, float yvel) {
-            if ((releasedChild.getLeft() + releasedChild.getWidth() / 2) / (float) buttonRoot.getWidth() <= 0.5f) {
+            if ((releasedChild.getLeft() + releasedChild.getWidth() / 2f) / (float) buttonRoot.getWidth() <= 0.5f) {
                 if (connection.status != enabled) {
                     // Connection is already in disabled status.
                     settleView(releasedChild, 0, null);
