@@ -23,7 +23,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var toolbar: Toolbar
     private lateinit var emailPreferencesHelper: EmailPreferencesHelper
 
-    private lateinit var configuration: ConnectButton.Configuration
+    private val credentialsProvider = object : CredentialsProvider {
+        override fun getUserToken() = ApiHelper.getUserToken(emailPreferencesHelper.getEmail())
+
+        override fun getOAuthCode() = emailPreferencesHelper.getEmail()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,12 +42,6 @@ class MainActivity : AppCompatActivity() {
 
         connectButton = findViewById(R.id.connect_button)
 
-        val credentialsProvider = object : CredentialsProvider {
-            override fun getUserToken() = ApiHelper.getUserToken(emailPreferencesHelper.getEmail())
-
-            override fun getOAuthCode() = emailPreferencesHelper.getEmail()
-        }
-
         val hasEmailSet = !TextUtils.isEmpty(emailPreferencesHelper.getEmail())
         val suggestedEmail = if (!hasEmailSet) {
             EMAIL
@@ -51,7 +49,7 @@ class MainActivity : AppCompatActivity() {
             emailPreferencesHelper.getEmail()!!
         }
 
-        configuration = ConnectButton.Configuration.Builder.withConnectionId(
+        val configuration = ConnectButton.Configuration.Builder.withConnectionId(
             CONNECTION_ID,
             suggestedEmail,
             credentialsProvider
@@ -105,9 +103,25 @@ class MainActivity : AppCompatActivity() {
             .setPositiveButton(R.string.login) { _, _ ->
                 val newEmail = emailView.editText!!.text.toString()
                 emailPreferencesHelper.setEmail(newEmail)
+                val configuration = ConnectButton.Configuration.Builder.withConnectionId(
+                    CONNECTION_ID,
+                    newEmail,
+                    credentialsProvider
+                    , REDIRECT_URI
+                ).setOnFetchCompleteListener { connection ->
+                    findViewById<TextView>(R.id.connection_title).text = connection.name
+                }.build()
                 connectButton.setup(configuration)
             }.setNegativeButton(R.string.logout) { _, _ ->
                 emailPreferencesHelper.clear()
+                val configuration = ConnectButton.Configuration.Builder.withConnectionId(
+                    CONNECTION_ID,
+                    EMAIL,
+                    credentialsProvider
+                    , REDIRECT_URI
+                ).setOnFetchCompleteListener { connection ->
+                    findViewById<TextView>(R.id.connection_title).text = connection.name
+                }.build()
                 connectButton.setup(configuration)
             }
             .show()
