@@ -560,12 +560,8 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 super.onAnimationUpdate(animation);
-
                 ViewCompat.offsetLeftAndRight(checkMarkView,
                         ((Integer) animation.getAnimatedValue()) - checkMarkView.getLeft());
-                int color =
-                        (int) EVALUATOR.evaluate(animation.getAnimatedFraction(), BLACK, worksWithService.brandColor);
-                ((StartIconDrawable) iconImg.getBackground()).setBackgroundColor(color);
             }
         });
 

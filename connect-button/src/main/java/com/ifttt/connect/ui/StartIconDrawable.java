@@ -1,6 +1,7 @@
 package com.ifttt.connect.ui;
 
 import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
@@ -196,6 +197,15 @@ final class StartIconDrawable extends Drawable {
                             (Integer) EVALUATOR.evaluate((Float) animation.getAnimatedValue(), originalColor,
                                     darkerColor), PorterDuff.Mode.SRC_IN));
             invalidateSelf();
+        });
+        pressAnimator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                if (!pressed) {
+                    // If not pressed, at the end of the animation, remove the ColorFilter.
+                    background.setColorFilter(null);
+                }
+            }
         });
         return pressAnimator;
     }
