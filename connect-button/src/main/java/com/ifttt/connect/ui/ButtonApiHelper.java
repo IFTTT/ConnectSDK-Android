@@ -31,7 +31,7 @@ import static com.ifttt.connect.ui.ConnectButtonState.Login;
 final class ButtonApiHelper {
 
     private static final String SHOW_CONNECTION_API_URL = "https://ifttt.com/access/api/";
-    private static final String PACKAGE_NAME_IFTTT = "com.ifttt.ifttt.debug";
+    private static final String PACKAGE_NAME_IFTTT = "com.ifttt.ifttt";
 
     private final ConnectionApiClient connectionApiClient;
     private final CredentialsProvider credentialsProvider;
