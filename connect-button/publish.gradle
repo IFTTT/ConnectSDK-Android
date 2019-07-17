@@ -9,7 +9,8 @@ ext {
     libraryName = 'connect-button'
     artifact = 'connect-button'
 
-    libraryDescription = 'Connect Button SDK is a library that helps facilitate the integration of the Connect Button and Connection API.'
+    libraryDescription =
+            'Connect Button SDK is a library that helps facilitate the integration of the Connect Button and Connection API.'
 
     siteUrl = 'https://github.com/IFTTT/ConnectSDK-Android'
     gitUrl = 'https://github.com/IFTTT/ConnectSDK-Android.git'
@@ -43,7 +44,8 @@ install {
                 licenses {
                     license {
                         name licenseName
-                        url licenseUrl }
+                        url licenseUrl
+                    }
                 }
                 developers {
                     developer {
@@ -56,7 +58,6 @@ install {
                     connection gitUrl
                     developerConnection gitUrl
                     url siteUrl
-
                 }
             }
         }
@@ -76,9 +77,9 @@ task javadoc(type: Javadoc) {
 }
 
 afterEvaluate {
-    javadoc.classpath += files(android.libraryVariants.collect { variant ->
-        variant.javaCompileProvider.get().classpath.files
-    })
+    javadoc.classpath +=
+            files(android.libraryVariants.collect { variant -> variant.javaCompileProvider.get().classpath.files
+            })
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
@@ -91,13 +92,14 @@ artifacts {
     archives sourcesJar
 }
 
-Properties properties = new Properties()
-properties.load(project.rootProject.file('local.properties').newDataInputStream())
+if (project.hasProperty('bintrayUser') && project.hasProperty('bintrayKey') &&
+        project.hasProperty('bintrayGpgPassphrase')) {
+    bintray.user = project.bintrayUser
+    bintray.key = project.bintrayKey
+    bintray.pkg.version.gpg.passphrase = project.bintrayGpgPassphrase
+}
 
 bintray {
-    user = properties.getProperty("bintray.user")
-    key = properties.getProperty("bintray.apikey")
-
     configurations = ['archives']
     pkg {
         repo = bintrayRepo
@@ -114,7 +116,6 @@ bintray {
             vcsTag = libraryVersion
             gpg {
                 sign = true
-                passphrase = properties.getProperty("bintray.gpg.passphrase")
             }
         }
     }
