@@ -2,7 +2,7 @@
 <resources>
     <color name="ifttt_button_background">#EEEEEE</color>
     <color name="ifttt_email_hint_text_color">#CBCBCB</color>
-    <color name="ifttt_progress_background_color">#414141</color>
+    <color name="ifttt_progress_background_color">#222222</color>
     <color name="ifttt_background_touch_color">#444444</color>
     <color name="ifttt_semi_transparent_white">#41FFFFFF</color>
     <color name="ifttt_about_button_color">#222222</color>
