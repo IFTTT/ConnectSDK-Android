@@ -35,6 +35,11 @@ This SDK uses the following libraries as dependencies:
 ### Gradle
 ```groovy
 implementation "com.ifttt:connect-button:2.0.0"
+implementation "com.squareup.retrofit2:retrofit:2.6.0"
+implementation "com.squareup.retrofit2:converter-moshi:2.6.0"
+implementation "com.squareup.moshi:moshi:1.8.0"
+implementation "com.squareup.moshi:moshi-adapters:1.8.0"
+implementation "com.squareup.okhttp3:logging-interceptor:3.14.2"
 ```
 
 ## Usage
