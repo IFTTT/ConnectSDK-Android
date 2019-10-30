@@ -365,6 +365,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         }
 
         revertableHandler.revertAll();
+        iconDragHelperCallback.isEnabled = true;
 
         this.connection = connection;
         worksWithService = findWorksWithService(connection);
@@ -629,6 +630,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                 // When the animation starts, disable the click on buttonRoot, so that the flow will not be started
                 // again.
                 emailEdt.setVisibility(GONE);
+                iconDragHelperCallback.isEnabled = false;
             }
 
             @Override
@@ -731,6 +733,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                 super.onAnimationStart(animation);
                 emailEdt.setEnabled(false);
                 emailEdt.setVisibility(VISIBLE);
+                iconDragHelperCallback.isEnabled = false;
             }
 
             @Override
@@ -985,6 +988,8 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         private int settledAt = 0;
         private int trackEndColor = Color.BLACK;
 
+        boolean isEnabled = true;
+
         void setSettledAt(Connection.Status status) {
             if (status == enabled) {
                 settledAt = buttonRoot.getWidth() - iconImg.getWidth();
@@ -999,6 +1004,11 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
         @Override
         public boolean tryCaptureView(@NonNull View child, int pointerId) {
+            if (!isEnabled) {
+                // Do not capture any view if disabled.
+                return false;
+            }
+
             return child == iconImg;
         }
 
