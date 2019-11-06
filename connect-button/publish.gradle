@@ -15,7 +15,7 @@ ext {
     siteUrl = 'https://github.com/IFTTT/ConnectSDK-Android'
     gitUrl = 'https://github.com/IFTTT/ConnectSDK-Android.git'
 
-    libraryVersion = '2.0.0'
+    libraryVersion = '2.0.1'
 
     developerId = 'lzanita09'
     developerName = 'Zhe Lu'
