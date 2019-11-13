@@ -38,6 +38,7 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.core.text.HtmlCompat;
 import androidx.core.view.ViewCompat;
 import androidx.customview.widget.ViewDragHelper;
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
@@ -127,6 +128,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
     private IconDragHelperCallback iconDragHelperCallback;
 
     private boolean onDarkBackground = false;
+    private boolean isDisplayingError = false;
 
     @Nullable private Call ongoingImageCall;
 
@@ -229,6 +231,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
     }
 
     void setErrorMessage(CharSequence text, OnClickListener listener) {
+        isDisplayingError = true;
         float currentAlpha = helperTxt.getCurrentView().getAlpha();
         helperTxt.setText(text);
         helperTxt.getCurrentView().setAlpha(1f);
@@ -336,12 +339,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                 complete();
                 break;
             case Error:
-                if (result.errorType == null) {
-                    dispatchError(UNKNOWN_STATE);
-                    break;
-                }
-
-                dispatchError(new ErrorResponse(result.errorType, ""));
+                dispatchError(result.errorType);
                 break;
             default:
                 if (buttonState == Login) {
@@ -350,7 +348,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                 }
 
                 // The authentication result doesn't contain any next step instruction.
-                dispatchError(UNKNOWN_STATE);
+                dispatchError(null);
         }
     }
 
@@ -372,7 +370,11 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
         emailEdt.setVisibility(GONE);
 
-        helperTxt.setCurrentText(worksWithIfttt);
+        if (!isDisplayingError) {
+            helperTxt.setCurrentText(worksWithIfttt);
+            helperTxt.setOnClickListener(v -> getContext().startActivity(
+                    AboutIftttActivity.intent(getContext(), connection)));
+        }
 
         if (onDarkBackground) {
             setTextSwitcherTextColor(helperTxt, WHITE);
@@ -502,9 +504,6 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         }
 
         StartIconDrawable.setPressListener(iconImg);
-
-        helperTxt.setOnClickListener(
-                v -> getContext().startActivity(AboutIftttActivity.intent(getContext(), connection)));
     }
 
     Connection getConnection() {
@@ -926,10 +925,41 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         buttonState = newState;
     }
 
-    private void dispatchError(ErrorResponse errorResponse) {
-        for (ButtonStateChangeListener listener : listeners) {
-            listener.onError(errorResponse);
+    private void dispatchError(@Nullable String errorType) {
+        Spanned errorText;
+        if (errorType != null) {
+            switch (errorType) {
+                case ConnectResult.ERROR_TYPE_VERIFICATION:
+                    errorText = HtmlCompat.fromHtml(getResources().getString(R.string.ifttt_error_verifying_user),
+                            HtmlCompat.FROM_HTML_MODE_COMPACT);
+                    break;
+                case ConnectResult.ERROR_TYPE_AUTH:
+                    errorText = HtmlCompat.fromHtml(getResources().getString(R.string.ifttt_error_authenticating_service),
+                            HtmlCompat.FROM_HTML_MODE_COMPACT);
+                    break;
+                case ConnectResult.ERROR_TYPE_CONNECTION:
+                    errorText = HtmlCompat.fromHtml(getResources().getString(R.string.ifttt_error_enabling_connection),
+                            HtmlCompat.FROM_HTML_MODE_COMPACT);
+                    break;
+                default:
+                    errorText = HtmlCompat.fromHtml(getResources().getString(R.string.ifttt_error_generic),
+                            HtmlCompat.FROM_HTML_MODE_COMPACT);
+                    break;
+            }
+        } else  {
+            errorText = HtmlCompat.fromHtml(getResources().getString(R.string.ifttt_error_generic),
+                    HtmlCompat.FROM_HTML_MODE_COMPACT);
         }
+
+        SpannableString errorSpan = new SpannableString(errorText);
+        errorSpan.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.ifttt_error_red)), 0,
+                errorText.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+
+        setErrorMessage(errorText, v -> {
+            // Retry enabling connection
+            buttonRoot.performClick();
+        });
 
         // Reset the button state.
         if (buttonApiHelper.shouldPresentEmail(getContext())) {
@@ -1127,7 +1157,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                     processAndRun(() -> {
                         connectStateTxt.animate().alpha(1f).start();
                         cleanUpViews(ProgressView.class);
-                        dispatchError(errorResponse);
+                        dispatchError(errorResponse.code);
                     });
                 }
 
