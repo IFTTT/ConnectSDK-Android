@@ -136,7 +136,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/ifttt_space_med"
                 android:adjustViewBounds="true"
-                android:src="@drawable/google_play_badge"/>
+                android:src="@drawable/ic_google_play_store_download"/>
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/term_and_privacy"
