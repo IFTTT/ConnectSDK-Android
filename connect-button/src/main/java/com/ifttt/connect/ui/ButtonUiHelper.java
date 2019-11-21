@@ -59,7 +59,7 @@ final class ButtonUiHelper {
     @CheckReturnValue
     static CharSequence replaceKeyWithImage(TextView textView, String in, String key, final Drawable image) {
         Paint.FontMetrics fontMetrics = textView.getPaint().getFontMetrics();
-        float imageHeight = -fontMetrics.ascent;
+        float imageHeight = -fontMetrics.top - fontMetrics.leading;
         float scaleRatio = imageHeight / image.getIntrinsicHeight();
         int width = (int) (image.getIntrinsicWidth() * scaleRatio);
         int height = (int) imageHeight;
