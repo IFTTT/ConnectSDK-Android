@@ -109,7 +109,7 @@ public final class ConnectionApiClient {
 
             OkHttpClient okHttpClient = builder.build();
             Retrofit retrofit = new Retrofit.Builder().addConverterFactory(MoshiConverterFactory.create(moshi))
-                    .baseUrl("https://api.ifttt.com")
+                    .baseUrl("https://connect.ifttt.com")
                     .client(okHttpClient)
                     .build();
 
