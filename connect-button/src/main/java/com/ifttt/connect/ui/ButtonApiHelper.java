@@ -148,7 +148,7 @@ final class ButtonApiHelper {
         RedirectPrepAsyncTask task = new RedirectPrepAsyncTask(credentialsProvider,
                 connectionApiClient.isUserAuthenticated() ? connectionApiClient.api().user() : null, email,
                 prepResult -> {
-                    this.oAuthCode = prepResult.opaqueToken;
+                    this.oAuthCode = prepResult.oauthToken;
                     this.accountFound = prepResult.accountFound;
                     this.userLogin = prepResult.userLogin;
                 });
