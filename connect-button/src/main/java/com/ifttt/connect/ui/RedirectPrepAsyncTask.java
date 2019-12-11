@@ -96,7 +96,7 @@ final class RedirectPrepAsyncTask extends AsyncTask<Void, Void, RedirectPrepAsyn
         private final AccountApi accountApi;
 
         private AccountApiHelper() {
-            Retrofit retrofit = new Retrofit.Builder().baseUrl("https://api.ifttt.com")
+            Retrofit retrofit = new Retrofit.Builder().baseUrl("https://connect.ifttt.com")
                     .addConverterFactory(MoshiConverterFactory.create())
                     .build();
 
