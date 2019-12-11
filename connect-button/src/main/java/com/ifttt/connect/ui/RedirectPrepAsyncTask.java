@@ -1,6 +1,7 @@
 package com.ifttt.connect.ui;
 
 import android.os.AsyncTask;
+import com.ifttt.connect.BuildConfig;
 import com.ifttt.connect.User;
 import com.ifttt.connect.api.PendingResult;
 import java.io.IOException;
@@ -35,10 +36,10 @@ final class RedirectPrepAsyncTask extends AsyncTask<Void, Void, RedirectPrepAsyn
 
     @Override
     protected PrepResult doInBackground(Void... voids) {
+        String username = null;
+        boolean accountFound;
         try {
-            String oAuthCode = provider.getOAuthCode();
             Response<Void> accountMatchResponse = AccountApiHelper.get().findAccount(email).execute();
-            String username = null;
             if (userPendingResult != null) {
                 Response<User> userResponse = userPendingResult.getCall().execute();
                 User user = userResponse.body();
@@ -46,13 +47,26 @@ final class RedirectPrepAsyncTask extends AsyncTask<Void, Void, RedirectPrepAsyn
                     username = user.userLogin;
                 }
             }
-            boolean accountFound = accountMatchResponse.code() != 404;
-            return new PrepResult(oAuthCode, accountFound, username);
+            accountFound = accountMatchResponse.code() != 404;
         } catch (IOException e) {
             // Intentionally set the flag to true, so that the SDK will know to bring users to the web flow
             // to continue Connection authentication.
-            return new PrepResult(null, true, null);
+            accountFound = true;
         }
+
+        // Attempt to get OAuth code from the CredentialProvider implementation.
+        String oAuthCode;
+        try {
+            oAuthCode = provider.getOAuthCode();
+        } catch (Exception e) {
+            if (BuildConfig.DEBUG) {
+                e.printStackTrace();
+            }
+
+            oAuthCode = null;
+        }
+
+        return new PrepResult(oAuthCode, accountFound, username);
     }
 
     @Override
@@ -61,12 +75,12 @@ final class RedirectPrepAsyncTask extends AsyncTask<Void, Void, RedirectPrepAsyn
     }
 
     static final class PrepResult {
-        @Nullable final String opaqueToken;
+        @Nullable final String oauthToken;
         final boolean accountFound;
         @Nullable final String userLogin;
 
-        PrepResult(@Nullable String opaqueToken, boolean accountFound, @Nullable String userLogin) {
-            this.opaqueToken = opaqueToken;
+        PrepResult(@Nullable String oauthToken, boolean accountFound, @Nullable String userLogin) {
+            this.oauthToken = oauthToken;
             this.accountFound = accountFound;
             this.userLogin = userLogin;
         }

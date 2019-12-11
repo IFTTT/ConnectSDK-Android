@@ -27,6 +27,7 @@ import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LifecycleRegistry;
 import androidx.lifecycle.OnLifecycleEvent;
+import com.ifttt.connect.BuildConfig;
 import com.ifttt.connect.Connection;
 import com.ifttt.connect.ConnectionApiClient;
 import com.ifttt.connect.ErrorResponse;
@@ -446,7 +447,7 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
     private static final class UserTokenAsyncTask extends android.os.AsyncTask<Void, Void, String> {
 
         private interface UserTokenCallback {
-            void onUserTokenSet();
+            void onComplete();
         }
 
         private final CredentialsProvider callback;
@@ -459,13 +460,24 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
 
         @Override
         protected String doInBackground(Void... voids) {
-            return callback.getUserToken();
+            try {
+                return callback.getUserToken();
+            } catch (Exception e) {
+                if (BuildConfig.DEBUG) {
+                    e.printStackTrace();
+                }
+
+                return null;
+            }
         }
 
         @Override
-        protected void onPostExecute(String s) {
-            API_CLIENT.setUserToken(s);
-            userTokenCallback.onUserTokenSet();
+        protected void onPostExecute(@Nullable String s) {
+            if (s != null) {
+                API_CLIENT.setUserToken(s);
+            }
+
+            userTokenCallback.onComplete();
         }
     }
 
