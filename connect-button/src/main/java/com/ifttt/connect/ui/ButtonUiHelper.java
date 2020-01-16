@@ -9,8 +9,6 @@ import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.text.SpannableString;
 import android.text.Spanned;
-import android.text.StaticLayout;
-import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.style.ImageSpan;
 import android.util.Patterns;
@@ -21,14 +19,11 @@ import androidx.annotation.ColorInt;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.core.view.ViewCompat;
-import androidx.core.widget.TextViewCompat;
 import com.ifttt.connect.Connection;
 import com.ifttt.connect.R;
 import com.ifttt.connect.Service;
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
-
-import static android.util.TypedValue.COMPLEX_UNIT_PX;
 
 final class ButtonUiHelper {
 
@@ -177,30 +172,12 @@ final class ButtonUiHelper {
 
     private static void adjustTextViewPadding(TextView textView, int largePadding, int smallPadding,
             ConnectButtonState buttonState) {
-        int maxSize = textView.getResources().getDimensionPixelSize(R.dimen.ifttt_service_name_max_text_size);
-        int minSize = textView.getResources().getDimensionPixelSize(R.dimen.ifttt_service_name_min_text_size);
-
-        // Test the TextView using the max size.
-        TextPaint textPaint = textView.getPaint();
-        textPaint.setTextSize(maxSize);
-        float textWidth = StaticLayout.getDesiredWidth(textView.getText(), textPaint);
-        float maxWidth = textView.getWidth() - largePadding * 2;
-        if (textWidth > maxWidth) {
-            // Reduce the right padding if the original text is longer than the available space in this View. This is to
-            // keep the text "center" visually.
-            if (buttonState == ConnectButtonState.Enabled) {
-                textView.setPadding(smallPadding, 0, largePadding, 0);
-            } else {
-                textView.setPadding(largePadding, 0, smallPadding, 0);
-            }
-
-            TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(textView, minSize, maxSize, 1, COMPLEX_UNIT_PX);
+        // Reduce the right padding if the original text is longer than the available space in this View. This is to
+        // keep the text "center" visually.
+        if (buttonState == ConnectButtonState.Enabled) {
+            textView.setPadding(smallPadding, 0, largePadding, 0);
         } else {
-            textView.setPadding(largePadding, 0, largePadding, 0);
-
-            // Disable auto resizing and use the maximum size.
-            TextViewCompat.setAutoSizeTextTypeWithDefaults(textView, TextViewCompat.AUTO_SIZE_TEXT_TYPE_NONE);
-            textView.setTextSize(COMPLEX_UNIT_PX, maxSize);
+            textView.setPadding(largePadding, 0, smallPadding, 0);
         }
     }
 

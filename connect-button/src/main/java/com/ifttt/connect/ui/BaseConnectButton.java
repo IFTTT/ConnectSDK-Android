@@ -156,7 +156,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         buttonRoot = findViewById(R.id.ifttt_button_root);
 
         emailEdt = findViewById(R.id.ifttt_email);
-        emailEdt.setBackground(ButtonUiHelper.buildButtonBackground(context,
+        emailEdt.setBackground(buildButtonBackground(context,
                 ContextCompat.getColor(getContext(), R.color.ifttt_button_background)));
 
         connectStateTxt = findViewById(R.id.connect_with_ifttt);
@@ -222,10 +222,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
     @Override
     protected void dispatchDraw(Canvas canvas) {
         super.dispatchDraw(canvas);
-
-        if (onDarkBackground) {
-            borderDrawable.draw(canvas);
-        }
+        borderDrawable.draw(canvas);
     }
 
     void setErrorMessage(CharSequence text, OnClickListener listener) {
@@ -442,7 +439,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
             if (connection.status == Connection.Status.disabled) {
                 dispatchState(Disabled);
                 connectStateTxt.setCurrentText(
-                        getResources().getString(R.string.ifttt_reconnect_to, worksWithService.shortName));
+                        getResources().getString(R.string.ifttt_connect_to, worksWithService.shortName));
                 adjustTextViewLayout(connectStateTxt, buttonState);
                 iconDragHelperCallback.setTrackEndColor(BLACK);
             } else {
@@ -541,7 +538,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                 getDarkerColor(worksWithService.brandColor));
         CheckMarkView checkMarkView = CheckMarkView.create(buttonRoot);
 
-        CharSequence text = getResources().getString(R.string.ifttt_connecting_account);
+        CharSequence text = getResources().getString(R.string.ifttt_connecting);
         Animator progress = progressView.progress(0f, 1f, text, ANIM_DURATION_LONG);
         Animator check = checkMarkView.getAnimator(ENABLE);
         check.setStartDelay(100L);
@@ -590,7 +587,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
                 connectStateTxt.setAlpha(1f);
                 connectStateTxt.setText(getResources().getString(R.string.ifttt_connected));
-                adjustTextViewLayout(connectStateTxt, buttonState);
+                adjustTextViewLayout(connectStateTxt, Enabled);
             }
 
             @Override
@@ -617,7 +614,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         int primaryProgressColor = ContextCompat.getColor(getContext(), R.color.ifttt_progress_background_color);
         ProgressView progressView = ProgressView.create(buttonRoot, primaryProgressColor, BLACK);
 
-        CharSequence text = getResources().getString(R.string.ifttt_verifying);
+        CharSequence text = getResources().getString(R.string.ifttt_connecting);
         Animator showProgress = progressView.progress(0f, 0.5f, text, ANIM_DURATION_LONG);
         showProgress.setInterpolator(LINEAR_INTERPOLATOR);
         showProgress.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
@@ -1019,6 +1016,11 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         }
 
         @Override
+        public int clampViewPositionVertical(@NonNull View child, int top, int dy) {
+            return iconImg.getTop();
+        }
+
+        @Override
         public void onViewPositionChanged(@NonNull View changedView, int left, int top, int dx, int dy) {
             float progress = Math.abs((left - settledAt) / (float) (buttonRoot.getWidth() - iconImg.getWidth()));
 
@@ -1084,7 +1086,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                 }
             };
 
-            if (viewDragHelper.settleCapturedViewAt(left, 0)) {
+            if (viewDragHelper.settleCapturedViewAt(left, iconImg.getTop())) {
                 post(settlingAnimation);
             } else {
                 settlingAnimation.run();
@@ -1103,7 +1105,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                 public void onAnimationStart(Animator animation) {
                     // Assume the network call will be successful, change the text before the animation starts.
                     connectStateTxt.setCurrentText(
-                            getResources().getString(R.string.ifttt_reconnect_to, worksWithService.shortName));
+                            getResources().getString(R.string.ifttt_connect_to, worksWithService.shortName));
                     adjustTextViewLayout(connectStateTxt, Disabled);
                 }
             });
