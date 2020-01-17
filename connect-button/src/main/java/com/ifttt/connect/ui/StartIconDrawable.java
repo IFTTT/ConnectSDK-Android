@@ -41,7 +41,6 @@ final class StartIconDrawable extends Drawable {
     private final int initialBackgroundSize;
     private final int startIconWidth;
     private final int startIconHeight;
-    private final int startIconBackgroundColor;
     private final boolean onDarkBackground;
 
     private final ShapeDrawable borderDrawable = new ShapeDrawable();
@@ -55,9 +54,6 @@ final class StartIconDrawable extends Drawable {
         this.iconSize = iconSize;
         this.initialBackgroundSize = initialBackgroundSize;
         this.onDarkBackground = onDarkBackground;
-        this.startIconBackgroundColor =
-                onDarkBackground ? ContextCompat.getColor(context, R.color.ifttt_start_icon_background_on_dark)
-                        : Color.BLACK;
         if (onDarkBackground) {
             startIcon.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
         } else {
@@ -164,7 +160,8 @@ final class StartIconDrawable extends Drawable {
                     radius, radius, rounded, rounded, rounded, rounded, radius, radius
             }, null, null));
 
-            Integer color = (Integer) EVALUATOR.evaluate(progress, backgroundColor, startIconBackgroundColor);
+            Integer color = (Integer) EVALUATOR.evaluate(progress, backgroundColor,
+                    ButtonUiHelper.getDarkerColor(backgroundColor));
             background.getPaint().setColor(color);
             // Remove any press state color filter.
             background.getPaint().setColorFilter(null);
