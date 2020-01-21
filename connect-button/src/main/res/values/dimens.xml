@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="ifttt_text_padding_horizontal">72dp</dimen>
+    <dimen name="ifttt_text_padding_horizontal">@dimen/ifttt_connect_button_height</dimen>
     <dimen name="ifttt_text_padding_horizontal_small">30dp</dimen>
     <dimen name="ifttt_icon_image_size">32dp</dimen>
     <dimen name="ifttt_start_image_width">9dp</dimen>
