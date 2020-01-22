@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="ifttt_connect_to">Connect %1$s</string>
-    <string name="ifttt_reconnect_to">Reconnect %1$s</string>
     <string name="ifttt_connect">Connect</string>
     <string name="ifttt_email">Email</string>
     <string name="ifttt_about_title">IFTTT connects %1$s to %2$s</string>
@@ -14,12 +13,11 @@
     <string name="ifttt_creating_account">Creating account…</string>
     <string name="ifttt_continue_to">Going to %1$s…</string>
     <string name="ifttt_connected">Connected</string>
-    <string name="ifttt_connecting_account">Connecting…</string>
+    <string name="ifttt_connecting">Connecting…</string>
     <string name="ifttt_connection_off">Disconnect</string>
     <string name="ifttt_sign_in_to_ifttt_or_create_new_account"><![CDATA[You are creating or using your IFTTT account subject to <a href=\"https://ifttt.com/terms\">Terms</a> & <a href=\"https://ifttt.com/privacy\">Privacy Policy</a>.]]></string>
     <string name="ifttt_all_set">You\'re all set. Manage connection with IFTTT</string>
     <string name="ifttt_slide_to_turn_off">Slide to disconnect</string>
-    <string name="ifttt_verifying">Verifying…</string>
     <string name="ifttt_enter_valid_email">Please enter a valid email address</string>
     <string name="terms_and_privacy"><![CDATA[By using this connection you agree to our <a href=\"https://ifttt.com/terms\">Privacy & Terms</a>.]]></string>
     <string name="disconnecting">Disconnecting…</string>

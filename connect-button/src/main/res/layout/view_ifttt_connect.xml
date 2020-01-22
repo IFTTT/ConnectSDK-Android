@@ -8,7 +8,8 @@
         android:layout_height="@dimen/ifttt_connect_button_height"
         android:layout_marginEnd="@dimen/ifttt_connect_button_margin_horizontal"
         android:layout_marginStart="@dimen/ifttt_connect_button_margin_horizontal"
-        android:layout_marginTop="@dimen/ifttt_space_med">
+        android:layout_marginTop="@dimen/ifttt_connect_button_margin_top"
+        android:layout_marginBottom="@dimen/ifttt_connect_button_margin_bottom">
 
         <EditText
             android:id="@+id/ifttt_email"
@@ -57,6 +58,7 @@
                 android:textColor="@android:color/white"
                 android:textSize="@dimen/ifttt_service_name_max_text_size"
                 app:autoSizeMaxTextSize="@dimen/ifttt_service_name_max_text_size"
+                app:autoSizeMinTextSize="@dimen/ifttt_service_name_min_text_size"
                 app:autoSizeTextType="uniform"/>
 
         </TextSwitcher>
@@ -64,7 +66,7 @@
         <ImageView
             android:id="@+id/ifttt_icon"
             android:layout_width="@dimen/ifttt_connect_button_height"
-            android:layout_height="match_parent"
+            android:layout_height="@dimen/ifttt_connect_button_height"
             android:layout_gravity="center_vertical"
             android:scaleType="centerInside"/>
 

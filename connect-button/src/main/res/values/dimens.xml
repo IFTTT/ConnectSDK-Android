@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="ifttt_text_padding_horizontal">72dp</dimen>
+    <dimen name="ifttt_text_padding_horizontal">@dimen/ifttt_connect_button_height</dimen>
     <dimen name="ifttt_text_padding_horizontal_small">30dp</dimen>
     <dimen name="ifttt_icon_image_size">32dp</dimen>
     <dimen name="ifttt_start_image_width">9dp</dimen>
@@ -10,18 +10,21 @@
     <dimen name="ifttt_start_icon_elevation_dark_mode">2dp</dimen>
     <dimen name="ifttt_check_mark_size">40dp</dimen>
     <dimen name="ifttt_about_drawable_padding">16dp</dimen>
-    <dimen name="ifttt_connect_button_height">70dp</dimen>
-    <dimen name="connect_button_radius">35dp</dimen>
+    <dimen name="ifttt_connect_button_height">68dp</dimen>
+    <dimen name="ifttt_connect_button_height_with_border">72dp</dimen>
+    <dimen name="connect_button_radius_with_border">36dp</dimen>
+    <dimen name="connect_button_radius">34dp</dimen>
     <dimen name="ifttt_about_button_radius">18sp</dimen>
     <dimen name="ifttt_about_button_height">34sp</dimen>
+    <dimen name="ifttt_button_icon_margin">2dp</dimen>
     <dimen name="ifttt_button_border_width">2dp</dimen>
-    <dimen name="ifttt_service_name_max_text_size">24sp</dimen>
+    <dimen name="ifttt_service_name_max_text_size">22sp</dimen>
     <dimen name="ifttt_about_text_line_space">6sp</dimen>
     <dimen name="ifttt_service_name_max_width">160dp</dimen>
     <dimen name="ifttt_service_name_height">26sp</dimen>
     <dimen name="ifttt_service_name_min_text_size">12sp</dimen>
-    <dimen name="ifttt_connect_button_width">330dp</dimen>
-    <dimen name="ifttt_connect_button_min_width">300dp</dimen>
+    <dimen name="ifttt_connect_button_width">311dp</dimen>
+    <dimen name="ifttt_connect_button_min_width">282dp</dimen>
     <dimen name="ifttt_continue_icon_size">30dp</dimen>
     <dimen name="ifttt_about_padding_horizontal">48dp</dimen>
     <dimen name="ifttt_about_logo_width">160dp</dimen>
@@ -40,5 +43,7 @@
     <dimen name="ifttt_about_icon_size">48dp</dimen>
     <dimen name="ifttt_loading_status_margin_top">88dp</dimen>
     <dimen name="ifttt_about_title_size">28sp</dimen>
-    <dimen name="ifttt_connect_button_margin_horizontal">24dp</dimen>
+    <dimen name="ifttt_connect_button_margin_horizontal">28dp</dimen>
+    <dimen name="ifttt_connect_button_margin_top">18dp</dimen>
+    <dimen name="ifttt_connect_button_margin_bottom">2dp</dimen>
 </resources>
