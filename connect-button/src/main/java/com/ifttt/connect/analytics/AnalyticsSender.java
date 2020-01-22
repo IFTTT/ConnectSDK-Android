@@ -1,8 +1,8 @@
 package com.ifttt.connect.analytics;
 
 import android.content.Context;
-import com.squareup.tape2.ObjectQueue;
-import com.squareup.tape2.QueueFile;
+import com.ifttt.connect.analytics.tape.ObjectQueue;
+import com.ifttt.connect.analytics.tape.QueueFile;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
