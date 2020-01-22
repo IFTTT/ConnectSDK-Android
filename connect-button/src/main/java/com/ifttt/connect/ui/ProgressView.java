@@ -74,8 +74,8 @@ final class ProgressView extends FrameLayout {
         return set;
     }
 
-    void hideText() {
-        textSwitcher.setText(null);
+    void setProgressText(@Nullable CharSequence text) {
+        textSwitcher.setText(text);
     }
 
     static ProgressView create(ViewGroup parent, @ColorInt int primaryColor, @ColorInt int progressColor) {
