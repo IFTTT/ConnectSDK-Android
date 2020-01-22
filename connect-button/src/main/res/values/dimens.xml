@@ -30,8 +30,9 @@
     <dimen name="ifttt_about_logo_width">160dp</dimen>
     <dimen name="ifttt_space_med">16dp</dimen>
     <dimen name="ifttt_space_large">32dp</dimen>
-    <dimen name="ifttt_about_description_margin_top">24dp</dimen>
     <dimen name="ifttt_space_small">8dp</dimen>
+    <dimen name="ifttt_space_xsmall">4dp</dimen>
+    <dimen name="ifttt_about_description_margin_top">24dp</dimen>
     <dimen name="ifttt_about_google_play_badge_width">180dp</dimen>
     <dimen name="ifttt_about_button_text_size">18sp</dimen>
     <dimen name="ifttt_check_mark_width">64dp</dimen>

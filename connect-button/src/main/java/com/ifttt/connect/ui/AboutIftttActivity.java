@@ -23,6 +23,8 @@ import com.ifttt.connect.Connection;
 import com.ifttt.connect.R;
 import com.ifttt.connect.Service;
 
+import static com.ifttt.connect.ui.ButtonApiHelper.redirectToConnection;
+import static com.ifttt.connect.ui.ButtonApiHelper.redirectToService;
 import static com.ifttt.connect.ui.ButtonApiHelper.redirectToTerms;
 import static com.ifttt.connect.ui.ButtonUiHelper.findWorksWithService;
 
@@ -47,6 +49,22 @@ public final class AboutIftttActivity extends AppCompatActivity {
         ImageLoader.get().load(getLifecycle(), primaryService.monochromeIconUrl, primaryServiceIcon::setImageBitmap);
         ImageLoader.get()
                 .load(getLifecycle(), secondaryService.monochromeIconUrl, secondaryServiceIcon::setImageBitmap);
+        primaryServiceIcon.setOnClickListener(v -> {
+            Intent intent = redirectToService(this, primaryService.id);
+            if (intent == null) {
+                return;
+            }
+
+            startActivity(intent);
+        });
+        secondaryServiceIcon.setOnClickListener(v -> {
+            Intent intent = redirectToService(this, secondaryService.id);
+            if (intent == null) {
+                return;
+            }
+
+            startActivity(intent);
+        });
 
         TextView title = findViewById(R.id.ifttt_about_title);
         String aboutTitleString = getString(R.string.ifttt_about_title, secondaryService.name, primaryService.name);
@@ -63,6 +81,14 @@ public final class AboutIftttActivity extends AppCompatActivity {
         highlightServiceNames.setSpan(new AvenirTypefaceSpan(bold), primaryServiceNameStart, primaryServiceNameEnd,
                 Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         title.setText(highlightServiceNames);
+        title.setOnClickListener(v -> {
+            Intent intent = redirectToConnection(this, connection.id);
+            if (intent == null) {
+                return;
+            }
+
+            startActivity(intent);
+        });
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setNavigationOnClickListener(v -> finish());
@@ -75,9 +101,7 @@ public final class AboutIftttActivity extends AppCompatActivity {
 
         Intent redirectToTermsIntent = redirectToTerms(this);
         if (redirectToTermsIntent != null) {
-            termsAndPrivacy.setOnClickListener(v -> {
-                startActivity(redirectToTermsIntent);
-            });
+            termsAndPrivacy.setOnClickListener(v -> startActivity(redirectToTermsIntent));
         }
 
         View manageConnectionView = findViewById(R.id.ifttt_manage_connection);

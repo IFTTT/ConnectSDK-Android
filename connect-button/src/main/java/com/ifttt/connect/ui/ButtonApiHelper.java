@@ -31,6 +31,7 @@ import static com.ifttt.connect.ui.ConnectButtonState.Login;
 final class ButtonApiHelper {
 
     private static final String SHOW_CONNECTION_API_URL = "https://ifttt.com/access/api/";
+    private static final Uri IFTTT_URI = Uri.parse("https://ifttt.com");
     private static final String PACKAGE_NAME_IFTTT = "com.ifttt.ifttt";
 
     private final ConnectionApiClient connectionApiClient;
@@ -216,8 +217,7 @@ final class ButtonApiHelper {
     @CheckReturnValue
     @Nullable
     static Intent redirectToManage(Context context, String id) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(Uri.parse("https://ifttt.com/connections/" + id));
+        Intent intent = new Intent(Intent.ACTION_VIEW, IFTTT_URI.buildUpon().appendPath(id).build());
         if (!hasActivityToLaunch(context, intent)) {
             return null;
         }
@@ -228,7 +228,30 @@ final class ButtonApiHelper {
     @CheckReturnValue
     @Nullable
     static Intent redirectToTerms(Context context) {
-        Intent intent = new Intent(Intent.ACTION_VIEW).setData(Uri.parse("https://ifttt.com/terms"));
+        Intent intent = new Intent(Intent.ACTION_VIEW, IFTTT_URI.buildUpon().appendPath("terms").build());
+        if (!hasActivityToLaunch(context, intent)) {
+            return null;
+        }
+
+        return intent;
+    }
+
+    @CheckReturnValue
+    @Nullable
+    static Intent redirectToService(Context context, String moduleName) {
+        Intent intent = new Intent(Intent.ACTION_VIEW, IFTTT_URI.buildUpon().appendPath(moduleName).build());
+        if (!hasActivityToLaunch(context, intent)) {
+            return null;
+        }
+
+        return intent;
+    }
+
+    @CheckReturnValue
+    @Nullable
+    static Intent redirectToConnection(Context context, String id) {
+        Intent intent =
+                new Intent(Intent.ACTION_VIEW, IFTTT_URI.buildUpon().appendPath("connections").appendPath(id).build());
         if (!hasActivityToLaunch(context, intent)) {
             return null;
         }
