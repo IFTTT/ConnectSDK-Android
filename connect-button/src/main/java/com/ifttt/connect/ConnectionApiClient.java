@@ -140,6 +140,11 @@ public final class ConnectionApiClient {
         }
 
         @Override
+        public PendingResult<Connection> reenableConnection(String id) {
+            return new ApiPendingResult<>(retrofitConnectionApi.reenableConnection(id), errorResponseJsonAdapter);
+        }
+
+        @Override
         public PendingResult<User> user() {
             return new ApiPendingResult<>(retrofitConnectionApi.user(), errorResponseJsonAdapter);
         }

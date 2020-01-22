@@ -16,6 +16,9 @@ interface RetrofitConnectionApi {
     @POST("/v2/connections/{id}/disable")
     Call<Connection> disableConnection(@Path("id") String id);
 
+    @POST("/v2/connections/{id}/enable")
+    Call<Connection> reenableConnection(@Path("id") String id);
+
     @GET("/v2/me")
     Call<User> user();
 }

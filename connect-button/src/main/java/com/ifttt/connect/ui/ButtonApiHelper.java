@@ -43,12 +43,13 @@ final class ButtonApiHelper {
     @Nullable private String oAuthCode;
     @Nullable private String userLogin;
 
-    // Default to account existed, so that we don't create unnecessary account through the automatic flow. This is used
+    // Default to account existed, so that we don't addTo unnecessary account through the automatic flow. This is used
     // to help simplify the flow by setting an aggressive timeout for account checking requests.
     private boolean accountFound = true;
 
     // Reference to the ongoing disable connection call.
     @Nullable private PendingResult<Connection> disableConnectionCall;
+    @Nullable private PendingResult<Connection> reenableConnectionCall;
 
     ButtonApiHelper(ConnectionApiClient client, Uri redirectUri, @Nullable String inviteCode,
             CredentialsProvider provider, Lifecycle lifecycle) {
@@ -79,13 +80,34 @@ final class ButtonApiHelper {
         lifecycle.addObserver(new PendingResultLifecycleObserver<>(disableConnectionCall));
     }
 
+    void reenableConnection(Lifecycle lifecycle, String id, ResultCallback<Connection> resultCallback) {
+        reenableConnectionCall = connectionApiClient.api().reenableConnection(id);
+        lifecycle.addObserver(new PendingResultLifecycleObserver<>(reenableConnectionCall));
+        reenableConnectionCall.execute(new ResultCallback<Connection>() {
+            @Override
+            public void onSuccess(Connection result) {
+                reenableConnectionCall = null;
+                resultCallback.onSuccess(result);
+            }
+
+            @Override
+            public void onFailure(ErrorResponse errorResponse) {
+                reenableConnectionCall = null;
+                resultCallback.onFailure(errorResponse);
+            }
+        });
+    }
+
     void cancelDisconnect() {
-        if (disableConnectionCall == null) {
-            return;
+        if (disableConnectionCall != null) {
+            disableConnectionCall.cancel();
+            disableConnectionCall = null;
         }
 
-        disableConnectionCall.cancel();
-        disableConnectionCall = null;
+        if (reenableConnectionCall != null) {
+            reenableConnectionCall.cancel();
+            reenableConnectionCall = null;
+        }
     }
 
     @CheckReturnValue

@@ -8,8 +8,8 @@ public enum ConnectButtonState {
     Initial,
 
     /**
-     * A button state for the create account authentication step. In this step, the user is going to be redirected
-     * to web to create an account and continue with service connection.
+     * A button state for the addTo account authentication step. In this step, the user is going to be redirected
+     * to web to addTo an account and continue with service connection.
      */
     CreateAccount,
 

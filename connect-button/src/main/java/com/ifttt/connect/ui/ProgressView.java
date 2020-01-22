@@ -78,7 +78,7 @@ final class ProgressView extends FrameLayout {
         textSwitcher.setText(text);
     }
 
-    static ProgressView create(ViewGroup parent, @ColorInt int primaryColor, @ColorInt int progressColor) {
+    static ProgressView addTo(ViewGroup parent, @ColorInt int primaryColor, @ColorInt int progressColor) {
         ProgressView progressView = new ProgressView(parent.getContext());
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT);
         progressView.setLayoutParams(lp);

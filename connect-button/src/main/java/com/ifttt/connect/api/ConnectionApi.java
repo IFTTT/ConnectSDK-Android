@@ -29,6 +29,14 @@ public interface ConnectionApi {
     PendingResult<Connection> disableConnection(String id);
 
     /**
+     * API for re-enable a Connection
+     *
+     * @param id  Connection id.
+     * @return A {@link PendingResult} for the API call execution.
+     */
+    PendingResult<Connection> reenableConnection(String id);
+
+    /**
      * API for retrieving information about the IFTTT user, as well as the authentication level of the current
      * ConnectionApiClient.
      *
