@@ -699,7 +699,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                 if (buttonApiHelper.shouldPresentCreateAccount(getContext())) {
                     AnimatorSet set = new AnimatorSet();
                     Animator completeProgress =
-                            progressView.progress(0.5f, 1f, getResources().getString(R.string.ifttt_creating_account),
+                            progressView.progress(0.5f, 1f, getResources().getString(R.string. ifttt_creating_account),
                                     ANIM_DURATION_LONG);
                     completeProgress.setInterpolator(LINEAR_INTERPOLATOR);
                     completeProgress.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {

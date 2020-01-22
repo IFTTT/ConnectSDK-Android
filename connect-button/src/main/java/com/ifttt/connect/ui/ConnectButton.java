@@ -64,6 +64,7 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
     public ConnectButton(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
+
         setClipToPadding(false);
         setClipChildren(false);
         setLayoutTransition(new LayoutTransition());
