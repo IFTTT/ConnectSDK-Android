@@ -217,7 +217,8 @@ final class ButtonApiHelper {
     @CheckReturnValue
     @Nullable
     static Intent redirectToManage(Context context, String id) {
-        Intent intent = new Intent(Intent.ACTION_VIEW, IFTTT_URI.buildUpon().appendPath(id).build());
+        Intent intent = new Intent(Intent.ACTION_VIEW,
+                IFTTT_URI.buildUpon().appendPath("connections").appendPath(id).appendPath("edit").build());
         if (!hasActivityToLaunch(context, intent)) {
             return null;
         }
