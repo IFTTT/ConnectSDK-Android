@@ -37,7 +37,9 @@
                     android:id="@+id/ifttt_primary_service_icon"
                     android:layout_width="@dimen/ifttt_about_icon_size"
                     android:layout_height="@dimen/ifttt_about_icon_size"
-                    android:layout_margin="@dimen/ifttt_space_small"/>
+                    android:layout_margin="@dimen/ifttt_space_xsmall"
+                    android:padding="@dimen/ifttt_space_xsmall"
+                    android:background="?selectableItemBackground"/>
 
                 <ImageView
                     android:layout_width="@dimen/ifttt_about_icon_size"
@@ -51,7 +53,9 @@
                     android:id="@+id/ifttt_secondary_service_icon"
                     android:layout_width="@dimen/ifttt_about_icon_size"
                     android:layout_height="@dimen/ifttt_about_icon_size"
-                    android:layout_margin="@dimen/ifttt_space_small"/>
+                    android:layout_margin="@dimen/ifttt_space_xsmall"
+                    android:padding="@dimen/ifttt_space_xsmall"
+                    android:background="?selectableItemBackground"/>
 
             </LinearLayout>
 
@@ -65,7 +69,8 @@
                 android:lineSpacingExtra="@dimen/ifttt_about_text_line_space"
                 android:text="@string/ifttt_about_title"
                 android:textSize="@dimen/ifttt_about_title_size"
-                android:textAppearance="@style/AboutIfttt.Title"/>
+                android:textAppearance="@style/AboutIfttt.Title"
+                android:background="?selectableItemBackground"/>
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/ifttt_about_1"
