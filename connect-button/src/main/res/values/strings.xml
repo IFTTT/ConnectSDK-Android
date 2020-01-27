@@ -14,9 +14,9 @@
     <string name="ifttt_continue_to">Going to %1$s…</string>
     <string name="ifttt_connected">Connected</string>
     <string name="ifttt_connecting">Connecting…</string>
+    <string name="ifttt_disconnecting">Disconnecting…</string>
     <string name="ifttt_connection_off">Disconnect</string>
     <string name="ifttt_sign_in_to_ifttt_or_create_new_account"><![CDATA[You are creating or using your IFTTT account subject to <a href=\"https://ifttt.com/terms\">Terms</a> & <a href=\"https://ifttt.com/privacy\">Privacy Policy</a>.]]></string>
-    <string name="ifttt_slide_to_turn_off">Slide to disconnect</string>
     <string name="ifttt_enter_valid_email">Please enter a valid email address</string>
     <string name="terms_and_privacy"><![CDATA[By using this connection you agree to our <a href=\"https://ifttt.com/terms\">Privacy & Terms</a>.]]></string>
     <string name="disconnecting">Disconnecting…</string>
@@ -31,4 +31,5 @@
 
     <string name="service_icon_content_description">%1$s service icon</string>
     <string name="start_button_content_description">Start icon</string>
+    <string name="ifttt_disconnected">Disconnected</string>
 </resources>
