@@ -655,6 +655,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                     Animator completeProgress =
                             progressView.progress(0.5f, 1f, getResources().getString(R.string.ifttt_connecting),
                                     ANIM_DURATION_MEDIUM);
+                    completeProgress.setInterpolator(LINEAR_INTERPOLATOR);
                     completeProgress.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
                         @Override
                         public void onAnimationEnd(Animator animation) {
