@@ -495,6 +495,10 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                         @Override
                         public void onAnimationStart(Animator animation) {
                             super.onAnimationStart(animation);
+                            if (isCanceled()) {
+                                return;
+                            }
+
                             buttonApiHelper.reenableConnection(getLifecycle(), connection.id,
                                     new PendingResult.ResultCallback<Connection>() {
                                         @Override
@@ -608,6 +612,10 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
             @Override
             public void onAnimationStart(Animator animation) {
                 super.onAnimationStart(animation);
+                if (isCanceled()) {
+                    return;
+                }
+
                 currentProgress.setProgressText(null);
             }
         });
@@ -616,6 +624,9 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
             @Override
             public void onAnimationStart(Animator animation) {
                 super.onAnimationStart(animation);
+                if (isCanceled()) {
+                    return;
+                }
 
                 buttonRoot.setBackground(buildButtonBackground(getContext(), BLACK));
                 connectStateTxt.setAlpha(1f);
@@ -653,6 +664,9 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
             @Override
             public void onAnimationStart(Animator animation) {
                 super.onAnimationStart(animation);
+                if (isCanceled()) {
+                    return;
+                }
 
                 // Remove icon elevation when the progress bar is visible.
                 ViewCompat.setElevation(iconImg, 0f);

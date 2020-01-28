@@ -43,7 +43,7 @@ final class ButtonApiHelper {
     @Nullable private String oAuthCode;
     @Nullable private String userLogin;
 
-    // Default to account existed, so that we don't addTo unnecessary account through the automatic flow. This is used
+    // Default to account existed, so that we don't create unnecessary account through the automatic flow. This is used
     // to help simplify the flow by setting an aggressive timeout for account checking requests.
     private boolean accountFound = true;
 
