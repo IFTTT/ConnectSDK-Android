@@ -51,10 +51,10 @@ final class CheckMarkView extends AppCompatImageView {
         int height = parent.getResources().getDimensionPixelSize(R.dimen.ifttt_check_mark_height);
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(width, height);
         lp.gravity = Gravity.CENTER;
+        checkMarkView.setLayoutParams(lp);
 
         ViewCompat.setElevation(checkMarkView, parent.getResources().getDimension(R.dimen.ifttt_icon_elevation));
 
-        parent.addView(checkMarkView, lp);
         return checkMarkView;
     }
 }
