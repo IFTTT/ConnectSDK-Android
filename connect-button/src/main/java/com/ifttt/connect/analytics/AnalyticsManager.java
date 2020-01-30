@@ -6,6 +6,7 @@ import androidx.work.ExistingWorkPolicy;
 import androidx.work.NetworkType;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
+import com.ifttt.connect.BuildConfig;
 import com.ifttt.connect.analytics.tape.ObjectQueue;
 import com.ifttt.connect.analytics.tape.QueueFile;
 import com.squareup.moshi.JsonAdapter;
@@ -18,6 +19,7 @@ import java.util.List;
 import okio.Buffer;
 import okio.BufferedSink;
 import okio.Okio;
+import android.os.Build.VERSION;
 
 /*
  * This is the main class implementing analytics for the ConnectButton SDK. It is responsible for :
@@ -54,16 +56,15 @@ public class AnalyticsManager {
         anonymousId = AnalyticsPreferences.getAnonymousId(context);
     }
 
-    static AnalyticsManager getInstance(Context context) {
+    public static AnalyticsManager getInstance(Context context) {
         if (instance == null) {
             instance = new AnalyticsManager(context);
         }
-
         return instance;
     }
 
     /*
-     * This method tracks a UI element impression, call it to track impressions on buttons, texts and so on.
+     * This method generates a UI item impression event
      * */
     public void trackUiImpression(AnalyticsObject obj, AnalyticsLocation location,
             AnalyticsLocation sourceLocation) {
@@ -71,7 +72,7 @@ public class AnalyticsManager {
     }
 
     /*
-     * This method tracks a UI element click, call it to track clicks on buttons, texts and so on.
+     * This method generates a UI item click event
      * */
     public void trackUiClick(AnalyticsObject obj, AnalyticsLocation location,
             AnalyticsLocation sourceLocation) {
@@ -79,8 +80,7 @@ public class AnalyticsManager {
     }
 
     /*
-     * This method tracks a system event,
-     * call it to track events where some important change occured and it cannot be categorized as a state change event for a particular object
+     * This method generates a system change event
      * */
     public void trackSystemEvent(AnalyticsObject obj, AnalyticsLocation location,
             AnalyticsLocation sourceLocation) {
@@ -88,7 +88,7 @@ public class AnalyticsManager {
     }
 
     /*
-     * This method tracks a state change event, call it to track events where a state was changed for an object
+     * This method generates a state change event for an object
      * */
     public void trackStateChangeEvent(AnalyticsObject obj, AnalyticsLocation location,
             AnalyticsLocation sourceLocation) {
@@ -96,7 +96,7 @@ public class AnalyticsManager {
     }
 
     /*
-     * This method tracks screen views, call it when the activity with the Connect button is in foreground
+     * This method generates screen view event
      * */
     public void trackScreenView(AnalyticsObject obj, AnalyticsLocation location,
             AnalyticsLocation sourceLocation) {
@@ -104,7 +104,7 @@ public class AnalyticsManager {
     }
 
     /*
-     * Process the event data before adding it to the queue
+     * Process the event data before adding it to the event queue
      * */
     private void trackItemEvent(String name, AnalyticsObject obj, AnalyticsLocation location,
             AnalyticsLocation sourceLocation) {
@@ -114,15 +114,14 @@ public class AnalyticsManager {
         data.put("object_id", obj.id);
         data.put("object_type", obj.type);
 
-        // Special attributes that only certain types of objects have.
         mapAttributes(data, obj);
 
         data.put("location_type", location.type);
         data.put("location_id", location.id);
         data.put("source_location_type", sourceLocation.type);
-
-        // TODO: Add source_location_id = {app_bundle_id, package_name} to data
-        // TODO: Add sdk version code + name, android version
+        data.put("source_location_id", context.getPackageName());
+        data.put("sdk_version", BuildConfig.VERSION_NAME);
+        data.put("system_version", VERSION.SDK_INT);
 
         data.put("sdk_anonymous_id", anonymousId);
         if (previousEventName != null) {
@@ -212,7 +211,7 @@ public class AnalyticsManager {
     /*
     * Call this method when the ConnectButton is initialized to flush the initial set of events
     * */
-    void performFlush() {
+    private void performFlush() {
         // One time request to read the queue, send events to server and flush the queue.
         Constraints constraints =
                 new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build();

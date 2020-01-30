@@ -5,7 +5,7 @@ public class AnalyticsLocation {
     String id;
     String type;
 
-    AnalyticsLocation(String id, String type) {
+    public AnalyticsLocation(String id, String type) {
         this.id = id;
         this.type = type;
     }

@@ -32,6 +32,9 @@ import com.ifttt.connect.Connection;
 import com.ifttt.connect.ConnectionApiClient;
 import com.ifttt.connect.ErrorResponse;
 import com.ifttt.connect.R;
+import com.ifttt.connect.analytics.AnalyticsLocation;
+import com.ifttt.connect.analytics.AnalyticsManager;
+import com.ifttt.connect.analytics.AnalyticsObject;
 import com.ifttt.connect.api.PendingResult;
 
 import static android.animation.ValueAnimator.INFINITE;
@@ -50,6 +53,8 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
     private final TextView loadingView;
 
     private CredentialsProvider credentialsProvider;
+    private boolean analyticsOptOut;
+    private AnalyticsManager analyticsManager;
 
     private final LifecycleRegistry lifecycleRegistry = new LifecycleRegistry(this);
 
@@ -88,6 +93,8 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
                 return false;
             }
         });
+
+        analyticsManager = AnalyticsManager.getInstance(context);
     }
 
     /**
@@ -97,6 +104,20 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
      * @param configuration Configuration object that helps set up the Connect Button.
      */
     public void setup(Configuration configuration) {
+        setup(configuration, false);
+        analyticsManager.trackScreenView(new AnalyticsObject("test", "test"),
+                new AnalyticsLocation("testLocationId", "testLocationType"), new AnalyticsLocation("sourceLocation", "sourceLocationId"));
+    }
+
+    /**
+     * Set up the Connect Button to fetch the Connection data with the given id and set up the View to be able to do
+     * authentication.
+     *
+     * @param configuration Configuration object that helps set up the Connect Button.
+     * @param analyticsOptOut boolean to allow opting out of analytics. If set to true, analytics event tracking will be disabled.
+     */
+    public void setup(Configuration configuration, boolean analyticsOptOut) {
+        this.analyticsOptOut = analyticsOptOut;
         if (ButtonUiHelper.isEmailInvalid(configuration.suggestedUserEmail) && !ButtonUiHelper.isIftttInstalled(
                 getContext().getPackageManager())) {
             connectButton.setVisibility(View.GONE);
