@@ -321,12 +321,16 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
      *
      * @param result Authentication flow redirect result from the web view.
      */
-    void setConnectResult(ConnectResult result) {
+    void setConnectResult(@Nullable ConnectResult result) {
         if (activityLifecycleCallbacks != null) {
             // Unregister existing ActivityLifecycleCallbacks and let the AuthenticationResult handle the button
             // state change.
             ((Activity) getContext()).getApplication().unregisterActivityLifecycleCallbacks(activityLifecycleCallbacks);
             activityLifecycleCallbacks = null;
+        }
+
+        if (result == null) {
+            return;
         }
 
         cleanUpViews(ProgressView.class);
@@ -499,6 +503,9 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                                 return;
                             }
 
+                            // Remove icon elevation when the progress bar is visible.
+                            ViewCompat.setElevation(iconImg, 0f);
+
                             buttonApiHelper.reenableConnection(getLifecycle(), connection.id,
                                     new PendingResult.ResultCallback<Connection>() {
                                         @Override
@@ -628,7 +635,15 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                     return;
                 }
 
+                // Reset email UI.
+                emailEdt.setVisibility(GONE);
+                ((StartIconDrawable) iconImg.getBackground()).reset();
+                ((StartIconDrawable) iconImg.getBackground()).setBackgroundColor(worksWithService.brandColor);
+
+                // Reset Button background.
                 buttonRoot.setBackground(buildButtonBackground(getContext(), BLACK));
+
+                // Reset Button text.
                 connectStateTxt.setAlpha(1f);
                 connectStateTxt.setText(getResources().getString(R.string.ifttt_connected));
                 adjustTextViewLayout(connectStateTxt, Enabled);
