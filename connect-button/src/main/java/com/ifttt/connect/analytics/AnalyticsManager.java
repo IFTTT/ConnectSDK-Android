@@ -1,7 +1,12 @@
 package com.ifttt.connect.analytics;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Message;
+import android.util.Log;
 import androidx.work.Constraints;
+import androidx.work.Data;
 import androidx.work.ExistingWorkPolicy;
 import androidx.work.NetworkType;
 import androidx.work.OneTimeWorkRequest;
@@ -11,11 +16,14 @@ import com.ifttt.connect.analytics.tape.ObjectQueue;
 import com.ifttt.connect.analytics.tape.QueueFile;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
+import com.squareup.moshi.Types;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import okio.Buffer;
 import okio.BufferedSink;
 import okio.Okio;
@@ -26,41 +34,66 @@ import android.os.Build.VERSION;
  * 1. Providing different analytics tracking methods,
  * 2. A Queue for storing the events, including synchronous add, read and remove operations.
  * 3. Setting up the WorkManager with a one time work request to schedule event uploads to server.
- * Events are scheduled to be uploaded for every 5 events or when performFlush is explicitly called.
+ * Events are scheduled to be uploaded for every 5 events or when submitFlush is explicitly called by the ConnectButton class
  * */
-public class AnalyticsManager {
+public final class AnalyticsManager {
 
-    private static AnalyticsManager instance = null;
+    private static AnalyticsManager INSTANCE = null;
     private ObjectQueue queue;
+    private JsonAdapter eventsSerializer;
     private Context context;
+    private Handler handler;
+
 
     private String previousEventName;
     private String anonymousId;
 
     private static final String WORK_ID_QUEUE_POLLING = "analytics_queue_polling";
+    private static final int REQUEST_ENQUEUE = 0;
+    private static final int REQUEST_FLUSH = 1;
 
-    private AnalyticsManager(Context context) {
+    private AnalyticsManager(Context context, HandlerThread handlerThread) {
         this.context = context;
         /*
          * Try to create a file based queue to store the analytics event
          * Use the in-memory queue as fallback
          **/
+        Moshi moshi = new Moshi.Builder()
+                .build();
+        eventsSerializer = moshi.adapter(Types.newParameterizedType(List.class, Map.class));
+
         try {
             File folder = context.getDir("analytics-disk-queue", Context.MODE_PRIVATE);
             QueueFile queueFile = createQueueFile(folder);
-            Moshi moshi = new Moshi.Builder().build();
-            queue = ObjectQueue.create(queueFile, new AnalyticsEventConverter<>(moshi));
+            queue = ObjectQueue.create(queueFile, new AnalyticsPayloadConverter(moshi));
         } catch (IOException e) {
             queue = ObjectQueue.createInMemory();
         }
+
         anonymousId = AnalyticsPreferences.getAnonymousId(context);
+        this.handler = new Handler(handlerThread.getLooper()) {
+            @Override
+            public void handleMessage(Message msg) {
+                switch (msg.what) {
+                    case REQUEST_ENQUEUE:
+                        Map<String, Object> payload = (Map<String, Object>) msg.obj;
+                        performEnqueue(payload);
+                        break;
+                    case REQUEST_FLUSH:
+                        performFlush();
+                        break;
+                    default:
+                        throw new AssertionError("Unknown dispatcher message: " + msg.what);
+                }
+            }
+        };
     }
 
-    public static AnalyticsManager getInstance(Context context) {
-        if (instance == null) {
-            instance = new AnalyticsManager(context);
+    public static AnalyticsManager getInstance(Context context, HandlerThread handlerThread) {
+        if (INSTANCE == null) {
+            INSTANCE = new AnalyticsManager(context, handlerThread);
         }
-        return instance;
+        return INSTANCE;
     }
 
     /*
@@ -109,8 +142,9 @@ public class AnalyticsManager {
     private void trackItemEvent(String name, AnalyticsObject obj, AnalyticsLocation location,
             AnalyticsLocation sourceLocation) {
 
-        LinkedHashMap<String, Object> data = new LinkedHashMap<>();
+        Map<String, Object> data = new HashMap<>();
 
+        data.put("name", name);
         data.put("object_id", obj.id);
         data.put("object_type", obj.type);
 
@@ -130,53 +164,56 @@ public class AnalyticsManager {
 
         this.previousEventName = name;
 
-        performEnqueue(new AnalyticsEventPayload(name, data));
+        handler.sendMessage(handler.obtainMessage(REQUEST_ENQUEUE, data));
     }
 
     /*
      * Map object specific attributes to an appropriate data parameter
      * */
-    private void mapAttributes(LinkedHashMap<String, Object> data, AnalyticsObject obj) {
+    private void mapAttributes(Map<String, Object> data, AnalyticsObject obj) {
         // TODO: Map attributes depending on AnalyticsObject type
     }
 
     /*
-     * If adding to queue and removing from queue operations are not synchronized using a lock,
-     * we may end up with a case where we are in the middle of adding to the queue, but the repeat interval for the periodic work has elapsed,
-     * which invokes reading all elements from the queue, followed by removing.
-     * This lock ensures that the payloads are not removed while we are adding them.
+     * This lock is to ensure that only one queue operation - add, remove, or peek can be performed at a time.
+     * This will help make sure that items are not removed while we are adding them to the queue.
      * */
     private final Object queueLock = new Object();
     private static final int MAX_QUEUE_SIZE = 1000;
     private static final int FLUSH_QUEUE_SIZE = 5;
 
-    int getCurrentQueueSize() {
-        return queue.size();
-    }
-
-    void performRemove(int count) {
+    /*
+     * Removes n items from the queue
+     * */
+    private void performRemove(int n) {
         try {
             synchronized (queueLock) {
-                queue.remove(count);
+                queue.remove(n);
             }
         } catch (IOException e) {
-            // TODO: Exception handling
+            return;
         }
     }
 
-    List<AnalyticsEventPayload> performRead(int count) {
+    /*
+     * Reads n items from the queue
+     * */
+    private List<Map<String, Object>> performRead(int n) {
         try {
             synchronized (queueLock) {
-                return queue.peek(count);
+                return queue.peek(n);
             }
         } catch (IOException e) {
-            // TODO: Exception handling
             return null;
         }
     }
 
-    private void performEnqueue(AnalyticsEventPayload payload) {
-
+    /*
+     * Checks the queue size, if it is full, remove the oldest item
+     * Add an item to the queue
+     * After adding the new item, if the queue reaches threshold limit, perform flush
+     * */
+    private void performEnqueue(Map<String, Object> payload) {
         if (queue.size() >= MAX_QUEUE_SIZE) {
             try {
                 synchronized (queueLock) {
@@ -200,24 +237,45 @@ public class AnalyticsManager {
             synchronized (queueLock) {
                 queue.add(payload);
                 if (queue.size() >= FLUSH_QUEUE_SIZE) {
-                    performFlush();
+                    handler.sendMessage(handler.obtainMessage(REQUEST_FLUSH));
                 }
             }
         } catch (IOException e) {
-            // TODO: Exception handling
+            return;
         }
     }
 
+    // Call this from the ConnectButton class to periodically flush out events
+    public void  submitFlush() {
+        handler.sendMessage(handler.obtainMessage(REQUEST_FLUSH));
+    }
+
     /*
-    * Call this method when the ConnectButton is initialized to flush the initial set of events
+    * Reads from the queue, schedules a one time work request to make an api call, and removes from the queue
     * */
     private void performFlush() {
-        // One time request to read the queue, send events to server and flush the queue.
+        // Read from the queue
+        int queueSize = queue.size();
+        List<Map<String, Object>> list = performRead(queueSize);
+
+        // One time request to send events to server
         Constraints constraints =
                 new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build();
 
-        OneTimeWorkRequest oneTimeWorkRequest = new OneTimeWorkRequest.Builder(AnalyticsEventUploader.class).setConstraints(constraints).build();
+        String eventsJson = eventsSerializer.toJson(list);
+
+        Data data = new Data.Builder()
+                .putString("event_data", eventsJson)
+                .build();
+
+        OneTimeWorkRequest oneTimeWorkRequest = new OneTimeWorkRequest.Builder(AnalyticsEventUploader.class)
+                .setInputData(data)
+                .setConstraints(constraints)
+                .build();
         WorkManager.getInstance(context).enqueueUniqueWork(WORK_ID_QUEUE_POLLING, ExistingWorkPolicy.KEEP, oneTimeWorkRequest);
+
+        // Remove data from queue
+        performRemove(queueSize);
     }
 
     private static QueueFile createQueueFile(File folder) throws IOException {
@@ -241,21 +299,18 @@ public class AnalyticsManager {
     }
 
     /** Converter which uses Moshi to serialize instances of class T to disk. */
-    class AnalyticsEventConverter<T>
-            implements ObjectQueue.Converter<AnalyticsEventPayload> {
-        private final JsonAdapter<com.ifttt.connect.analytics.AnalyticsEventPayload> jsonAdapter;
+    class AnalyticsPayloadConverter implements ObjectQueue.Converter<Map> {
+        private final JsonAdapter<Map> jsonAdapter;
 
-        public AnalyticsEventConverter(Moshi moshi) {
-            this.jsonAdapter = moshi.adapter(com.ifttt.connect.analytics.AnalyticsEventPayload.class);
+        AnalyticsPayloadConverter(Moshi moshi) {
+            this.jsonAdapter = moshi.adapter(Map.class);
         }
 
-        @Override
-        public com.ifttt.connect.analytics.AnalyticsEventPayload from(byte[] bytes) throws IOException {
+        @Override public Map from(byte[] bytes) throws IOException {
             return jsonAdapter.fromJson(new Buffer().write(bytes));
         }
 
-        @Override
-        public void toStream(com.ifttt.connect.analytics.AnalyticsEventPayload val, OutputStream os) throws IOException {
+        @Override public void toStream(Map val, OutputStream os) throws IOException {
             try (BufferedSink sink = Okio.buffer(Okio.sink(os))) {
                 jsonAdapter.toJson(sink, val);
             }

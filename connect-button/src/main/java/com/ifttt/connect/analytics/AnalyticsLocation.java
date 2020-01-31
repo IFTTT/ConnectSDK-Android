@@ -1,6 +1,6 @@
 package com.ifttt.connect.analytics;
 
-public class AnalyticsLocation {
+public final class AnalyticsLocation {
 
     String id;
     String type;

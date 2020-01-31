@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import java.util.UUID;
 
-class AnalyticsPreferences {
+final class AnalyticsPreferences {
 
     private static final String ANALYTICS_ANONYMOUS_ID_KEY = "anonymous_id";
 
