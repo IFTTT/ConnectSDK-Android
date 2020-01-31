@@ -7,11 +7,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Handler;
-import android.os.HandlerThread;
-import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
-
-import android.os.Message;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
@@ -37,9 +32,6 @@ import com.ifttt.connect.Connection;
 import com.ifttt.connect.ConnectionApiClient;
 import com.ifttt.connect.ErrorResponse;
 import com.ifttt.connect.R;
-import com.ifttt.connect.analytics.AnalyticsLocation;
-import com.ifttt.connect.analytics.AnalyticsManager;
-import com.ifttt.connect.analytics.AnalyticsObject;
 import com.ifttt.connect.api.PendingResult;
 
 import static android.animation.ValueAnimator.INFINITE;
@@ -60,7 +52,6 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
     private CredentialsProvider credentialsProvider;
     private boolean analyticsOptOut;
     private AnalyticsManager analyticsManager;
-    private HandlerThread analyticsHandlerThread;
 
     private final LifecycleRegistry lifecycleRegistry = new LifecycleRegistry(this);
 
@@ -99,34 +90,7 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
             }
         });
 
-        analyticsHandlerThread = new HandlerThread("analytics_thread", THREAD_PRIORITY_BACKGROUND);
-        analyticsHandlerThread.start();
-        analyticsManager = AnalyticsManager.getInstance(getContext(), analyticsHandlerThread);
-
-        //TODO: Remove test events
-        analyticsManager.trackScreenView(new AnalyticsObject("testObjectId", "testObjectType"),
-                new AnalyticsLocation("locationId", "locationType"),
-                new AnalyticsLocation("sourceLocationId", "sourceLocationType"));
-
-        analyticsManager.trackStateChangeEvent(new AnalyticsObject("testObjectId", "testObjectType"),
-                new AnalyticsLocation("locationId", "locationType"),
-                new AnalyticsLocation("sourceLocationId", "sourceLocationType"));
-
-        analyticsManager.trackSystemEvent(new AnalyticsObject("testObjectId", "testObjectType"),
-                new AnalyticsLocation("locationId", "locationType"),
-                new AnalyticsLocation("sourceLocationId", "sourceLocationType"));
-
-        analyticsManager.trackUiClick(new AnalyticsObject("testObjectId", "testObjectType"),
-                new AnalyticsLocation("locationId", "locationType"),
-                new AnalyticsLocation("sourceLocationId", "sourceLocationType"));
-
-        analyticsManager.trackUiImpression(new AnalyticsObject("testObjectId", "testObjectType"),
-                new AnalyticsLocation("locationId", "locationType"),
-                new AnalyticsLocation("sourceLocationId", "sourceLocationType"));
-
-        analyticsManager.trackScreenView(new AnalyticsObject("testObjectId", "testObjectType"),
-                new AnalyticsLocation("locationId", "locationType"),
-                new AnalyticsLocation("sourceLocationId", "sourceLocationType"));
+        analyticsManager = AnalyticsManager.getInstance(getContext());
     }
 
     /**
@@ -306,15 +270,38 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         lifecycleRegistry.markState(Lifecycle.State.STARTED);
+        //TODO: Remove test events
+        analyticsManager.trackScreenView(new AnalyticsObject("testObjectId", "testObjectType"),
+                new AnalyticsLocation("locationId", "locationType"),
+                new AnalyticsLocation("sourceLocationId", "sourceLocationType"));
 
-        analyticsManager.submitFlush();
+        analyticsManager.trackStateChangeEvent(new AnalyticsObject("testObjectId", "testObjectType"),
+                new AnalyticsLocation("locationId", "locationType"),
+                new AnalyticsLocation("sourceLocationId", "sourceLocationType"));
+
+        //analyticsManager.trackSystemEvent(new AnalyticsObject("testObjectId", "testObjectType"),
+        //        new AnalyticsLocation("locationId", "locationType"),
+        //        new AnalyticsLocation("sourceLocationId", "sourceLocationType"));
+        //
+        //analyticsManager.trackUiClick(new AnalyticsObject("testObjectId", "testObjectType"),
+        //        new AnalyticsLocation("locationId", "locationType"),
+        //        new AnalyticsLocation("sourceLocationId", "sourceLocationType"));
+        //
+        //analyticsManager.trackUiImpression(new AnalyticsObject("testObjectId", "testObjectType"),
+        //        new AnalyticsLocation("locationId", "locationType"),
+        //        new AnalyticsLocation("sourceLocationId", "sourceLocationType"));
+        //
+        //analyticsManager.trackScreenView(new AnalyticsObject("testObjectId", "testObjectType"),
+        //        new AnalyticsLocation("locationId", "locationType"),
+        //        new AnalyticsLocation("sourceLocationId", "sourceLocationType"));
+
+        analyticsManager.performFlush();
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         lifecycleRegistry.markState(Lifecycle.State.DESTROYED);
-        analyticsHandlerThread.quitSafely();
     }
 
     @NonNull

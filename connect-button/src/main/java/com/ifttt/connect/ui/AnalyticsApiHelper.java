@@ -1,14 +1,13 @@
-package com.ifttt.connect.analytics;
+package com.ifttt.connect.ui;
 
+import java.util.List;
+import java.util.Map;
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.moshi.MoshiConverterFactory;
 import retrofit2.http.Body;
-import retrofit2.http.Field;
-import retrofit2.http.Headers;
 import retrofit2.http.POST;
-import retrofit2.http.Path;
 
 class AnalyticsApiHelper {
 
@@ -36,12 +35,12 @@ class AnalyticsApiHelper {
         return INSTANCE;
     }
 
-    Call<Void> submitEvents(String events) {
+    Call<Void> submitEvents(List<Map<String, Object>> events) {
         return eventsApi.postEvents(events);
     }
 
-    interface EventsApi {
+    private interface EventsApi {
         @POST("/v2/sdk/events")
-        Call<Void> postEvents(@Body String events);
+        Call<Void> postEvents(@Body List<Map<String, Object>> events);
     }
 }

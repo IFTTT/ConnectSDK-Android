@@ -1,4 +1,4 @@
-package com.ifttt.connect.analytics;
+package com.ifttt.connect.ui;
 
 import android.content.Context;
 import android.content.SharedPreferences;

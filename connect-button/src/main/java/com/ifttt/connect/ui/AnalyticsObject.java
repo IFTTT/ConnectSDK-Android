@@ -1,13 +1,13 @@
-package com.ifttt.connect.analytics;
+package com.ifttt.connect.ui;
 
-public class AnalyticsObject {
+class AnalyticsObject {
 
     String id;
     String type;
 
     private static String TYPE_CONNECTION = "connection";
 
-    public AnalyticsObject(String id, String type) {
+    AnalyticsObject(String id, String type) {
         this.id = id;
         this.type = type;
     }
