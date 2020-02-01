@@ -76,8 +76,6 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
         connectButton = findViewById(R.id.ifttt_connect_button);
         loadingView = findViewById(R.id.ifttt_loading_view);
 
-        analyticsManager = AnalyticsManager.getInstance(context);
-
         // Make sure the loading view has the same size as the connect button.
         loadingView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
             @Override
@@ -111,7 +109,9 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
      * @param analyticsOptOut boolean to allow opting out of analytics. If set to true, analytics event tracking will be disabled.
      */
     public void setup(Configuration configuration, boolean analyticsOptOut) {
-        this.analyticsOptOut = analyticsOptOut;
+        analyticsManager = AnalyticsManager.getInstance(getContext());
+        AnalyticsPreferences.getInstance(getContext()).setAnalyticsTrackingOptOutPreference(analyticsOptOut);
+
         if (ButtonUiHelper.isEmailInvalid(configuration.suggestedUserEmail) && !ButtonUiHelper.isIftttInstalled(
                 getContext().getPackageManager())) {
             connectButton.setVisibility(View.GONE);

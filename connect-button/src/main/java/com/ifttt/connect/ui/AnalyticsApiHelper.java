@@ -1,7 +1,6 @@
 package com.ifttt.connect.ui;
 
 import okhttp3.OkHttpClient;
-import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.moshi.MoshiConverterFactory;
@@ -18,9 +17,7 @@ final class AnalyticsApiHelper {
 
     private AnalyticsApiHelper() {
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
-
-        // TODO: Remove interceptor before merging
-        OkHttpClient okHttpClient = builder.addInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)).build();
+        OkHttpClient okHttpClient = builder.build();
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://connect.ifttt.com")

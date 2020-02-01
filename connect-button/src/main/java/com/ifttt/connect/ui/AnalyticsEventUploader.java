@@ -17,7 +17,7 @@ public class AnalyticsEventUploader extends Worker {
     public AnalyticsEventUploader(@NonNull Context context, @NonNull WorkerParameters params) {
         super(context, params);
         analyticsManager = AnalyticsManager.getInstance(context.getApplicationContext());
-        anonymousId = AnalyticsPreferences.getAnonymousId(context.getApplicationContext());
+        anonymousId = AnalyticsPreferences.getInstance(context).getAnonymousId();
     }
 
     @Override

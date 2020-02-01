@@ -32,8 +32,8 @@ final class AnalyticsManager {
 
     private static AnalyticsManager INSTANCE = null;
     private ObjectQueue queue;
-    private static String packageName;
     private static WorkManager workManager;
+    private AnalyticsPreferences preference;
 
     /*
      * This lock is to ensure that only one queue operation - add, remove, or peek can be performed at a time.
@@ -62,7 +62,7 @@ final class AnalyticsManager {
         }
 
         workManager = WorkManager.getInstance(context);
-        packageName = context.getPackageName();
+        preference = AnalyticsPreferences.getInstance(context);
     }
 
     static AnalyticsManager getInstance(Context context) {
@@ -111,17 +111,23 @@ final class AnalyticsManager {
      * Process the event data before adding it to the event queue
      * */
     private void trackItemEvent(String name, AnalyticsObject obj, AnalyticsLocation location) {
+        if (preference.getAnalyticsTrackingOptOutPreference()) {
+            return;
+        }
 
         Map<String, String> properties = new HashMap<>();
 
         properties.put("object_id", obj.id);
         properties.put("object_type", obj.type);
+        if (obj instanceof AnalyticsObject.ConnectionAnalyticsObject) {
+            properties.put("object_status", ((AnalyticsObject.ConnectionAnalyticsObject) obj).status);
+        }
 
-        mapAttributes(properties, obj);
+        properties.put("location_id", location.id);
+        properties.put("location_type", location.type);
 
         properties.put("sdk_version", BuildConfig.VERSION_NAME);
         properties.put("system_version", Integer.toString(VERSION.SDK_INT));
-
         String timestamp = Long.toString(System.currentTimeMillis());
 
         performEnqueue(new AnalyticsEventPayload(
@@ -129,15 +135,6 @@ final class AnalyticsManager {
                 timestamp,
                 properties
         ));
-    }
-
-    /*
-     * Map object specific attributes to an appropriate data parameter
-     * */
-    private void mapAttributes(Map<String, String> data, AnalyticsObject obj) {
-        if (obj instanceof AnalyticsObject.ConnectionAnalyticsObject) {
-            data.put("object_status", ((AnalyticsObject.ConnectionAnalyticsObject) obj).status);
-        }
     }
 
     /*

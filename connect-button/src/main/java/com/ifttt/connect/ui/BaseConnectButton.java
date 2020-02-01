@@ -132,6 +132,8 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
     @Nullable private Call ongoingImageCall;
 
+    private AnalyticsManager analyticsManager;
+
     public BaseConnectButton(Context context) {
         this(context, null);
     }
@@ -174,6 +176,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
         iconDragHelperCallback = new IconDragHelperCallback();
         viewDragHelper = buttonRoot.getViewDragHelperCallback(iconDragHelperCallback);
+        analyticsManager = AnalyticsManager.getInstance(context.getApplicationContext());
     }
 
     @Override
@@ -262,6 +265,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         buttonApiHelper =
                 new ButtonApiHelper(connectionApiClient, redirectUri, inviteCode, credentialsProvider, getLifecycle());
         emailEdt.setText(email);
+        analyticsManager.trackUiImpression(AnalyticsObject.CONNECT_BUTTON_EMAIL, AnalyticsLocation.fromConnectButtonWithId(connection.id));
     }
 
     /**
@@ -417,6 +421,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                 AnimatorSet set = new AnimatorSet();
                 set.playSequentially(moveToggle, buildDisconnectAnimator());
                 set.start();
+                analyticsManager.trackUiClick(AnalyticsObject.fromConnnection(connection), AnalyticsLocation.fromConnectButton(getContext()));
             };
 
             buttonRoot.setOnClickListener(onClickListener);
@@ -529,6 +534,8 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                     set.playSequentially(slideIcon, progress);
                     set.start();
                 }
+
+                analyticsManager.trackUiClick(AnalyticsObject.fromConnnection(connection), AnalyticsLocation.fromConnectButton(getContext()));
             };
 
             // Clicking both the button or the icon ImageView starts the flow.
@@ -541,7 +548,10 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         StartIconDrawable.setPressListener(iconImg);
 
         helperTxt.setOnClickListener(
-                v -> getContext().startActivity(AboutIftttActivity.intent(getContext(), connection)));
+                v -> {
+                    getContext().startActivity(AboutIftttActivity.intent(getContext(), connection));
+                    analyticsManager.trackUiClick(AnalyticsObject.WORKS_WITH_IFTTT, AnalyticsLocation.WORKS_WITH_IFTTT);
+                });
     }
 
     Connection getConnection() {

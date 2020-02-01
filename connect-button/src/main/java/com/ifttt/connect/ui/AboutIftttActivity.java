@@ -33,6 +33,8 @@ import static com.ifttt.connect.ui.ButtonUiHelper.findWorksWithService;
  */
 public final class AboutIftttActivity extends AppCompatActivity {
 
+    private AnalyticsManager analyticsManager;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,6 +42,7 @@ public final class AboutIftttActivity extends AppCompatActivity {
         setContentView(R.layout.view_ifttt_about);
 
         Connection connection = getIntent().getParcelableExtra(EXTRA_CONNECTION);
+        analyticsManager = AnalyticsManager.getInstance(this.getApplicationContext());
 
         Service primaryService = connection.getPrimaryService();
         Service secondaryService = findWorksWithService(connection);
@@ -55,6 +58,7 @@ public final class AboutIftttActivity extends AppCompatActivity {
                 return;
             }
 
+            analyticsManager.trackUiClick(AnalyticsObject.fromService(primaryService.id), AnalyticsLocation.fromConnectButtonWithId(connection.id));
             startActivity(intent);
         });
         secondaryServiceIcon.setOnClickListener(v -> {
@@ -63,6 +67,7 @@ public final class AboutIftttActivity extends AppCompatActivity {
                 return;
             }
 
+            analyticsManager.trackUiClick(AnalyticsObject.fromService(secondaryService.id), AnalyticsLocation.fromConnectButtonWithId(connection.id));
             startActivity(intent);
         });
 
@@ -101,7 +106,10 @@ public final class AboutIftttActivity extends AppCompatActivity {
 
         Intent redirectToTermsIntent = redirectToTerms(this);
         if (redirectToTermsIntent != null) {
-            termsAndPrivacy.setOnClickListener(v -> startActivity(redirectToTermsIntent));
+            termsAndPrivacy.setOnClickListener(v -> {
+                startActivity(redirectToTermsIntent);
+                analyticsManager.trackUiClick(AnalyticsObject.PRIVACY_POLICY, AnalyticsLocation.fromConnectButtonWithId(connection.id));
+            });
         }
 
         View manageConnectionView = findViewById(R.id.ifttt_manage_connection);
@@ -116,7 +124,10 @@ public final class AboutIftttActivity extends AppCompatActivity {
             Intent manageIntent = ButtonApiHelper.redirectToManage(this, connection.id);
             if (manageIntent != null && hasConnected) {
                 manageConnectionView.setVisibility(View.VISIBLE);
-                manageConnectionView.setOnClickListener(v -> startActivity(manageIntent));
+                manageConnectionView.setOnClickListener(v -> {
+                    startActivity(manageIntent);
+                    analyticsManager.trackUiClick(AnalyticsObject.MANAGE_CONNECTION, AnalyticsLocation.fromConnectButtonWithId(connection.id));
+                });
             } else {
                 manageConnectionView.setVisibility(View.GONE);
             }
@@ -131,6 +142,8 @@ public final class AboutIftttActivity extends AppCompatActivity {
                 googlePlayView.setVisibility(View.GONE);
             }
         }
+
+        analyticsManager.trackUiImpression(AnalyticsObject.CONNECT_INFORMATION_MODAL, AnalyticsLocation.fromConnectButtonWithId(connection.id));
     }
 
     private static final String EXTRA_CONNECTION = "extra_connection";
