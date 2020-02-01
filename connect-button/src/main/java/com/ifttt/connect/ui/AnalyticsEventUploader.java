@@ -6,28 +6,27 @@ import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import retrofit2.Response;
 
 public class AnalyticsEventUploader extends Worker {
 
     private static String anonymousId;
     private AnalyticsManager analyticsManager;
+    private static final int MAX_RETRY_COUNT = 3;
 
-    public AnalyticsEventUploader(
-            @NonNull Context context,
-            @NonNull WorkerParameters params) {
+    public AnalyticsEventUploader(@NonNull Context context, @NonNull WorkerParameters params) {
         super(context, params);
-        analyticsManager = AnalyticsManager.getInstance(context);
-        anonymousId = AnalyticsPreferences.getAnonymousId(context);
+        analyticsManager = AnalyticsManager.getInstance(context.getApplicationContext());
+        anonymousId = AnalyticsPreferences.getAnonymousId(context.getApplicationContext());
     }
 
     @Override
     @NonNull
     public Result doWork() {
+        Result result;
         try {
             int queueSize = analyticsManager.getQueueSize();
-            List<Map<String, String>> list = analyticsManager.performRead(queueSize);
+            List<AnalyticsEventPayload> list = analyticsManager.performRead(queueSize);
 
             if (list != null && !list.isEmpty()) {
                 Response<Void> response = AnalyticsApiHelper.get()
@@ -36,14 +35,21 @@ public class AnalyticsEventUploader extends Worker {
 
                 if (response.isSuccessful()) {
                     analyticsManager.performRemove(queueSize);
+                    return Result.success();
                 } else {
-                    // TODO: Schedule retries
+                    result = Result.failure();
                 }
+            } else {
+                return Result.success();
             }
         } catch (IOException e) {
-            // TODO: Schedule retries
+            result = Result.failure();
         }
 
-        return Result.success();
+        if (result.equals(Result.failure()) && getRunAttemptCount() < MAX_RETRY_COUNT) {
+            return Result.retry();
+        } else {
+            return result;
+        }
     }
 }

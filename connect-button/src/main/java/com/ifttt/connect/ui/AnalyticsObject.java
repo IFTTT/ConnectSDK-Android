@@ -1,5 +1,7 @@
 package com.ifttt.connect.ui;
 
+import com.ifttt.connect.Connection;
+
 class AnalyticsObject {
 
     String id;
@@ -12,22 +14,28 @@ class AnalyticsObject {
         this.type = type;
     }
 
-    class Generic extends AnalyticsObject {
+    static class GenericAnalyticsObject extends AnalyticsObject {
 
-        Generic(String id, String type) {
+        GenericAnalyticsObject(String id, String type) {
             super(id, type);
         }
     }
 
-    class Connection extends AnalyticsObject {
+    static class ConnectionAnalyticsObject extends AnalyticsObject {
 
         String status;
-        String connectionType;
 
-        Connection(String id, String status, String connectionType) {
+        ConnectionAnalyticsObject(String id, String status) {
             super(id, TYPE_CONNECTION);
             this.status = status;
-            this.connectionType = connectionType;
         }
+    }
+
+    static ConnectionAnalyticsObject fromConnnection(Connection connection) {
+        return new ConnectionAnalyticsObject(connection.id, connection.status.toString());
+    }
+
+    static GenericAnalyticsObject fromConnectButtonEmail() {
+        return new GenericAnalyticsObject(null, "connection_email");
     }
 }

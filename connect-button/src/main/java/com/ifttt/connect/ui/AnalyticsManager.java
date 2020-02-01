@@ -10,11 +10,9 @@ import com.ifttt.connect.analytics.tape.ObjectQueue;
 import com.ifttt.connect.analytics.tape.QueueFile;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
-import com.squareup.moshi.Types;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,7 +67,7 @@ final class AnalyticsManager {
 
     static AnalyticsManager getInstance(Context context) {
         if (INSTANCE == null) {
-            INSTANCE = new AnalyticsManager(context);
+            INSTANCE = new AnalyticsManager(context.getApplicationContext());
         }
         return INSTANCE;
     }
@@ -77,75 +75,69 @@ final class AnalyticsManager {
     /*
      * This method generates a UI item impression event
      * */
-    void trackUiImpression(AnalyticsObject obj, AnalyticsLocation location,
-            AnalyticsLocation sourceLocation) {
-        trackItemEvent("android.impression", obj, location, sourceLocation);
+    void trackUiImpression(AnalyticsObject obj, AnalyticsLocation location) {
+        trackItemEvent("android.impression", obj, location);
     }
 
     /*
      * This method generates a UI item click event
      * */
-    void trackUiClick(AnalyticsObject obj, AnalyticsLocation location,
-            AnalyticsLocation sourceLocation) {
-        trackItemEvent("android.click", obj, location, sourceLocation);
+    void trackUiClick(AnalyticsObject obj, AnalyticsLocation location) {
+        trackItemEvent("android.click", obj, location);
     }
 
     /*
      * This method generates a system change event
      * */
-    void trackSystemEvent(AnalyticsObject obj, AnalyticsLocation location,
-            AnalyticsLocation sourceLocation) {
-        trackItemEvent("android.system", obj, location, sourceLocation);
+    void trackSystemEvent(AnalyticsObject obj, AnalyticsLocation location) {
+        trackItemEvent("android.system", obj, location);
     }
 
     /*
      * This method generates a state change event for an object
      * */
-    void trackStateChangeEvent(AnalyticsObject obj, AnalyticsLocation location,
-            AnalyticsLocation sourceLocation) {
-        trackItemEvent("android.statechange", obj, location, sourceLocation);
+    void trackStateChangeEvent(AnalyticsObject obj, AnalyticsLocation location) {
+        trackItemEvent("android.statechange", obj, location);
     }
 
     /*
      * This method generates screen view event
      * */
-    void trackScreenView(AnalyticsObject obj, AnalyticsLocation location,
-            AnalyticsLocation sourceLocation) {
-        trackItemEvent("android.pageviewed", obj, location, sourceLocation);
+    void trackScreenView(AnalyticsObject obj, AnalyticsLocation location) {
+        trackItemEvent("android.pageviewed", obj, location);
     }
 
     /*
      * Process the event data before adding it to the event queue
      * */
-    private void trackItemEvent(String name, AnalyticsObject obj, AnalyticsLocation location,
-            AnalyticsLocation sourceLocation) {
+    private void trackItemEvent(String name, AnalyticsObject obj, AnalyticsLocation location) {
 
-        Map<String, String> data = new HashMap<>();
+        Map<String, String> properties = new HashMap<>();
 
-        data.put("name", name);
-        data.put("object_id", obj.id);
-        data.put("object_type", obj.type);
+        properties.put("object_id", obj.id);
+        properties.put("object_type", obj.type);
 
-        mapAttributes(data, obj);
+        mapAttributes(properties, obj);
 
-        data.put("location_type", location.type);
-        data.put("location_id", location.id);
-        data.put("source_location_type", sourceLocation.type);
-        data.put("source_location_id", packageName);
-        data.put("sdk_version", BuildConfig.VERSION_NAME);
-        data.put("system_version", Integer.toString(VERSION.SDK_INT));
+        properties.put("sdk_version", BuildConfig.VERSION_NAME);
+        properties.put("system_version", Integer.toString(VERSION.SDK_INT));
 
-        //TODO: Format timestamp
-        data.put("timestamp", Long.toString(System.currentTimeMillis()));
+        String timestamp = Long.toString(System.currentTimeMillis());
 
-        performEnqueue(data);
+        performEnqueue(new AnalyticsEventPayload(
+                name,
+                timestamp,
+                properties
+        ));
     }
 
     /*
      * Map object specific attributes to an appropriate data parameter
      * */
     private void mapAttributes(Map<String, String> data, AnalyticsObject obj) {
-        // TODO: Map attributes depending on AnalyticsObject type
+        if (obj instanceof AnalyticsObject.ConnectionAnalyticsObject) {
+            data.put("object_status", ((AnalyticsObject.ConnectionAnalyticsObject) obj).status);
+        }
     }
 
     /*
@@ -159,7 +151,7 @@ final class AnalyticsManager {
      * Enqueue an async task to add to the queue.
      * The default serial scheduler of AsyncTask will be used to ensure that events are enqueued in the correct order.
      **/
-    private void performEnqueue(Map payload) {
+    private void performEnqueue(AnalyticsEventPayload payload) {
         new EnqueueTask(this).execute(payload);
     }
 
@@ -190,7 +182,7 @@ final class AnalyticsManager {
      * Reads n items from the queue
      * */
     @SuppressWarnings("unchecked")
-    List<Map<String, String>> performRead(int n) {
+    List<AnalyticsEventPayload> performRead(int n) {
         try {
             synchronized (queueLock) {
                 return queue.peek(n);
@@ -218,7 +210,7 @@ final class AnalyticsManager {
         }
     }
 
-    final static class EnqueueTask extends AsyncTask<Map, Void, Void> {
+    final static class EnqueueTask extends AsyncTask<AnalyticsEventPayload, Void, Void> {
 
         private final AnalyticsManager analyticsManager;
 
@@ -228,7 +220,7 @@ final class AnalyticsManager {
 
         @Override
         @SuppressWarnings("unchecked")
-        protected final Void doInBackground(Map... items) {
+        protected final Void doInBackground(AnalyticsEventPayload... items) {
             ObjectQueue queue = analyticsManager.queue;
 
             if (queue.size() >= MAX_QUEUE_SIZE) {
@@ -265,23 +257,22 @@ final class AnalyticsManager {
         }
     }
 
-    /** Converter which uses Moshi to serialize instances of class Map<String, String> to disk. */
+    /** Converter which uses Moshi to serialize instances of class AnalyticsEventPayload to disk. */
     private final class AnalyticsPayloadConverter
-            implements ObjectQueue.Converter<Map<String, String>> {
-        private final JsonAdapter<Map<String, String>> jsonAdapter;
+            implements ObjectQueue.Converter<AnalyticsEventPayload> {
+        private final JsonAdapter<AnalyticsEventPayload> jsonAdapter;
 
         AnalyticsPayloadConverter(Moshi moshi) {
-            Type type = Types.newParameterizedType(Map.class, String.class, String.class);
-            this.jsonAdapter = moshi.adapter(type);
+            this.jsonAdapter = moshi.adapter(AnalyticsEventPayload.class);
         }
 
         @Override
-        public Map<String, String> from(byte[] bytes) throws IOException {
+        public AnalyticsEventPayload from(byte[] bytes) throws IOException {
             return jsonAdapter.fromJson(new Buffer().write(bytes));
         }
 
         @Override
-        public void toStream(Map<String, String> val, OutputStream os) throws IOException {
+        public void toStream(AnalyticsEventPayload val, OutputStream os) throws IOException {
             try (BufferedSink sink = Okio.buffer(Okio.sink(os))) {
                 jsonAdapter.toJson(sink, val);
             }

@@ -101,8 +101,6 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
      */
     public void setup(Configuration configuration) {
         setup(configuration, false);
-        analyticsManager.trackScreenView(new AnalyticsObject("test", "test"),
-                new AnalyticsLocation("testLocationId", "testLocationType"), new AnalyticsLocation("sourceLocation", "sourceLocationId"));
     }
 
     /**
@@ -271,30 +269,7 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
         super.onAttachedToWindow();
         lifecycleRegistry.markState(Lifecycle.State.STARTED);
 
-        //TODO: Remove test events before merging
-        analyticsManager.trackScreenView(new AnalyticsObject("testObjectId", "testObjectType"),
-                new AnalyticsLocation("locationId", "locationType"),
-                new AnalyticsLocation("sourceLocationId", "sourceLocationType"));
-
-        analyticsManager.trackStateChangeEvent(new AnalyticsObject("testObjectId", "testObjectType"),
-                new AnalyticsLocation("locationId", "locationType"),
-                new AnalyticsLocation("sourceLocationId", "sourceLocationType"));
-
-        analyticsManager.trackSystemEvent(new AnalyticsObject("testObjectId", "testObjectType"),
-                new AnalyticsLocation("locationId", "locationType"),
-                new AnalyticsLocation("sourceLocationId", "sourceLocationType"));
-
-        analyticsManager.trackUiClick(new AnalyticsObject("testObjectId", "testObjectType"),
-                new AnalyticsLocation("locationId", "locationType"),
-                new AnalyticsLocation("sourceLocationId", "sourceLocationType"));
-
-        analyticsManager.trackUiImpression(new AnalyticsObject("testObjectId", "testObjectType"),
-                new AnalyticsLocation("locationId", "locationType"),
-                new AnalyticsLocation("sourceLocationId", "sourceLocationType"));
-
-        analyticsManager.trackScreenView(new AnalyticsObject("testObjectId", "testObjectType"),
-                new AnalyticsLocation("locationId", "locationType"),
-                new AnalyticsLocation("sourceLocationId", "sourceLocationType"));
+        if (!analyticsOptOut) { analyticsManager.trackUiImpression(AnalyticsObject.fromConnnection(connectButton.getConnection()), AnalyticsLocation.fromConnectButton(getContext())); }
     }
 
     @Override
