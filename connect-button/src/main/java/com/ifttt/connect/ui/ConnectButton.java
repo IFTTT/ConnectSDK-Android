@@ -76,6 +76,8 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
         connectButton = findViewById(R.id.ifttt_connect_button);
         loadingView = findViewById(R.id.ifttt_loading_view);
 
+        analyticsManager = AnalyticsManager.getInstance(context);
+
         // Make sure the loading view has the same size as the connect button.
         loadingView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
             @Override
@@ -89,8 +91,6 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
                 return false;
             }
         });
-
-        analyticsManager = AnalyticsManager.getInstance(getContext());
     }
 
     /**
@@ -270,7 +270,8 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         lifecycleRegistry.markState(Lifecycle.State.STARTED);
-        //TODO: Remove test events
+
+        //TODO: Remove test events before merging
         analyticsManager.trackScreenView(new AnalyticsObject("testObjectId", "testObjectType"),
                 new AnalyticsLocation("locationId", "locationType"),
                 new AnalyticsLocation("sourceLocationId", "sourceLocationType"));
@@ -279,23 +280,21 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
                 new AnalyticsLocation("locationId", "locationType"),
                 new AnalyticsLocation("sourceLocationId", "sourceLocationType"));
 
-        //analyticsManager.trackSystemEvent(new AnalyticsObject("testObjectId", "testObjectType"),
-        //        new AnalyticsLocation("locationId", "locationType"),
-        //        new AnalyticsLocation("sourceLocationId", "sourceLocationType"));
-        //
-        //analyticsManager.trackUiClick(new AnalyticsObject("testObjectId", "testObjectType"),
-        //        new AnalyticsLocation("locationId", "locationType"),
-        //        new AnalyticsLocation("sourceLocationId", "sourceLocationType"));
-        //
-        //analyticsManager.trackUiImpression(new AnalyticsObject("testObjectId", "testObjectType"),
-        //        new AnalyticsLocation("locationId", "locationType"),
-        //        new AnalyticsLocation("sourceLocationId", "sourceLocationType"));
-        //
-        //analyticsManager.trackScreenView(new AnalyticsObject("testObjectId", "testObjectType"),
-        //        new AnalyticsLocation("locationId", "locationType"),
-        //        new AnalyticsLocation("sourceLocationId", "sourceLocationType"));
+        analyticsManager.trackSystemEvent(new AnalyticsObject("testObjectId", "testObjectType"),
+                new AnalyticsLocation("locationId", "locationType"),
+                new AnalyticsLocation("sourceLocationId", "sourceLocationType"));
 
-        analyticsManager.performFlush();
+        analyticsManager.trackUiClick(new AnalyticsObject("testObjectId", "testObjectType"),
+                new AnalyticsLocation("locationId", "locationType"),
+                new AnalyticsLocation("sourceLocationId", "sourceLocationType"));
+
+        analyticsManager.trackUiImpression(new AnalyticsObject("testObjectId", "testObjectType"),
+                new AnalyticsLocation("locationId", "locationType"),
+                new AnalyticsLocation("sourceLocationId", "sourceLocationType"));
+
+        analyticsManager.trackScreenView(new AnalyticsObject("testObjectId", "testObjectType"),
+                new AnalyticsLocation("locationId", "locationType"),
+                new AnalyticsLocation("sourceLocationId", "sourceLocationType"));
     }
 
     @Override

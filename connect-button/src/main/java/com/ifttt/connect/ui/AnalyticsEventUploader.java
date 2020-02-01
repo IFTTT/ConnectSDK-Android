@@ -1,7 +1,6 @@
 package com.ifttt.connect.ui;
 
 import android.content.Context;
-import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
@@ -12,33 +11,36 @@ import retrofit2.Response;
 
 public class AnalyticsEventUploader extends Worker {
 
-    private Context context;
+    private static String anonymousId;
+    private AnalyticsManager analyticsManager;
 
     public AnalyticsEventUploader(
             @NonNull Context context,
             @NonNull WorkerParameters params) {
         super(context, params);
-        this.context = context;
+        analyticsManager = AnalyticsManager.getInstance(context);
+        anonymousId = AnalyticsPreferences.getAnonymousId(context);
     }
 
     @Override
     @NonNull
     public Result doWork() {
         try {
-            int queueSize = AnalyticsManager.getInstance(context).getQueueSize();
+            int queueSize = analyticsManager.getQueueSize();
+            List<Map<String, String>> list = analyticsManager.performRead(queueSize);
 
-            List<Map<String, Object>> list = AnalyticsManager.getInstance(context).performRead(queueSize);
-            Log.d("AnalyticsManager", "Inside do work, list= " + list);
-            if (list != null) {
-                Response<Void> response = AnalyticsApiHelper.get().submitEvents(list).execute();
+            if (list != null && !list.isEmpty()) {
+                Response<Void> response = AnalyticsApiHelper.get()
+                        .submitEvents(anonymousId, new EventsList(list))
+                        .execute();
+
                 if (response.isSuccessful()) {
-                    AnalyticsManager.getInstance(context).performRemove(queueSize);
+                    analyticsManager.performRemove(queueSize);
                 } else {
                     // TODO: Schedule retries
                 }
             }
-
-        } catch(IOException e){
+        } catch (IOException e) {
             // TODO: Schedule retries
         }
 

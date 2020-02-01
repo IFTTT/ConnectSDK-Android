@@ -2,31 +2,22 @@ package com.ifttt.connect.ui;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
-import androidx.annotation.NonNull;
-import androidx.work.Constraints;
 import androidx.work.ExistingWorkPolicy;
-import androidx.work.NetworkType;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 import com.ifttt.connect.BuildConfig;
 import com.ifttt.connect.analytics.tape.ObjectQueue;
 import com.ifttt.connect.analytics.tape.QueueFile;
 import com.squareup.moshi.JsonAdapter;
-import com.squareup.moshi.JsonReader;
-import com.squareup.moshi.JsonWriter;
 import com.squareup.moshi.Moshi;
 import com.squareup.moshi.Types;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Type;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import javax.annotation.Nullable;
 import okio.Buffer;
 import okio.BufferedSink;
 import okio.Okio;
@@ -34,18 +25,18 @@ import android.os.Build.VERSION;
 
 /*
  * This is the main class implementing analytics for the ConnectButton SDK. It is responsible for :
- * 1. Providing different analytics tracking methods,
+ * 1. Providing different analytics tracking methods
  * 2. A Queue for storing the events, including synchronous add, read and remove operations.
  * 3. Setting up the WorkManager with a one time work request to schedule event uploads to server.
  * Events are scheduled to be uploaded for every 5 events or when submitFlush is explicitly called by the ConnectButton class
  * */
 final class AnalyticsManager {
 
-    private Context context;
     private static AnalyticsManager INSTANCE = null;
     private ObjectQueue queue;
-    private String previousEventName;
-    private String anonymousId;
+    private static String packageName;
+    private static WorkManager workManager;
+
     /*
      * This lock is to ensure that only one queue operation - add, remove, or peek can be performed at a time.
      * This will help make sure that items are not removed while we are adding them to the queue.
@@ -55,15 +46,14 @@ final class AnalyticsManager {
     private static final int FLUSH_QUEUE_SIZE = 5;
 
     private static final String WORK_ID_QUEUE_POLLING = "analytics_queue_polling";
+    private static final String QUEUE_FILE_NAME = "analytics-queue-file";
 
     private AnalyticsManager(Context context) {
-        this.context = context;
         /*
          * Try to create a file based queue to store the analytics event
          * Use the in-memory queue as fallback
          **/
-        Moshi moshi = new Moshi.Builder()
-                .build();
+        Moshi moshi = new Moshi.Builder().build();
 
         try {
             File folder = context.getDir("analytics-disk-queue", Context.MODE_PRIVATE);
@@ -73,7 +63,8 @@ final class AnalyticsManager {
             queue = ObjectQueue.createInMemory();
         }
 
-        anonymousId = AnalyticsPreferences.getAnonymousId(context);
+        workManager = WorkManager.getInstance(context);
+        packageName = context.getPackageName();
     }
 
     static AnalyticsManager getInstance(Context context) {
@@ -129,7 +120,7 @@ final class AnalyticsManager {
     private void trackItemEvent(String name, AnalyticsObject obj, AnalyticsLocation location,
             AnalyticsLocation sourceLocation) {
 
-        Map<String, Object> data = new HashMap<>();
+        Map<String, String> data = new HashMap<>();
 
         data.put("name", name);
         data.put("object_id", obj.id);
@@ -140,16 +131,12 @@ final class AnalyticsManager {
         data.put("location_type", location.type);
         data.put("location_id", location.id);
         data.put("source_location_type", sourceLocation.type);
-        data.put("source_location_id", context.getPackageName());
+        data.put("source_location_id", packageName);
         data.put("sdk_version", BuildConfig.VERSION_NAME);
-        data.put("system_version", VERSION.SDK_INT);
+        data.put("system_version", Integer.toString(VERSION.SDK_INT));
 
-        data.put("sdk_anonymous_id", anonymousId);
-        if (previousEventName != null) {
-            data.put("previous_event_name", previousEventName);
-        }
-
-        this.previousEventName = name;
+        //TODO: Format timestamp
+        data.put("timestamp", Long.toString(System.currentTimeMillis()));
 
         performEnqueue(data);
     }
@@ -157,38 +144,33 @@ final class AnalyticsManager {
     /*
      * Map object specific attributes to an appropriate data parameter
      * */
-    private void mapAttributes(Map<String, Object> data, AnalyticsObject obj) {
+    private void mapAttributes(Map<String, String> data, AnalyticsObject obj) {
         // TODO: Map attributes depending on AnalyticsObject type
     }
 
     /*
-    * Returns the current size of the queue
-    * */
+     * Returns the current size of the queue
+     * */
     int getQueueSize() {
         return queue.size();
     }
 
     /*
-     * Checks the queue size, if it is full, remove the oldest item
-     * Add an item to the queue
-     * After adding the new item, if the queue reaches threshold limit, perform flush
-     * */
+     * Enqueue an async task to add to the queue.
+     * The default serial scheduler of AsyncTask will be used to ensure that events are enqueued in the correct order.
+     **/
     private void performEnqueue(Map payload) {
-        Log.d("AnalyticsManager", "Inside perform enqueue, payload= " + payload);
-
-        new EnqueueTask().execute(payload);
+        new EnqueueTask(this).execute(payload);
     }
 
     /*
-    * Schedules a one time work request to read from the queue, make an api call to submit events and remove them from queue
-    * */
-    void performFlush() {
-
-        Log.d("AnalyticsManager", "Inside perform flush method");
-        OneTimeWorkRequest oneTimeWorkRequest = new OneTimeWorkRequest.Builder(
-                AnalyticsEventUploader.class)
-                .build();
-        WorkManager.getInstance(context).enqueueUniqueWork("analytics_events_post", ExistingWorkPolicy.KEEP, oneTimeWorkRequest);
+     * Schedules a one time work request to read from the queue, make an api call to submit events and remove them from queue
+     * */
+    static void performFlush() {
+        OneTimeWorkRequest oneTimeWorkRequest =
+                new OneTimeWorkRequest.Builder(AnalyticsEventUploader.class).build();
+        workManager.enqueueUniqueWork(WORK_ID_QUEUE_POLLING, ExistingWorkPolicy.KEEP,
+                oneTimeWorkRequest);
     }
 
     /*
@@ -208,24 +190,7 @@ final class AnalyticsManager {
      * Reads n items from the queue
      * */
     @SuppressWarnings("unchecked")
-    List<Map<String, Object>> performRead(int n) {
-        List<Object> listOfOneItem;
-        List<Object> list;
-
-        try {
-            listOfOneItem = queue.peek(1);
-        } catch (IOException e) {
-            listOfOneItem = null;
-        }
-
-        try {
-            list = queue.peek(queue.size());
-        } catch (IOException e) {
-            list = null;
-        }
-
-
-        Log.d("AnalyticsManager", "peek(1) = " + listOfOneItem  + ", peek(all) = " + list);
+    List<Map<String, String>> performRead(int n) {
         try {
             synchronized (queueLock) {
                 return queue.peek(n);
@@ -236,13 +201,11 @@ final class AnalyticsManager {
     }
 
     private static QueueFile createQueueFile(File folder) throws IOException {
-        String name = "analytics-queue-file";
-
         if (!(folder.exists() || folder.mkdirs() || folder.isDirectory())) {
             throw new IOException("Could not create directory at " + folder);
         }
 
-        File file = new File(folder, name);
+        File file = new File(folder, QUEUE_FILE_NAME);
         try {
             return new QueueFile.Builder(file).build();
         } catch (IOException e) {
@@ -250,39 +213,27 @@ final class AnalyticsManager {
                 return new QueueFile.Builder(file).build();
             } else {
                 throw new IOException(
-                        "Could not create queue file (" + name + ") in " + folder + ".");
+                        "Could not create queue file (" + QUEUE_FILE_NAME + ") in " + folder + ".");
             }
         }
     }
 
-    /** Converter which uses Moshi to serialize instances of class T to disk. */
-    private final class AnalyticsPayloadConverter implements ObjectQueue.Converter<Map<String, Object>> {
-        private final JsonAdapter<Map<String, Object>> jsonAdapter;
+    final static class EnqueueTask extends AsyncTask<Map, Void, Void> {
 
-        AnalyticsPayloadConverter(Moshi moshi) {
-            Type type = Types.newParameterizedType(Map.class, String.class, Object.class);
-            this.jsonAdapter = moshi.adapter(type);
+        private final AnalyticsManager analyticsManager;
+
+        EnqueueTask(AnalyticsManager analyticsManager) {
+            this.analyticsManager = analyticsManager;
         }
-
-        @Override public Map<String, Object> from(byte[] bytes) throws IOException {
-            return jsonAdapter.fromJson(new Buffer().write(bytes));
-        }
-
-        @Override public void toStream(Map<String, Object> val, OutputStream os) throws IOException {
-            try (BufferedSink sink = Okio.buffer(Okio.sink(os))) {
-                jsonAdapter.toJson(sink, val);
-            }
-        }
-    }
-
-    private final class EnqueueTask extends AsyncTask<Map, Void, Void> {
 
         @Override
         @SuppressWarnings("unchecked")
-        protected final Void doInBackground(Map... item) {
+        protected final Void doInBackground(Map... items) {
+            ObjectQueue queue = analyticsManager.queue;
+
             if (queue.size() >= MAX_QUEUE_SIZE) {
                 try {
-                    synchronized (queueLock) {
+                    synchronized (analyticsManager.queueLock) {
                         /*
                          * Double check the lock.
                          * The payload may have been uploaded and removed from the queue while we were waiting.
@@ -300,17 +251,40 @@ final class AnalyticsManager {
             }
 
             try {
-                synchronized (queueLock) {
-                    queue.add(item);
-                    Log.d("AnalyticsManager", "In background, After adding item, queue = " + queue + ", queue size = " + queue.size());
-                    if (queue.size() >= FLUSH_QUEUE_SIZE) {
-                        performFlush();
-                    }
+                synchronized (analyticsManager.queueLock) {
+                    queue.add(items[0]);
+                }
+
+                if (queue.size() >= FLUSH_QUEUE_SIZE) {
+                    performFlush();
                 }
             } catch (IOException e) {
                 return null;
             }
             return null;
+        }
+    }
+
+    /** Converter which uses Moshi to serialize instances of class Map<String, String> to disk. */
+    private final class AnalyticsPayloadConverter
+            implements ObjectQueue.Converter<Map<String, String>> {
+        private final JsonAdapter<Map<String, String>> jsonAdapter;
+
+        AnalyticsPayloadConverter(Moshi moshi) {
+            Type type = Types.newParameterizedType(Map.class, String.class, String.class);
+            this.jsonAdapter = moshi.adapter(type);
+        }
+
+        @Override
+        public Map<String, String> from(byte[] bytes) throws IOException {
+            return jsonAdapter.fromJson(new Buffer().write(bytes));
+        }
+
+        @Override
+        public void toStream(Map<String, String> val, OutputStream os) throws IOException {
+            try (BufferedSink sink = Okio.buffer(Okio.sink(os))) {
+                jsonAdapter.toJson(sink, val);
+            }
         }
     }
 }

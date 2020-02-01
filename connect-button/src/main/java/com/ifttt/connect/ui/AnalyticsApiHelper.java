@@ -1,15 +1,16 @@
 package com.ifttt.connect.ui;
 
-import java.util.List;
-import java.util.Map;
 import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.moshi.MoshiConverterFactory;
 import retrofit2.http.Body;
+import retrofit2.http.Header;
+import retrofit2.http.Headers;
 import retrofit2.http.POST;
 
-class AnalyticsApiHelper {
+final class AnalyticsApiHelper {
 
     private static AnalyticsApiHelper INSTANCE;
 
@@ -17,7 +18,9 @@ class AnalyticsApiHelper {
 
     private AnalyticsApiHelper() {
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
-        OkHttpClient okHttpClient = builder.build();
+
+        // TODO: Remove interceptor before merging
+        OkHttpClient okHttpClient = builder.addInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)).build();
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://connect.ifttt.com")
@@ -35,12 +38,14 @@ class AnalyticsApiHelper {
         return INSTANCE;
     }
 
-    Call<Void> submitEvents(List<Map<String, Object>> events) {
-        return eventsApi.postEvents(events);
+    Call<Void> submitEvents(String anonymousId, EventsList events) {
+        // TODO: Remove service key header from the api before merging
+        return eventsApi.postEvents(anonymousId, events);
     }
 
     private interface EventsApi {
+        @Headers("Content-Type: application/json")
         @POST("/v2/sdk/events")
-        Call<Void> postEvents(@Body List<Map<String, Object>> events);
+        Call<Void> postEvents(@Header("IFTTT-Service-Key") String anonymousId, @Body EventsList events);
     }
 }
