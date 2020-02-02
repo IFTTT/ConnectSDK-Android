@@ -265,7 +265,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         buttonApiHelper =
                 new ButtonApiHelper(connectionApiClient, redirectUri, inviteCode, credentialsProvider, getLifecycle());
         emailEdt.setText(email);
-        analyticsManager.trackUiImpression(AnalyticsObject.CONNECT_BUTTON_EMAIL, AnalyticsLocation.fromConnectButtonWithId(connection.id));
+        analyticsManager.trackUiImpression(AnalyticsObject.CONNECT_BUTTON_EMAIL, AnalyticsLocation.fromConnectButton(getContext()));
     }
 
     /**
