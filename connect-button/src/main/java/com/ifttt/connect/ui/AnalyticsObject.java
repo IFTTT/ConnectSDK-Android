@@ -16,12 +16,14 @@ class AnalyticsObject {
     private static String ID_CONNECT_INFORMATION = "connect_information";
     private static String ID_PRIVACY_POLICY = "privacy_policy";
     private static String ID_MANAGE = "manage";
+    private static String ID_CONNECTION_NAME = "connection_name";
 
     static final AnalyticsObject CONNECT_BUTTON_EMAIL = new AnalyticsObject("", TYPE_CONNECTION_EMAIL);
     static final AnalyticsObject WORKS_WITH_IFTTT = new AnalyticsObject(ID_WORKS_WITH_IFTTT, TYPE_BUTTON);
     static final AnalyticsObject CONNECT_INFORMATION_MODAL = new AnalyticsObject(ID_CONNECT_INFORMATION, TYPE_MODAL);
     static final AnalyticsObject PRIVACY_POLICY = new AnalyticsObject(ID_PRIVACY_POLICY, TYPE_BUTTON);
     static final AnalyticsObject MANAGE_CONNECTION = new AnalyticsObject(ID_MANAGE, TYPE_BUTTON);
+    static final AnalyticsObject CONNECTION_NAME = new AnalyticsObject(ID_CONNECTION_NAME, TYPE_BUTTON);
 
     AnalyticsObject(String id, String type) {
         this.id = id;

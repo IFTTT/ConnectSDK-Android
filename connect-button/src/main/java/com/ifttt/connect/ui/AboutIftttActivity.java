@@ -92,6 +92,7 @@ public final class AboutIftttActivity extends AppCompatActivity {
                 return;
             }
 
+            analyticsManager.trackUiClick(AnalyticsObject.CONNECTION_NAME, AnalyticsLocation.fromConnectButtonWithId(connection.id));
             startActivity(intent);
         });
 

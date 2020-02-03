@@ -87,27 +87,6 @@ final class AnalyticsManager {
     }
 
     /*
-     * This method generates a system change event
-     * */
-    void trackSystemEvent(AnalyticsObject obj, AnalyticsLocation location) {
-        trackItemEvent("android.system", obj, location);
-    }
-
-    /*
-     * This method generates a state change event for an object
-     * */
-    void trackStateChangeEvent(AnalyticsObject obj, AnalyticsLocation location) {
-        trackItemEvent("android.statechange", obj, location);
-    }
-
-    /*
-     * This method generates screen view event
-     * */
-    void trackScreenView(AnalyticsObject obj, AnalyticsLocation location) {
-        trackItemEvent("android.pageviewed", obj, location);
-    }
-
-    /*
      * Process the event data before adding it to the event queue
      * */
     private void trackItemEvent(String name, AnalyticsObject obj, AnalyticsLocation location) {
