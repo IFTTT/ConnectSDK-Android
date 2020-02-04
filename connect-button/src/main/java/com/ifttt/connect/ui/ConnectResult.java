@@ -84,10 +84,11 @@ public final class ConnectResult implements Parcelable {
      * @param intent Intent object that should come from your deep link handler Activity.
      * @return An instance of ConnectResult that can be used in setting up {@link BaseConnectButton}.
      */
+    @Nullable
     public static ConnectResult fromIntent(Intent intent) {
         Uri data = intent.getData();
         if (data == null) {
-            return UNKNOWN;
+            return null;
         }
 
         String nextStepParam = data.getQueryParameter("next_step");
