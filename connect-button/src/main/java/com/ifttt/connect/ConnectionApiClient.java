@@ -100,7 +100,7 @@ public final class ConnectionApiClient {
             JsonAdapter<ErrorResponse> errorResponseJsonAdapter = moshi.adapter(ErrorResponse.class);
             TokenInterceptor tokenInterceptor = new TokenInterceptor(null);
             OkHttpClient.Builder builder =
-                    new OkHttpClient.Builder().addInterceptor(Factory.getApiInterceptor(anonymousId))
+                    new OkHttpClient.Builder().addInterceptor(new SdkInfoInterceptor(anonymousId))
                             .addInterceptor(tokenInterceptor);
 
             if (inviteCode != null) {

@@ -1,6 +1,6 @@
 package com.ifttt.connect.ui;
 
-import com.ifttt.connect.Factory;
+import com.ifttt.connect.SdkInfoInterceptor;
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Retrofit;
@@ -16,7 +16,7 @@ final class AnalyticsApiHelper {
 
     private AnalyticsApiHelper(String anonymousId) {
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
-        OkHttpClient okHttpClient = builder.addInterceptor(Factory.getApiInterceptor(anonymousId)).build();
+        OkHttpClient okHttpClient = builder.addInterceptor(new SdkInfoInterceptor(anonymousId)).build();
 
         Retrofit retrofit = new Retrofit.Builder().baseUrl("https://connect.ifttt.com")
                 .addConverterFactory(MoshiConverterFactory.create())

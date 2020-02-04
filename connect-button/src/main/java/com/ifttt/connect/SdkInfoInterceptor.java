@@ -7,11 +7,11 @@ import okhttp3.Response;
 /**
  * Interceptor that adds common headers in the API call to IFTTT API.
  */
-final class SdkInfoInterceptor implements Interceptor {
+public final class SdkInfoInterceptor implements Interceptor {
 
     private final String anonymousId;
 
-    SdkInfoInterceptor(String anonymousId) {
+    public SdkInfoInterceptor(String anonymousId) {
         this.anonymousId = anonymousId;
     }
 
