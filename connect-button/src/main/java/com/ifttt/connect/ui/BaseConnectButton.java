@@ -132,7 +132,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
     @Nullable private Call ongoingImageCall;
 
-    private AnalyticsManager analyticsManager;
+    private final AnalyticsManager analyticsManager;
 
     public BaseConnectButton(Context context) {
         this(context, null);
@@ -265,7 +265,6 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         buttonApiHelper =
                 new ButtonApiHelper(connectionApiClient, redirectUri, inviteCode, credentialsProvider, getLifecycle());
         emailEdt.setText(email);
-        analyticsManager.trackUiImpression(AnalyticsObject.CONNECT_BUTTON_EMAIL, AnalyticsLocation.fromConnectButton(getContext()));
     }
 
     /**
@@ -552,6 +551,8 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                     getContext().startActivity(AboutIftttActivity.intent(getContext(), connection));
                     analyticsManager.trackUiClick(AnalyticsObject.WORKS_WITH_IFTTT, AnalyticsLocation.WORKS_WITH_IFTTT);
                 });
+
+        analyticsManager.trackUiImpression(AnalyticsObject.fromConnnection(connection), AnalyticsLocation.fromConnectButtonWithId(connection.id));
     }
 
     Connection getConnection() {
@@ -709,7 +710,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                 if (buttonApiHelper.shouldPresentCreateAccount(getContext())) {
                     AnimatorSet set = new AnimatorSet();
                     Animator completeProgress =
-                            progressView.progress(0.5f, 1f, getResources().getString(R.string. ifttt_creating_account),
+                            progressView.progress(0.5f, 1f, getResources().getString(R.string.ifttt_creating_account),
                                     ANIM_DURATION_LONG);
                     completeProgress.setInterpolator(LINEAR_INTERPOLATOR);
                     completeProgress.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
@@ -899,6 +900,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                     return false;
                 });
 
+                analyticsManager.trackUiImpression(AnalyticsObject.CONNECT_BUTTON_EMAIL, AnalyticsLocation.fromConnectButton(getContext()));
                 helperTxt.setClickable(true);
             }
         });

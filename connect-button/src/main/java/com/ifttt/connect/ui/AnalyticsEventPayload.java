@@ -2,11 +2,11 @@ package com.ifttt.connect.ui;
 
 import java.util.Map;
 
-class AnalyticsEventPayload {
+final class AnalyticsEventPayload {
 
-    private String name;
-    private String timestamp;
-    private Map properties;
+    private final String name;
+    private final String timestamp;
+    private final Map properties;
 
     AnalyticsEventPayload(String name, String timestamp, Map<String, String> properties) {
         this.name = name;

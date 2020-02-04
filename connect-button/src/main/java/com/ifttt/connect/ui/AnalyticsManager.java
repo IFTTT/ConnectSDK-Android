@@ -2,6 +2,9 @@ package com.ifttt.connect.ui;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import androidx.annotation.MainThread;
+import androidx.annotation.Nullable;
+import androidx.annotation.WorkerThread;
 import androidx.work.ExistingWorkPolicy;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
@@ -31,9 +34,9 @@ import android.os.Build.VERSION;
 final class AnalyticsManager {
 
     private static AnalyticsManager INSTANCE = null;
-    private ObjectQueue queue;
+    private ObjectQueue<AnalyticsEventPayload> queue;
     private static WorkManager workManager;
-    private AnalyticsPreferences preference;
+    private static boolean analyticsDisabled;
 
     /*
      * This lock is to ensure that only one queue operation - add, remove, or peek can be performed at a time.
@@ -43,7 +46,7 @@ final class AnalyticsManager {
     private static final int MAX_QUEUE_SIZE = 1000;
     private static final int FLUSH_QUEUE_SIZE = 5;
 
-    private static final String WORK_ID_QUEUE_POLLING = "analytics_queue_polling";
+    private static final String WORK_ID_QUEUE_FLUSH = "analytics_queue_flush";
     private static final String QUEUE_FILE_NAME = "analytics-queue-file";
 
     private AnalyticsManager(Context context) {
@@ -62,10 +65,10 @@ final class AnalyticsManager {
         }
 
         workManager = WorkManager.getInstance(context);
-        preference = AnalyticsPreferences.getInstance(context);
+        analyticsDisabled = AnalyticsPreferences.getAnalyticsTrackingOptOutPreference(context);
     }
 
-    static AnalyticsManager getInstance(Context context) {
+    static synchronized AnalyticsManager getInstance(Context context) {
         if (INSTANCE == null) {
             INSTANCE = new AnalyticsManager(context.getApplicationContext());
         }
@@ -75,6 +78,7 @@ final class AnalyticsManager {
     /*
      * This method generates a UI item impression event
      * */
+    @MainThread
     void trackUiImpression(AnalyticsObject obj, AnalyticsLocation location) {
         trackItemEvent("android.impression", obj, location);
     }
@@ -82,6 +86,7 @@ final class AnalyticsManager {
     /*
      * This method generates a UI item click event
      * */
+    @MainThread
     void trackUiClick(AnalyticsObject obj, AnalyticsLocation location) {
         trackItemEvent("android.click", obj, location);
     }
@@ -90,7 +95,7 @@ final class AnalyticsManager {
      * Process the event data before adding it to the event queue
      * */
     private void trackItemEvent(String name, AnalyticsObject obj, AnalyticsLocation location) {
-        if (preference.getAnalyticsTrackingOptOutPreference()) {
+        if (analyticsDisabled) {
             return;
         }
 
@@ -132,18 +137,49 @@ final class AnalyticsManager {
     }
 
     /*
-     * Schedules a one time work request to read from the queue, make an api call to submit events and remove them from queue
+     * Adds an item to the queue
      * */
-    static void performFlush() {
-        OneTimeWorkRequest oneTimeWorkRequest =
-                new OneTimeWorkRequest.Builder(AnalyticsEventUploader.class).build();
-        workManager.enqueueUniqueWork(WORK_ID_QUEUE_POLLING, ExistingWorkPolicy.KEEP,
-                oneTimeWorkRequest);
+    @WorkerThread
+    private void performAdd(AnalyticsEventPayload payload) {
+        if (queue.size() >= MAX_QUEUE_SIZE) {
+            try {
+                synchronized (queueLock) {
+                    /*
+                     * Double check the lock.
+                     * The payload may have been uploaded and removed from the queue while we were waiting.
+                     * */
+                    if (queue.size() >= MAX_QUEUE_SIZE) {
+                        /*
+                         * Remove the oldest payload to accommodate the new one
+                         * */
+                        queue.remove(1);
+                    }
+                }
+            } catch (IOException e) {
+                return;
+            }
+        }
+
+        try {
+            synchronized (queueLock) {
+                queue.add(payload);
+            }
+
+            if (queue.size() >= FLUSH_QUEUE_SIZE) {
+                OneTimeWorkRequest oneTimeWorkRequest =
+                        new OneTimeWorkRequest.Builder(AnalyticsEventUploader.class).build();
+                workManager.enqueueUniqueWork(WORK_ID_QUEUE_FLUSH, ExistingWorkPolicy.KEEP,
+                        oneTimeWorkRequest);
+            }
+        } catch (IOException e) {
+            return;
+        }
     }
 
     /*
      * Removes n items from the queue
      * */
+    @WorkerThread
     void performRemove(int n) {
         try {
             synchronized (queueLock) {
@@ -157,11 +193,12 @@ final class AnalyticsManager {
     /*
      * Reads n items from the queue
      * */
-    @SuppressWarnings("unchecked")
-    List<AnalyticsEventPayload> performRead(int n) {
+    @WorkerThread
+    @Nullable
+    List<AnalyticsEventPayload> performRead() {
         try {
             synchronized (queueLock) {
-                return queue.peek(n);
+                return queue.peek(queue.size());
             }
         } catch (IOException e) {
             return null;
@@ -195,46 +232,14 @@ final class AnalyticsManager {
         }
 
         @Override
-        @SuppressWarnings("unchecked")
         protected final Void doInBackground(AnalyticsEventPayload... items) {
-            ObjectQueue queue = analyticsManager.queue;
-
-            if (queue.size() >= MAX_QUEUE_SIZE) {
-                try {
-                    synchronized (analyticsManager.queueLock) {
-                        /*
-                         * Double check the lock.
-                         * The payload may have been uploaded and removed from the queue while we were waiting.
-                         * */
-                        if (queue.size() >= MAX_QUEUE_SIZE) {
-                            /*
-                             * Remove the oldest payload to accommodate the new one
-                             * */
-                            queue.remove(1);
-                        }
-                    }
-                } catch (IOException e) {
-                    return null;
-                }
-            }
-
-            try {
-                synchronized (analyticsManager.queueLock) {
-                    queue.add(items[0]);
-                }
-
-                if (queue.size() >= FLUSH_QUEUE_SIZE) {
-                    performFlush();
-                }
-            } catch (IOException e) {
-                return null;
-            }
+            analyticsManager.performAdd(items[0]);
             return null;
         }
     }
 
     /** Converter which uses Moshi to serialize instances of class AnalyticsEventPayload to disk. */
-    private final class AnalyticsPayloadConverter
+    private static final class AnalyticsPayloadConverter
             implements ObjectQueue.Converter<AnalyticsEventPayload> {
         private final JsonAdapter<AnalyticsEventPayload> jsonAdapter;
 

@@ -1,12 +1,13 @@
 package com.ifttt.connect.ui;
 
+import android.content.Context;
+import com.ifttt.connect.BuildConfig;
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.moshi.MoshiConverterFactory;
 import retrofit2.http.Body;
-import retrofit2.http.Header;
-import retrofit2.http.Headers;
 import retrofit2.http.POST;
 
 final class AnalyticsApiHelper {
@@ -15,12 +16,18 @@ final class AnalyticsApiHelper {
 
     private final EventsApi eventsApi;
 
-    private AnalyticsApiHelper() {
-        OkHttpClient.Builder builder = new OkHttpClient.Builder();
-        OkHttpClient okHttpClient = builder.build();
+    private AnalyticsApiHelper(Context context) {
+        Interceptor interceptor = (chain -> chain.proceed(chain.request()
+                .newBuilder()
+                .addHeader("IFTTT-SDK-Version", BuildConfig.VERSION_NAME)
+                .addHeader("IFTTT-SDK-Platform", "android")
+                .addHeader("IFTTT-SDK-Anonymous-Id", AnalyticsPreferences.getAnonymousId(context))
+                .build()));
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://connect.ifttt.com")
+        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+        OkHttpClient okHttpClient = builder.addInterceptor(interceptor).build();
+
+        Retrofit retrofit = new Retrofit.Builder().baseUrl("https://connect.ifttt.com")
                 .addConverterFactory(MoshiConverterFactory.create())
                 .client(okHttpClient)
                 .build();
@@ -28,21 +35,19 @@ final class AnalyticsApiHelper {
         eventsApi = retrofit.create(EventsApi.class);
     }
 
-    static AnalyticsApiHelper get() {
+    static synchronized AnalyticsApiHelper get(Context context) {
         if (INSTANCE == null) {
-            INSTANCE = new AnalyticsApiHelper();
+            INSTANCE = new AnalyticsApiHelper(context);
         }
         return INSTANCE;
     }
 
-    Call<Void> submitEvents(String anonymousId, EventsList events) {
-        // TODO: Remove service key header from the api before merging
-        return eventsApi.postEvents(anonymousId, events);
+    Call<Void> submitEvents(EventsList events) {
+        return eventsApi.postEvents(events);
     }
 
     private interface EventsApi {
-        @Headers("Content-Type: application/json")
         @POST("/v2/sdk/events")
-        Call<Void> postEvents(@Header("IFTTT-Service-Key") String anonymousId, @Body EventsList events);
+        Call<Void> postEvents(@Body EventsList events);
     }
 }

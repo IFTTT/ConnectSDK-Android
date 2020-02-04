@@ -4,8 +4,8 @@ import com.ifttt.connect.Connection;
 
 class AnalyticsObject {
 
-    String id;
-    String type;
+    final String id;
+    final String type;
 
     private static String TYPE_CONNECTION = "connection";
     private static String TYPE_CONNECTION_EMAIL = "connection_email";
@@ -30,7 +30,7 @@ class AnalyticsObject {
         this.type = type;
     }
 
-    static class ConnectionAnalyticsObject extends AnalyticsObject {
+    static final class ConnectionAnalyticsObject extends AnalyticsObject {
         String status;
 
         ConnectionAnalyticsObject(String id, String status) {

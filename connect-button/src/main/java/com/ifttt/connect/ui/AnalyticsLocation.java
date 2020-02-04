@@ -4,8 +4,8 @@ import android.content.Context;
 
 final class AnalyticsLocation {
 
-    String id;
-    String type;
+    final String id;
+    final String type;
 
     private static final String TYPE_CONNECT_BUTTON = "connect_button";
 

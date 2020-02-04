@@ -8,16 +8,19 @@ import java.io.IOException;
 import java.util.List;
 import retrofit2.Response;
 
-public class AnalyticsEventUploader extends Worker {
+/*
+ * Schedules a one time work request to read from the queue, make an api call to submit events and remove them from queue.
+ * */
+public final class AnalyticsEventUploader extends Worker {
 
-    private static String anonymousId;
     private AnalyticsManager analyticsManager;
     private static final int MAX_RETRY_COUNT = 3;
+    private static AnalyticsApiHelper apiHelper;
 
-    public AnalyticsEventUploader(@NonNull Context context, @NonNull WorkerParameters params) {
+    public AnalyticsEventUploader(Context context, WorkerParameters params) {
         super(context, params);
         analyticsManager = AnalyticsManager.getInstance(context.getApplicationContext());
-        anonymousId = AnalyticsPreferences.getInstance(context).getAnonymousId();
+        apiHelper = AnalyticsApiHelper.get(context);
     }
 
     @Override
@@ -25,16 +28,15 @@ public class AnalyticsEventUploader extends Worker {
     public Result doWork() {
         Result result;
         try {
-            int queueSize = analyticsManager.getQueueSize();
-            List<AnalyticsEventPayload> list = analyticsManager.performRead(queueSize);
+            List<AnalyticsEventPayload> list = analyticsManager.performRead();
 
             if (list != null && !list.isEmpty()) {
-                Response<Void> response = AnalyticsApiHelper.get()
-                        .submitEvents(anonymousId, new EventsList(list))
+                Response<Void> response = apiHelper
+                        .submitEvents(new EventsList(list))
                         .execute();
 
                 if (response.isSuccessful()) {
-                    analyticsManager.performRemove(queueSize);
+                    analyticsManager.performRemove(list.size());
                     return Result.success();
                 } else {
                     result = Result.failure();
@@ -46,7 +48,7 @@ public class AnalyticsEventUploader extends Worker {
             result = Result.failure();
         }
 
-        if (result.equals(Result.failure()) && getRunAttemptCount() < MAX_RETRY_COUNT) {
+        if (getRunAttemptCount() < MAX_RETRY_COUNT) {
             return Result.retry();
         } else {
             return result;
