@@ -2,6 +2,7 @@ package com.ifttt.connect.ui;
 
 import android.content.Context;
 import com.ifttt.connect.BuildConfig;
+import com.ifttt.connect.Factory;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
@@ -17,15 +18,8 @@ final class AnalyticsApiHelper {
     private final EventsApi eventsApi;
 
     private AnalyticsApiHelper(Context context) {
-        Interceptor interceptor = (chain -> chain.proceed(chain.request()
-                .newBuilder()
-                .addHeader("IFTTT-SDK-Version", BuildConfig.VERSION_NAME)
-                .addHeader("IFTTT-SDK-Platform", "android")
-                .addHeader("IFTTT-SDK-Anonymous-Id", AnalyticsPreferences.getAnonymousId(context))
-                .build()));
-
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
-        OkHttpClient okHttpClient = builder.addInterceptor(interceptor).build();
+        OkHttpClient okHttpClient = builder.addInterceptor(Factory.getApiInterceptor(AnalyticsPreferences.getAnonymousId(context))).build();
 
         Retrofit retrofit = new Retrofit.Builder().baseUrl("https://connect.ifttt.com")
                 .addConverterFactory(MoshiConverterFactory.create())

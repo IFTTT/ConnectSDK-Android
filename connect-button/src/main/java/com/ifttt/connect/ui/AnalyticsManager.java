@@ -80,7 +80,7 @@ final class AnalyticsManager {
      * */
     @MainThread
     void trackUiImpression(AnalyticsObject obj, AnalyticsLocation location) {
-        trackItemEvent("android.impression", obj, location);
+        trackItemEvent("sdk.impression", obj, location);
     }
 
     /*
@@ -88,7 +88,7 @@ final class AnalyticsManager {
      * */
     @MainThread
     void trackUiClick(AnalyticsObject obj, AnalyticsLocation location) {
-        trackItemEvent("android.click", obj, location);
+        trackItemEvent("sdk.click", obj, location);
     }
 
     /*
@@ -119,13 +119,6 @@ final class AnalyticsManager {
                 timestamp,
                 properties
         ));
-    }
-
-    /*
-     * Returns the current size of the queue
-     * */
-    int getQueueSize() {
-        return queue.size();
     }
 
     /*
