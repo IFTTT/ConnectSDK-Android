@@ -20,13 +20,12 @@ public final class AnalyticsEventUploader extends Worker {
     public AnalyticsEventUploader(Context context, WorkerParameters params) {
         super(context, params);
         analyticsManager = AnalyticsManager.getInstance(context.getApplicationContext());
-        apiHelper = AnalyticsApiHelper.get(context);
+        apiHelper = AnalyticsApiHelper.get(AnalyticsPreferences.getAnonymousId(context));
     }
 
     @Override
     @NonNull
     public Result doWork() {
-        Result result;
         try {
             List<AnalyticsEventPayload> list = analyticsManager.performRead();
 
@@ -38,20 +37,17 @@ public final class AnalyticsEventUploader extends Worker {
                 if (response.isSuccessful()) {
                     analyticsManager.performRemove(list.size());
                     return Result.success();
-                } else {
-                    result = Result.failure();
                 }
             } else {
                 return Result.success();
             }
         } catch (IOException e) {
-            result = Result.failure();
         }
 
         if (getRunAttemptCount() < MAX_RETRY_COUNT) {
             return Result.retry();
         } else {
-            return result;
+            return Result.failure();
         }
     }
 }

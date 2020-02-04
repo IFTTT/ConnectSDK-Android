@@ -15,12 +15,7 @@ import static com.google.common.truth.Truth.assertThat;
 @RunWith(AndroidJUnit4.class)
 public final class ConnectButtonTest {
 
-    private final Activity activity = Robolectric.buildActivity(TestActivity.class).get();
-
-    @Before
-    public void setUp() {
-        ActivityScenario.launch(TestActivity.class);
-    }
+    private final Activity activity = Robolectric.buildActivity(TestActivity.class).create().get();
 
     @Test
     public void shouldHideUiWithInvalidEmail() {
