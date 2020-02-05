@@ -132,7 +132,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
     @Nullable private Call ongoingImageCall;
 
-    private final AnalyticsManager analyticsManager;
+    private AnalyticsManager analyticsManager;
 
     public BaseConnectButton(Context context) {
         this(context, null);
@@ -176,7 +176,6 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
         iconDragHelperCallback = new IconDragHelperCallback();
         viewDragHelper = buttonRoot.getViewDragHelperCallback(iconDragHelperCallback);
-        analyticsManager = AnalyticsManager.getInstance(context.getApplicationContext());
     }
 
     @Override
@@ -265,6 +264,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         buttonApiHelper =
                 new ButtonApiHelper(connectionApiClient, redirectUri, inviteCode, credentialsProvider, getLifecycle());
         emailEdt.setText(email);
+        analyticsManager = AnalyticsManager.getInstance(getContext().getApplicationContext());
     }
 
     /**

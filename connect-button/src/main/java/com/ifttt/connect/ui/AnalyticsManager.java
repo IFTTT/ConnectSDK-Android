@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import androidx.annotation.MainThread;
 import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 import androidx.annotation.WorkerThread;
 import androidx.work.ExistingWorkPolicy;
 import androidx.work.OneTimeWorkRequest;
@@ -34,8 +35,13 @@ import android.os.Build.VERSION;
 final class AnalyticsManager {
 
     private static AnalyticsManager INSTANCE = null;
-    private ObjectQueue<AnalyticsEventPayload> queue;
-    private static WorkManager workManager;
+
+    @VisibleForTesting
+    ObjectQueue<AnalyticsEventPayload> queue;
+
+    @VisibleForTesting
+    static WorkManager workManager;
+
     private static boolean analyticsDisabled;
 
     /*
@@ -125,7 +131,8 @@ final class AnalyticsManager {
      * Enqueue an async task to add to the queue.
      * The default serial scheduler of AsyncTask will be used to ensure that events are enqueued in the correct order.
      **/
-    private void performEnqueue(AnalyticsEventPayload payload) {
+    @VisibleForTesting
+    void performEnqueue(AnalyticsEventPayload payload) {
         new EnqueueTask(this).execute(payload);
     }
 
@@ -251,5 +258,10 @@ final class AnalyticsManager {
                 jsonAdapter.toJson(sink, val);
             }
         }
+    }
+
+    @VisibleForTesting
+    static void destroy() {
+        INSTANCE = null;
     }
 }
