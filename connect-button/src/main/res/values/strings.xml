@@ -18,7 +18,7 @@
     <string name="ifttt_connection_off">Disconnect</string>
     <string name="ifttt_sign_in_to_ifttt_or_create_new_account"><![CDATA[You are creating or using your IFTTT account subject to <a href=\"https://ifttt.com/terms\">Terms</a> & <a href=\"https://ifttt.com/privacy\">Privacy Policy</a>.]]></string>
     <string name="ifttt_enter_valid_email">Please enter a valid email address</string>
-    <string name="terms_and_privacy"><![CDATA[By using this connection you agree to our <a href=\"https://ifttt.com/terms\">Privacy & Terms</a>.]]></string>
+    <string name="terms_and_privacy"><![CDATA[By using this connection you agree to our <a href=\"https://ifttt.com/terms\">Privacy & Terms</a>]]></string>
     <string name="disconnecting">Disconnecting…</string>
     <string name="ifttt_authorize_with">Secured with IFTTT Learn more</string>
     <string name="ifttt_manage_connection">Manage</string>
