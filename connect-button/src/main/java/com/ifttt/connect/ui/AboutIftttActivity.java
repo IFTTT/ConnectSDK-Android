@@ -118,10 +118,10 @@ public final class AboutIftttActivity extends AppCompatActivity {
                 manageConnectionView.setVisibility(View.VISIBLE);
                 manageConnectionView.setOnClickListener(v -> startActivity(manageIntent));
             } else {
-                manageConnectionView.setVisibility(View.GONE);
+                manageConnectionView.setVisibility(View.VISIBLE);
             }
         } else {
-            manageConnectionView.setVisibility(View.GONE);
+            manageConnectionView.setVisibility(View.VISIBLE);
 
             Intent storeIntent = ButtonApiHelper.redirectToPlayStore(this);
             if (storeIntent != null) {
