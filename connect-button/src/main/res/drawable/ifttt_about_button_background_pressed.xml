@@ -4,6 +4,6 @@
 
     <corners android:radius="@dimen/connect_button_radius"/>
     <solid android:color="@color/ifttt_about_button_pressed_color"/>
-    <size android:height="@dimen/ifttt_connect_button_height"/>
+    <size android:height="@dimen/ifttt_about_button_height"/>
 
 </shape>
