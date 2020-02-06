@@ -14,8 +14,9 @@
     <dimen name="ifttt_connect_button_height_with_border">72dp</dimen>
     <dimen name="connect_button_radius_with_border">36dp</dimen>
     <dimen name="connect_button_radius">34dp</dimen>
-    <dimen name="ifttt_about_button_radius">18sp</dimen>
     <dimen name="ifttt_about_button_height">34sp</dimen>
+    <dimen name="ifttt_about_button_padding_vertical">16sp</dimen>
+    <dimen name="ifttt_about_button_radius">33sp</dimen>
     <dimen name="ifttt_button_icon_margin">2dp</dimen>
     <dimen name="ifttt_button_border_width">2dp</dimen>
     <dimen name="ifttt_service_name_max_text_size">22sp</dimen>

@@ -122,15 +122,16 @@
 
             <TextView
                 android:id="@+id/ifttt_manage_connection"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/ifttt_space_med"
                 android:background="@drawable/ifttt_about_button_background"
                 android:fontFamily="@font/avenir_next_ltpro_bold"
-                android:paddingBottom="@dimen/ifttt_space_small"
-                android:paddingEnd="@dimen/ifttt_space_med"
-                android:paddingStart="@dimen/ifttt_space_med"
-                android:paddingTop="@dimen/ifttt_space_small"
+                android:paddingBottom="@dimen/ifttt_about_button_padding_vertical"
+                android:paddingEnd="@dimen/ifttt_space_large"
+                android:paddingStart="@dimen/ifttt_space_large"
+                android:paddingTop="@dimen/ifttt_about_button_padding_vertical"
+                android:gravity="center"
                 android:text="@string/ifttt_manage_connection"
                 android:textColor="@android:color/white"
                 android:textSize="@dimen/ifttt_about_button_text_size"/>
