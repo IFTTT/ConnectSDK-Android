@@ -23,7 +23,6 @@ import java.util.Map;
 import okio.Buffer;
 import okio.BufferedSink;
 import okio.Okio;
-import android.os.Build.VERSION;
 
 /*
  * This is the main class implementing analytics for the ConnectButton SDK. It is responsible for :
@@ -119,7 +118,6 @@ final class AnalyticsManager {
         properties.put("location_type", location.type);
 
         properties.put("sdk_version", BuildConfig.VERSION_NAME);
-        properties.put("system_version", Integer.toString(VERSION.SDK_INT));
         String timestamp = Long.toString(System.currentTimeMillis());
 
         performEnqueue(new AnalyticsEventPayload(name, timestamp, properties));
