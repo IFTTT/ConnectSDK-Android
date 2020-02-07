@@ -13,7 +13,7 @@ import static com.google.common.truth.Truth.assertThat;
 
 @RunWith(AndroidJUnit4.class)
 @Config(shadows = { ShadowAnimatorSet.class })
-public class DisableTrackingTest {
+public final class DisableTrackingTest {
 
     private final Activity activity = Robolectric.buildActivity(TestActivity.class).create().get();
     private AnalyticsManager analyticsManager;
