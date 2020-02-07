@@ -47,6 +47,4 @@ public final class QueueOperationsTest {
         analyticsManager.performRemove(3);
         assertThat(analyticsManager.performRead().size()).isEqualTo(0);
     }
-
-
 }
