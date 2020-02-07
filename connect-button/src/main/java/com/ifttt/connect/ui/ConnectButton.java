@@ -95,8 +95,8 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
      * You only need to call this method once while setting up the first ConnectButton
      * Tracking will be disabled for all following instances of the ConnectButton.
      * */
-    static void disableTracking(Context context) {
-        AnalyticsPreferences.disableAnalyticsTracking(context);
+    public static void disableTracking(Context context) {
+        AnalyticsManager.getInstance(context).disableTracking();
     }
 
     /**

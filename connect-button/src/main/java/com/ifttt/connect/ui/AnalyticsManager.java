@@ -36,12 +36,11 @@ final class AnalyticsManager {
 
     private static AnalyticsManager INSTANCE = null;
 
-    @VisibleForTesting
-    ObjectQueue<AnalyticsEventPayload> queue;
+    private ObjectQueue<AnalyticsEventPayload> queue;
 
     private final WorkManager workManager;
 
-    private static boolean analyticsDisabled;
+    private static boolean analyticsDisabled = false;
 
     /*
      * This lock is to ensure that only one queue operation - add, remove, or peek can be performed at a time.
@@ -70,7 +69,6 @@ final class AnalyticsManager {
         }
 
         workManager = WorkManager.getInstance(context);
-        analyticsDisabled = AnalyticsPreferences.getAnalyticsTrackingOptOutPreference(context);
     }
 
     static synchronized AnalyticsManager getInstance(Context context) {
@@ -78,6 +76,10 @@ final class AnalyticsManager {
             INSTANCE = new AnalyticsManager(context.getApplicationContext());
         }
         return INSTANCE;
+    }
+
+    void disableTracking() {
+        analyticsDisabled = true;
     }
 
     /*
@@ -109,7 +111,8 @@ final class AnalyticsManager {
         properties.put("object_id", obj.id);
         properties.put("object_type", obj.type);
         if (obj instanceof AnalyticsObject.ConnectionAnalyticsObject) {
-            properties.put("object_status", ((AnalyticsObject.ConnectionAnalyticsObject) obj).status);
+            properties.put("object_status",
+                    ((AnalyticsObject.ConnectionAnalyticsObject) obj).status);
         }
 
         properties.put("location_id", location.id);
@@ -119,27 +122,24 @@ final class AnalyticsManager {
         properties.put("system_version", Integer.toString(VERSION.SDK_INT));
         String timestamp = Long.toString(System.currentTimeMillis());
 
-        performEnqueue(new AnalyticsEventPayload(
-                name,
-                timestamp,
-                properties
-        ));
+        performEnqueue(new AnalyticsEventPayload(name, timestamp, properties));
     }
 
     /*
      * Enqueue an async task to add to the queue.
      * The default serial scheduler of AsyncTask will be used to ensure that events are enqueued in the correct order.
      **/
-    @VisibleForTesting
-    void performEnqueue(AnalyticsEventPayload payload) {
+    private void performEnqueue(AnalyticsEventPayload payload) {
         new EnqueueTask(this).execute(payload);
     }
 
     /*
      * Adds an item to the queue
      * */
+
+    @VisibleForTesting
     @WorkerThread
-    private void performAdd(AnalyticsEventPayload payload) {
+    void performAdd(AnalyticsEventPayload payload) {
         if (queue.size() >= MAX_QUEUE_SIZE) {
             try {
                 synchronized (queueLock) {
@@ -186,6 +186,16 @@ final class AnalyticsManager {
             }
         } catch (IOException e) {
             return;
+        }
+    }
+    /*
+    * This will only be used for testing purpose to clear the queue between tests
+    * */
+    @VisibleForTesting
+    void clearQueue() {
+        try {
+            queue.clear();
+        } catch(IOException e) {
         }
     }
 
@@ -257,10 +267,5 @@ final class AnalyticsManager {
                 jsonAdapter.toJson(sink, val);
             }
         }
-    }
-
-    @VisibleForTesting
-    static void destroy() {
-        INSTANCE = null;
     }
 }

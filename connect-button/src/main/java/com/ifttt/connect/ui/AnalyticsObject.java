@@ -25,7 +25,7 @@ class AnalyticsObject {
     static final AnalyticsObject MANAGE_CONNECTION = new AnalyticsObject(ID_MANAGE, TYPE_BUTTON);
     static final AnalyticsObject CONNECTION_NAME = new AnalyticsObject(ID_CONNECTION_NAME, TYPE_BUTTON);
 
-    AnalyticsObject(String id, String type) {
+    private AnalyticsObject(String id, String type) {
         this.id = id;
         this.type = type;
     }
@@ -37,10 +37,10 @@ class AnalyticsObject {
             super(id, TYPE_CONNECTION);
             this.status = status;
         }
-    }
 
-    static ConnectionAnalyticsObject fromConnnection(Connection connection) {
-        return new ConnectionAnalyticsObject(connection.id, connection.status.toString());
+        static ConnectionAnalyticsObject fromConnection(Connection connection) {
+            return new ConnectionAnalyticsObject(connection.id, connection.status.toString());
+        }
     }
 
     static AnalyticsObject fromService(String serviceModuleName) {

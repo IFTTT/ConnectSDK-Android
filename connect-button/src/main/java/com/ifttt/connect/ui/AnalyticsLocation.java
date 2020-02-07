@@ -1,7 +1,6 @@
 package com.ifttt.connect.ui;
 
 import android.content.Context;
-import androidx.annotation.VisibleForTesting;
 
 final class AnalyticsLocation {
 
@@ -12,8 +11,7 @@ final class AnalyticsLocation {
 
     static final AnalyticsLocation WORKS_WITH_IFTTT = new AnalyticsLocation("", TYPE_CONNECT_BUTTON);
 
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    AnalyticsLocation(String id, String type) {
+    private AnalyticsLocation(String id, String type) {
         this.id = id;
         this.type = type;
     }

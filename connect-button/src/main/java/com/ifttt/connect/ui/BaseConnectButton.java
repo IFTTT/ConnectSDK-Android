@@ -420,7 +420,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                 AnimatorSet set = new AnimatorSet();
                 set.playSequentially(moveToggle, buildDisconnectAnimator());
                 set.start();
-                analyticsManager.trackUiClick(AnalyticsObject.fromConnnection(connection), AnalyticsLocation.fromConnectButton(getContext()));
+                analyticsManager.trackUiClick(AnalyticsObject.ConnectionAnalyticsObject.fromConnection(connection), AnalyticsLocation.fromConnectButton(getContext()));
             };
 
             buttonRoot.setOnClickListener(onClickListener);
@@ -534,7 +534,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                     set.start();
                 }
 
-                analyticsManager.trackUiClick(AnalyticsObject.fromConnnection(connection), AnalyticsLocation.fromConnectButton(getContext()));
+                analyticsManager.trackUiClick(AnalyticsObject.ConnectionAnalyticsObject.fromConnection(connection), AnalyticsLocation.fromConnectButton(getContext()));
             };
 
             // Clicking both the button or the icon ImageView starts the flow.
@@ -552,7 +552,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                     analyticsManager.trackUiClick(AnalyticsObject.WORKS_WITH_IFTTT, AnalyticsLocation.WORKS_WITH_IFTTT);
                 });
 
-        analyticsManager.trackUiImpression(AnalyticsObject.fromConnnection(connection), AnalyticsLocation.fromConnectButtonWithId(connection.id));
+        analyticsManager.trackUiImpression(AnalyticsObject.ConnectionAnalyticsObject.fromConnection(connection), AnalyticsLocation.fromConnectButtonWithId(connection.id));
     }
 
     Connection getConnection() {
