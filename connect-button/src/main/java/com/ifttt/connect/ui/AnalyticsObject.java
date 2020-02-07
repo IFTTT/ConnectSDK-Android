@@ -1,5 +1,6 @@
 package com.ifttt.connect.ui;
 
+import androidx.annotation.VisibleForTesting;
 import com.ifttt.connect.Connection;
 
 class AnalyticsObject {
@@ -25,7 +26,8 @@ class AnalyticsObject {
     static final AnalyticsObject MANAGE_CONNECTION = new AnalyticsObject(ID_MANAGE, TYPE_BUTTON);
     static final AnalyticsObject CONNECTION_NAME = new AnalyticsObject(ID_CONNECTION_NAME, TYPE_BUTTON);
 
-    private AnalyticsObject(String id, String type) {
+    @VisibleForTesting
+    AnalyticsObject(String id, String type) {
         this.id = id;
         this.type = type;
     }

@@ -3,7 +3,6 @@ package com.ifttt.connect.ui;
 import android.app.Activity;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import com.ifttt.connect.ShadowAnimatorSet;
-import java.util.HashMap;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,7 +13,7 @@ import static com.google.common.truth.Truth.assertThat;
 
 @RunWith(AndroidJUnit4.class)
 @Config(shadows = { ShadowAnimatorSet.class })
-public final class QueueOperationsTest {
+public class DisableTrackingTest {
 
     private final Activity activity = Robolectric.buildActivity(TestActivity.class).create().get();
     private AnalyticsManager analyticsManager;
@@ -23,30 +22,16 @@ public final class QueueOperationsTest {
     public void setup() {
         analyticsManager = AnalyticsManager.getInstance(activity);
         analyticsManager.clearQueue();
+        analyticsManager.destroyInstance();
     }
 
     @Test
-    public void testEnqueueAndRead() {
+    public void testAnalyticsDisabled() {
         assertThat(analyticsManager.performRead().size()).isEqualTo(0);
 
-        analyticsManager.performAdd(new AnalyticsEventPayload("event1", "", new HashMap<>()));
-        analyticsManager.performAdd(new AnalyticsEventPayload("event2", "", new HashMap<>()));
-        analyticsManager.performAdd(new AnalyticsEventPayload("event3", "", new HashMap<>()));
+        analyticsManager.disableTracking();
+        analyticsManager.trackUiClick(new AnalyticsObject("obj_id", "obj_type"), new AnalyticsLocation("loc_id", "loc_type"));
 
-        assertThat(analyticsManager.performRead().size()).isEqualTo(3);
-    }
-
-    @Test
-    public void testRemove() {
-        assertThat(analyticsManager.performRead().size()).isEqualTo(0);
-
-        analyticsManager.performAdd(new AnalyticsEventPayload("event1", "", new HashMap<>()));
-        analyticsManager.performAdd(new AnalyticsEventPayload("event2", "", new HashMap<>()));
-        analyticsManager.performAdd(new AnalyticsEventPayload("event3", "", new HashMap<>()));
-
-        analyticsManager.performRemove(3);
         assertThat(analyticsManager.performRead().size()).isEqualTo(0);
     }
-
-
 }

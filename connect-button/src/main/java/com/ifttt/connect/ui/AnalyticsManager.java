@@ -212,6 +212,11 @@ final class AnalyticsManager {
         }
     }
 
+    @VisibleForTesting
+    void destroyInstance() {
+        INSTANCE = null;
+    }
+
     private static QueueFile createQueueFile(File folder) throws IOException {
         if (!(folder.exists() || folder.mkdirs() || folder.isDirectory())) {
             throw new IOException("Could not create directory at " + folder);
