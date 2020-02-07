@@ -39,8 +39,7 @@ final class AnalyticsManager {
     @VisibleForTesting
     ObjectQueue<AnalyticsEventPayload> queue;
 
-    @VisibleForTesting
-    static WorkManager workManager;
+    private final WorkManager workManager;
 
     private static boolean analyticsDisabled;
 

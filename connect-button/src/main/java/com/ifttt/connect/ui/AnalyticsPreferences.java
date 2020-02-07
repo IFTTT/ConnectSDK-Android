@@ -19,10 +19,10 @@ final class AnalyticsPreferences {
         return getSharedPreferences(context).getBoolean(ANALYTICS_DISABLED_KEY, false);
     }
 
-    static void setAnalyticsTrackingOptOutPreference(Context context, boolean analyticsDisabled) {
+    static void disableAnalyticsTracking(Context context) {
         // Disable analytics tracking.
         SharedPreferences.Editor editor = getSharedPreferences(context).edit();
-        editor.putBoolean(ANALYTICS_DISABLED_KEY, analyticsDisabled);
+        editor.putBoolean(ANALYTICS_DISABLED_KEY, true);
         editor.apply();
     }
 

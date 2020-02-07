@@ -89,6 +89,16 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
         });
     }
 
+    /*
+     * Method to disable analytics tracking for the SDK. Analytics tracking is enabled by default,
+     * Call this method before setting up the ConnectButton using{@link #ConnectButton.setup(Configuration) if you want to disable event tracking.
+     * You only need to call this method once while setting up the first ConnectButton
+     * Tracking will be disabled for all following instances of the ConnectButton.
+     * */
+    static void disableTracking(Context context) {
+        AnalyticsPreferences.disableAnalyticsTracking(context);
+    }
+
     /**
      * Set up the Connect Button to fetch the Connection data with the given id and set up the View to be able to do
      * authentication.
@@ -96,7 +106,6 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
      * @param configuration Configuration object that helps set up the Connect Button.
      */
     public void setup(Configuration configuration) {
-        AnalyticsPreferences.setAnalyticsTrackingOptOutPreference(getContext(), configuration.analyticsDisabled);
         if (ButtonUiHelper.isEmailInvalid(configuration.suggestedUserEmail) && !ButtonUiHelper.isIftttInstalled(
                 getContext().getPackageManager())) {
             connectButton.setVisibility(View.GONE);
@@ -326,7 +335,6 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
         @Nullable private Connection connection;
         @Nullable private OnFetchConnectionListener listener;
         @Nullable private String inviteCode;
-        private boolean analyticsDisabled;
 
         /**
          * Builder class for constructing a Configuration object.
@@ -341,7 +349,6 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
             @Nullable private OnFetchConnectionListener listener;
             @Nullable private Connection connection;
             @Nullable private String inviteCode;
-            private boolean analyticsDisabled = false;
 
             /**
              * Factory method for creating a new Configuration builder.
@@ -422,16 +429,6 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
                 return this;
             }
 
-            /**
-             * Call this method if you want to disable analytics tracking.
-             * Default value of this boolean is false, which means that analytics tracking is enabled.
-             * @return The Builder object itself for chaining.
-             */
-            public Builder disableAnalyticsTracking() {
-                this.analyticsDisabled = true;
-                return this;
-            }
-
             public Configuration build() {
                 if (connection == null && connectionId == null) {
                     throw new IllegalStateException("Either connection or connectionId must be non-null.");
@@ -444,7 +441,6 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
                 configuration.connectionId = connectionId;
                 configuration.listener = listener;
                 configuration.inviteCode = inviteCode;
-                configuration.analyticsDisabled = analyticsDisabled;
                 return configuration;
             }
         }

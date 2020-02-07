@@ -13,9 +13,10 @@ import retrofit2.Response;
  * */
 public final class AnalyticsEventUploader extends Worker {
 
-    private AnalyticsManager analyticsManager;
+    private final AnalyticsManager analyticsManager;
+    private final AnalyticsApiHelper apiHelper;
+
     private static final int MAX_RETRY_COUNT = 3;
-    private static AnalyticsApiHelper apiHelper;
 
     public AnalyticsEventUploader(Context context, WorkerParameters params) {
         super(context, params);
