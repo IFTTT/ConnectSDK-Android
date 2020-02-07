@@ -22,7 +22,6 @@ public final class DisableTrackingTest {
     public void setup() {
         analyticsManager = AnalyticsManager.getInstance(activity);
         analyticsManager.clearQueue();
-        analyticsManager.destroyInstance();
     }
 
     @Test
