@@ -251,7 +251,7 @@ The APIs available are:
 * `user`: return the authenticated user.
 * `userToken`: given the user's OAuth token to your service, plus your IFTTT Service key, return the IFTTT user token.
 
-**Note:** When setting up a ConnectButton, if there is no ConnectionApiClient instance provided by the Configuration, a default one will be used.
+**Note:** When setting up a ConnectButton, if there is no ConnectionApiClient instance provided by the Configuration, a default one will be used. If your app manages user login, you should consider using your own ConnectApiClient instance, so that you can control the lifecycle of the authorization and tie it to the logged in user. 
 
 ### Authentication with IftttApiClient
 
