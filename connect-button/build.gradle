@@ -33,6 +33,7 @@ dependencies {
     implementation "com.squareup.moshi:moshi-adapters:$moshiVersion"
     implementation 'androidx.browser:browser:1.0.0'
     implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.work:work-runtime:2.3.0'
 
     implementation 'com.google.code.findbugs:jsr305:3.0.2'
 
@@ -43,6 +44,7 @@ dependencies {
     testImplementation 'androidx.test.ext:truth:1.2.0'
     testImplementation 'androidx.test.ext:junit:1.1.1'
     testImplementation "com.squareup.retrofit2:retrofit-mock:$retrofitVersion"
+    testImplementation 'androidx.work:work-testing:2.3.0'
 }
 
 apply from: 'publish.gradle'

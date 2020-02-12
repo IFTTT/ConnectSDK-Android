@@ -89,6 +89,16 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
         });
     }
 
+    /*
+     * Method to disable analytics tracking for the SDK. Analytics tracking is enabled by default,
+     * Call this method before setting up the ConnectButton using{@link #ConnectButton.setup(Configuration) if you want to disable event tracking.
+     * You only need to call this method once while setting up the first ConnectButton
+     * Tracking will be disabled for all following instances of the ConnectButton.
+     * */
+    public static void disableTracking(Context context) {
+        AnalyticsManager.getInstance(context).disableTracking();
+    }
+
     /**
      * Set up the Connect Button to fetch the Connection data with the given id and set up the View to be able to do
      * authentication.
