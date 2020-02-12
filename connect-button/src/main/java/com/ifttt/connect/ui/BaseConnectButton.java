@@ -62,6 +62,7 @@ import static android.graphics.Color.WHITE;
 import static androidx.lifecycle.Lifecycle.State.CREATED;
 import static androidx.lifecycle.Lifecycle.State.DESTROYED;
 import static androidx.lifecycle.Lifecycle.State.STARTED;
+import static com.ifttt.connect.Connection.Status.disabled;
 import static com.ifttt.connect.Connection.Status.enabled;
 import static com.ifttt.connect.Connection.Status.never_enabled;
 import static com.ifttt.connect.Connection.Status.unknown;
@@ -477,7 +478,8 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                 // Cancel potential disable connection API call.
                 buttonApiHelper.cancelDisconnect();
 
-                if (connection.status == never_enabled || connection.status == unknown) {
+                if (connection.status == never_enabled || connection.status == unknown || (connection.status == disabled
+                        && !buttonApiHelper.isUserAuthorized())) {
                     if (buttonApiHelper.shouldPresentEmail(getContext())) {
                         buildEmailTransitionAnimator(0).start();
                     } else {

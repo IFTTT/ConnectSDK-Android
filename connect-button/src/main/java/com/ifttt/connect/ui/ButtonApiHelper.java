@@ -120,7 +120,17 @@ final class ButtonApiHelper {
             return false;
         }
 
-        return !connectionApiClient.isUserAuthenticated();
+        return !connectionApiClient.isUserAuthorized();
+    }
+
+    @CheckReturnValue
+    boolean shouldPresentCreateAccount(Context context) {
+        return shouldPresentEmail(context) && !accountFound;
+    }
+
+    @CheckReturnValue
+    boolean isUserAuthorized() {
+        return connectionApiClient.isUserAuthorized();
     }
 
     void connect(Context context, Connection connection, String email, ConnectButtonState buttonState) {
@@ -162,14 +172,10 @@ final class ButtonApiHelper {
         return launchIntent;
     }
 
-    boolean shouldPresentCreateAccount(Context context) {
-        return shouldPresentEmail(context) && !accountFound;
-    }
-
     @MainThread
     void prepareAuthentication(String email) {
         RedirectPrepAsyncTask task = new RedirectPrepAsyncTask(credentialsProvider,
-                connectionApiClient.isUserAuthenticated() ? connectionApiClient.api().user() : null, email,
+                connectionApiClient.isUserAuthorized() ? connectionApiClient.api().user() : null, email,
                 prepResult -> {
                     this.oAuthCode = prepResult.oauthToken;
                     this.accountFound = prepResult.accountFound;
