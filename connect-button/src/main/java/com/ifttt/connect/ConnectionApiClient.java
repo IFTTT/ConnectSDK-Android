@@ -58,7 +58,7 @@ public final class ConnectionApiClient {
      */
     @MainThread
     @CheckReturnValue
-    public boolean isUserAuthenticated() {
+    public boolean isUserAuthorized() {
         return tokenInterceptor.isUserAuthenticated();
     }
 

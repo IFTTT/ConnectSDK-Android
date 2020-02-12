@@ -12,6 +12,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.google.android.material.textfield.TextInputLayout
+import com.ifttt.connect.ConnectionApiClient
 import com.ifttt.connect.ui.ConnectButton
 import com.ifttt.connect.ui.ConnectResult
 import com.ifttt.connect.ui.CredentialsProvider
@@ -121,7 +122,9 @@ class MainActivity : AppCompatActivity() {
                     , REDIRECT_URI
                 ).setOnFetchCompleteListener { connection ->
                     findViewById<TextView>(R.id.connection_title).text = connection.name
-                }.build()
+                }
+                    .setConnectionApiClient(ConnectionApiClient.Builder(this).build()) // Provide a new ConnectionApiClient to reset the authorization header.
+                    .build()
                 connectButton.setup(configuration)
             }
             .show()
