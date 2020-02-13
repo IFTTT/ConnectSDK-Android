@@ -214,35 +214,40 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
      *
      * @param result Authentication flow redirect result from the web view.
      */
-    public void setConnectResult(ConnectResult result) {
+    public void setConnectResult(@Nullable ConnectResult result) {
         if (credentialsProvider == null) {
             return;
         }
 
-        ButtonStateChangeListener listener = new ButtonStateChangeListener() {
-            @Override
-            public void onStateChanged(ConnectButtonState currentState, ConnectButtonState previousState) {
-                connectButton.removeButtonStateChangeListener(this);
-                if (currentState == ConnectButtonState.Enabled && result.nextStep == ConnectResult.NextStep.Complete) {
-                    if (result.userToken != null) {
-                        API_CLIENT.setUserToken(result.userToken);
-                        refreshConnection();
-                    } else {
-                        UserTokenAsyncTask task =
-                                new UserTokenAsyncTask(credentialsProvider, ConnectButton.this::refreshConnection);
-                        task.execute();
-                        lifecycleRegistry.addObserver(new AsyncTaskObserver(task));
+        if (result != null) {
+            ButtonStateChangeListener listener = new ButtonStateChangeListener() {
+
+                private final ConnectResult.NextStep nextStep = result.nextStep;
+
+                @Override
+                public void onStateChanged(ConnectButtonState currentState, ConnectButtonState previousState) {
+                    connectButton.removeButtonStateChangeListener(this);
+                    if (currentState == ConnectButtonState.Enabled && nextStep == ConnectResult.NextStep.Complete) {
+                        if (result.userToken != null) {
+                            API_CLIENT.setUserToken(result.userToken);
+                            refreshConnection();
+                        } else {
+                            UserTokenAsyncTask task =
+                                    new UserTokenAsyncTask(credentialsProvider, ConnectButton.this::refreshConnection);
+                            task.execute();
+                            lifecycleRegistry.addObserver(new AsyncTaskObserver(task));
+                        }
                     }
                 }
-            }
 
-            @Override
-            public void onError(ErrorResponse errorResponse) {
-                // No-op.
-            }
-        };
+                @Override
+                public void onError(ErrorResponse errorResponse) {
+                    connectButton.removeButtonStateChangeListener(this);
+                }
+            };
 
-        connectButton.addButtonStateChangeListener(listener);
+            connectButton.addButtonStateChangeListener(listener);
+        }
 
         if (ViewCompat.isLaidOut(connectButton)) {
             connectButton.setConnectResult(result);
