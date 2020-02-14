@@ -247,7 +247,6 @@ ConnectionApi api = apiClient.api();
 
 The APIs available are:
 * `showConnection`: returns metadata for a Connection.
-* `disableConnection`: disable a Connection. User authentication level required.
 * `user`: return the authenticated user.
 * `userToken`: given the user's OAuth token to your service, plus your IFTTT Service key, return the IFTTT user token.
 
@@ -269,4 +268,3 @@ connectionApiClient.setUserToken(userToken);
 
 After that, subsequent API calls will be user-authenticated:
 * `ConnectionApi#showConnection` will return Connection status for the user, whether it is `never_enabled`, `enabled` or `disabled`.
-* `ConnectionApi#disableConnection` can be used to disable a Connection. 
