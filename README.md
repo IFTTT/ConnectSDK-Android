@@ -257,21 +257,8 @@ In order to continually innovate and improve our SDK, IFTTT may collect certain 
 
 The data collected is examined in the aggregate to improve the SDK and IFTTT’s associated services, and is maintained in accordance with IFTTT's [Privacy Policy](https://ifttt.com/terms).
 
-#### Events
-By default, the SDK will collect the following user interactions when users interact with the ConnectButton:
-* ConnectButton view:
-  * ConnectButton view impression: when the view is rendered on screen.
-  * ConnectButton view clicked: when the user clicks or swipes on the view.
-  * ConnectButton view email confirmation button clicked: when the user clicks on the email confirmation button on the email is shown.
-  * "Works with IFTTT" button clicked: when the user clicks on the "Works with IFTTT" text on the UI.
-* "Learn more about IFTTT" screen (`AboutIftttActivity`)
-  * Impression: when the user navigates to Activity.
-  * Service icons clicked: when the user clicks on either of the two service icons, this redirects to the service web page on ifttt.com.
-  * Title clicked: when the user clicks on the title, this redirects to the connection page on ifttt.com.
-  * Privacy link clicked: when the user clicks on the "Privacy & Terms".
-  * "Manage" clicked: when the user clicks on the "Manage" button when the connection is enabled, this redirects to the connection edit page on ifttt.com.
-
-In order to distinguish unique installs, we randomly generate a UUID per application installation ("anonymous id"), and send it along with the events above.
+#### Anonymous ID
+By default, the SDK will track user interactions when users interact with the ConnectButton. In order to distinguish unique installs, we randomly generate a UUID per application installation (“anonymous id”), and send it along with the event requests.
 
 #### Disable tracking
 You may call the `ConnectButton.disableTracking(context)` if you wish to opt-out from tracking. After this method is called, all tracking will be disabled for all of the ConnectButton instances within the app **for as long as it is in-memory**. If you want to persist the user's preference for disabling tracking, you should store the preference within your persistent storage, and call this method every time the app is started.
