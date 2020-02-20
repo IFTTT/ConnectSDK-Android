@@ -34,7 +34,7 @@ This SDK uses the following libraries as dependencies:
 ## Installation
 ### Gradle
 ```groovy
-implementation "com.ifttt:connect-button:2.0.2"
+implementation "com.ifttt:connect-button:2.1.0"
 ```
 
 ## Usage
@@ -252,19 +252,13 @@ The APIs available are:
 
 **Note:** When setting up a ConnectButton, if there is no ConnectionApiClient instance provided by the Configuration, a default one will be used. If your app manages user login, you should consider using your own ConnectApiClient instance, so that you can control the lifecycle of the authorization and tie it to the logged in user. 
 
-### Authentication with IftttApiClient
+### Tracking
+In order to continually innovate and improve our SDK, IFTTT may collect certain usage statistics from the software including but not limited to an anonymized unique identifier, version number of the software, and user interactions with elements of the UI provided by the SDK. It is common practice, and your responsibility as a user of the IFTTT SDK, to inform your customers that they may opt-out of information collection. The instructions in this section explain how you can enable opt-out. When properly implemented by you, if consent is withheld, the information will not be collected.
 
-To setup authentication for an IftttApiClient instance, you will need to retrieve an [IFTTT user token](https://github.com/IFTTT/IFTTTSDK-Android-v2#Authentication), and call
+The data collected is examined in the aggregate to improve the SDK and IFTTT’s associated services, and is maintained in accordance with IFTTT's [Privacy Policy](https://ifttt.com/terms).
 
-```java
-// Fetch IFTTT user token.
-...
+#### Anonymous ID
+By default, the SDK will track user interactions when users interact with the ConnectButton. In order to distinguish unique installs, we randomly generate a UUID per application installation (“anonymous id”), and send it along with the event requests.
 
-connectionApiClient.setUserToken(userToken);
-
-// Make API calls.
-...
-```
-
-After that, subsequent API calls will be user-authenticated:
-* `ConnectionApi#showConnection` will return Connection status for the user, whether it is `never_enabled`, `enabled` or `disabled`.
+#### Disable tracking
+You may call the `ConnectButton.disableTracking(context)` if you wish to opt-out from tracking. After this method is called, all tracking will be disabled for all of the ConnectButton instances within the app **for as long as it is in-memory**. If you want to persist the user's preference for disabling tracking, you should store the preference within your persistent storage, and call this method every time the app is started.
