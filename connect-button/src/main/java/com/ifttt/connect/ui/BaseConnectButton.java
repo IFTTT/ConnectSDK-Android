@@ -16,6 +16,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.SpannableString;
@@ -23,6 +24,7 @@ import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.UnderlineSpan;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
@@ -849,6 +851,9 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         set.setInterpolator(EASE_INTERPOLATOR);
 
         OnClickListener startAuthOnClickListener = v -> {
+            analyticsManager.trackUiClick(AnalyticsObject.CONNECT_BUTTON_EMAIL,
+                    AnalyticsLocation.fromConnectButton(getContext()));
+
             revertableHandler.revertAll();
             if (ButtonUiHelper.isEmailInvalid(emailEdt.getText())) {
                 float currentAlpha = helperTxt.getNextView().getAlpha();
@@ -1136,6 +1141,16 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
                     activity.getApplication().unregisterActivityLifecycleCallbacks(this);
                     activityLifecycleCallbacks = null;
+                }
+            }
+
+            @Override
+            public void onActivityPaused(Activity activity) {
+                /*
+                * Clear the event queue when activity is paused to make sure the queued events are not missed
+                * */
+                if (activity == context) {
+                    analyticsManager.flushTrackedEvents();
                 }
             }
         };
