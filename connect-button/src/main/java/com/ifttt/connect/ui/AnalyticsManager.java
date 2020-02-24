@@ -163,10 +163,7 @@ final class AnalyticsManager {
             }
 
             if (queue.size() >= FLUSH_QUEUE_SIZE) {
-                OneTimeWorkRequest oneTimeWorkRequest =
-                        new OneTimeWorkRequest.Builder(AnalyticsEventUploader.class).build();
-                workManager.enqueueUniqueWork(WORK_ID_QUEUE_FLUSH, ExistingWorkPolicy.KEEP,
-                        oneTimeWorkRequest);
+                flushTrackedEvents();
             }
         } catch (IOException e) {
             return;
@@ -186,6 +183,21 @@ final class AnalyticsManager {
             return;
         }
     }
+
+    /*
+    * This method will flush the analytics event queue
+    * Call this when
+    * 1. The queue size reaches a set threshold,
+    * 2. BaseConnectButton is attached to window
+    * 3. BaseConnectButton is detached from window
+    * */
+    void flushTrackedEvents() {
+        OneTimeWorkRequest oneTimeWorkRequest =
+                new OneTimeWorkRequest.Builder(AnalyticsEventUploader.class).build();
+        workManager.enqueueUniqueWork(WORK_ID_QUEUE_FLUSH, ExistingWorkPolicy.KEEP,
+                oneTimeWorkRequest);
+    }
+
     /*
     * This will only be used for testing purpose to clear the queue between tests
     * */

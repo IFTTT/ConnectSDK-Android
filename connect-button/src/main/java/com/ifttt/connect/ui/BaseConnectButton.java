@@ -183,13 +183,14 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         lifecycleRegistry.markState(STARTED);
+        analyticsManager.flushTrackedEvents();
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
+        analyticsManager.flushTrackedEvents();
         lifecycleRegistry.markState(DESTROYED);
-
         revertableHandler.clear();
     }
 
