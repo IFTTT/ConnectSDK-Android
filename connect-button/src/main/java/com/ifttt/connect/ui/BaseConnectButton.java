@@ -181,14 +181,14 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         lifecycleRegistry.markState(STARTED);
-        AnalyticsManager.getInstance(getContext().getApplicationContext())
+        AnalyticsManager.getInstance(getContext())
                 .flushTrackedEvents();
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        AnalyticsManager.getInstance(getContext().getApplicationContext())
+        AnalyticsManager.getInstance(getContext())
                 .flushTrackedEvents();
         lifecycleRegistry.markState(DESTROYED);
         revertableHandler.clear();
@@ -425,7 +425,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                 AnimatorSet set = new AnimatorSet();
                 set.playSequentially(moveToggle, buildDisconnectAnimator());
                 set.start();
-                AnalyticsManager.getInstance(getContext().getApplicationContext())
+                AnalyticsManager.getInstance(getContext())
                         .trackUiClick(AnalyticsObject.ConnectionAnalyticsObject.fromConnection(connection), AnalyticsLocation.fromConnectButton(getContext()));
             };
 
@@ -541,7 +541,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                     set.start();
                 }
 
-                AnalyticsManager.getInstance(getContext().getApplicationContext())
+                AnalyticsManager.getInstance(getContext())
                         .trackUiClick(AnalyticsObject.ConnectionAnalyticsObject.fromConnection(connection), AnalyticsLocation.fromConnectButton(getContext()));
             };
 
@@ -556,11 +556,11 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
         helperTxt.setOnClickListener(v -> {
             getContext().startActivity(AboutIftttActivity.intent(getContext(), connection));
-            AnalyticsManager.getInstance(getContext().getApplicationContext())
+            AnalyticsManager.getInstance(getContext())
                     .trackUiClick(AnalyticsObject.WORKS_WITH_IFTTT, AnalyticsLocation.WORKS_WITH_IFTTT);
         });
 
-        AnalyticsManager.getInstance(getContext().getApplicationContext())
+        AnalyticsManager.getInstance(getContext())
                 .trackUiImpression(AnalyticsObject.ConnectionAnalyticsObject.fromConnection(connection),
                 AnalyticsLocation.fromConnectButtonWithId(connection.id));
     }
@@ -850,7 +850,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         set.setInterpolator(EASE_INTERPOLATOR);
 
         OnClickListener startAuthOnClickListener = v -> {
-            AnalyticsManager.getInstance(getContext().getApplicationContext())
+            AnalyticsManager.getInstance(getContext())
                     .trackUiClick(AnalyticsObject.CONNECT_BUTTON_EMAIL,
                     AnalyticsLocation.fromConnectButton(getContext()));
 
@@ -922,7 +922,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                     return false;
                 });
 
-                AnalyticsManager.getInstance(getContext().getApplicationContext())
+                AnalyticsManager.getInstance(getContext())
                         .trackUiImpression(AnalyticsObject.CONNECT_BUTTON_EMAIL, AnalyticsLocation.fromConnectButton(getContext()));
                 helperTxt.setClickable(true);
             }
@@ -1141,17 +1141,6 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
                     activity.getApplication().unregisterActivityLifecycleCallbacks(this);
                     activityLifecycleCallbacks = null;
-                }
-            }
-
-            @Override
-            public void onActivityPaused(Activity activity) {
-                /*
-                * Clear the event queue when activity is paused to make sure the queued events are not missed
-                * */
-                if (activity == context) {
-                    AnalyticsManager.getInstance(getContext().getApplicationContext())
-                            .flushTrackedEvents();
                 }
             }
         };

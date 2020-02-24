@@ -190,7 +190,6 @@ final class AnalyticsManager {
     * 1. The queue size reaches a set threshold,
     * 2. BaseConnectButton is attached to window
     * 3. BaseConnectButton is detached from window
-    * 4. Parent activity is paused before redirect
     * */
     void flushTrackedEvents() {
         OneTimeWorkRequest oneTimeWorkRequest =
