@@ -92,15 +92,15 @@ artifacts {
     archives sourcesJar
 }
 
-if (project.hasProperty('bintrayUser') && project.hasProperty('bintrayKey') &&
-        project.hasProperty('bintrayGpgPassphrase')) {
-    bintray.user = project.bintrayUser
-    bintray.key = project.bintrayKey
-    bintray.pkg.version.gpg.passphrase = project.bintrayGpgPassphrase
-}
-
 bintray {
+    Properties properties = new Properties()
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
     configurations = ['archives']
+    user = properties.getProperty('bintray.user')
+    key = properties.getProperty('bintray.apikey')
+    pkg.version.gpg.passphrase = properties.getProperty('bintray.gpg.passphrase')
+
     pkg {
         repo = bintrayRepo
         name = bintrayName
