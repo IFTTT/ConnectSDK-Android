@@ -10,3 +10,8 @@ local.properties
 
 # Mac OS
 .DS_Store
+
+# Secret stuff
+*.keystore
+env
+signing.properties

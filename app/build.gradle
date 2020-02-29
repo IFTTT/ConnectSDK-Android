@@ -4,6 +4,7 @@ apply plugin: 'kotlin-android'
 android {
     compileSdkVersion 28
     buildToolsVersion '28.0.3'
+
     defaultConfig {
         applicationId "com.ifttt.groceryexpress"
         minSdkVersion 18
@@ -12,8 +13,19 @@ android {
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+
+    signingConfigs {
+        production {
+            storeFile file("ifttt.keystore")
+            storePassword rootProject.storePassword
+            keyAlias "ifttt"
+            keyPassword rootProject.prodKeyPassword
+        }
+    }
+    
     buildTypes {
         release {
+            signingConfig signingConfigs.production
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }

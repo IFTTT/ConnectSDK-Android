@@ -31,10 +31,15 @@ task clean(type: Delete) {
     delete rootProject.buildDir
 }
 
+Properties props = new Properties()
+props.load(new FileInputStream(file("signing.properties")))
+
 ext {
     libVersion = '2.1.0'
     okHttpVersion = '3.14.2'
     retrofitVersion = '2.6.0'
     moshiVersion = '1.8.0'
     workManagerVersion = '2.3.1'
+    storePassword = props["storePassword"]
+    prodKeyPassword = props["prodKeyPassword"]
 }
