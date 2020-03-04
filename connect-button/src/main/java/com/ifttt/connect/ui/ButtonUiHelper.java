@@ -165,11 +165,6 @@ final class ButtonUiHelper {
         }
     }
 
-    static void setTextSwitcherTextColor(TextSwitcher switcher, @ColorInt int color) {
-        ((TextView) switcher.getCurrentView()).setTextColor(color);
-        ((TextView) switcher.getNextView()).setTextColor(color);
-    }
-
     private static void adjustTextViewPadding(TextView textView, int largePadding, int smallPadding,
             ConnectButtonState buttonState) {
         // Reduce the right padding if the original text is longer than the available space in this View. This is to

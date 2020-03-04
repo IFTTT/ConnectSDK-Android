@@ -58,7 +58,6 @@ import javax.annotation.Nullable;
 import okhttp3.Call;
 
 import static android.graphics.Color.BLACK;
-import static android.graphics.Color.WHITE;
 import static androidx.lifecycle.Lifecycle.State.CREATED;
 import static androidx.lifecycle.Lifecycle.State.DESTROYED;
 import static androidx.lifecycle.Lifecycle.State.STARTED;
@@ -71,7 +70,6 @@ import static com.ifttt.connect.ui.ButtonUiHelper.buildButtonBackground;
 import static com.ifttt.connect.ui.ButtonUiHelper.findWorksWithService;
 import static com.ifttt.connect.ui.ButtonUiHelper.getDarkerColor;
 import static com.ifttt.connect.ui.ButtonUiHelper.replaceKeyWithImage;
-import static com.ifttt.connect.ui.ButtonUiHelper.setTextSwitcherTextColor;
 import static com.ifttt.connect.ui.CheckMarkDrawable.AnimatorType.ENABLE;
 import static com.ifttt.connect.ui.ConnectButtonState.CreateAccount;
 import static com.ifttt.connect.ui.ConnectButtonState.Disabled;
