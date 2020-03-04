@@ -197,7 +197,7 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
      * @param onDarkBackground true for rendering ConnectButton on a dark background, false for light background
      */
     public void setOnDarkBackground(boolean onDarkBackground) {
-        connectButton.setOnDarkBackground(true);
+        connectButton.setOnDarkBackground(onDarkBackground);
     }
 
     /**
