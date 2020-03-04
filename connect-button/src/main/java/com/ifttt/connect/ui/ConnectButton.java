@@ -116,6 +116,10 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
 
         connectButton.setVisibility(View.VISIBLE);
         loadingView.setVisibility(View.VISIBLE);
+
+        if (configuration.onDarkBackground) {
+            connectButton.setOnDarkBackground(true);
+        }
         ConnectionApiClient clientToUse;
         if (configuration.connectionApiClient == null) {
             if (API_CLIENT == null) {
@@ -326,6 +330,7 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
     /**
      * Configuration for a {@link ConnectButton}, it encapsulates the information needed to set up a ConnectButton
      * instance, to enable it to
+     * - set dark background mode to render the UI
      * - display Connection status, and
      * - initiate Connection enable flow.
      */
@@ -334,6 +339,7 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
         private final String suggestedUserEmail;
         private final CredentialsProvider credentialsProvider;
         private final Uri connectRedirectUri;
+        private boolean onDarkBackground = false;
 
         @Nullable private final ConnectionApiClient connectionApiClient;
         @Nullable private String connectionId;
@@ -354,6 +360,7 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
             @Nullable private OnFetchConnectionListener listener;
             @Nullable private Connection connection;
             @Nullable private String inviteCode;
+            private boolean onDarkBackground = false;
 
             /**
              * Factory method for creating a new Configuration builder.
@@ -434,6 +441,16 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
                 return this;
             }
 
+            /**
+             * An optional configuration to render the connect button on a dark background
+             * Call this method while building the configuration if your activity has a dark background color
+             * @return The Builder object itself for chaining.
+             */
+            public Builder setOnDarkBackground(boolean onDarkBackground) {
+                this.onDarkBackground = onDarkBackground;
+                return this;
+            }
+
             public Configuration build() {
                 if (connection == null && connectionId == null) {
                     throw new IllegalStateException("Either connection or connectionId must be non-null.");
@@ -446,6 +463,7 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
                 configuration.connectionId = connectionId;
                 configuration.listener = listener;
                 configuration.inviteCode = inviteCode;
+                configuration.onDarkBackground = onDarkBackground;
                 return configuration;
             }
         }

@@ -88,6 +88,14 @@ public class YourActivity extends Activity {
 
 For more information about the user token used in `CredentialProvider`, please see [Authentication](https://github.com/IFTTT/IFTTTSDK-Android-v2#Authentication) section.
 
+### If you want to render the ConnectButton on a dark background, call `setOnDarkBackground(true)` while building the `Configuration`.
+```java
+ConnectButton.Configuration configuration =
+                ConnectButton.Configuration.Builder.withConnectionId("connection_id", "user_email", provider,  Uri.parse("redirect_url"))
+                    .setOnDarkBackground(true)
+                    .build();
+```
+
 ### Listen to Connection status
 ConnectButton helps initiate connection enable flows for users, which involve opening web views within your app. Currently, we are using [Chrome Custom Tabs](https://developer.chrome.com/multidevice/android/customtabs) for the web views. 
 
