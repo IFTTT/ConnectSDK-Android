@@ -116,10 +116,8 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
 
         connectButton.setVisibility(View.VISIBLE);
         loadingView.setVisibility(View.VISIBLE);
+        connectButton.setOnDarkBackground(configuration.onDarkBackground);
 
-        if (configuration.onDarkBackground) {
-            connectButton.setOnDarkBackground(true);
-        }
         ConnectionApiClient clientToUse;
         if (configuration.connectionApiClient == null) {
             if (API_CLIENT == null) {
@@ -330,7 +328,6 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
     /**
      * Configuration for a {@link ConnectButton}, it encapsulates the information needed to set up a ConnectButton
      * instance, to enable it to
-     * - set dark background mode to render the UI
      * - display Connection status, and
      * - initiate Connection enable flow.
      */
