@@ -116,6 +116,7 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
 
         connectButton.setVisibility(View.VISIBLE);
         loadingView.setVisibility(View.VISIBLE);
+
         ConnectionApiClient clientToUse;
         if (configuration.connectionApiClient == null) {
             if (API_CLIENT == null) {
@@ -188,6 +189,15 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
         });
         task.execute();
         lifecycleRegistry.addObserver(new AsyncTaskObserver(task));
+    }
+
+    /**
+     * Use this method if you want to change the default colors for rendering `ConnectButton` depending on the activity background
+     * Default setting for this flag is false
+     * @param onDarkBackground true for rendering ConnectButton on a dark background, false for light background
+     */
+    public void setOnDarkBackground(boolean onDarkBackground) {
+        connectButton.setOnDarkBackground(onDarkBackground);
     }
 
     /**

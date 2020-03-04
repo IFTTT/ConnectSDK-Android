@@ -85,27 +85,25 @@
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:alpha="0.3"
             android:ellipsize="end"
             android:fontFamily="@font/avenir_next_ltpro_demi"
             android:gravity="center"
             android:lineSpacingExtra="@dimen/ifttt_helper_text_line_spacing"
             android:lines="1"
-            android:textColor="@android:color/black"
-            android:textColorLink="@android:color/black"
+            android:textColor="@color/ifttt_footer_text_black"
+            android:textColorLink="@color/ifttt_footer_text_black"
             android:textSize="@dimen/ifttt_helper_text_size"/>
 
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:alpha="0.3"
             android:ellipsize="end"
             android:fontFamily="@font/avenir_next_ltpro_demi"
             android:gravity="center"
             android:lineSpacingExtra="@dimen/ifttt_helper_text_line_spacing"
             android:lines="1"
-            android:textColor="@android:color/black"
-            android:textColorLink="@android:color/black"
+            android:textColor="@color/ifttt_footer_text_black"
+            android:textColorLink="@color/ifttt_footer_text_black"
             android:textSize="@dimen/ifttt_helper_text_size"/>
 
     </TextSwitcher>

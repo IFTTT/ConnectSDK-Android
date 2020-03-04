@@ -41,24 +41,16 @@ final class StartIconDrawable extends Drawable {
     private final int initialBackgroundSize;
     private final int startIconWidth;
     private final int startIconHeight;
-    private final boolean onDarkBackground;
 
     private final ShapeDrawable borderDrawable = new ShapeDrawable();
 
-    StartIconDrawable(Context context, Drawable serviceIcon, int iconSize, int initialBackgroundSize,
-            boolean onDarkBackground) {
+    StartIconDrawable(Context context, Drawable serviceIcon, int iconSize, int initialBackgroundSize) {
         this.serviceIcon = serviceIcon;
         this.startIcon = ContextCompat.getDrawable(context, R.drawable.ic_start_arrow);
         startIconWidth = context.getResources().getDimensionPixelSize(R.dimen.ifttt_start_image_width);
         startIconHeight = context.getResources().getDimensionPixelSize(R.dimen.ifttt_start_image_height);
         this.iconSize = iconSize;
         this.initialBackgroundSize = initialBackgroundSize;
-        this.onDarkBackground = onDarkBackground;
-        if (onDarkBackground) {
-            startIcon.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
-        } else {
-            startIcon.setColorFilter(null);
-        }
 
         this.startIcon.setAlpha(0);
         this.serviceIcon.setAlpha(255);
@@ -138,12 +130,7 @@ final class StartIconDrawable extends Drawable {
     }
 
     void setBackgroundColor(@ColorInt int color) {
-        if (onDarkBackground) {
-            background.getPaint().setColor(ButtonUiHelper.getDarkerColor(color));
-        } else {
-            background.getPaint().setColor(color);
-        }
-
+        background.getPaint().setColor(color);
         invalidateSelf();
     }
 
