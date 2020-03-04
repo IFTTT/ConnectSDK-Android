@@ -58,7 +58,6 @@ class MainActivity : AppCompatActivity() {
         ).setOnFetchCompleteListener { connection ->
             findViewById<TextView>(R.id.connection_title).text = connection.name
         }.build()
-
         connectButton.setup(configuration)
 
         if (!hasEmailSet) {

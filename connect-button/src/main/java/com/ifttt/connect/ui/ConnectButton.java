@@ -116,7 +116,6 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
 
         connectButton.setVisibility(View.VISIBLE);
         loadingView.setVisibility(View.VISIBLE);
-        connectButton.setOnDarkBackground(configuration.onDarkBackground);
 
         ConnectionApiClient clientToUse;
         if (configuration.connectionApiClient == null) {
@@ -190,6 +189,15 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
         });
         task.execute();
         lifecycleRegistry.addObserver(new AsyncTaskObserver(task));
+    }
+
+    /**
+     * Use this method if you want to change the default colors for rendering `ConnectButton` depending on the activity background
+     * Default setting for this flag is false
+     * @param onDarkBackground true for rendering ConnectButton on a dark background, false for light background
+     */
+    public void setOnDarkBackground(boolean onDarkBackground) {
+        connectButton.setOnDarkBackground(true);
     }
 
     /**
@@ -336,7 +344,6 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
         private final String suggestedUserEmail;
         private final CredentialsProvider credentialsProvider;
         private final Uri connectRedirectUri;
-        private boolean onDarkBackground = false;
 
         @Nullable private final ConnectionApiClient connectionApiClient;
         @Nullable private String connectionId;
@@ -357,7 +364,6 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
             @Nullable private OnFetchConnectionListener listener;
             @Nullable private Connection connection;
             @Nullable private String inviteCode;
-            private boolean onDarkBackground = false;
 
             /**
              * Factory method for creating a new Configuration builder.
@@ -438,16 +444,6 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
                 return this;
             }
 
-            /**
-             * An optional configuration to render the connect button on a dark background
-             * Call this method while building the configuration if your activity has a dark background color
-             * @return The Builder object itself for chaining.
-             */
-            public Builder setOnDarkBackground(boolean onDarkBackground) {
-                this.onDarkBackground = onDarkBackground;
-                return this;
-            }
-
             public Configuration build() {
                 if (connection == null && connectionId == null) {
                     throw new IllegalStateException("Either connection or connectionId must be non-null.");
@@ -460,7 +456,6 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
                 configuration.connectionId = connectionId;
                 configuration.listener = listener;
                 configuration.inviteCode = inviteCode;
-                configuration.onDarkBackground = onDarkBackground;
                 return configuration;
             }
         }

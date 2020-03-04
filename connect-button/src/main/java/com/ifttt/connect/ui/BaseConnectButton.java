@@ -171,6 +171,10 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         iftttLogo = ContextCompat.getDrawable(getContext(), R.drawable.ic_ifttt_logo_black);
         worksWithIfttt = new SpannableString(replaceKeyWithImage((TextView) helperTxt.getCurrentView(),
                 getResources().getString(R.string.ifttt_powered_by_ifttt), "IFTTT", iftttLogo));
+
+        // Tint the logo Drawable within the text to black.
+        DrawableCompat.setTint(DrawableCompat.wrap(iftttLogo), ContextCompat.getColor(context, R.color.ifttt_footer_text_black));
+
         helperTxt.setCurrentText(worksWithIfttt);
 
         iconDragHelperCallback = new IconDragHelperCallback();
@@ -232,16 +236,13 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
     }
 
     void setErrorMessage(CharSequence text, OnClickListener listener) {
-        float currentAlpha = helperTxt.getCurrentView().getAlpha();
         helperTxt.setText(text);
-        helperTxt.getCurrentView().setAlpha(1f);
         helperTxt.setOnClickListener(v -> {
             listener.onClick(v);
 
             // Revert back to the original text.
             helperTxt.setClickable(false);
             helperTxt.showNext();
-            helperTxt.getNextView().setAlpha(currentAlpha);
         });
     }
 
@@ -269,9 +270,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
     }
 
     /**
-     * If the button is used in a dark background, set this flag to true so that the button can adapt the UI. This
-     * method must be called before {@link #setConnection(Connection)} to apply the change.
-     *
+     * If the button is used in a dark background, set this flag to true so that the button can adapt the UI.
      * @param onDarkBackground True if the button is used in a dark background, false otherwise.
      */
     void setOnDarkBackground(boolean onDarkBackground) {
@@ -288,7 +287,9 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
             // Set helper text to white.
             int semiTransparentWhite = ContextCompat.getColor(getContext(), R.color.ifttt_footer_text_white);
             currentHelperTextView.setTextColor(semiTransparentWhite);
+            currentHelperTextView.setLinkTextColor(semiTransparentWhite);
             nextHelperTextView.setTextColor(semiTransparentWhite);
+            nextHelperTextView.setLinkTextColor(semiTransparentWhite);
 
             // Tint the logo Drawable within the text to white.
             DrawableCompat.setTint(DrawableCompat.wrap(iftttLogo), semiTransparentWhite);
@@ -296,7 +297,9 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
             // Set helper text to black.
             int semiTransparentBlack = ContextCompat.getColor(getContext(), R.color.ifttt_footer_text_black);
             currentHelperTextView.setTextColor(semiTransparentBlack);
+            currentHelperTextView.setLinkTextColor(semiTransparentBlack);
             nextHelperTextView.setTextColor(semiTransparentBlack);
+            nextHelperTextView.setLinkTextColor(semiTransparentBlack);
 
             // Tint the logo Drawable within the text to black.
             DrawableCompat.setTint(DrawableCompat.wrap(iftttLogo), semiTransparentBlack);
@@ -392,14 +395,6 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         emailEdt.setVisibility(GONE);
 
         helperTxt.setCurrentText(worksWithIfttt);
-
-        if (onDarkBackground) {
-            setTextSwitcherTextColor(helperTxt, WHITE);
-            DrawableCompat.setTint(DrawableCompat.wrap(iftttLogo), WHITE);
-        } else {
-            setTextSwitcherTextColor(helperTxt, BLACK);
-            DrawableCompat.setTint(DrawableCompat.wrap(iftttLogo), BLACK);
-        }
 
         iconDragHelperCallback.setSettledAt(connection.status);
 
@@ -572,7 +567,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
     private void setServiceIconImage(@Nullable Bitmap bitmap) {
         // Set a placeholder for the image.
         if (bitmap == null) {
-            StartIconDrawable placeHolderImage = new StartIconDrawable(getContext(), new ColorDrawable(), 0, 0, false);
+            StartIconDrawable placeHolderImage = new StartIconDrawable(getContext(), new ColorDrawable(), 0, 0);
             placeHolderImage.setBackgroundColor(worksWithService.brandColor);
             iconImg.setBackground(placeHolderImage);
             iconImg.setContentDescription(getContext().getString(R.string.start_button_content_description));
@@ -580,7 +575,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
             int iconBackgroundMargin = getResources().getDimensionPixelSize(R.dimen.ifttt_icon_margin);
             BitmapDrawable serviceIcon = new BitmapDrawable(getResources(), bitmap);
             StartIconDrawable drawable = new StartIconDrawable(getContext(), serviceIcon, iconSize,
-                    iconImg.getHeight() - iconBackgroundMargin * 2, onDarkBackground);
+                    iconImg.getHeight() - iconBackgroundMargin * 2);
 
             iconImg.setBackground(drawable);
             drawable.setBackgroundColor(worksWithService.brandColor);
@@ -827,10 +822,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
             }
         });
 
-        // Adjust icon elevation.
-        float startButtonElevation =
-                onDarkBackground ? getResources().getDimension(R.dimen.ifttt_start_icon_elevation_dark_mode) : 0f;
-        ValueAnimator elevationChange = ValueAnimator.ofFloat(ViewCompat.getElevation(iconImg), startButtonElevation);
+        ValueAnimator elevationChange = ValueAnimator.ofFloat(ViewCompat.getElevation(iconImg), 0f);
         elevationChange.addUpdateListener(
                 animation -> ViewCompat.setElevation(iconImg, (Float) animation.getAnimatedValue()));
 
@@ -856,12 +848,10 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
             revertableHandler.revertAll();
             if (ButtonUiHelper.isEmailInvalid(emailEdt.getText())) {
-                float currentAlpha = helperTxt.getNextView().getAlpha();
                 Revertable revertable = new Revertable() {
                     @Override
                     public void revert() {
                         helperTxt.showNext();
-                        helperTxt.getNextView().setAlpha(currentAlpha);
                         helperTxt.setClickable(true);
                     }
 
