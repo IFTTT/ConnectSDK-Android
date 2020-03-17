@@ -842,7 +842,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         OnClickListener startAuthOnClickListener = v -> {
             AnalyticsManager.getInstance(getContext())
                     .trackUiClick(AnalyticsObject.CONNECT_BUTTON_EMAIL,
-                    AnalyticsLocation.fromConnectButton(getContext()));
+                    AnalyticsLocation.fromConnectButtonWithId(connection.id));
 
             revertableHandler.revertAll();
             if (ButtonUiHelper.isEmailInvalid(emailEdt.getText())) {
@@ -911,7 +911,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                 });
 
                 AnalyticsManager.getInstance(getContext())
-                        .trackUiImpression(AnalyticsObject.CONNECT_BUTTON_EMAIL, AnalyticsLocation.fromConnectButton(getContext()));
+                        .trackUiImpression(AnalyticsObject.CONNECT_BUTTON_EMAIL, AnalyticsLocation.fromConnectButtonWithId(connection.id));
                 helperTxt.setClickable(true);
             }
         });
