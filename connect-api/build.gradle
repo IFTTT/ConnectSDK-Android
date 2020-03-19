@@ -3,11 +3,14 @@ apply plugin: 'com.android.library'
 android {
     compileSdkVersion rootProject.compileSdkVersion
     buildToolsVersion rootProject.buildToolsVersion
+    packageBuildConfig false
 
     defaultConfig {
         minSdkVersion rootProject.minSdkVersion
-        versionCode 6
-        versionName "$libVersion"
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -20,15 +23,17 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-
-    testOptions.unitTests.includeAndroidResources = true
 }
 
 dependencies {
-    api project(':connect-api')
+    api 'com.google.code.findbugs:jsr305:3.0.2'
 
-    implementation 'androidx.browser:browser:1.2.0'
-    implementation "androidx.work:work-runtime:$workManagerVersion"
+    api "com.squareup.okhttp3:okhttp:$okHttpVersion"
+    api "com.squareup.retrofit2:retrofit:$retrofitVersion"
+    api "com.squareup.retrofit2:converter-moshi:$retrofitVersion"
+    api "com.squareup.moshi:moshi:$moshiVersion"
+    api "com.squareup.moshi:moshi-adapters:$moshiVersion"
+    api 'androidx.appcompat:appcompat:1.1.0'
 
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.robolectric:robolectric:4.3'
@@ -37,7 +42,4 @@ dependencies {
     testImplementation 'androidx.test.ext:truth:1.2.0'
     testImplementation 'androidx.test.ext:junit:1.1.1'
     testImplementation "com.squareup.retrofit2:retrofit-mock:$retrofitVersion"
-    testImplementation "androidx.work:work-testing:$workManagerVersion"
 }
-
-apply from: 'publish.gradle'

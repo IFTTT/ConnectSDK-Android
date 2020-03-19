@@ -1,1 +1,2 @@
-include ':app', ':connect-button'
+include ':app'
+include ':connect-api', ':connect-button'

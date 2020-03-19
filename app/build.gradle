@@ -2,11 +2,12 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 28
-    buildToolsVersion '28.0.3'
+    compileSdkVersion rootProject.compileSdkVersion
+    buildToolsVersion rootProject.buildToolsVersion
+
     defaultConfig {
         applicationId "com.ifttt.groceryexpress"
-        minSdkVersion 18
+        minSdkVersion rootProject.minSdkVersion
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"

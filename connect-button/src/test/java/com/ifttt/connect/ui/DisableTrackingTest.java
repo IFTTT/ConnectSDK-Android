@@ -2,7 +2,6 @@ package com.ifttt.connect.ui;
 
 import android.app.Activity;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
-import com.ifttt.connect.ShadowAnimatorSet;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,7 +11,7 @@ import org.robolectric.annotation.Config;
 import static com.google.common.truth.Truth.assertThat;
 
 @RunWith(AndroidJUnit4.class)
-@Config(shadows = { ShadowAnimatorSet.class })
+@Config(sdk = 28)
 public final class DisableTrackingTest {
 
     private final Activity activity = Robolectric.buildActivity(TestActivity.class).create().get();
