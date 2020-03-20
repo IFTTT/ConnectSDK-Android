@@ -12,9 +12,9 @@ import okio.Okio;
 public final class TestUtils {
 
     private static final Moshi MOSHI = new Moshi.Builder().add(Date.class, new Rfc3339DateJsonAdapter().nullSafe())
-            .add(new ConnectionJsonAdapter())
-            .add(new HexColorJsonAdapter())
-            .build();
+        .add(new HexColorJsonAdapter())
+        .add(new ConnectionJsonAdapter())
+        .build();
 
     private static final JsonAdapter<Connection> CONNECTION_ADAPTER = MOSHI.adapter(Connection.class);
 

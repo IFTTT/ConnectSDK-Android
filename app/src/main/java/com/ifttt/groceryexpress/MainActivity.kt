@@ -115,14 +115,16 @@ class MainActivity : AppCompatActivity() {
             }.setNegativeButton(R.string.logout) { _, _ ->
                 emailPreferencesHelper.clear()
                 val configuration = ConnectButton.Configuration.Builder.withConnectionId(
-                    CONNECTION_ID,
-                    EMAIL,
-                    credentialsProvider
-                    , REDIRECT_URI
-                ).setOnFetchCompleteListener { connection ->
-                    findViewById<TextView>(R.id.connection_title).text = connection.name
-                }
-                    .setConnectionApiClient(ConnectionApiClient.Builder(this).build()) // Provide a new ConnectionApiClient to reset the authorization header.
+                        CONNECTION_ID,
+                        EMAIL,
+                        credentialsProvider
+                        , REDIRECT_URI
+                    ).setOnFetchCompleteListener { connection ->
+                        findViewById<TextView>(R.id.connection_title).text = connection.name
+                    }
+                    .setConnectionApiClient(
+                        ConnectionApiClient.Builder(this).build()
+                    ) // Provide a new ConnectionApiClient to reset the authorization header.
                     .build()
                 connectButton.setup(configuration)
             }

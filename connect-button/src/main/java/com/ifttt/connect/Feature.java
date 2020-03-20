@@ -3,22 +3,47 @@ package com.ifttt.connect;
 import android.os.Parcel;
 import android.os.Parcelable;
 import com.squareup.moshi.Json;
+import java.util.List;
+import javax.annotation.Nullable;
 
 /**
  * Data structure for features within a Connection.
  */
 public final class Feature implements Parcelable {
 
+    /**
+     * Unique identifier for the feature.
+     */
     public final String id;
+
+    /**
+     * User-friendly title for the feature.
+     */
     public final String title;
+
+    /**
+     * User-friendly description for the feature.
+     */
     public final String description;
+
+    /**
+     * URL string for the feature icon asset.
+     */
     @Json(name = "icon_url") public final String iconUrl;
 
-    public Feature(String id, String title, String description, String iconUrl) {
+    /**
+     * A list of {@link UserFeature} representing the set of feature instances that a given user has enabled. Null if
+     * the user has not enabled this feature, or the API authentication is anonymous.
+     */
+    @Nullable public final List<UserFeature> userFeatures;
+
+    public Feature(String id, String title, String description, String iconUrl,
+            List<UserFeature> userFeatures) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.iconUrl = iconUrl;
+        this.userFeatures = userFeatures;
     }
 
     protected Feature(Parcel in) {
@@ -26,6 +51,7 @@ public final class Feature implements Parcelable {
         title = in.readString();
         description = in.readString();
         iconUrl = in.readString();
+        userFeatures = in.createTypedArrayList(UserFeature.CREATOR);
     }
 
     public static final Creator<Feature> CREATOR = new Creator<Feature>() {
@@ -51,5 +77,6 @@ public final class Feature implements Parcelable {
         dest.writeString(title);
         dest.writeString(description);
         dest.writeString(iconUrl);
+        dest.writeTypedList(userFeatures);
     }
 }
