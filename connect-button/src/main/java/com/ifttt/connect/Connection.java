@@ -2,7 +2,7 @@ package com.ifttt.connect;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import com.squareup.moshi.Json;
+import java.util.Collections;
 import java.util.List;
 import javax.annotation.Nullable;
 
@@ -52,14 +52,20 @@ public final class Connection implements Parcelable {
     public final String url;
     public final List<Service> services;
 
-    @Nullable @Json(name = "cover_image") public final CoverImage coverImage;
-    @Json(name = "value_propositions") public final List<ValueProposition> valuePropositions;
+    @Nullable public final CoverImage coverImage;
+
+    /**
+     * @deprecated Use {@link #features} instead.
+     */
+    @Deprecated public final List<ValueProposition> valuePropositions = Collections.emptyList();
+
+    public final List<Feature> features;
 
     // Cached primary service object.
     @Nullable private Service primaryService;
 
     public Connection(String id, String name, String description, Status status, String url, List<Service> services,
-            @Nullable CoverImage coverImage, List<ValueProposition> valuePropositions) {
+            @Nullable CoverImage coverImage, List<Feature> features) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -67,7 +73,7 @@ public final class Connection implements Parcelable {
         this.url = url;
         this.services = services;
         this.coverImage = coverImage;
-        this.valuePropositions = valuePropositions;
+        this.features = features;
     }
 
     /**
@@ -100,7 +106,7 @@ public final class Connection implements Parcelable {
         url = in.readString();
         services = in.createTypedArrayList(Service.CREATOR);
         coverImage = in.readParcelable(CoverImage.class.getClassLoader());
-        valuePropositions = in.createTypedArrayList(ValueProposition.CREATOR);
+        features = in.createTypedArrayList(Feature.CREATOR);
     }
 
     public static final Creator<Connection> CREATOR = new Creator<Connection>() {
@@ -129,6 +135,6 @@ public final class Connection implements Parcelable {
         parcel.writeString(url);
         parcel.writeTypedList(services);
         parcel.writeParcelable(coverImage, flags);
-        parcel.writeTypedList(valuePropositions);
+        parcel.writeTypedList(features);
     }
 }

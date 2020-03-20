@@ -24,8 +24,7 @@ final class ConnectionJsonAdapter {
         }
 
         return new Connection(connectionJson.id, connectionJson.name, connectionJson.description, status,
-                connectionJson.url, connectionJson.services, connectionJson.cover_image,
-                connectionJson.value_propositions);
+                connectionJson.url, connectionJson.services, connectionJson.cover_image, connectionJson.features);
     }
 
     @ToJson
@@ -42,11 +41,10 @@ final class ConnectionJsonAdapter {
         final String url;
         final List<Service> services;
         @Nullable final CoverImage cover_image;
-        final List<ValueProposition> value_propositions;
+        final List<Feature> features;
 
         ConnectionJson(String id, String name, String description, @Nullable String user_status, Date published_at,
-                String url, List<Service> services, @Nullable CoverImage cover_image,
-                List<ValueProposition> value_propositions) {
+                String url, List<Service> services, @Nullable CoverImage cover_image, List<Feature> features) {
             this.id = id;
             this.name = name;
             this.description = description;
@@ -55,7 +53,7 @@ final class ConnectionJsonAdapter {
             this.url = url;
             this.services = services;
             this.cover_image = cover_image;
-            this.value_propositions = value_propositions;
+            this.features = features;
         }
     }
 }

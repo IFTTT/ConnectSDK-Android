@@ -6,7 +6,10 @@ import com.squareup.moshi.Json;
 
 /**
  * Value proposition data structure, including the icon url and the description.
+ *
+ * @deprecated use {@link Feature} instead.
  */
+@Deprecated
 public final class ValueProposition implements Parcelable {
     @Json(name = "icon_url") final String iconUrl;
     final String description;
