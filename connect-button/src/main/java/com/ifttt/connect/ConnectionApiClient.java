@@ -27,8 +27,11 @@ public final class ConnectionApiClient {
     private final ConnectionApi connectionApi;
     private final TokenInterceptor tokenInterceptor;
 
-    private ConnectionApiClient(RetrofitConnectionApi retrofitConnectionApi, JsonAdapter<ErrorResponse> errorResponseJsonAdapter,
-            TokenInterceptor tokenInterceptor) {
+    private ConnectionApiClient(
+        RetrofitConnectionApi retrofitConnectionApi,
+        JsonAdapter<ErrorResponse> errorResponseJsonAdapter,
+        TokenInterceptor tokenInterceptor
+    ) {
         this.tokenInterceptor = tokenInterceptor;
         connectionApi = new ConnectionApiImpl(retrofitConnectionApi, errorResponseJsonAdapter);
     }
@@ -93,25 +96,23 @@ public final class ConnectionApiClient {
 
         public ConnectionApiClient build() {
             Moshi moshi = new Moshi.Builder().add(new HexColorJsonAdapter())
-                    .add(Date.class, new Rfc3339DateJsonAdapter().nullSafe())
-                    .add(new ConnectionJsonAdapter())
-                    .add(new UserTokenJsonAdapter())
-                    .build();
+                .add(Date.class, new Rfc3339DateJsonAdapter().nullSafe())
+                .add(new ConnectionJsonAdapter())
+                .add(new UserTokenJsonAdapter())
+                .build();
             JsonAdapter<ErrorResponse> errorResponseJsonAdapter = moshi.adapter(ErrorResponse.class);
             TokenInterceptor tokenInterceptor = new TokenInterceptor(null);
-            OkHttpClient.Builder builder =
-                    new OkHttpClient.Builder().addInterceptor(new SdkInfoInterceptor(anonymousId))
-                            .addInterceptor(tokenInterceptor);
+            OkHttpClient.Builder builder
+                = new OkHttpClient.Builder().addInterceptor(new SdkInfoInterceptor(anonymousId)).addInterceptor(
+                tokenInterceptor);
 
             if (inviteCode != null) {
                 builder.addInterceptor(new InviteCodeInterceptor(inviteCode));
             }
 
             OkHttpClient okHttpClient = builder.build();
-            Retrofit retrofit = new Retrofit.Builder().addConverterFactory(MoshiConverterFactory.create(moshi))
-                    .baseUrl("https://connect.ifttt.com")
-                    .client(okHttpClient)
-                    .build();
+            Retrofit retrofit = new Retrofit.Builder().addConverterFactory(MoshiConverterFactory.create(moshi)).baseUrl(
+                "https://connect.ifttt.com").client(okHttpClient).build();
 
             RetrofitConnectionApi retrofitConnectionApi = retrofit.create(RetrofitConnectionApi.class);
 
@@ -124,7 +125,9 @@ public final class ConnectionApiClient {
         private final RetrofitConnectionApi retrofitConnectionApi;
         private final JsonAdapter<ErrorResponse> errorResponseJsonAdapter;
 
-        ConnectionApiImpl(RetrofitConnectionApi retrofitConnectionApi, JsonAdapter<ErrorResponse> errorResponseJsonAdapter) {
+        ConnectionApiImpl(
+            RetrofitConnectionApi retrofitConnectionApi, JsonAdapter<ErrorResponse> errorResponseJsonAdapter
+        ) {
             this.retrofitConnectionApi = retrofitConnectionApi;
             this.errorResponseJsonAdapter = errorResponseJsonAdapter;
         }
