@@ -1,6 +1,7 @@
 package com.ifttt.connect.ui;
 
 import android.net.Uri;
+import android.os.Looper;
 import android.widget.ImageView;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
@@ -11,20 +12,22 @@ import com.ifttt.connect.Connection;
 import com.ifttt.connect.ConnectionApiClient;
 import com.ifttt.connect.ErrorResponse;
 import com.ifttt.connect.R;
-import com.ifttt.connect.ShadowAnimatorSet;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
+import org.robolectric.annotation.LooperMode;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.ifttt.connect.TestUtils.loadConnection;
 import static org.junit.Assert.fail;
 
 @RunWith(AndroidJUnit4.class)
-@Config(shadows = { ShadowAnimatorSet.class })
+@LooperMode(LooperMode.Mode.PAUSED)
+@Config(sdk = 28)
 public final class BaseConnectButtonTest {
 
     private BaseConnectButton button;
@@ -137,6 +140,8 @@ public final class BaseConnectButtonTest {
 
         errorRef.set(null);
         button.setConnectResult(new ConnectResult(ConnectResult.NextStep.Complete, "token", null));
+        Shadows.shadowOf(Looper.getMainLooper()).idle();
+
         assertThat(currentStateRef.get()).isEqualTo(ConnectButtonState.Enabled);
     }
 }

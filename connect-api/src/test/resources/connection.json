@@ -1,0 +1,202 @@
+{
+  "type": "connection",
+  "id": "aVxGRrtD",
+  "name": "Tweet your Instagrams as native photos on Twitter",
+  "description": "Instagram photos will show up in your Twitter feed as a full image rather than a link",
+  "published_at": "2017-02-16T11:10:43-08:00",
+  "user_status": null,
+  "last_run_at": null,
+  "services": [
+    {
+      "service_id": "twitter",
+      "service_name": "Twitter",
+      "service_short_name": "Twitter",
+      "is_primary": false,
+      "monochrome_icon_url": "https://assets.ifttt.com/images/channels/2/icons/monochrome_regular.png",
+      "color_icon_url": "https://assets.ifttt.com/images/channels/2/icons/on_color_regular.png",
+      "brand_color": "#00abec",
+      "url": "https://ifttt.com/twitter"
+    },
+    {
+      "service_id": "instagram",
+      "service_name": "Instagram",
+      "service_short_name": "Instagram",
+      "is_primary": true,
+      "monochrome_icon_url": "https://assets.ifttt.com/images/channels/28/icons/monochrome_regular.png",
+      "color_icon_url": "https://assets.ifttt.com/images/channels/28/icons/on_color_regular.png",
+      "brand_color": "#e4405f",
+      "url": "https://ifttt.com/instagram"
+    }
+  ],
+  "cover_image": null,
+  "features": [
+    {
+      "id": "pmtch6832j",
+      "title": "Required feature",
+      "description": "This is a required feature, you cannot disable it",
+      "icon_url": "https://ifttt.com/value-prop-icons/babble.png",
+      "field_options_url": "https://connect.ifttt.com/v2/connections/aVxGRrtD/features/pmtch6832j/field_options",
+      "fields": [],
+      "feature_triggers": [
+        {
+          "id": "606",
+          "trigger_id": "any_new_file",
+          "service_id": "google_drive",
+          "label": "New file in your folder",
+          "field_options_url": "https://connect.ifttt.com/v2/connections/aVxGRrtD/triggers/google_drive.any_new_file/field_options",
+          "run_url": null,
+          "fields": [
+            {
+              "id": "path",
+              "label": "Drive folder path",
+              "type": "TEXT_FIELD",
+              "required": true,
+              "hidden": false,
+              "default_value": "/IFTTT"
+            }
+          ]
+        }
+      ],
+      "feature_queries": [],
+      "feature_actions": [
+        {
+          "id": "446",
+          "action_id": "upload_file_from_url_google_drive",
+          "service_id": "google_drive",
+          "label": "Upload file from URL",
+          "field_options_url": "https://connect.ifttt.com/v2/connections/aVxGRrtD/actions/google_drive.upload_file_from_url_google_drive/field_options",
+          "run_url": "https://connect.ifttt.com/v2/connections/aVxGRrtD/actions/google_drive.upload_file_from_url_google_drive/run",
+          "fields": [
+            {
+              "id": "url",
+              "label": "File URL",
+              "type": "TEXT_FIELD",
+              "required": true,
+              "hidden": false,
+              "default_value": "Test"
+            },
+            {
+              "id": "filename",
+              "label": "File name",
+              "type": "TEXT_FIELD",
+              "required": false,
+              "hidden": false,
+              "default_value": ""
+            },
+            {
+              "id": "path",
+              "label": "Drive folder path",
+              "type": "TEXT_FIELD",
+              "required": false,
+              "hidden": false,
+              "default_value": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sxfkrzwujy",
+      "title": "Optional feature",
+      "description": "This is an optional feature, you can disable it",
+      "icon_url": "https://ifttt.com/value-prop-icons/babble.png",
+      "field_options_url": "https://connect.ifttt.com/v2/connections/aVxGRrtD/features/sxfkrzwujy/field_options",
+      "fields": [],
+      "feature_triggers": [
+        {
+          "id": "564",
+          "trigger_id": "enter_region_location",
+          "service_id": "location",
+          "label": "You enter an area",
+          "field_options_url": "https://connect.ifttt.com/v2/connections/aVxGRrtD/triggers/location.enter_region_location/field_options",
+          "run_url": null,
+          "fields": [
+            {
+              "id": "location",
+              "label": "Locate an area",
+              "type": "LOCATION_ENTER",
+              "required": true,
+              "hidden": false,
+              "default_value": {
+                "latitude": "37.78383800416815",
+                "longitude": "-122.40843300000002",
+                "radius": "316.2010756871335",
+                "address": "923 Market St, San Francisco, CA 94103, USA",
+                "description": "923 Market St, San Francisco, CA 94103, USA",
+                "zoom": "16"
+              }
+            }
+          ]
+        }
+      ],
+      "feature_queries": [],
+      "feature_actions": []
+    }
+  ],
+  "user_connection": {
+    "user_features": [
+      {
+        "id": "5c7f6d49-5fa9-4305-a7db-39ca38484e6e",
+        "feature_id": "pmtch6832j",
+        "user_fields": [],
+        "user_feature_triggers": [
+          {
+            "feature_trigger_id": "606",
+            "user_fields": [
+              {
+                "field_id": "path",
+                "value": "/IFTTT"
+              }
+            ]
+          }
+        ],
+        "user_feature_queries": [],
+        "user_feature_actions": [
+          {
+            "feature_action_id": "446",
+            "user_fields": [
+              {
+                "field_id": "url",
+                "value": "Test"
+              },
+              {
+                "field_id": "filename",
+                "value": ""
+              },
+              {
+                "field_id": "path",
+                "value": ""
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "6888021f-47b0-4d3a-8058-bbf57e260173",
+        "feature_id": "sxfkrzwujy",
+        "user_fields": [],
+        "user_feature_triggers": [
+          {
+            "feature_trigger_id": "564",
+            "user_fields": [
+              {
+                "field_id": "location",
+                "value": {
+                  "lat": "37.78383800416815",
+                  "lng": "-122.40843300000002",
+                  "radius": "316.2010756871335",
+                  "address": "923 Market St, San Francisco, CA 94103, USA",
+                  "description": "923 Market St, San Francisco, CA 94103, USA",
+                  "zoom": "16"
+                }
+              }
+            ]
+          }
+        ],
+        "user_feature_queries": [],
+        "user_feature_actions": []
+      }
+    ]
+  },
+  "url": "https://ifttt.com/applets/aVxGRrtD"
+}

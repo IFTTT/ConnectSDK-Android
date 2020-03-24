@@ -287,7 +287,8 @@ final class ConnectionJsonAdapter {
                                         checkNonNull(fieldType);
 
                                         if (FIELD_TYPES_LOCATION.contains(fieldType)) {
-                                            LocationFieldValue locationFieldValue = locationDelegate.fromJson(jsonReader);
+                                            LocationFieldValue locationFieldValue
+                                                = locationDelegate.fromJson(jsonReader);
                                             fields.add(new UserFeatureField<>(locationFieldValue, fieldId));
                                         } else if (FIELD_TYPES_COLLECTION.contains(fieldType)) {
                                             CollectionFieldValue collectionFieldValue
@@ -297,7 +298,8 @@ final class ConnectionJsonAdapter {
                                             List<String> arrayValue = stringArrayDelegate.fromJson(jsonReader);
                                             checkNonNull(arrayValue);
 
-                                            StringArrayFieldValue stringArrayFieldValue = new StringArrayFieldValue(arrayValue);
+                                            StringArrayFieldValue stringArrayFieldValue = new StringArrayFieldValue(
+                                                arrayValue);
                                             fields.add(new UserFeatureField<>(stringArrayFieldValue, fieldId));
                                         } else {
                                             fields.add(new UserFeatureField<>(new StringFieldValue(jsonReader.nextString()),
