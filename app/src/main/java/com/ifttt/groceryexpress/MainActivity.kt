@@ -2,9 +2,7 @@ package com.ifttt.groceryexpress
 
 import android.Manifest
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
-import android.os.Process
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.Menu
@@ -23,8 +21,6 @@ import com.ifttt.connect.ui.ConnectResult
 import com.ifttt.connect.ui.CredentialsProvider
 import com.ifttt.groceryexpress.ApiHelper.REDIRECT_URI
 import com.ifttt.location.ConnectLocation
-import com.ifttt.location.LocationCredentialsProvider
-import java.security.Permission
 
 class MainActivity : AppCompatActivity() {
 
