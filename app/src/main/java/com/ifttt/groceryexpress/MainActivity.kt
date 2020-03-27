@@ -146,7 +146,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private companion object {
-        const val CONNECTION_ID = "pWisyzm7"
+        const val CONNECTION_ID = "fWj4fxYg"
         const val EMAIL = "user@email.com"
     }
 }
