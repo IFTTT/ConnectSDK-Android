@@ -1,0 +1,13 @@
+package com.ifttt.location;
+
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+
+final class AwarenessEnterReceiver extends BroadcastReceiver {
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        // Parse region and upload trigger event
+    }
+}

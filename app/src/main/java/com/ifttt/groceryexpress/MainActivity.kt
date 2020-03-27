@@ -1,7 +1,10 @@
 package com.ifttt.groceryexpress
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Process
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.Menu
@@ -11,12 +14,17 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.app.ActivityCompat
+import androidx.core.content.PermissionChecker
 import com.google.android.material.textfield.TextInputLayout
 import com.ifttt.connect.ConnectionApiClient
 import com.ifttt.connect.ui.ConnectButton
 import com.ifttt.connect.ui.ConnectResult
 import com.ifttt.connect.ui.CredentialsProvider
 import com.ifttt.groceryexpress.ApiHelper.REDIRECT_URI
+import com.ifttt.location.ConnectLocation
+import com.ifttt.location.LocationCredentialsProvider
+import java.security.Permission
 
 class MainActivity : AppCompatActivity() {
 
@@ -59,6 +67,16 @@ class MainActivity : AppCompatActivity() {
             findViewById<TextView>(R.id.connection_title).text = connection.name
         }.build()
         connectButton.setup(configuration)
+
+        val connectLocationConfiguration = ConnectLocation.LocationConfiguration.Builder.withConnectionId(
+            CONNECTION_ID
+        ) { ApiHelper.getUserToken(emailPreferencesHelper.getEmail()) }.build()
+
+        if (PermissionChecker.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PermissionChecker.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 0)
+        }
+
+        ConnectLocation(this.applicationContext).setUp(connectLocationConfiguration);
 
         if (!hasEmailSet) {
             promptLogin()
@@ -132,7 +150,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private companion object {
-        const val CONNECTION_ID = "fWj4fxYg"
+        const val CONNECTION_ID = "pWisyzm7"
         const val EMAIL = "user@email.com"
     }
 }

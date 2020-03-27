@@ -1,2 +1,2 @@
 include ':app'
-include ':connect-api', ':connect-button'
+include ':connect-api', ':connect-button', ':connect-location'
