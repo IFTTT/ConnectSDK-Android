@@ -19,8 +19,8 @@ final class GeofenceProvider {
     private final static int REQUEST_CODE_ENTER = 1001;
     private final static int REQUEST_CODE_EXIT = 1002;
 
-    private FenceClient fenceClient;
-    private Context context;
+    private final FenceClient fenceClient;
+    private final Context context;
 
     GeofenceProvider(Context context) {
         this.context = context;

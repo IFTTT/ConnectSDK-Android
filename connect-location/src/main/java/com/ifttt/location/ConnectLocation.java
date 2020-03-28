@@ -32,9 +32,6 @@ public final class ConnectLocation {
                 if (configuration.inviteCode != null) {
                     clientBuilder.setInviteCode(configuration.inviteCode);
                 }
-                if (configuration.inviteCode != null) {
-                    clientBuilder.setInviteCode(configuration.inviteCode);
-                }
                 API_CLIENT = clientBuilder.build();
             }
         } else {
@@ -73,8 +70,8 @@ public final class ConnectLocation {
                 "id",
                 "location/triggers.enter_or_exit_region_location",
                     new LocationFieldValue(
-                            37.743520,
-                            -122.431170,
+                            0,
+                            0,
                             0.0,
                             "address"
                     )
