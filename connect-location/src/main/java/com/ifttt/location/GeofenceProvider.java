@@ -10,6 +10,7 @@ import com.google.android.gms.awareness.fence.FenceQueryRequest;
 import com.google.android.gms.awareness.fence.FenceUpdateRequest;
 import com.google.android.gms.awareness.fence.LocationFence;
 import com.ifttt.connect.LocationFieldValue;
+import com.ifttt.connect.UserFeatureField;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -27,15 +28,15 @@ final class GeofenceProvider {
         this.fenceClient = Awareness.getFenceClient(context);
     }
 
-    void updateGeofences(final List<LocationTriggerField> locationTriggerFields) {
+    void updateGeofences(final List<UserFeatureField> userFeatureFields) {
         final List<String> updatedIds = new ArrayList<>();
-        for (LocationTriggerField field: locationTriggerFields) {
-            if (field.id == null) { throw new IllegalStateException("NativePermission id cannot be null for location."); }
-            if (field.permissionName.equals(ConnectLocation.TRIGGER_ID_LOCATION_ENTER_EXIT)) {
-                updatedIds.add(getEnterFenceKey(field.id));
-                updatedIds.add(getExitFenceKey(field.id));
+        for (UserFeatureField field: userFeatureFields) {
+            if (field.fieldId == null) { throw new IllegalStateException("Id cannot be null for location."); }
+            if (field.fieldType.equals(ConnectLocation.FIELD_TYPE_LOCATION_ENTER_EXIT)) {
+                updatedIds.add(getEnterFenceKey(field.fieldId));
+                updatedIds.add(getExitFenceKey(field.fieldId));
             } else {
-                updatedIds.add(field.id);
+                updatedIds.add(field.fieldId);
             }
         }
 
@@ -50,8 +51,8 @@ final class GeofenceProvider {
                         }
                     }
 
-                    for (LocationTriggerField locationTriggerField: locationTriggerFields) {
-                        LocationFieldValue region = locationTriggerField.locationFieldValue;
+                    for (UserFeatureField userFeatureField: userFeatureFields) {
+                        LocationFieldValue region = (LocationFieldValue) userFeatureField.value;
 
                         PendingIntent exitPendingIntent = PendingIntent.getBroadcast(
                                 context,
@@ -67,31 +68,31 @@ final class GeofenceProvider {
                                 PendingIntent.FLAG_UPDATE_CURRENT
                         );
 
-                        switch (locationTriggerField.permissionName) {
-                            case ConnectLocation.TRIGGER_ID_LOCATION_ENTER:
+                        switch (userFeatureField.fieldType) {
+                            case ConnectLocation.FIELD_TYPE_LOCATION_ENTER:
                                 requestBuilder.addFence(
-                                        locationTriggerField.id,
+                                        userFeatureField.fieldId,
                                         LocationFence.entering(region.lat, region.lng, region.radius),
                                         enterPendingIntent
                                 );
                                 break;
 
-                            case ConnectLocation.TRIGGER_ID_LOCATION_EXIT:
+                            case ConnectLocation.FIELD_TYPE_LOCATION_EXIT:
                                 requestBuilder.addFence(
-                                        locationTriggerField.id,
+                                        userFeatureField.fieldId,
                                         LocationFence.exiting(region.lat, region.lng, region.radius),
                                         exitPendingIntent
                                 );
                                 break;
 
-                            case ConnectLocation.TRIGGER_ID_LOCATION_ENTER_EXIT:
+                            case ConnectLocation.FIELD_TYPE_LOCATION_ENTER_EXIT:
                                 requestBuilder.addFence(
-                                        getExitFenceKey(locationTriggerField.id),
+                                        getExitFenceKey(userFeatureField.fieldId),
                                         LocationFence.exiting(region.lat, region.lng, region.radius),
                                         exitPendingIntent
                                 );
                                 requestBuilder.addFence(
-                                        getEnterFenceKey(locationTriggerField.id),
+                                        getEnterFenceKey(userFeatureField.fieldId),
                                         LocationFence.entering(region.lat, region.lng, region.radius),
                                         enterPendingIntent
                                 );

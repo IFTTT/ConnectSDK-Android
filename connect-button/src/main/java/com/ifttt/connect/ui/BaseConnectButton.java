@@ -48,6 +48,7 @@ import androidx.lifecycle.LifecycleRegistry;
 import androidx.lifecycle.OnLifecycleEvent;
 import com.ifttt.connect.Connection;
 import com.ifttt.connect.ConnectionApiClient;
+import com.ifttt.connect.CredentialsProvider;
 import com.ifttt.connect.ErrorResponse;
 import com.ifttt.connect.R;
 import com.ifttt.connect.Service;
@@ -1074,7 +1075,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
     private void dispatchState(ConnectButtonState newState) {
         if (newState != buttonState) {
             for (ButtonStateChangeListener listener : listeners) {
-                listener.onStateChanged(newState, buttonState);
+                listener.onStateChanged(newState, buttonState, connection.features);
             }
         }
 

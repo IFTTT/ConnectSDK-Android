@@ -30,5 +30,6 @@ android {
 
 dependencies {
     api project(':connect-api')
+    api project(':connect-button')
     implementation "com.google.android.gms:play-services-awareness:$awarenessVersion"
 }

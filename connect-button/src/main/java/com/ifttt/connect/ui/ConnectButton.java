@@ -30,9 +30,13 @@ import androidx.lifecycle.OnLifecycleEvent;
 import com.ifttt.connect.BuildConfig;
 import com.ifttt.connect.Connection;
 import com.ifttt.connect.ConnectionApiClient;
+import com.ifttt.connect.CredentialsProvider;
 import com.ifttt.connect.ErrorResponse;
+import com.ifttt.connect.Feature;
 import com.ifttt.connect.R;
+import com.ifttt.connect.UserTokenAsyncTask;
 import com.ifttt.connect.api.PendingResult;
+import java.util.List;
 
 import static android.animation.ValueAnimator.INFINITE;
 import static androidx.core.text.HtmlCompat.FROM_HTML_MODE_COMPACT;
@@ -48,6 +52,7 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
 
     private final BaseConnectButton connectButton;
     private final TextView loadingView;
+    private onConnectionStateChangeListener onConnectionStateChangeListener = null;
 
     private CredentialsProvider credentialsProvider;
 
@@ -100,6 +105,32 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
     }
 
     /**
+     * Connection enable interface for this class. It provides all of the necessary information for the
+     * ConnectLocation library to handle different enabled state and set up location triggers
+     */
+    public interface onConnectionStateChangeListener {
+        /**
+         * Called when the connection is enabled.
+         *
+         * @param connectionFeatures Connection feature data associated with the Connection
+         */
+        void onConnectionEnabled(List<Feature> connectionFeatures);
+
+        /**
+         * Called when the connection is disabled.
+         */
+        void onConnectionDisabled();
+    }
+
+    /*
+    * Method to set up state change callbacks for Location SDK
+    * */
+    public void setUpWithLocationTriggers(
+            onConnectionStateChangeListener onConnectionStateChangeListener) {
+        this.onConnectionStateChangeListener = onConnectionStateChangeListener;
+    }
+
+    /**
      * Set up the Connect Button to fetch the Connection data with the given id and set up the View to be able to do
      * authentication.
      *
@@ -137,7 +168,7 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
                 configuration.credentialsProvider, configuration.inviteCode);
 
         pulseLoading();
-        UserTokenAsyncTask task = new UserTokenAsyncTask(credentialsProvider, () -> {
+        UserTokenAsyncTask task = new UserTokenAsyncTask(credentialsProvider, clientToUse, () -> {
             if (configuration.connection != null) {
                 if (configuration.listener != null) {
                     configuration.listener.onFetchConnectionSuccessful(configuration.connection);
@@ -235,7 +266,7 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
                 private final ConnectResult.NextStep nextStep = result.nextStep;
 
                 @Override
-                public void onStateChanged(ConnectButtonState currentState, ConnectButtonState previousState) {
+                public void onStateChanged(ConnectButtonState currentState, ConnectButtonState previousState, List<Feature> connectionFeatures) {
                     connectButton.removeButtonStateChangeListener(this);
                     if (currentState == ConnectButtonState.Enabled && nextStep == ConnectResult.NextStep.Complete) {
                         if (result.userToken != null) {
@@ -243,9 +274,13 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
                             refreshConnection();
                         } else {
                             UserTokenAsyncTask task =
-                                    new UserTokenAsyncTask(credentialsProvider, ConnectButton.this::refreshConnection);
+                                    new UserTokenAsyncTask(credentialsProvider, API_CLIENT, ConnectButton.this::refreshConnection);
                             task.execute();
                             lifecycleRegistry.addObserver(new AsyncTaskObserver(task));
+                        }
+                    } else if (currentState == ConnectButtonState.Disabled) {
+                        if (onConnectionStateChangeListener != null) {
+                            onConnectionStateChangeListener.onConnectionDisabled();
                         }
                     }
                 }
@@ -298,6 +333,9 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
             @Override
             public void onSuccess(Connection result) {
                 connectButton.setConnection(result);
+                if (onConnectionStateChangeListener != null) {
+                    onConnectionStateChangeListener.onConnectionEnabled(connection.features);
+                }
             }
 
             @Override
@@ -466,43 +504,6 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
             this.credentialsProvider = credentialsProvider;
             this.connectRedirectUri = connectRedirectUri;
             this.connectionApiClient = connectionApiClient;
-        }
-    }
-
-    private static final class UserTokenAsyncTask extends android.os.AsyncTask<Void, Void, String> {
-
-        private interface UserTokenCallback {
-            void onComplete();
-        }
-
-        private final CredentialsProvider callback;
-        private final UserTokenCallback userTokenCallback;
-
-        private UserTokenAsyncTask(CredentialsProvider callback, UserTokenCallback userTokenCallback) {
-            this.callback = callback;
-            this.userTokenCallback = userTokenCallback;
-        }
-
-        @Override
-        protected String doInBackground(Void... voids) {
-            try {
-                return callback.getUserToken();
-            } catch (Exception e) {
-                if (BuildConfig.DEBUG) {
-                    e.printStackTrace();
-                }
-
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(@Nullable String s) {
-            if (s != null) {
-                API_CLIENT.setUserToken(s);
-            }
-
-            userTokenCallback.onComplete();
         }
     }
 

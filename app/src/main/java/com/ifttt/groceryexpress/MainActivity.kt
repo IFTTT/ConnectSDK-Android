@@ -18,7 +18,7 @@ import com.google.android.material.textfield.TextInputLayout
 import com.ifttt.connect.ConnectionApiClient
 import com.ifttt.connect.ui.ConnectButton
 import com.ifttt.connect.ui.ConnectResult
-import com.ifttt.connect.ui.CredentialsProvider
+import com.ifttt.connect.CredentialsProvider
 import com.ifttt.groceryexpress.ApiHelper.REDIRECT_URI
 import com.ifttt.location.ConnectLocation
 
@@ -28,7 +28,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var toolbar: Toolbar
     private lateinit var emailPreferencesHelper: EmailPreferencesHelper
 
-    private val credentialsProvider = object : CredentialsProvider {
+    private val credentialsProvider = object :
+        CredentialsProvider {
         override fun getUserToken() = ApiHelper.getUserToken(emailPreferencesHelper.getEmail())
 
         override fun getOAuthCode() = emailPreferencesHelper.getEmail()
@@ -62,17 +63,14 @@ class MainActivity : AppCompatActivity() {
         ).setOnFetchCompleteListener { connection ->
             findViewById<TextView>(R.id.connection_title).text = connection.name
         }.build()
-        connectButton.setup(configuration)
 
-        val connectLocationConfiguration = ConnectLocation.LocationConfiguration.Builder.withConnectionId(
-            CONNECTION_ID
-        ) { ApiHelper.getUserToken(emailPreferencesHelper.getEmail()) }.build()
+        connectButton.setup(configuration)
+        connectButton.setUpWithLocationTriggers(ConnectLocation(this, ConnectLocation.Configuration.Builder.withConnectionId(
+            CONNECTION_ID, credentialsProvider).build()))
 
         if (PermissionChecker.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PermissionChecker.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 0)
         }
-
-        ConnectLocation(this.applicationContext).setUp(connectLocationConfiguration);
 
         if (!hasEmailSet) {
             promptLogin()

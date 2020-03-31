@@ -2,137 +2,93 @@ package com.ifttt.location;
 
 import android.content.Context;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresPermission;
-import com.ifttt.connect.Connection;
 import com.ifttt.connect.ConnectionApiClient;
-import com.ifttt.connect.ErrorResponse;
+import com.ifttt.connect.CredentialsProvider;
+import com.ifttt.connect.Feature;
 import com.ifttt.connect.LocationFieldValue;
-import com.ifttt.connect.api.PendingResult;
+import com.ifttt.connect.UserFeatureField;
+import com.ifttt.connect.ui.ConnectButton;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
-public final class ConnectLocation {
+public final class ConnectLocation implements ConnectButton.onConnectionStateChangeListener {
 
-    private Context context;
-    private static ConnectionApiClient API_CLIENT;
+    private GeofenceProvider geofenceProvider;
+    private ConnectionApiClient connectionApiClient;
 
-    final static String TRIGGER_ID_LOCATION_ENTER = "location/triggers.enter_region_location";
-    final static String TRIGGER_ID_LOCATION_EXIT = "location/triggers.exit_region_location";
-    final static String TRIGGER_ID_LOCATION_ENTER_EXIT = "location/triggers.enter_or_exit_region_location";
+    final static String FIELD_TYPE_LOCATION_ENTER = "location/triggers.enter_region_location";
+    final static String FIELD_TYPE_LOCATION_EXIT = "location/triggers.exit_region_location";
+    final static String FIELD_TYPE_LOCATION_ENTER_EXIT =
+            "location/triggers.enter_or_exit_region_location";
 
-    public ConnectLocation(Context context) {
-        this.context = context;
-    }
+    final static List<String> locationFieldTypesList = Arrays.asList(FIELD_TYPE_LOCATION_ENTER, FIELD_TYPE_LOCATION_EXIT, FIELD_TYPE_LOCATION_ENTER_EXIT);
 
-    @RequiresPermission("android.permission.ACCESS_FINE_LOCATION")
-    public void setUp(LocationConfiguration configuration) {
+    public ConnectLocation(Context context, Configuration configuration) {
+        geofenceProvider = new GeofenceProvider(context);
         if (configuration.connectionApiClient == null) {
-            if (API_CLIENT == null) {
-                ConnectionApiClient.Builder clientBuilder = new ConnectionApiClient.Builder(context);
-                if (configuration.inviteCode != null) {
-                    clientBuilder.setInviteCode(configuration.inviteCode);
-                }
-                API_CLIENT = clientBuilder.build();
-            }
+            ConnectionApiClient.Builder clientBuilder = new ConnectionApiClient.Builder(context);
+            connectionApiClient = clientBuilder.build();
         } else {
-            API_CLIENT = configuration.connectionApiClient;
+            connectionApiClient = configuration.connectionApiClient;
         }
-
-        UserTokenAsyncTask task = new UserTokenAsyncTask(configuration.credentialsProvider, () -> {
-            if (configuration.connection != null) {
-                setUpGeofenceForLocationFields(configuration.connection);
-                return;
-            }
-
-            if (configuration.connectionId == null) {
-                throw new IllegalStateException("Connection id cannot be null.");
-            }
-
-            PendingResult<Connection> pendingResult = API_CLIENT.api().showConnection(configuration.connectionId);
-            pendingResult.execute(new PendingResult.ResultCallback<Connection>() {
-                @Override
-                public void onSuccess(Connection result) {
-                    setUpGeofenceForLocationFields(result);
-                }
-
-                @Override
-                public void onFailure(ErrorResponse errorResponse) {
-                    // Handle errors
-                }
-            });
-        });
-        task.execute();
+        // Set up work manager to poll
     }
 
-    private void setUpGeofenceForLocationFields(Connection connection) {
-        List<LocationTriggerField> locationTriggerFields = new ArrayList<>();
-        locationTriggerFields.add( new LocationTriggerField(
-                "id",
-                "location/triggers.enter_or_exit_region_location",
-                    new LocationFieldValue(
-                            0,
-                            0,
-                            0.0,
-                            "address"
-                    )
-                )
+    @Override
+    public void onConnectionEnabled(List<Feature> connectionFeatures) {
+        // Filter the location based enabled user feature fields.
+        // Using hard-coded data till API is ready
+
+        List<UserFeatureField> userFeatureFields = new ArrayList<>();
+        userFeatureFields.add(new UserFeatureField(
+                new LocationFieldValue(0, 0, 0.0, "address"), "id")
         );
 
-        // Check if the connection contains location trigger fields before setting up geofences.
-        // Using hard-coded list for testing.
-
-        GeofenceProvider geofenceProvider = new GeofenceProvider(context);
-        geofenceProvider.updateGeofences(locationTriggerFields);
+        geofenceProvider.updateGeofences(userFeatureFields);
     }
 
-    public static class LocationConfiguration {
+    @Override
+    public void onConnectionDisabled() {
+        // Remove all previously registered geofences.
+        geofenceProvider.updateGeofences(Collections.emptyList());
+    }
 
-        private final LocationCredentialsProvider credentialsProvider;
+    public static final class Configuration {
+
         @Nullable private final ConnectionApiClient connectionApiClient;
-        @Nullable private String connectionId;
-        @Nullable private Connection connection;
-        @Nullable private String inviteCode;
+        private String connectionId;
+        private final CredentialsProvider credentialsProvider;
 
         /**
          * Builder class for constructing a Configuration object.
          */
         public static final class Builder {
-            private final LocationCredentialsProvider credentialsProvider;
+            private final CredentialsProvider credentialsProvider;
             @Nullable private ConnectionApiClient connectionApiClient;
-            @Nullable private String connectionId;
-            @Nullable private Connection connection;
-            @Nullable private String inviteCode;
+
+            private String connectionId;
 
             /**
-             * Factory method for creating a new Location Configuration builder.
-             *
-             * @param connection {@link Connection} object.
-             */
-            public static Builder withConnection(Connection connection, LocationCredentialsProvider credentialsProvider) {
-                Builder builder = new Builder(credentialsProvider);
-                builder.connection = connection;
-                return builder;
-            }
-
-            /**
-             * Factory method for creating a new Location Configuration builder.
+             * Factory method for creating a new Configuration builder.
              *
              * @param connectionId A Connection id that the {@link ConnectionApiClient} can use to fetch the
              * associated Connection object.
-             * @return The Builder object itself for chaining.
+             * @param credentialsProvider {@link CredentialsProvider} object that helps get the user token
              */
-            public static Builder withConnectionId(String connectionId, LocationCredentialsProvider credentialsProvider) {
+            public static Builder withConnectionId(String connectionId, CredentialsProvider credentialsProvider) {
                 Builder builder = new Builder(credentialsProvider);
                 builder.connectionId = connectionId;
                 return builder;
             }
 
-            private Builder(LocationCredentialsProvider credentialsProvider) {
+            private Builder(CredentialsProvider credentialsProvider) {
                 this.credentialsProvider = credentialsProvider;
             }
 
             /**
-             * @param connectionApiClient an optional {@link ConnectionApiClient} that will be used for the ConnectButton
+             * @param connectionApiClient an optional {@link ConnectionApiClient} that will be used for the ConnectLocation
              * instead of the default one.
              * @return The Builder object itself for chaining.
              */
@@ -141,72 +97,17 @@ public final class ConnectLocation {
                 return this;
             }
 
-            /**
-             * @param inviteCode an optional string as the invite code, this is needed if your service is not yet
-             * published on IFTTT Platform.
-             * @return The Builder object itself for chaining.
-             * @see ConnectionApiClient.Builder#setInviteCode(String)
-             */
-            public Builder setInviteCode(String inviteCode) {
-                this.inviteCode = inviteCode;
-                return this;
-            }
-
-            public LocationConfiguration build() {
-                if (connection == null && connectionId == null) {
-                    throw new IllegalStateException("Either connection or connectionId must be non-null.");
-                }
-
-                LocationConfiguration configuration =
-                        new LocationConfiguration(credentialsProvider, connectionApiClient);
-                configuration.connection = connection;
+            public Configuration build() {
+                Configuration configuration =
+                        new Configuration(credentialsProvider, connectionApiClient);
                 configuration.connectionId = connectionId;
-                configuration.inviteCode = inviteCode;
                 return configuration;
             }
-
         }
 
-        private LocationConfiguration(LocationCredentialsProvider credentialsProvider, @Nullable ConnectionApiClient connectionApiClient) {
+        private Configuration(CredentialsProvider credentialsProvider, @Nullable ConnectionApiClient connectionApiClient) {
             this.credentialsProvider = credentialsProvider;
             this.connectionApiClient = connectionApiClient;
-        }
-    }
-
-    private static final class UserTokenAsyncTask extends android.os.AsyncTask<Void, Void, String> {
-
-        private interface UserTokenCallback {
-            void onComplete();
-        }
-
-        private final LocationCredentialsProvider callback;
-        private final UserTokenCallback userTokenCallback;
-
-        private UserTokenAsyncTask(LocationCredentialsProvider callback, UserTokenCallback userTokenCallback) {
-            this.callback = callback;
-            this.userTokenCallback = userTokenCallback;
-        }
-
-        @Override
-        protected String doInBackground(Void... voids) {
-            try {
-                return callback.getUserToken();
-            } catch (Exception e) {
-                if (BuildConfig.DEBUG) {
-                    e.printStackTrace();
-                }
-
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(@Nullable String s) {
-            if (s != null) {
-                API_CLIENT.setUserToken(s);
-            }
-
-            userTokenCallback.onComplete();
         }
     }
 }
