@@ -41,7 +41,7 @@ final class ConnectionJsonAdapter {
     private final JsonReader.Options triggerOptions = JsonReader.Options.of("feature_trigger_id", "user_fields");
     private final JsonReader.Options queryOptions = JsonReader.Options.of("feature_query_id", "user_fields");
     private final JsonReader.Options actionOptions = JsonReader.Options.of("feature_action_id", "user_fields");
-    private final JsonReader.Options fieldOptions = JsonReader.Options.of("field_id", "value");
+    private final JsonReader.Options fieldOptions = JsonReader.Options.of("field_id", "field_type", "value");
 
     @FromJson
     Connection fromJson(
@@ -56,12 +56,13 @@ final class ConnectionJsonAdapter {
         String id = null;
         String name = null;
         String description = null;
-        Connection.Status user_status = null;
+        Connection.Status userStatus = null;
         String url = null;
         List<Service> services = null;
-        CoverImage cover_image = null;
+        CoverImage coverImage = null;
         List<FeatureJson> featureJsonList = new ArrayList<>();
         List<Feature> features = new ArrayList<>();
+        Map<String, List<UserFeature>> userFeatureGroup = new LinkedHashMap<>();
 
         jsonReader.beginObject();
         while (jsonReader.hasNext()) {
@@ -78,9 +79,9 @@ final class ConnectionJsonAdapter {
                     break;
                 case 3:
                     if (jsonReader.peek() == JsonReader.Token.STRING) {
-                        user_status = Connection.Status.valueOf(jsonReader.nextString());
+                        userStatus = Connection.Status.valueOf(jsonReader.nextString());
                     } else {
-                        user_status = Connection.Status.unknown;
+                        userStatus = Connection.Status.unknown;
                     }
                     break;
                 case 4:
@@ -90,15 +91,14 @@ final class ConnectionJsonAdapter {
                     services = servicesDelegate.fromJson(jsonReader);
                     break;
                 case 6:
-                    cover_image = coverImageDelegate.fromJson(jsonReader);
+                    coverImage = coverImageDelegate.fromJson(jsonReader);
                     break;
                 case 7:
                     featureJsonList = delegate.fromJson(jsonReader);
                     break;
                 case 8:
                     checkNonNull(featureJsonList);
-                    features = fromJsonToUserFeature(jsonReader,
-                        featureJsonList,
+                    userFeatureGroup = fromJsonToUserFeature(jsonReader,
                         locationDelegate,
                         stringListDelegate,
                         collectionFieldDelegate
@@ -116,7 +116,16 @@ final class ConnectionJsonAdapter {
         checkNonNull(url);
         checkNonNull(services);
 
-        return new Connection(id, name, description, user_status, url, services, cover_image, features);
+        for (FeatureJson featureJson : featureJsonList) {
+            features.add(new Feature(featureJson.id,
+                featureJson.title,
+                featureJson.description,
+                featureJson.icon_url,
+                userFeatureGroup.get(featureJson.id)
+            ));
+        }
+
+        return new Connection(id, name, description, userStatus, url, services, coverImage, features);
     }
 
     @ToJson
@@ -124,33 +133,12 @@ final class ConnectionJsonAdapter {
         throw new UnsupportedOperationException();
     }
 
-    private List<Feature> fromJsonToUserFeature(
+    private Map<String, List<UserFeature>> fromJsonToUserFeature(
         JsonReader jsonReader,
-        List<FeatureJson> featureJsonList,
         JsonAdapter<LocationFieldValue> locationDelegate,
         JsonAdapter<List<String>> stringListDelegate,
         JsonAdapter<CollectionFieldValue> collectionFieldDelegate
     ) throws IOException {
-        // Prepare field type and id map for lookup.
-        Map<String, String> fieldTypeIdMap = new LinkedHashMap<>();
-        for (FeatureJson feature : featureJsonList) {
-            for (FeatureTrigger featureTrigger : feature.feature_triggers) {
-                for (Field field : featureTrigger.fields) {
-                    fieldTypeIdMap.put(field.id, field.type);
-                }
-            }
-            for (FeatureQuery featureQuery : feature.feature_queries) {
-                for (Field field : featureQuery.fields) {
-                    fieldTypeIdMap.put(field.id, field.type);
-                }
-            }
-            for (FeatureAction featureAction : feature.feature_actions) {
-                for (Field field : featureAction.fields) {
-                    fieldTypeIdMap.put(field.id, field.type);
-                }
-            }
-        }
-
         ArrayList<UserFeature> userFeatures = new ArrayList<>();
         jsonReader.beginObject();
         while (jsonReader.hasNext()) {
@@ -181,7 +169,6 @@ final class ConnectionJsonAdapter {
                             parseUserSteps(jsonReader,
                                 FeatureStep.StepType.Trigger,
                                 triggerOptions,
-                                fieldTypeIdMap,
                                 locationDelegate,
                                 collectionFieldDelegate,
                                 stringListDelegate,
@@ -193,7 +180,6 @@ final class ConnectionJsonAdapter {
                             parseUserSteps(jsonReader,
                                 FeatureStep.StepType.Query,
                                 queryOptions,
-                                fieldTypeIdMap,
                                 locationDelegate,
                                 collectionFieldDelegate,
                                 stringListDelegate,
@@ -205,7 +191,6 @@ final class ConnectionJsonAdapter {
                             parseUserSteps(jsonReader,
                                 FeatureStep.StepType.Action,
                                 actionOptions,
-                                fieldTypeIdMap,
                                 locationDelegate,
                                 collectionFieldDelegate,
                                 stringListDelegate,
@@ -235,24 +220,13 @@ final class ConnectionJsonAdapter {
             userFeatureGroup.get(userFeature.featureId).add(userFeature);
         }
 
-        List<Feature> parsedFeatures = new ArrayList<>();
-        for (FeatureJson featureJson : featureJsonList) {
-            parsedFeatures.add(new Feature(featureJson.id,
-                featureJson.title,
-                featureJson.description,
-                featureJson.icon_url,
-                userFeatureGroup.get(featureJson.id)
-            ));
-        }
-
-        return parsedFeatures;
+        return userFeatureGroup;
     }
 
     private void parseUserSteps(
         JsonReader jsonReader,
         FeatureStep.StepType type,
         JsonReader.Options options,
-        Map<String, String> fieldTypeIdMap,
         JsonAdapter<LocationFieldValue> locationDelegate,
         JsonAdapter<CollectionFieldValue> collectionFieldDelegate,
         JsonAdapter<List<String>> stringArrayDelegate,
@@ -273,6 +247,7 @@ final class ConnectionJsonAdapter {
                         jsonReader.beginArray();
                         while (jsonReader.hasNext()) {
                             String fieldId = null;
+                            String fieldType = null;
                             jsonReader.beginObject();
                             while (jsonReader.hasNext()) {
                                 int fieldIndex = jsonReader.selectName(fieldOptions);
@@ -281,28 +256,38 @@ final class ConnectionJsonAdapter {
                                         fieldId = jsonReader.nextString();
                                         break;
                                     case 1:
+                                        fieldType = jsonReader.nextString();
+                                        break;
+                                    case 2:
                                         checkNonNull(fieldId);
-
-                                        String fieldType = fieldTypeIdMap.get(fieldId);
                                         checkNonNull(fieldType);
 
                                         if (FIELD_TYPES_LOCATION.contains(fieldType)) {
                                             LocationFieldValue locationFieldValue
                                                 = locationDelegate.fromJson(jsonReader);
-                                            fields.add(new UserFeatureField<>(locationFieldValue, fieldId));
+                                            fields.add(new UserFeatureField<>(locationFieldValue, fieldType, fieldId));
                                         } else if (FIELD_TYPES_COLLECTION.contains(fieldType)) {
                                             CollectionFieldValue collectionFieldValue
                                                 = collectionFieldDelegate.fromJson(jsonReader);
-                                            fields.add(new UserFeatureField<>(collectionFieldValue, fieldId));
+                                            fields.add(new UserFeatureField<>(
+                                                collectionFieldValue,
+                                                fieldType,
+                                                fieldId
+                                            ));
                                         } else if (FIELD_TYPE_CHECKBOX.equals(fieldType)) {
                                             List<String> arrayValue = stringArrayDelegate.fromJson(jsonReader);
                                             checkNonNull(arrayValue);
 
                                             StringArrayFieldValue stringArrayFieldValue = new StringArrayFieldValue(
                                                 arrayValue);
-                                            fields.add(new UserFeatureField<>(stringArrayFieldValue, fieldId));
+                                            fields.add(new UserFeatureField<>(
+                                                stringArrayFieldValue,
+                                                fieldType,
+                                                fieldId
+                                            ));
                                         } else {
                                             fields.add(new UserFeatureField<>(new StringFieldValue(jsonReader.nextString()),
+                                                fieldType,
                                                 fieldId
                                             ));
                                         }

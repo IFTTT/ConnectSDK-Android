@@ -15,10 +15,12 @@ import javax.annotation.Nullable;
 public final class UserFeatureField<T extends Parcelable> implements Parcelable {
 
     @Nullable public final T value;
+    public final String fieldType;
     public final String fieldId;
 
-    public UserFeatureField(@Nullable T value, String fieldId) {
+    public UserFeatureField(@Nullable T value, String fieldType, String fieldId) {
         this.value = value;
+        this.fieldType = fieldType;
         this.fieldId = fieldId;
     }
 
@@ -34,6 +36,7 @@ public final class UserFeatureField<T extends Parcelable> implements Parcelable 
 
         value = parceledValue;
         fieldId = in.readString();
+        fieldType = in.readString();
     }
 
     public static final Creator<UserFeatureField> CREATOR = new Creator<UserFeatureField>() {
@@ -58,5 +61,6 @@ public final class UserFeatureField<T extends Parcelable> implements Parcelable 
         dest.writeString(value.getClass().getName());
         dest.writeParcelable(value, flags);
         dest.writeString(fieldId);
+        dest.writeString(fieldType);
     }
 }
