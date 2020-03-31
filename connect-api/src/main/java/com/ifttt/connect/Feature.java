@@ -38,7 +38,7 @@ public final class Feature implements Parcelable {
     @Nullable public final List<UserFeature> userFeatures;
 
     public Feature(String id, String title, String description, String iconUrl,
-            List<UserFeature> userFeatures) {
+            @Nullable List<UserFeature> userFeatures) {
         this.id = id;
         this.title = title;
         this.description = description;

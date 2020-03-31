@@ -145,6 +145,7 @@
             "user_fields": [
               {
                 "field_id": "path",
+                "field_type": "TEXT_FIELD",
                 "value": "/IFTTT"
               }
             ]
@@ -157,14 +158,17 @@
             "user_fields": [
               {
                 "field_id": "url",
+                "field_type": "TEXT_FIELD",
                 "value": "Test"
               },
               {
                 "field_id": "filename",
+                "field_type": "TEXT_FIELD",
                 "value": ""
               },
               {
                 "field_id": "path",
+                "field_type": "TEXT_FIELD",
                 "value": ""
               }
             ]
@@ -181,6 +185,7 @@
             "user_fields": [
               {
                 "field_id": "location",
+                "field_type": "LOCATION_ENTER",
                 "value": {
                   "lat": "37.78383800416815",
                   "lng": "-122.40843300000002",
