@@ -34,6 +34,7 @@ import com.ifttt.connect.CredentialsProvider;
 import com.ifttt.connect.ErrorResponse;
 import com.ifttt.connect.Feature;
 import com.ifttt.connect.R;
+import com.ifttt.connect.UserFeature;
 import com.ifttt.connect.UserTokenAsyncTask;
 import com.ifttt.connect.api.PendingResult;
 import java.util.List;
@@ -52,11 +53,11 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
 
     private final BaseConnectButton connectButton;
     private final TextView loadingView;
-    private onConnectionStateChangeListener onConnectionStateChangeListener = null;
 
     private CredentialsProvider credentialsProvider;
 
     private final LifecycleRegistry lifecycleRegistry = new LifecycleRegistry(this);
+    private ButtonStateChangeListener buttonStateChangeListener = null;
 
     public ConnectButton(@NonNull Context context) {
         this(context, null);
@@ -102,32 +103,6 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
      * */
     public static void disableTracking(Context context) {
         AnalyticsManager.getInstance(context).disableTracking();
-    }
-
-    /**
-     * Connection enable interface for this class. It provides all of the necessary information for the
-     * ConnectLocation library to handle different enabled state and set up location triggers
-     */
-    public interface onConnectionStateChangeListener {
-        /**
-         * Called when the connection is enabled.
-         *
-         * @param connectionFeatures Connection feature data associated with the Connection
-         */
-        void onConnectionEnabled(List<Feature> connectionFeatures);
-
-        /**
-         * Called when the connection is disabled.
-         */
-        void onConnectionDisabled();
-    }
-
-    /*
-    * Method to set up state change callbacks for Location SDK
-    * */
-    public void setUpWithLocationTriggers(
-            onConnectionStateChangeListener onConnectionStateChangeListener) {
-        this.onConnectionStateChangeListener = onConnectionStateChangeListener;
     }
 
     /**
@@ -238,6 +213,8 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
      */
     public void addButtonStateChangeListener(ButtonStateChangeListener listener) {
         connectButton.addButtonStateChangeListener(listener);
+        this.buttonStateChangeListener = listener;
+
     }
 
     /**
@@ -266,7 +243,7 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
                 private final ConnectResult.NextStep nextStep = result.nextStep;
 
                 @Override
-                public void onStateChanged(ConnectButtonState currentState, ConnectButtonState previousState, List<Feature> connectionFeatures) {
+                public void onStateChanged(ConnectButtonState currentState, ConnectButtonState previousState) {
                     connectButton.removeButtonStateChangeListener(this);
                     if (currentState == ConnectButtonState.Enabled && nextStep == ConnectResult.NextStep.Complete) {
                         if (result.userToken != null) {
@@ -278,16 +255,26 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
                             task.execute();
                             lifecycleRegistry.addObserver(new AsyncTaskObserver(task));
                         }
-                    } else if (currentState == ConnectButtonState.Disabled) {
-                        if (onConnectionStateChangeListener != null) {
-                            onConnectionStateChangeListener.onConnectionDisabled();
-                        }
+                    }
+
+                    if (buttonStateChangeListener != null) {
+                        buttonStateChangeListener.onConnectionDisabled();
                     }
                 }
 
                 @Override
                 public void onError(ErrorResponse errorResponse) {
                     connectButton.removeButtonStateChangeListener(this);
+                }
+
+                @Override
+                public void onConnectionEnabled(List<Feature> connectionFeatures) {
+                    // No-op
+                }
+
+                @Override
+                public void onConnectionDisabled() {
+                    // No-op
                 }
             };
 
@@ -333,8 +320,8 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
             @Override
             public void onSuccess(Connection result) {
                 connectButton.setConnection(result);
-                if (onConnectionStateChangeListener != null) {
-                    onConnectionStateChangeListener.onConnectionEnabled(connection.features);
+                if (buttonStateChangeListener != null) {
+                    buttonStateChangeListener.onConnectionEnabled(result.features);
                 }
             }
 

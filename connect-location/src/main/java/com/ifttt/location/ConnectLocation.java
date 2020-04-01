@@ -1,39 +1,60 @@
 package com.ifttt.location;
 
 import android.content.Context;
-import androidx.annotation.Nullable;
+import android.util.Log;
 import com.ifttt.connect.ConnectionApiClient;
 import com.ifttt.connect.CredentialsProvider;
+import com.ifttt.connect.ErrorResponse;
 import com.ifttt.connect.Feature;
 import com.ifttt.connect.LocationFieldValue;
 import com.ifttt.connect.UserFeatureField;
+import com.ifttt.connect.ui.ButtonStateChangeListener;
 import com.ifttt.connect.ui.ConnectButton;
+import com.ifttt.connect.ui.ConnectButtonState;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public final class ConnectLocation implements ConnectButton.onConnectionStateChangeListener {
+public final class ConnectLocation implements ButtonStateChangeListener {
 
-    private GeofenceProvider geofenceProvider;
+    private static ConnectLocation INSTANCE = null;
+    private AwarenessGeofenceProvider awarenessGeofenceProvider;
     private ConnectionApiClient connectionApiClient;
 
-    final static String FIELD_TYPE_LOCATION_ENTER = "location/triggers.enter_region_location";
-    final static String FIELD_TYPE_LOCATION_EXIT = "location/triggers.exit_region_location";
+    final static String FIELD_TYPE_LOCATION_ENTER = "LOCATION_ENTER";
+    final static String FIELD_TYPE_LOCATION_EXIT = "LOCATION_EXIT";
     final static String FIELD_TYPE_LOCATION_ENTER_EXIT =
-            "location/triggers.enter_or_exit_region_location";
+            "LOCATION_ENTER_OR_EXIT";
 
     final static List<String> locationFieldTypesList = Arrays.asList(FIELD_TYPE_LOCATION_ENTER, FIELD_TYPE_LOCATION_EXIT, FIELD_TYPE_LOCATION_ENTER_EXIT);
 
-    public ConnectLocation(Context context, Configuration configuration) {
-        geofenceProvider = new GeofenceProvider(context);
-        if (configuration.connectionApiClient == null) {
-            ConnectionApiClient.Builder clientBuilder = new ConnectionApiClient.Builder(context);
-            connectionApiClient = clientBuilder.build();
-        } else {
-            connectionApiClient = configuration.connectionApiClient;
+    public static synchronized ConnectLocation init(Context context, ConnectionApiClient apiClient) {
+        if (INSTANCE == null) {
+            INSTANCE = new ConnectLocation(context);
         }
-        // Set up work manager to poll
+        INSTANCE.connectionApiClient = apiClient;
+        return INSTANCE;
+    }
+
+    public static synchronized ConnectLocation init(Context context, CredentialsProvider credentialsProvider) {
+        if (INSTANCE == null) {
+            INSTANCE = new ConnectLocation(context);
+        }
+        ConnectionApiClient.Builder clientBuilder = new ConnectionApiClient.Builder(context);
+        INSTANCE.connectionApiClient = clientBuilder.build();
+        return INSTANCE;
+    }
+
+    private ConnectLocation(Context context) {
+        awarenessGeofenceProvider = new AwarenessGeofenceProvider(context);
+    }
+
+    public static void setUpWithConnectButton(ConnectButton connectButton) {
+        if (INSTANCE == null) {
+            throw new IllegalStateException("Connect Location is not initialized");
+        }
+        connectButton.addButtonStateChangeListener(INSTANCE);
     }
 
     @Override
@@ -42,72 +63,24 @@ public final class ConnectLocation implements ConnectButton.onConnectionStateCha
         // Using hard-coded data till API is ready
 
         List<UserFeatureField> userFeatureFields = new ArrayList<>();
-        userFeatureFields.add(new UserFeatureField(
-                new LocationFieldValue(0, 0, 0.0, "address"), "id")
-        );
 
-        geofenceProvider.updateGeofences(userFeatureFields);
+        awarenessGeofenceProvider.updateGeofences(userFeatureFields);
     }
 
     @Override
     public void onConnectionDisabled() {
         // Remove all previously registered geofences.
-        geofenceProvider.updateGeofences(Collections.emptyList());
+        awarenessGeofenceProvider.updateGeofences(Collections.emptyList());
     }
 
-    public static final class Configuration {
-
-        @Nullable private final ConnectionApiClient connectionApiClient;
-        private String connectionId;
-        private final CredentialsProvider credentialsProvider;
-
-        /**
-         * Builder class for constructing a Configuration object.
-         */
-        public static final class Builder {
-            private final CredentialsProvider credentialsProvider;
-            @Nullable private ConnectionApiClient connectionApiClient;
-
-            private String connectionId;
-
-            /**
-             * Factory method for creating a new Configuration builder.
-             *
-             * @param connectionId A Connection id that the {@link ConnectionApiClient} can use to fetch the
-             * associated Connection object.
-             * @param credentialsProvider {@link CredentialsProvider} object that helps get the user token
-             */
-            public static Builder withConnectionId(String connectionId, CredentialsProvider credentialsProvider) {
-                Builder builder = new Builder(credentialsProvider);
-                builder.connectionId = connectionId;
-                return builder;
-            }
-
-            private Builder(CredentialsProvider credentialsProvider) {
-                this.credentialsProvider = credentialsProvider;
-            }
-
-            /**
-             * @param connectionApiClient an optional {@link ConnectionApiClient} that will be used for the ConnectLocation
-             * instead of the default one.
-             * @return The Builder object itself for chaining.
-             */
-            public Builder setConnectionApiClient(ConnectionApiClient connectionApiClient) {
-                this.connectionApiClient = connectionApiClient;
-                return this;
-            }
-
-            public Configuration build() {
-                Configuration configuration =
-                        new Configuration(credentialsProvider, connectionApiClient);
-                configuration.connectionId = connectionId;
-                return configuration;
-            }
-        }
-
-        private Configuration(CredentialsProvider credentialsProvider, @Nullable ConnectionApiClient connectionApiClient) {
-            this.credentialsProvider = credentialsProvider;
-            this.connectionApiClient = connectionApiClient;
-        }
+    @Override
+    public void onStateChanged(ConnectButtonState currentState, ConnectButtonState previousState) {
+        // No-op
     }
+
+    @Override
+    public void onError(ErrorResponse errorResponse) {
+        // No-op
+    }
+
 }

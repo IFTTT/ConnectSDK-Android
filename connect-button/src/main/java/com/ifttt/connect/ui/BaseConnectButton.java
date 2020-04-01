@@ -52,6 +52,7 @@ import com.ifttt.connect.CredentialsProvider;
 import com.ifttt.connect.ErrorResponse;
 import com.ifttt.connect.R;
 import com.ifttt.connect.Service;
+import com.ifttt.connect.UserTokenAsyncTask;
 import com.ifttt.connect.api.PendingResult;
 import java.util.ArrayList;
 import javax.annotation.CheckReturnValue;
@@ -1075,7 +1076,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
     private void dispatchState(ConnectButtonState newState) {
         if (newState != buttonState) {
             for (ButtonStateChangeListener listener : listeners) {
-                listener.onStateChanged(newState, buttonState, connection.features);
+                listener.onStateChanged(newState, buttonState);
             }
         }
 

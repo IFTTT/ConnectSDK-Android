@@ -65,8 +65,8 @@ class MainActivity : AppCompatActivity() {
         }.build()
 
         connectButton.setup(configuration)
-        connectButton.setUpWithLocationTriggers(ConnectLocation(this, ConnectLocation.Configuration.Builder.withConnectionId(
-            CONNECTION_ID, credentialsProvider).build()))
+        ConnectLocation.init(this, credentialsProvider)
+        ConnectLocation.setUpWithConnectButton(connectButton)
 
         if (PermissionChecker.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PermissionChecker.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 0)
