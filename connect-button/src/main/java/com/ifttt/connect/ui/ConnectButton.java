@@ -6,7 +6,6 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Color;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
@@ -23,21 +22,15 @@ import androidx.core.content.ContextCompat;
 import androidx.core.text.HtmlCompat;
 import androidx.core.view.ViewCompat;
 import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LifecycleRegistry;
-import androidx.lifecycle.OnLifecycleEvent;
-import com.ifttt.connect.BuildConfig;
 import com.ifttt.connect.Connection;
 import com.ifttt.connect.ConnectionApiClient;
 import com.ifttt.connect.CredentialsProvider;
 import com.ifttt.connect.ErrorResponse;
-import com.ifttt.connect.Feature;
 import com.ifttt.connect.R;
-import com.ifttt.connect.UserFeature;
 import com.ifttt.connect.UserTokenAsyncTask;
 import com.ifttt.connect.api.PendingResult;
-import java.util.List;
 
 import static android.animation.ValueAnimator.INFINITE;
 import static androidx.core.text.HtmlCompat.FROM_HTML_MODE_COMPACT;
@@ -54,10 +47,8 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
     private final BaseConnectButton connectButton;
     private final TextView loadingView;
 
-    private CredentialsProvider credentialsProvider;
 
     private final LifecycleRegistry lifecycleRegistry = new LifecycleRegistry(this);
-    private ButtonStateChangeListener buttonStateChangeListener = null;
 
     public ConnectButton(@NonNull Context context) {
         this(context, null);
@@ -74,7 +65,7 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
         setClipChildren(false);
         setLayoutTransition(new LayoutTransition());
 
-        lifecycleRegistry.markState(Lifecycle.State.CREATED);
+        lifecycleRegistry.setCurrentState(Lifecycle.State.CREATED);
 
         inflate(context, R.layout.view_ifttt_simple_connect_button, this);
         connectButton = findViewById(R.id.ifttt_connect_button);
@@ -138,12 +129,12 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
             clientToUse = configuration.connectionApiClient;
         }
 
-        credentialsProvider = configuration.credentialsProvider;
         connectButton.setup(configuration.suggestedUserEmail, clientToUse, configuration.connectRedirectUri,
                 configuration.credentialsProvider, configuration.inviteCode);
 
         pulseLoading();
-        UserTokenAsyncTask task = new UserTokenAsyncTask(credentialsProvider, clientToUse, () -> {
+
+        UserTokenAsyncTask task = new UserTokenAsyncTask(configuration.credentialsProvider, clientToUse, () -> {
             if (configuration.connection != null) {
                 if (configuration.listener != null) {
                     configuration.listener.onFetchConnectionSuccessful(configuration.connection);
@@ -159,7 +150,7 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
                 throw new IllegalStateException("Connection id cannot be null.");
             }
 
-            PendingResult<Connection> pendingResult = API_CLIENT.api().showConnection(configuration.connectionId);
+            PendingResult<Connection> pendingResult = clientToUse.api().showConnection(configuration.connectionId);
             pendingResult.execute(new PendingResult.ResultCallback<Connection>() {
                 @Override
                 public void onSuccess(Connection result) {
@@ -184,7 +175,7 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
 
                     connectButton.setErrorMessage(errorSpan, v -> {
                         PendingResult<Connection> pendingResult =
-                                API_CLIENT.api().showConnection(configuration.connectionId);
+                                clientToUse.api().showConnection(configuration.connectionId);
                         pendingResult.execute(this);
                         lifecycleRegistry.addObserver(new PendingResultLifecycleObserver<>(pendingResult));
                     });
@@ -213,7 +204,6 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
      */
     public void addButtonStateChangeListener(ButtonStateChangeListener listener) {
         connectButton.addButtonStateChangeListener(listener);
-        this.buttonStateChangeListener = listener;
     }
 
     /**
@@ -232,46 +222,6 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
      * @param result Authentication flow redirect result from the web view.
      */
     public void setConnectResult(@Nullable ConnectResult result) {
-        if (credentialsProvider == null) {
-            return;
-        }
-
-        if (result != null) {
-            ButtonStateChangeListener listener = new ButtonStateChangeListener() {
-
-                private final ConnectResult.NextStep nextStep = result.nextStep;
-
-                @Override
-                public void onStateChanged(ConnectButtonState currentState, ConnectButtonState previousState, List<Feature> connectionFeatures) {
-                    connectButton.removeButtonStateChangeListener(this);
-                    if (currentState == ConnectButtonState.Enabled && nextStep == ConnectResult.NextStep.Complete) {
-                        if (result.userToken != null) {
-                            API_CLIENT.setUserToken(result.userToken);
-                            refreshConnection(currentState, previousState);
-                        } else {
-                            UserTokenAsyncTask task =
-                                    new UserTokenAsyncTask(credentialsProvider, API_CLIENT, () -> {
-                                        refreshConnection(currentState, previousState);
-                                    });
-                            task.execute();
-                            lifecycleRegistry.addObserver(new AsyncTaskObserver(task));
-                        }
-                    }
-
-                    if (buttonStateChangeListener != null) {
-                        buttonStateChangeListener.onStateChanged(currentState, previousState, connectionFeatures);
-                    }
-                }
-
-                @Override
-                public void onError(ErrorResponse errorResponse) {
-                    connectButton.removeButtonStateChangeListener(this);
-                }
-            };
-
-            connectButton.addButtonStateChangeListener(listener);
-        }
-
         if (ViewCompat.isLaidOut(connectButton)) {
             connectButton.setConnectResult(result);
         } else {
@@ -289,40 +239,19 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        lifecycleRegistry.markState(Lifecycle.State.STARTED);
+        lifecycleRegistry.setCurrentState(Lifecycle.State.STARTED);
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        lifecycleRegistry.markState(Lifecycle.State.DESTROYED);
+        lifecycleRegistry.setCurrentState(Lifecycle.State.DESTROYED);
     }
 
     @NonNull
     @Override
     public Lifecycle getLifecycle() {
         return lifecycleRegistry;
-    }
-
-    private void refreshConnection(ConnectButtonState currentState, ConnectButtonState previousState) {
-        Connection connection = connectButton.getConnection();
-        PendingResult<Connection> pendingResult = API_CLIENT.api().showConnection(connection.id);
-        pendingResult.execute(new PendingResult.ResultCallback<Connection>() {
-            @Override
-            public void onSuccess(Connection result) {
-                connectButton.setConnection(result);
-                if (buttonStateChangeListener != null) {
-                    buttonStateChangeListener.onStateChanged(currentState, previousState, result.features);
-                }
-            }
-
-            @Override
-            public void onFailure(ErrorResponse errorResponse) {
-                connectButton.setConnection(connection);
-            }
-        });
-
-        lifecycleRegistry.addObserver(new PendingResultLifecycleObserver<>(pendingResult));
     }
 
     private void pulseLoading() {
@@ -482,20 +411,6 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
             this.credentialsProvider = credentialsProvider;
             this.connectRedirectUri = connectRedirectUri;
             this.connectionApiClient = connectionApiClient;
-        }
-    }
-
-    private final class AsyncTaskObserver implements LifecycleObserver {
-
-        private final AsyncTask task;
-
-        private AsyncTaskObserver(AsyncTask task) {
-            this.task = task;
-        }
-
-        @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-        void onStop() {
-            task.cancel(true);
         }
     }
 }

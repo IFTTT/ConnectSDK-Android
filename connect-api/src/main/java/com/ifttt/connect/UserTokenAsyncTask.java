@@ -12,9 +12,9 @@ public final class UserTokenAsyncTask extends android.os.AsyncTask<Void, Void, S
     private final UserTokenCallback userTokenCallback;
     private final ConnectionApiClient apiClient;
 
-    public UserTokenAsyncTask(CredentialsProvider callback, ConnectionApiClient apiClient,
+    public UserTokenAsyncTask(CredentialsProvider credentialsProvider, ConnectionApiClient apiClient,
             UserTokenCallback userTokenCallback) {
-        this.callback = callback;
+        this.callback = credentialsProvider;
         this.userTokenCallback = userTokenCallback;
         this.apiClient = apiClient;
     }
