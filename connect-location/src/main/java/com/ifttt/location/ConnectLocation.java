@@ -58,24 +58,13 @@ public final class ConnectLocation implements ButtonStateChangeListener {
     }
 
     @Override
-    public void onConnectionEnabled(List<Feature> connectionFeatures) {
+    public void onStateChanged(ConnectButtonState currentState, ConnectButtonState previousState, List<Feature> connectionFeatures) {
         // Filter the location based enabled user feature fields.
         // Using hard-coded data till API is ready
 
         List<UserFeatureField> userFeatureFields = new ArrayList<>();
 
         awarenessGeofenceProvider.updateGeofences(userFeatureFields);
-    }
-
-    @Override
-    public void onConnectionDisabled() {
-        // Remove all previously registered geofences.
-        awarenessGeofenceProvider.updateGeofences(Collections.emptyList());
-    }
-
-    @Override
-    public void onStateChanged(ConnectButtonState currentState, ConnectButtonState previousState) {
-        // No-op
     }
 
     @Override

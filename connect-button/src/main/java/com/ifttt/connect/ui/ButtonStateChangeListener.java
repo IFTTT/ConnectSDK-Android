@@ -14,7 +14,7 @@ public interface ButtonStateChangeListener {
      * @param currentState Current state of the button.
      * @param previousState Previous state of the button.
      */
-    void onStateChanged(ConnectButtonState currentState, ConnectButtonState previousState);
+    void onStateChanged(ConnectButtonState currentState, ConnectButtonState previousState, List<Feature> connectionFeatures);
 
     /**
      * Called when the button state change encounters an errorResponse.
@@ -23,16 +23,4 @@ public interface ButtonStateChangeListener {
      * change.
      */
     void onError(ErrorResponse errorResponse);
-
-    /**
-     * Called when a connection is enabled, after fetching the refreshed connection with enabled fields.
-     *
-     * @param connectionFeatures Enabled connection features.
-     */
-    void onConnectionEnabled(List<Feature> connectionFeatures);
-
-    /**
-     * Called when a connection is disabled
-     */
-    void onConnectionDisabled();
 }

@@ -214,7 +214,6 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
     public void addButtonStateChangeListener(ButtonStateChangeListener listener) {
         connectButton.addButtonStateChangeListener(listener);
         this.buttonStateChangeListener = listener;
-
     }
 
     /**
@@ -243,38 +242,30 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
                 private final ConnectResult.NextStep nextStep = result.nextStep;
 
                 @Override
-                public void onStateChanged(ConnectButtonState currentState, ConnectButtonState previousState) {
+                public void onStateChanged(ConnectButtonState currentState, ConnectButtonState previousState, List<Feature> connectionFeatures) {
                     connectButton.removeButtonStateChangeListener(this);
                     if (currentState == ConnectButtonState.Enabled && nextStep == ConnectResult.NextStep.Complete) {
                         if (result.userToken != null) {
                             API_CLIENT.setUserToken(result.userToken);
-                            refreshConnection();
+                            refreshConnection(currentState, previousState);
                         } else {
                             UserTokenAsyncTask task =
-                                    new UserTokenAsyncTask(credentialsProvider, API_CLIENT, ConnectButton.this::refreshConnection);
+                                    new UserTokenAsyncTask(credentialsProvider, API_CLIENT, () -> {
+                                        refreshConnection(currentState, previousState);
+                                    });
                             task.execute();
                             lifecycleRegistry.addObserver(new AsyncTaskObserver(task));
                         }
                     }
 
                     if (buttonStateChangeListener != null) {
-                        buttonStateChangeListener.onConnectionDisabled();
+                        buttonStateChangeListener.onStateChanged(currentState, previousState, connectionFeatures);
                     }
                 }
 
                 @Override
                 public void onError(ErrorResponse errorResponse) {
                     connectButton.removeButtonStateChangeListener(this);
-                }
-
-                @Override
-                public void onConnectionEnabled(List<Feature> connectionFeatures) {
-                    // No-op
-                }
-
-                @Override
-                public void onConnectionDisabled() {
-                    // No-op
                 }
             };
 
@@ -313,7 +304,7 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
         return lifecycleRegistry;
     }
 
-    private void refreshConnection() {
+    private void refreshConnection(ConnectButtonState currentState, ConnectButtonState previousState) {
         Connection connection = connectButton.getConnection();
         PendingResult<Connection> pendingResult = API_CLIENT.api().showConnection(connection.id);
         pendingResult.execute(new PendingResult.ResultCallback<Connection>() {
@@ -321,7 +312,7 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
             public void onSuccess(Connection result) {
                 connectButton.setConnection(result);
                 if (buttonStateChangeListener != null) {
-                    buttonStateChangeListener.onConnectionEnabled(result.features);
+                    buttonStateChangeListener.onStateChanged(currentState, previousState, result.features);
                 }
             }
 

@@ -1076,7 +1076,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
     private void dispatchState(ConnectButtonState newState) {
         if (newState != buttonState) {
             for (ButtonStateChangeListener listener : listeners) {
-                listener.onStateChanged(newState, buttonState);
+                listener.onStateChanged(newState, buttonState, connection.features);
             }
         }
 
