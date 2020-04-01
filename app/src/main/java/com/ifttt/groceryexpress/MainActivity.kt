@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
@@ -17,13 +16,9 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.PermissionChecker
 import com.google.android.material.textfield.TextInputLayout
 import com.ifttt.connect.ConnectionApiClient
-import com.ifttt.connect.CredentialsProvider
-import com.ifttt.connect.ErrorResponse
-import com.ifttt.connect.Feature
-import com.ifttt.connect.ui.ButtonStateChangeListener
 import com.ifttt.connect.ui.ConnectButton
-import com.ifttt.connect.ui.ConnectButtonState
 import com.ifttt.connect.ui.ConnectResult
+import com.ifttt.connect.CredentialsProvider
 import com.ifttt.groceryexpress.ApiHelper.REDIRECT_URI
 import com.ifttt.location.ConnectLocation
 
@@ -70,28 +65,10 @@ class MainActivity : AppCompatActivity() {
         }.build()
 
         connectButton.setup(configuration)
-        connectButton.addButtonStateChangeListener(object : ButtonStateChangeListener {
-            override fun onStateChanged(
-                currentState: ConnectButtonState,
-                previousState: ConnectButtonState,
-                connectionFeatures: MutableList<Feature>
-            ) {
-                Log.d(MainActivity::class.java.simpleName, "$currentState with ${connectionFeatures.size} feature(s).")
-            }
-
-            override fun onError(errorResponse: ErrorResponse) {
-
-            }
-
-        })
         ConnectLocation.init(this, credentialsProvider)
         ConnectLocation.setUpWithConnectButton(connectButton)
 
-        if (PermissionChecker.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PermissionChecker.PERMISSION_GRANTED
-        ) {
+        if (PermissionChecker.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PermissionChecker.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 0)
         }
 
@@ -150,13 +127,13 @@ class MainActivity : AppCompatActivity() {
             }.setNegativeButton(R.string.logout) { _, _ ->
                 emailPreferencesHelper.clear()
                 val configuration = ConnectButton.Configuration.Builder.withConnectionId(
-                    CONNECTION_ID,
-                    EMAIL,
-                    credentialsProvider
-                    , REDIRECT_URI
-                ).setOnFetchCompleteListener { connection ->
-                    findViewById<TextView>(R.id.connection_title).text = connection.name
-                }
+                        CONNECTION_ID,
+                        EMAIL,
+                        credentialsProvider
+                        , REDIRECT_URI
+                    ).setOnFetchCompleteListener { connection ->
+                        findViewById<TextView>(R.id.connection_title).text = connection.name
+                    }
                     .setConnectionApiClient(
                         ConnectionApiClient.Builder(this).build()
                     ) // Provide a new ConnectionApiClient to reset the authorization header.
