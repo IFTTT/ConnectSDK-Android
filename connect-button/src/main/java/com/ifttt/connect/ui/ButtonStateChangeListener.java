@@ -1,5 +1,6 @@
 package com.ifttt.connect.ui;
 
+import com.ifttt.connect.Connection;
 import com.ifttt.connect.ErrorResponse;
 import com.ifttt.connect.Feature;
 import java.util.List;
@@ -13,8 +14,9 @@ public interface ButtonStateChangeListener {
      *
      * @param currentState Current state of the button.
      * @param previousState Previous state of the button.
+     * @param connection Connection object
      */
-    void onStateChanged(ConnectButtonState currentState, ConnectButtonState previousState, List<Feature> connectionFeatures);
+    void onStateChanged(ConnectButtonState currentState, ConnectButtonState previousState, Connection connection);
 
     /**
      * Called when the button state change encounters an errorResponse.

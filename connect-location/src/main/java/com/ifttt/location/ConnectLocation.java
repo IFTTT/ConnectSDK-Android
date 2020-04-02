@@ -1,19 +1,20 @@
 package com.ifttt.location;
 
 import android.content.Context;
-import android.util.Log;
+import androidx.annotation.VisibleForTesting;
+import com.ifttt.connect.Connection;
 import com.ifttt.connect.ConnectionApiClient;
 import com.ifttt.connect.CredentialsProvider;
 import com.ifttt.connect.ErrorResponse;
 import com.ifttt.connect.Feature;
-import com.ifttt.connect.LocationFieldValue;
+import com.ifttt.connect.UserFeature;
 import com.ifttt.connect.UserFeatureField;
+import com.ifttt.connect.UserFeatureStep;
 import com.ifttt.connect.ui.ButtonStateChangeListener;
 import com.ifttt.connect.ui.ConnectButton;
 import com.ifttt.connect.ui.ConnectButtonState;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public final class ConnectLocation implements ButtonStateChangeListener {
@@ -27,7 +28,7 @@ public final class ConnectLocation implements ButtonStateChangeListener {
     final static String FIELD_TYPE_LOCATION_ENTER_EXIT =
             "LOCATION_ENTER_OR_EXIT";
 
-    final static List<String> locationFieldTypesList = Arrays.asList(FIELD_TYPE_LOCATION_ENTER, FIELD_TYPE_LOCATION_EXIT, FIELD_TYPE_LOCATION_ENTER_EXIT);
+    private final static List<String> locationFieldTypesList = Arrays.asList(FIELD_TYPE_LOCATION_ENTER, FIELD_TYPE_LOCATION_EXIT, FIELD_TYPE_LOCATION_ENTER_EXIT);
 
     public static synchronized ConnectLocation init(Context context, ConnectionApiClient apiClient) {
         if (INSTANCE == null) {
@@ -58,11 +59,33 @@ public final class ConnectLocation implements ButtonStateChangeListener {
     }
 
     @Override
-    public void onStateChanged(ConnectButtonState currentState, ConnectButtonState previousState, List<Feature> connectionFeatures) {
+    public void onStateChanged(ConnectButtonState currentState, ConnectButtonState previousState, Connection connection) {
         // Filter the location based enabled user feature fields.
         // Using hard-coded data till API is ready
 
+        List<UserFeatureStep> userFeatureSteps = new ArrayList<>();
+
+        for (Feature feature :connection.features) {
+            if (feature.userFeatures != null) {
+                for (UserFeature userFeature : feature.userFeatures) {
+                    if (userFeature.userFeatureSteps != null) {
+                        userFeatureSteps.addAll(userFeature.userFeatureSteps);
+                    }
+                }
+            }
+        }
+
         List<UserFeatureField> userFeatureFields = new ArrayList<>();
+
+        for (UserFeatureStep userFeatureStep: userFeatureSteps) {
+            if (userFeatureStep.fields != null) {
+                for (UserFeatureField userFeatureField : userFeatureStep.fields) {
+                    if (locationFieldTypesList.contains(userFeatureField.fieldType)) {
+                        userFeatureFields.add(userFeatureField);
+                    }
+                }
+            }
+        }
 
         awarenessGeofenceProvider.updateGeofences(userFeatureFields);
     }
@@ -71,5 +94,4 @@ public final class ConnectLocation implements ButtonStateChangeListener {
     public void onError(ErrorResponse errorResponse) {
         // No-op
     }
-
 }

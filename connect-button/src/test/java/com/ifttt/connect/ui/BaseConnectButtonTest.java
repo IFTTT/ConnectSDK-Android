@@ -12,10 +12,8 @@ import com.ifttt.connect.Connection;
 import com.ifttt.connect.ConnectionApiClient;
 import com.ifttt.connect.CredentialsProvider;
 import com.ifttt.connect.ErrorResponse;
-import com.ifttt.connect.Feature;
 import com.ifttt.connect.R;
 import java.io.IOException;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.Before;
 import org.junit.Test;
@@ -122,7 +120,7 @@ public final class BaseConnectButtonTest {
         AtomicReference<ErrorResponse> errorRef = new AtomicReference<>();
         button.addButtonStateChangeListener(new ButtonStateChangeListener() {
             @Override
-            public void onStateChanged(ConnectButtonState currentState, ConnectButtonState previousState, List<Feature> connectionFeatures) {
+            public void onStateChanged(ConnectButtonState currentState, ConnectButtonState previousState, Connection connection) {
                 currentStateRef.set(currentState);
                 prevStateRef.set(previousState);
             }
