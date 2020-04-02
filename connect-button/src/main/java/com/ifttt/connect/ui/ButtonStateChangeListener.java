@@ -12,7 +12,8 @@ public interface ButtonStateChangeListener {
      *
      * @param currentState Current state of the button.
      * @param previousState Previous state of the button.
-     * @param connection Updated connection after state change event.
+     * @param connection Connection instance.
+     * If currentState = Enabled, this param will reflect the refreshed Connection instance with updated feature fields.
      */
     void onStateChanged(ConnectButtonState currentState, ConnectButtonState previousState, Connection connection);
 
