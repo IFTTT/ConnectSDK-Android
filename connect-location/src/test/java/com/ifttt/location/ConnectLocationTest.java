@@ -3,7 +3,6 @@ package com.ifttt.location;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import com.ifttt.connect.ui.ConnectButton;
-import com.ifttt.connect.ui.TestActivity;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,7 +26,8 @@ public class ConnectLocationTest {
         });
     }
 
-    @Test
+
+    @Test(expected = IllegalStateException.class)
     public void setUpWithoutInit() {
         ConnectLocation.setUpWithConnectButton(button);
         fail();

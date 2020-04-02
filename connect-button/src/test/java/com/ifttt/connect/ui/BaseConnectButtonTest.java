@@ -138,11 +138,5 @@ public final class BaseConnectButtonTest {
         button.setConnectResult(new ConnectResult(ConnectResult.NextStep.Error, null, "error"));
         assertThat(currentStateRef.get()).isEqualTo(ConnectButtonState.Initial);
         assertThat(errorRef.get()).isNotNull();
-
-        errorRef.set(null);
-        button.setConnectResult(new ConnectResult(ConnectResult.NextStep.Complete, "token", null));
-        Shadows.shadowOf(Looper.getMainLooper()).idle();
-
-        assertThat(currentStateRef.get()).isEqualTo(ConnectButtonState.Enabled);
     }
 }

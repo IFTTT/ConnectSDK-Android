@@ -8,7 +8,6 @@ import androidx.work.Configuration;
 import androidx.work.testing.SynchronousExecutor;
 import androidx.work.testing.WorkManagerTestInitHelper;
 import com.ifttt.connect.R;
-import com.ifttt.connect.ui.BaseConnectButtonTest;
 import com.ifttt.connect.ui.ConnectButton;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
