@@ -8,9 +8,13 @@ import com.google.android.gms.awareness.FenceClient;
 import com.google.android.gms.awareness.fence.FenceQueryRequest;
 import com.google.android.gms.awareness.fence.FenceUpdateRequest;
 import com.google.android.gms.awareness.fence.LocationFence;
+import com.ifttt.connect.Feature;
 import com.ifttt.connect.LocationFieldValue;
+import com.ifttt.connect.UserFeature;
 import com.ifttt.connect.UserFeatureField;
+import com.ifttt.connect.UserFeatureStep;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -22,6 +26,13 @@ final class AwarenessGeofenceProvider implements GeofenceProvider {
     private final FenceClient fenceClient;
     private final PendingIntent enterPendingIntent;
     private final PendingIntent exitPendingIntent;
+
+    private final static String FIELD_TYPE_LOCATION_ENTER = "LOCATION_ENTER";
+    private final static String FIELD_TYPE_LOCATION_EXIT = "LOCATION_EXIT";
+    private final static String FIELD_TYPE_LOCATION_ENTER_EXIT =
+            "LOCATION_ENTER_OR_EXIT";
+
+    private final static List<String> locationFieldTypesList = Arrays.asList(FIELD_TYPE_LOCATION_ENTER, FIELD_TYPE_LOCATION_EXIT, FIELD_TYPE_LOCATION_ENTER_EXIT);
 
     AwarenessGeofenceProvider(Context context) {
         this.fenceClient = Awareness.getFenceClient(context);
@@ -42,15 +53,37 @@ final class AwarenessGeofenceProvider implements GeofenceProvider {
     }
 
     @Override
-    public void updateGeofences(final List<UserFeatureField> userFeatureFields) {
+    public void updateGeofences(final List<Feature> features) {
         final List<String> updatedIds = new ArrayList<>();
-        for (UserFeatureField field: userFeatureFields) {
-            if (field.fieldId == null) { throw new IllegalStateException("Field Id cannot be null for location feature fields"); }
-            if (field.fieldType.equals(ConnectLocation.FIELD_TYPE_LOCATION_ENTER_EXIT)) {
-                updatedIds.add(getEnterFenceKey(field.fieldId));
-                updatedIds.add(getExitFenceKey(field.fieldId));
-            } else {
-                updatedIds.add(field.fieldId);
+
+        List<UserFeatureStep> userFeatureSteps = new ArrayList<>();
+
+        for (Feature feature : features) {
+            if (feature.userFeatures != null) {
+                for (UserFeature userFeature : feature.userFeatures) {
+                    if (userFeature.userFeatureSteps != null) {
+                        userFeatureSteps.addAll(userFeature.userFeatureSteps);
+                    }
+                }
+            }
+        }
+
+        List<UserFeatureField> userFeatureFields = new ArrayList<>();
+
+        for (UserFeatureStep userFeatureStep: userFeatureSteps) {
+            if (userFeatureStep.fields != null) {
+                for (UserFeatureField userFeatureField : userFeatureStep.fields) {
+                    if (locationFieldTypesList.contains(userFeatureField.fieldType)) {
+                        userFeatureFields.add(userFeatureField);
+                        if (userFeatureField.fieldId == null) { throw new IllegalStateException("Field Id cannot be null for location feature fields"); }
+                        if (userFeatureField.fieldType.equals(FIELD_TYPE_LOCATION_ENTER_EXIT)) {
+                            updatedIds.add(getEnterFenceKey(userFeatureField.fieldId));
+                            updatedIds.add(getExitFenceKey(userFeatureField.fieldId));
+                        } else {
+                            updatedIds.add(userFeatureField.fieldId);
+                        }
+                    }
+                }
             }
         }
 
@@ -69,7 +102,7 @@ final class AwarenessGeofenceProvider implements GeofenceProvider {
                 LocationFieldValue region = (LocationFieldValue) userFeatureField.value;
 
                 switch (userFeatureField.fieldType) {
-                    case ConnectLocation.FIELD_TYPE_LOCATION_ENTER:
+                    case FIELD_TYPE_LOCATION_ENTER:
                         requestBuilder.addFence(
                                 userFeatureField.fieldId,
                                 LocationFence.entering(region.lat, region.lng, region.radius),
@@ -77,7 +110,7 @@ final class AwarenessGeofenceProvider implements GeofenceProvider {
                         );
                         break;
 
-                    case ConnectLocation.FIELD_TYPE_LOCATION_EXIT:
+                    case FIELD_TYPE_LOCATION_EXIT:
                         requestBuilder.addFence(
                                 userFeatureField.fieldId,
                                 LocationFence.exiting(region.lat, region.lng, region.radius),
@@ -85,7 +118,7 @@ final class AwarenessGeofenceProvider implements GeofenceProvider {
                         );
                         break;
 
-                    case ConnectLocation.FIELD_TYPE_LOCATION_ENTER_EXIT:
+                    case FIELD_TYPE_LOCATION_ENTER_EXIT:
                         requestBuilder.addFence(
                                 getExitFenceKey(userFeatureField.fieldId),
                                 LocationFence.exiting(region.lat, region.lng, region.radius),
@@ -108,9 +141,5 @@ final class AwarenessGeofenceProvider implements GeofenceProvider {
 
     private String getExitFenceKey(String id) {
         return id.concat("/exit");
-    }
-
-    static String extractLocationTriggerFieldId(String fenceKey) {
-        return fenceKey.split("/")[0];
     }
 }

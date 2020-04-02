@@ -17,8 +17,6 @@ android {
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
-                    'proguard-rules.pro'
         }
     }
 
@@ -32,10 +30,9 @@ android {
 
 dependencies {
     api project(':connect-api')
-    api project(':connect-button')
+    implementation project(':connect-button')
     implementation "com.google.android.gms:play-services-awareness:$awarenessVersion"
 
-    testImplementation project(':connect-button')
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.robolectric:robolectric:4.3'
     testImplementation 'androidx.test:runner:1.2.0'

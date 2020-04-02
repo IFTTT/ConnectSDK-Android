@@ -1,7 +1,6 @@
 package com.ifttt.location;
 
 import android.content.Context;
-import androidx.annotation.VisibleForTesting;
 import com.ifttt.connect.Connection;
 import com.ifttt.connect.ConnectionApiClient;
 import com.ifttt.connect.CredentialsProvider;
@@ -23,31 +22,23 @@ public final class ConnectLocation implements ButtonStateChangeListener {
     private AwarenessGeofenceProvider awarenessGeofenceProvider;
     private ConnectionApiClient connectionApiClient;
 
-    final static String FIELD_TYPE_LOCATION_ENTER = "LOCATION_ENTER";
-    final static String FIELD_TYPE_LOCATION_EXIT = "LOCATION_EXIT";
-    final static String FIELD_TYPE_LOCATION_ENTER_EXIT =
-            "LOCATION_ENTER_OR_EXIT";
-
-    private final static List<String> locationFieldTypesList = Arrays.asList(FIELD_TYPE_LOCATION_ENTER, FIELD_TYPE_LOCATION_EXIT, FIELD_TYPE_LOCATION_ENTER_EXIT);
-
     public static synchronized ConnectLocation init(Context context, ConnectionApiClient apiClient) {
         if (INSTANCE == null) {
-            INSTANCE = new ConnectLocation(context);
+            INSTANCE = new ConnectLocation(context, apiClient);
         }
-        INSTANCE.connectionApiClient = apiClient;
         return INSTANCE;
     }
 
     public static synchronized ConnectLocation init(Context context, CredentialsProvider credentialsProvider) {
         if (INSTANCE == null) {
-            INSTANCE = new ConnectLocation(context);
+            ConnectionApiClient.Builder clientBuilder = new ConnectionApiClient.Builder(context);
+            INSTANCE = new ConnectLocation(context, clientBuilder.build());
         }
-        ConnectionApiClient.Builder clientBuilder = new ConnectionApiClient.Builder(context);
-        INSTANCE.connectionApiClient = clientBuilder.build();
         return INSTANCE;
     }
 
-    private ConnectLocation(Context context) {
+    private ConnectLocation(Context context, ConnectionApiClient connectionApiClient) {
+        this.connectionApiClient = connectionApiClient;
         awarenessGeofenceProvider = new AwarenessGeofenceProvider(context);
     }
 
@@ -60,34 +51,7 @@ public final class ConnectLocation implements ButtonStateChangeListener {
 
     @Override
     public void onStateChanged(ConnectButtonState currentState, ConnectButtonState previousState, Connection connection) {
-        // Filter the location based enabled user feature fields.
-        // Using hard-coded data till API is ready
-
-        List<UserFeatureStep> userFeatureSteps = new ArrayList<>();
-
-        for (Feature feature :connection.features) {
-            if (feature.userFeatures != null) {
-                for (UserFeature userFeature : feature.userFeatures) {
-                    if (userFeature.userFeatureSteps != null) {
-                        userFeatureSteps.addAll(userFeature.userFeatureSteps);
-                    }
-                }
-            }
-        }
-
-        List<UserFeatureField> userFeatureFields = new ArrayList<>();
-
-        for (UserFeatureStep userFeatureStep: userFeatureSteps) {
-            if (userFeatureStep.fields != null) {
-                for (UserFeatureField userFeatureField : userFeatureStep.fields) {
-                    if (locationFieldTypesList.contains(userFeatureField.fieldType)) {
-                        userFeatureFields.add(userFeatureField);
-                    }
-                }
-            }
-        }
-
-        awarenessGeofenceProvider.updateGeofences(userFeatureFields);
+        awarenessGeofenceProvider.updateGeofences(connection.features);
     }
 
     @Override

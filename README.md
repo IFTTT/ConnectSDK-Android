@@ -230,6 +230,11 @@ The SDK provides the basic data structure for the data returned from the Connect
 #### Button state change listeners
 In case your app wants to listen to the button state changes, you can register a `ButtonStateChangeListener` via `ConnectButton#addButtonStateChangeListener`.
 
+There are two callback method within the listener:
+* `onStateChanged(ConnectButtonState currentState, ConnectButtonState previousState, Connection connection)`: We added a `connection` to this callback method, available starting from v7. If your app has registered this listener, please add the `connection` param in the overriden callback method.
+* `onError(ErrorResponse errorResponse)`
+
+
 To unregister the listener, call `ConnectButton#removeButtonStateChangeListener`.
 
 #### Layout limitation.

@@ -1,5 +1,6 @@
 package com.ifttt.location;
 
+import android.app.Activity;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import com.ifttt.connect.ui.ConnectButton;
@@ -22,7 +23,7 @@ public class ConnectLocationTest {
     public void setUp(){
         ActivityScenario<TestActivity> scenario = ActivityScenario.launch(TestActivity.class);
         scenario.onActivity(activity -> {
-            button = activity.findViewById(R.id.ifttt_connect_button_test);
+            button = new ConnectButton(activity);
         });
     }
 

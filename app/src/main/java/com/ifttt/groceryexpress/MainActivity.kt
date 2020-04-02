@@ -68,10 +68,6 @@ class MainActivity : AppCompatActivity() {
         ConnectLocation.init(this, credentialsProvider)
         ConnectLocation.setUpWithConnectButton(connectButton)
 
-        if (PermissionChecker.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PermissionChecker.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 0)
-        }
-
         if (!hasEmailSet) {
             promptLogin()
         }

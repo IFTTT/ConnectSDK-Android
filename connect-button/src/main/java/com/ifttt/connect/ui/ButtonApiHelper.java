@@ -17,7 +17,6 @@ import com.ifttt.connect.Connection;
 import com.ifttt.connect.ConnectionApiClient;
 import com.ifttt.connect.CredentialsProvider;
 import com.ifttt.connect.ErrorResponse;
-import com.ifttt.connect.UserTokenAsyncTask;
 import com.ifttt.connect.api.PendingResult;
 import com.ifttt.connect.api.PendingResult.ResultCallback;
 import java.util.List;
