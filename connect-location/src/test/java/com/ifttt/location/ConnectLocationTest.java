@@ -30,7 +30,7 @@ public class ConnectLocationTest {
 
     @Test(expected = IllegalStateException.class)
     public void setUpWithoutInit() {
-        ConnectLocation.setUpWithConnectButton(button);
+        ConnectLocation.getInstance().setUpWithConnectButton(button);
         fail();
     }
 }

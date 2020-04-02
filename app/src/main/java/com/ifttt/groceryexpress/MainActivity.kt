@@ -66,7 +66,7 @@ class MainActivity : AppCompatActivity() {
 
         connectButton.setup(configuration)
         ConnectLocation.init(this, credentialsProvider)
-        ConnectLocation.setUpWithConnectButton(connectButton)
+        ConnectLocation.getInstance().setUpWithConnectButton(connectButton)
 
         if (!hasEmailSet) {
             promptLogin()

@@ -5,16 +5,9 @@ import com.ifttt.connect.Connection;
 import com.ifttt.connect.ConnectionApiClient;
 import com.ifttt.connect.CredentialsProvider;
 import com.ifttt.connect.ErrorResponse;
-import com.ifttt.connect.Feature;
-import com.ifttt.connect.UserFeature;
-import com.ifttt.connect.UserFeatureField;
-import com.ifttt.connect.UserFeatureStep;
 import com.ifttt.connect.ui.ButtonStateChangeListener;
 import com.ifttt.connect.ui.ConnectButton;
 import com.ifttt.connect.ui.ConnectButtonState;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public final class ConnectLocation implements ButtonStateChangeListener {
 
@@ -37,16 +30,20 @@ public final class ConnectLocation implements ButtonStateChangeListener {
         return INSTANCE;
     }
 
-    private ConnectLocation(Context context, ConnectionApiClient connectionApiClient) {
-        this.connectionApiClient = connectionApiClient;
-        awarenessGeofenceProvider = new AwarenessGeofenceProvider(context);
-    }
-
-    public static void setUpWithConnectButton(ConnectButton connectButton) {
+    public static ConnectLocation getInstance() {
         if (INSTANCE == null) {
             throw new IllegalStateException("Connect Location is not initialized");
         }
-        connectButton.addButtonStateChangeListener(INSTANCE);
+        return INSTANCE;
+    }
+
+    public void setUpWithConnectButton(ConnectButton connectButton) {
+        connectButton.addButtonStateChangeListener(this);
+    }
+
+    private ConnectLocation(Context context, ConnectionApiClient connectionApiClient) {
+        this.connectionApiClient = connectionApiClient;
+        awarenessGeofenceProvider = new AwarenessGeofenceProvider(context);
     }
 
     @Override
