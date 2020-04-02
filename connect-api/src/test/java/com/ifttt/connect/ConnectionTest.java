@@ -48,6 +48,7 @@ public final class ConnectionTest {
     public void testUserFeatureSteps() {
         assertThat(connection.features.get(0).userFeatures.get(0).userFeatureSteps).hasSize(2);
         assertThat(connection.features.get(0).userFeatures.get(0).userFeatureSteps.get(0).stepId).isEqualTo("606");
+        assertThat(connection.features.get(0).userFeatures.get(0).userFeatureSteps.get(0).id).isEqualTo("707");
         assertThat(connection.features.get(0).userFeatures.get(0).userFeatureSteps.get(0).stepType).isEqualTo(
             FeatureStep.StepType.Trigger);
     }

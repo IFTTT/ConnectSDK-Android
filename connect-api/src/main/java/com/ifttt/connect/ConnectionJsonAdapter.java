@@ -38,9 +38,9 @@ final class ConnectionJsonAdapter {
         "user_feature_queries",
         "user_feature_actions"
     );
-    private final JsonReader.Options triggerOptions = JsonReader.Options.of("feature_trigger_id", "user_fields");
-    private final JsonReader.Options queryOptions = JsonReader.Options.of("feature_query_id", "user_fields");
-    private final JsonReader.Options actionOptions = JsonReader.Options.of("feature_action_id", "user_fields");
+    private final JsonReader.Options triggerOptions = JsonReader.Options.of("feature_trigger_id", "id", "user_fields");
+    private final JsonReader.Options queryOptions = JsonReader.Options.of("feature_query_id", "id", "user_fields");
+    private final JsonReader.Options actionOptions = JsonReader.Options.of("feature_action_id", "id", "user_fields");
     private final JsonReader.Options fieldOptions = JsonReader.Options.of("field_id", "field_type", "value");
 
     @FromJson
@@ -236,6 +236,7 @@ final class ConnectionJsonAdapter {
         while (jsonReader.hasNext()) {
             jsonReader.beginObject();
             String stepId = null;
+            String id = null;
             List<UserFeatureField> fields = new ArrayList<>();
             while (jsonReader.hasNext()) {
                 int triggerIndex = jsonReader.selectName(options);
@@ -244,6 +245,9 @@ final class ConnectionJsonAdapter {
                         stepId = jsonReader.nextString();
                         break;
                     case 1:
+                        id = jsonReader.nextString();
+                        break;
+                    case 2:
                         jsonReader.beginArray();
                         while (jsonReader.hasNext()) {
                             String fieldId = null;
@@ -269,8 +273,7 @@ final class ConnectionJsonAdapter {
                                         } else if (FIELD_TYPES_COLLECTION.contains(fieldType)) {
                                             CollectionFieldValue collectionFieldValue
                                                 = collectionFieldDelegate.fromJson(jsonReader);
-                                            fields.add(new UserFeatureField<>(
-                                                collectionFieldValue,
+                                            fields.add(new UserFeatureField<>(collectionFieldValue,
                                                 fieldType,
                                                 fieldId
                                             ));
@@ -280,8 +283,7 @@ final class ConnectionJsonAdapter {
 
                                             StringArrayFieldValue stringArrayFieldValue = new StringArrayFieldValue(
                                                 arrayValue);
-                                            fields.add(new UserFeatureField<>(
-                                                stringArrayFieldValue,
+                                            fields.add(new UserFeatureField<>(stringArrayFieldValue,
                                                 fieldType,
                                                 fieldId
                                             ));
@@ -306,8 +308,9 @@ final class ConnectionJsonAdapter {
             }
             jsonReader.endObject();
             checkNonNull(stepId);
+            checkNonNull(id);
 
-            steps.add(new UserFeatureStep(type, stepId, fields));
+            steps.add(new UserFeatureStep(type, id, stepId, fields));
         }
         jsonReader.endArray();
     }

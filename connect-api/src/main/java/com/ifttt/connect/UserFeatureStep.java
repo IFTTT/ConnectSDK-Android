@@ -11,17 +11,22 @@ import java.util.List;
 public final class UserFeatureStep implements Parcelable {
 
     public final FeatureStep.StepType stepType;
+    public final String id;
     public final String stepId;
     public final List<UserFeatureField> fields;
 
-    public UserFeatureStep(FeatureStep.StepType stepType, String stepId, List<UserFeatureField> fields) {
+    public UserFeatureStep(
+        FeatureStep.StepType stepType, String id, String stepId, List<UserFeatureField> fields
+    ) {
         this.stepType = stepType;
+        this.id = id;
         this.stepId = stepId;
         this.fields = fields;
     }
 
     protected UserFeatureStep(Parcel in) {
         stepType = (FeatureStep.StepType) in.readSerializable();
+        id = in.readString();
         stepId = in.readString();
         fields = in.createTypedArrayList(UserFeatureField.CREATOR);
     }
@@ -46,6 +51,7 @@ public final class UserFeatureStep implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeSerializable(stepType);
+        dest.writeString(id);
         dest.writeString(stepId);
         dest.writeTypedList(fields);
     }
