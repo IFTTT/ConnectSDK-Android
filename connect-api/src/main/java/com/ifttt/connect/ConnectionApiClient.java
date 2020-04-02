@@ -95,6 +95,10 @@ public final class ConnectionApiClient {
         }
 
         public ConnectionApiClient build() {
+            return buildWithBaseUrl("https://connect.ifttt.com");
+        }
+
+        ConnectionApiClient buildWithBaseUrl(String baseUrl) {
             Moshi moshi = new Moshi.Builder().add(new HexColorJsonAdapter())
                 .add(Date.class, new Rfc3339DateJsonAdapter().nullSafe())
                 .add(new ConnectionJsonAdapter())
@@ -112,7 +116,7 @@ public final class ConnectionApiClient {
 
             OkHttpClient okHttpClient = builder.build();
             Retrofit retrofit = new Retrofit.Builder().addConverterFactory(MoshiConverterFactory.create(moshi)).baseUrl(
-                "https://connect.ifttt.com").client(okHttpClient).build();
+                baseUrl).client(okHttpClient).build();
 
             RetrofitConnectionApi retrofitConnectionApi = retrofit.create(RetrofitConnectionApi.class);
 
