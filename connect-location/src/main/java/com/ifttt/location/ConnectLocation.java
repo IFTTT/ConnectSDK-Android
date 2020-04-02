@@ -12,12 +12,12 @@ import com.ifttt.connect.ui.ConnectButtonState;
 public final class ConnectLocation implements ButtonStateChangeListener {
 
     private static ConnectLocation INSTANCE = null;
-    private AwarenessGeofenceProvider awarenessGeofenceProvider;
+    private GeofenceProvider geofenceProvider;
     private ConnectionApiClient connectionApiClient;
 
     public static synchronized ConnectLocation init(Context context, ConnectionApiClient apiClient) {
         if (INSTANCE == null) {
-            INSTANCE = new ConnectLocation(context, apiClient);
+            INSTANCE = new ConnectLocation(new AwarenessGeofenceProvider(context), apiClient);
         }
         return INSTANCE;
     }
@@ -25,7 +25,7 @@ public final class ConnectLocation implements ButtonStateChangeListener {
     public static synchronized ConnectLocation init(Context context, CredentialsProvider credentialsProvider) {
         if (INSTANCE == null) {
             ConnectionApiClient.Builder clientBuilder = new ConnectionApiClient.Builder(context);
-            INSTANCE = new ConnectLocation(context, clientBuilder.build());
+            INSTANCE = new ConnectLocation(new AwarenessGeofenceProvider(context), clientBuilder.build());
         }
         return INSTANCE;
     }
@@ -41,14 +41,14 @@ public final class ConnectLocation implements ButtonStateChangeListener {
         connectButton.addButtonStateChangeListener(this);
     }
 
-    private ConnectLocation(Context context, ConnectionApiClient connectionApiClient) {
+    private ConnectLocation(GeofenceProvider geofenceProvider, ConnectionApiClient connectionApiClient) {
         this.connectionApiClient = connectionApiClient;
-        awarenessGeofenceProvider = new AwarenessGeofenceProvider(context);
+        this.geofenceProvider = geofenceProvider;
     }
 
     @Override
     public void onStateChanged(ConnectButtonState currentState, ConnectButtonState previousState, Connection connection) {
-        awarenessGeofenceProvider.updateGeofences(connection.features);
+        geofenceProvider.updateGeofences(connection.features);
     }
 
     @Override
