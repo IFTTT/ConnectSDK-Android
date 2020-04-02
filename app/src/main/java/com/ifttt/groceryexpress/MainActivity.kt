@@ -1,5 +1,6 @@
 package com.ifttt.groceryexpress
 
+import android.Manifest
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
@@ -11,12 +12,15 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.app.ActivityCompat
+import androidx.core.content.PermissionChecker
 import com.google.android.material.textfield.TextInputLayout
 import com.ifttt.connect.ConnectionApiClient
 import com.ifttt.connect.ui.ConnectButton
 import com.ifttt.connect.ui.ConnectResult
-import com.ifttt.connect.ui.CredentialsProvider
+import com.ifttt.connect.CredentialsProvider
 import com.ifttt.groceryexpress.ApiHelper.REDIRECT_URI
+import com.ifttt.location.ConnectLocation
 
 class MainActivity : AppCompatActivity() {
 
@@ -24,7 +28,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var toolbar: Toolbar
     private lateinit var emailPreferencesHelper: EmailPreferencesHelper
 
-    private val credentialsProvider = object : CredentialsProvider {
+    private val credentialsProvider = object :
+        CredentialsProvider {
         override fun getUserToken() = ApiHelper.getUserToken(emailPreferencesHelper.getEmail())
 
         override fun getOAuthCode() = emailPreferencesHelper.getEmail()
@@ -58,7 +63,10 @@ class MainActivity : AppCompatActivity() {
         ).setOnFetchCompleteListener { connection ->
             findViewById<TextView>(R.id.connection_title).text = connection.name
         }.build()
+
         connectButton.setup(configuration)
+        ConnectLocation.init(this, credentialsProvider)
+        ConnectLocation.getInstance().setUpWithConnectButton(connectButton)
 
         if (!hasEmailSet) {
             promptLogin()

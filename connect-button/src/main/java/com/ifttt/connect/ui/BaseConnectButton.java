@@ -48,6 +48,7 @@ import androidx.lifecycle.LifecycleRegistry;
 import androidx.lifecycle.OnLifecycleEvent;
 import com.ifttt.connect.Connection;
 import com.ifttt.connect.ConnectionApiClient;
+import com.ifttt.connect.CredentialsProvider;
 import com.ifttt.connect.ErrorResponse;
 import com.ifttt.connect.R;
 import com.ifttt.connect.Service;
@@ -151,7 +152,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
         lifecycleRegistry = new LifecycleRegistry(this);
         lifecycleRegistry.addObserver(animatorLifecycleObserver);
-        lifecycleRegistry.markState(CREATED);
+        lifecycleRegistry.setCurrentState(CREATED);
 
         inflate(context, R.layout.view_ifttt_connect, this);
         buttonRoot = findViewById(R.id.ifttt_button_root);
@@ -182,7 +183,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        lifecycleRegistry.markState(STARTED);
+        lifecycleRegistry.setCurrentState(STARTED);
         AnalyticsManager.getInstance(getContext())
                 .flushTrackedEvents();
     }
@@ -192,7 +193,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         super.onDetachedFromWindow();
         AnalyticsManager.getInstance(getContext())
                 .flushTrackedEvents();
-        lifecycleRegistry.markState(DESTROYED);
+        lifecycleRegistry.setCurrentState(DESTROYED);
         revertableHandler.clear();
     }
 
@@ -341,6 +342,10 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         cleanUpViews(ProgressView.class);
         switch (result.nextStep) {
             case Complete:
+                if (result.userToken != null) {
+                    buttonApiHelper.setUserToken(result.userToken);
+                }
+
                 CharSequence text = getResources().getString(R.string.ifttt_connecting);
                 ProgressView progressView = ProgressView.addTo(buttonRoot, worksWithService.brandColor,
                         getDarkerColor(worksWithService.brandColor));
@@ -558,10 +563,6 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                 AnalyticsLocation.fromConnectButtonWithId(connection.id));
     }
 
-    Connection getConnection() {
-        return connection;
-    }
-
     private void setServiceIconImage(@Nullable Bitmap bitmap) {
         // Set a placeholder for the image.
         if (bitmap == null) {
@@ -666,7 +667,24 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                 cleanUpViews(ProgressView.class);
                 cleanUpViews(CheckMarkView.class);
 
-                dispatchState(Enabled);
+                PendingResult.ResultCallback<Connection> callback = new PendingResult.ResultCallback<Connection>() {
+                    @Override
+                    public void onSuccess(Connection result) {
+                        setConnection(result);
+                    }
+
+                    @Override
+                    public void onFailure(ErrorResponse errorResponse) {
+                        dispatchError(errorResponse);
+                    }
+                };
+
+                if (buttonApiHelper.isUserAuthorized()) {
+                    buttonApiHelper.fetchConnection(lifecycleRegistry, connection.id, callback);
+                } else {
+                    buttonApiHelper.fetchUserToken(lifecycleRegistry, () ->
+                        buttonApiHelper.fetchConnection(lifecycleRegistry, connection.id, callback));
+                }
             }
         });
 
@@ -1074,7 +1092,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
     private void dispatchState(ConnectButtonState newState) {
         if (newState != buttonState) {
             for (ButtonStateChangeListener listener : listeners) {
-                listener.onStateChanged(newState, buttonState);
+                listener.onStateChanged(newState, buttonState, connection);
             }
         }
 

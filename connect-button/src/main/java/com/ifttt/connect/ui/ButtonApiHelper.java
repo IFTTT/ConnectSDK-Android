@@ -15,6 +15,7 @@ import androidx.lifecycle.OnLifecycleEvent;
 import com.ifttt.connect.BuildConfig;
 import com.ifttt.connect.Connection;
 import com.ifttt.connect.ConnectionApiClient;
+import com.ifttt.connect.CredentialsProvider;
 import com.ifttt.connect.ErrorResponse;
 import com.ifttt.connect.api.PendingResult;
 import com.ifttt.connect.api.PendingResult.ResultCallback;
@@ -51,8 +52,13 @@ final class ButtonApiHelper {
     @Nullable private PendingResult<Connection> disableConnectionCall;
     @Nullable private PendingResult<Connection> reenableConnectionCall;
 
-    ButtonApiHelper(ConnectionApiClient client, Uri redirectUri, @Nullable String inviteCode,
-            CredentialsProvider provider, Lifecycle lifecycle) {
+    ButtonApiHelper(
+        ConnectionApiClient client,
+        Uri redirectUri,
+        @Nullable String inviteCode,
+        CredentialsProvider provider,
+        Lifecycle lifecycle
+    ) {
         this.lifecycle = lifecycle;
         this.redirectUri = redirectUri;
         this.inviteCode = inviteCode;
@@ -133,6 +139,28 @@ final class ButtonApiHelper {
         return connectionApiClient.isUserAuthorized();
     }
 
+    void setUserToken(String userToken) {
+        connectionApiClient.setUserToken(userToken);
+    }
+
+    void fetchUserToken(Lifecycle lifecycle, UserTokenAsyncTask.UserTokenCallback callback) {
+        UserTokenAsyncTask asyncTask = new UserTokenAsyncTask(
+            credentialsProvider,
+            connectionApiClient,
+            callback
+        );
+        asyncTask.execute();
+
+        lifecycle.addObserver(new AsyncTaskObserver(asyncTask));
+    }
+
+    void fetchConnection(Lifecycle lifecycle, String connectionId, PendingResult.ResultCallback<Connection> callback) {
+        PendingResult<Connection> pendingResult = connectionApiClient.api().showConnection(connectionId);
+        pendingResult.execute(callback);
+
+        lifecycle.addObserver(new PendingResultLifecycleObserver<>(pendingResult));
+    }
+
     void connect(Context context, Connection connection, String email, ConnectButtonState buttonState) {
         Intent launchAppIntent = getIntentToApp(context, connection, email, buttonState);
         if (launchAppIntent != null) {
@@ -147,8 +175,16 @@ final class ButtonApiHelper {
     private void redirectToWeb(Context context, Connection connection, String email, ConnectButtonState buttonState) {
         EmailAppsChecker checker = new EmailAppsChecker(context.getPackageManager());
         String anonymousId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
-        Uri uri = getEmbedUri(connection, buttonState, redirectUri, checker.detectEmailApps(), email, userLogin,
-                anonymousId, oAuthCode, inviteCode);
+        Uri uri = getEmbedUri(connection,
+            buttonState,
+            redirectUri,
+            checker.detectEmailApps(),
+            email,
+            userLogin,
+            anonymousId,
+            oAuthCode,
+            inviteCode
+        );
         CustomTabsIntent intent = new CustomTabsIntent.Builder().build();
         intent.launchUrl(context, uri);
     }
@@ -156,13 +192,21 @@ final class ButtonApiHelper {
     @SuppressLint("HardwareIds")
     @CheckReturnValue
     @Nullable
-    private Intent getIntentToApp(Context context, Connection connection, String email,
-            ConnectButtonState buttonState) {
+    private Intent getIntentToApp(
+        Context context, Connection connection, String email, ConnectButtonState buttonState
+    ) {
         EmailAppsChecker checker = new EmailAppsChecker(context.getPackageManager());
         String anonymousId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
-        Intent launchIntent = new Intent(Intent.ACTION_VIEW,
-                getEmbedUri(connection, buttonState, redirectUri, checker.detectEmailApps(), email, userLogin,
-                        anonymousId, oAuthCode, inviteCode));
+        Intent launchIntent = new Intent(Intent.ACTION_VIEW, getEmbedUri(connection,
+            buttonState,
+            redirectUri,
+            checker.detectEmailApps(),
+            email,
+            userLogin,
+            anonymousId,
+            oAuthCode,
+            inviteCode
+        ));
         launchIntent.setPackage(PACKAGE_NAME_IFTTT);
 
         if (!hasActivityToLaunch(context, launchIntent)) {
@@ -175,12 +219,14 @@ final class ButtonApiHelper {
     @MainThread
     void prepareAuthentication(String email) {
         RedirectPrepAsyncTask task = new RedirectPrepAsyncTask(credentialsProvider,
-                connectionApiClient.isUserAuthorized() ? connectionApiClient.api().user() : null, email,
-                prepResult -> {
-                    this.oAuthCode = prepResult.oauthToken;
-                    this.accountFound = prepResult.accountFound;
-                    this.userLogin = prepResult.userLogin;
-                });
+            connectionApiClient.isUserAuthorized() ? connectionApiClient.api().user() : null,
+            email,
+            prepResult -> {
+                this.oAuthCode = prepResult.oauthToken;
+                this.accountFound = prepResult.accountFound;
+                this.userLogin = prepResult.userLogin;
+            }
+        );
         lifecycle.addObserver(new OAuthTokenExchangeTaskObserver(task));
         task.execute();
     }
@@ -190,15 +236,26 @@ final class ButtonApiHelper {
      * option invite code for the service.
      */
     @VisibleForTesting
-    static Uri getEmbedUri(Connection connection, ConnectButtonState buttonState, Uri redirectUri,
-            List<String> emailApps, String email, @Nullable String userLogin, String anonymousId,
-            @Nullable String oAuthCode, @Nullable String inviteCode) {
+    static Uri getEmbedUri(
+        Connection connection,
+        ConnectButtonState buttonState,
+        Uri redirectUri,
+        List<String> emailApps,
+        String email,
+        @Nullable String userLogin,
+        String anonymousId,
+        @Nullable String oAuthCode,
+        @Nullable String inviteCode
+    ) {
         Uri.Builder builder = Uri.parse(SHOW_CONNECTION_API_URL + connection.id)
-                .buildUpon()
-                .appendQueryParameter("sdk_version", BuildConfig.VERSION_NAME)
-                .appendQueryParameter("sdk_platform", "android")
-                .appendQueryParameter("sdk_return_to", redirectUri.toString())
-                .appendQueryParameter("sdk_anonymous_id", anonymousId);
+            .buildUpon()
+            .appendQueryParameter(
+                "sdk_version",
+                BuildConfig.VERSION_NAME
+            )
+            .appendQueryParameter("sdk_platform", "android")
+            .appendQueryParameter("sdk_return_to", redirectUri.toString())
+            .appendQueryParameter("sdk_anonymous_id", anonymousId);
 
         if (inviteCode != null) {
             builder.appendQueryParameter("invite_code", inviteCode);
@@ -232,7 +289,8 @@ final class ButtonApiHelper {
     @CheckReturnValue
     static Intent redirectToPlayStore(Context context) {
         Intent launchIntent = new Intent(Intent.ACTION_VIEW,
-                Uri.parse("https://play.google.com/store/apps/details?id=com.ifttt.ifttt"));
+            Uri.parse("https://play.google.com/store/apps/details?id=com.ifttt.ifttt")
+        );
         launchIntent.setPackage("com.android.vending");
 
         if (!hasActivityToLaunch(context, launchIntent)) {
@@ -246,7 +304,8 @@ final class ButtonApiHelper {
     @Nullable
     static Intent redirectToManage(Context context, String id) {
         Intent intent = new Intent(Intent.ACTION_VIEW,
-                IFTTT_URI.buildUpon().appendPath("connections").appendPath(id).appendPath("edit").build());
+            IFTTT_URI.buildUpon().appendPath("connections").appendPath(id).appendPath("edit").build()
+        );
         if (!hasActivityToLaunch(context, intent)) {
             return null;
         }
@@ -279,8 +338,10 @@ final class ButtonApiHelper {
     @CheckReturnValue
     @Nullable
     static Intent redirectToConnection(Context context, String id) {
-        Intent intent =
-                new Intent(Intent.ACTION_VIEW, IFTTT_URI.buildUpon().appendPath("connections").appendPath(id).build());
+        Intent intent = new Intent(
+            Intent.ACTION_VIEW,
+            IFTTT_URI.buildUpon().appendPath("connections").appendPath(id).build()
+        );
         if (!hasActivityToLaunch(context, intent)) {
             return null;
         }

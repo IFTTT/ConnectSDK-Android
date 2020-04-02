@@ -1,7 +1,6 @@
-package com.ifttt.connect.ui;
+package com.ifttt.connect;
 
 import androidx.annotation.WorkerThread;
-import com.ifttt.connect.Connection;
 
 /**
  * Interface that defines APIs for providing credentials used during the service authentication process for a

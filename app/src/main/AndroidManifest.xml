@@ -30,6 +30,5 @@
                     android:scheme="groceryexpress"/>
             </intent-filter>
         </activity>
-
     </application>
 </manifest>

@@ -1,5 +1,6 @@
 package com.ifttt.connect.ui;
 
+import com.ifttt.connect.Connection;
 import com.ifttt.connect.ErrorResponse;
 
 /**
@@ -11,8 +12,10 @@ public interface ButtonStateChangeListener {
      *
      * @param currentState Current state of the button.
      * @param previousState Previous state of the button.
+     * @param connection Connection instance.
+     * If currentState = Enabled, this param will reflect the refreshed Connection instance with updated feature fields.
      */
-    void onStateChanged(ConnectButtonState currentState, ConnectButtonState previousState);
+    void onStateChanged(ConnectButtonState currentState, ConnectButtonState previousState, Connection connection);
 
     /**
      * Called when the button state change encounters an errorResponse.
