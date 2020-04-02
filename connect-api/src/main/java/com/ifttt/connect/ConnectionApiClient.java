@@ -10,6 +10,7 @@ import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter;
 import java.util.Date;
+import java.util.UUID;
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 import okhttp3.OkHttpClient;
@@ -80,7 +81,12 @@ public final class ConnectionApiClient {
          */
         @SuppressLint("HardwareIds")
         public Builder(Context context) {
-            anonymousId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+            String androidId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+            if (androidId != null) {
+                anonymousId = androidId;
+            } else {
+                anonymousId = UUID.randomUUID().toString();
+            }
         }
 
         /**
