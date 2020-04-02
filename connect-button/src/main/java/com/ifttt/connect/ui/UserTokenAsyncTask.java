@@ -5,7 +5,7 @@ import com.ifttt.connect.BuildConfig;
 import com.ifttt.connect.ConnectionApiClient;
 import com.ifttt.connect.CredentialsProvider;
 
-public final class UserTokenAsyncTask extends android.os.AsyncTask<Void, Void, String> {
+final class UserTokenAsyncTask extends android.os.AsyncTask<Void, Void, String> {
 
     public interface UserTokenCallback {
         void onComplete();

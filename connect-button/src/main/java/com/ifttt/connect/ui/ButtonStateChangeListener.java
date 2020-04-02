@@ -2,8 +2,6 @@ package com.ifttt.connect.ui;
 
 import com.ifttt.connect.Connection;
 import com.ifttt.connect.ErrorResponse;
-import com.ifttt.connect.Feature;
-import java.util.List;
 
 /**
  * Callback interface for listening to state changes of the {@link BaseConnectButton}.
@@ -14,7 +12,7 @@ public interface ButtonStateChangeListener {
      *
      * @param currentState Current state of the button.
      * @param previousState Previous state of the button.
-     * @param connection Connection object
+     * @param connection Updated connection after state change event.
      */
     void onStateChanged(ConnectButtonState currentState, ConnectButtonState previousState, Connection connection);
 
