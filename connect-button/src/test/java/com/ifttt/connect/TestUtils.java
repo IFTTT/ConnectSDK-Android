@@ -1,5 +1,6 @@
 package com.ifttt.connect;
 
+import android.content.Context;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.JsonReader;
 import com.squareup.moshi.Moshi;
@@ -7,6 +8,7 @@ import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
+import okhttp3.mockwebserver.MockWebServer;
 import okio.Okio;
 
 public final class TestUtils {
@@ -22,6 +24,10 @@ public final class TestUtils {
         InputStream inputStream = classLoader.getResourceAsStream("connection.json");
         JsonReader jsonReader = JsonReader.of(Okio.buffer(Okio.source(inputStream)));
         return CONNECTION_ADAPTER.fromJson(jsonReader);
+    }
+
+    public static ConnectionApiClient getMockConnectionApiClient(Context context, MockWebServer server) {
+        return new ConnectionApiClient.Builder(context).buildWithBaseUrl(server.url("").toString());
     }
 
     private TestUtils() {

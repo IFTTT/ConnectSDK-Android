@@ -10,6 +10,7 @@ import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter;
 import java.util.Date;
+import java.util.UUID;
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 import okhttp3.OkHttpClient;
@@ -80,7 +81,12 @@ public final class ConnectionApiClient {
          */
         @SuppressLint("HardwareIds")
         public Builder(Context context) {
-            anonymousId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+            String androidId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+            if (androidId != null) {
+                anonymousId = androidId;
+            } else {
+                anonymousId = UUID.randomUUID().toString();
+            }
         }
 
         /**
@@ -95,6 +101,10 @@ public final class ConnectionApiClient {
         }
 
         public ConnectionApiClient build() {
+            return buildWithBaseUrl("https://connect.ifttt.com");
+        }
+
+        ConnectionApiClient buildWithBaseUrl(String baseUrl) {
             Moshi moshi = new Moshi.Builder().add(new HexColorJsonAdapter())
                 .add(Date.class, new Rfc3339DateJsonAdapter().nullSafe())
                 .add(new ConnectionJsonAdapter())
@@ -112,7 +122,7 @@ public final class ConnectionApiClient {
 
             OkHttpClient okHttpClient = builder.build();
             Retrofit retrofit = new Retrofit.Builder().addConverterFactory(MoshiConverterFactory.create(moshi)).baseUrl(
-                "https://connect.ifttt.com").client(okHttpClient).build();
+                baseUrl).client(okHttpClient).build();
 
             RetrofitConnectionApi retrofitConnectionApi = retrofit.create(RetrofitConnectionApi.class);
 

@@ -13,8 +13,13 @@ import com.ifttt.connect.ConnectionApiClient;
 import com.ifttt.connect.CredentialsProvider;
 import com.ifttt.connect.ErrorResponse;
 import com.ifttt.connect.R;
+import com.ifttt.connect.TestUtils;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.concurrent.atomic.AtomicReference;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
+import okio.Okio;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -99,16 +104,20 @@ public final class BaseConnectButtonTest {
         TextView nextHelperTextView = (TextView) helperText.getNextView();
 
         button.setOnDarkBackground(true);
-        assertThat(currentHelperTextView.getCurrentTextColor()).isEqualTo(
-                ContextCompat.getColor(button.getContext(), R.color.ifttt_footer_text_white));
-        assertThat(nextHelperTextView.getCurrentTextColor()).isEqualTo(
-                ContextCompat.getColor(button.getContext(), R.color.ifttt_footer_text_white));
+        assertThat(currentHelperTextView.getCurrentTextColor()).isEqualTo(ContextCompat.getColor(button.getContext(),
+            R.color.ifttt_footer_text_white
+        ));
+        assertThat(nextHelperTextView.getCurrentTextColor()).isEqualTo(ContextCompat.getColor(button.getContext(),
+            R.color.ifttt_footer_text_white
+        ));
 
         button.setOnDarkBackground(false);
-        assertThat(currentHelperTextView.getCurrentTextColor()).isEqualTo(
-                ContextCompat.getColor(button.getContext(), R.color.ifttt_footer_text_black));
-        assertThat(nextHelperTextView.getCurrentTextColor()).isEqualTo(
-                ContextCompat.getColor(button.getContext(), R.color.ifttt_footer_text_black));
+        assertThat(currentHelperTextView.getCurrentTextColor()).isEqualTo(ContextCompat.getColor(button.getContext(),
+            R.color.ifttt_footer_text_black
+        ));
+        assertThat(nextHelperTextView.getCurrentTextColor()).isEqualTo(ContextCompat.getColor(button.getContext(),
+            R.color.ifttt_footer_text_black
+        ));
     }
 
     @Test
@@ -120,7 +129,9 @@ public final class BaseConnectButtonTest {
         AtomicReference<ErrorResponse> errorRef = new AtomicReference<>();
         button.addButtonStateChangeListener(new ButtonStateChangeListener() {
             @Override
-            public void onStateChanged(ConnectButtonState currentState, ConnectButtonState previousState, Connection connection) {
+            public void onStateChanged(
+                ConnectButtonState currentState, ConnectButtonState previousState, Connection connection
+            ) {
                 currentStateRef.set(currentState);
                 prevStateRef.set(previousState);
             }
@@ -138,5 +149,46 @@ public final class BaseConnectButtonTest {
         button.setConnectResult(new ConnectResult(ConnectResult.NextStep.Error, null, "error"));
         assertThat(currentStateRef.get()).isEqualTo(ConnectButtonState.Initial);
         assertThat(errorRef.get()).isNotNull();
+    }
+
+    @Test
+    public void testEnabledStateDispatch() throws IOException {
+        AtomicReference<ConnectButtonState> currentStateRef = new AtomicReference<>();
+        AtomicReference<ConnectButtonState> prevStateRef = new AtomicReference<>();
+
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("connection_enabled.json");
+        MockWebServer server = new MockWebServer();
+        server.enqueue(new MockResponse().setBody(Okio.buffer(Okio.source(inputStream)).readUtf8()));
+        server.start();
+
+        button.setup("a@b.com",
+            TestUtils.getMockConnectionApiClient(button.getContext(), server),
+            Uri.parse("https://google.com"),
+            credentialsProvider,
+            null
+        );
+
+        Connection connection = loadConnection(getClass().getClassLoader());
+        button.setConnection(connection);
+        button.addButtonStateChangeListener(new ButtonStateChangeListener() {
+            @Override
+            public void onStateChanged(
+                ConnectButtonState currentState, ConnectButtonState previousState, Connection connection
+            ) {
+                currentStateRef.set(currentState);
+                prevStateRef.set(previousState);
+            }
+
+            @Override
+            public void onError(ErrorResponse errorResponse) {
+            }
+        });
+
+        button.setConnectResult(new ConnectResult(ConnectResult.NextStep.Complete, "token", null));
+        Shadows.shadowOf(Looper.getMainLooper()).idle();
+
+        assertThat(currentStateRef.get()).isEqualTo(ConnectButtonState.Enabled);
+        assertThat(prevStateRef.get()).isEqualTo(ConnectButtonState.Initial);
+        server.shutdown();
     }
 }

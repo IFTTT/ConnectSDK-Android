@@ -36,6 +36,7 @@ dependencies {
     testImplementation 'androidx.test:core:1.2.0'
     testImplementation 'androidx.test.ext:truth:1.2.0'
     testImplementation 'androidx.test.ext:junit:1.1.1'
+    testImplementation 'com.squareup.okhttp3:mockwebserver:4.4.0'
     testImplementation "com.squareup.retrofit2:retrofit-mock:$retrofitVersion"
     testImplementation "androidx.work:work-testing:$workManagerVersion"
 }
