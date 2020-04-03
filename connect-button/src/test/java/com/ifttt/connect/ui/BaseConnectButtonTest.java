@@ -153,7 +153,8 @@ public final class BaseConnectButtonTest {
 
     @Test
     public void testEnabledStateDispatch() throws IOException {
-        AtomicReference<ConnectButtonState> currentStateRef = new AtomicReference<>(ConnectButtonState.Initial);
+        AtomicReference<ConnectButtonState> currentStateRef = new AtomicReference<>();
+        AtomicReference<ConnectButtonState> prevStateRef = new AtomicReference<>();
 
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("connection_enabled.json");
         MockWebServer server = new MockWebServer();
@@ -175,6 +176,7 @@ public final class BaseConnectButtonTest {
                 ConnectButtonState currentState, ConnectButtonState previousState, Connection connection
             ) {
                 currentStateRef.set(currentState);
+                prevStateRef.set(previousState);
             }
 
             @Override
@@ -186,6 +188,7 @@ public final class BaseConnectButtonTest {
         Shadows.shadowOf(Looper.getMainLooper()).idle();
 
         assertThat(currentStateRef.get()).isEqualTo(ConnectButtonState.Enabled);
+        assertThat(prevStateRef.get()).isEqualTo(ConnectButtonState.Initial);
         server.shutdown();
     }
 }
