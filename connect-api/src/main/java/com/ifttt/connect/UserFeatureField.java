@@ -2,7 +2,6 @@ package com.ifttt.connect;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import javax.annotation.Nullable;
 
 /**
  * Data structure representing one configuration field for a {@link UserFeature}. Currently, the supported value types
@@ -14,11 +13,11 @@ import javax.annotation.Nullable;
  */
 public final class UserFeatureField<T extends Parcelable> implements Parcelable {
 
-    @Nullable public final T value;
+    public final T value;
     public final String fieldType;
     public final String fieldId;
 
-    public UserFeatureField(@Nullable T value, String fieldType, String fieldId) {
+    public UserFeatureField(T value, String fieldType, String fieldId) {
         this.value = value;
         this.fieldType = fieldType;
         this.fieldId = fieldId;
