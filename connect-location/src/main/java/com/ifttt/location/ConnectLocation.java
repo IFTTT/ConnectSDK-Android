@@ -47,8 +47,14 @@ public final class ConnectLocation implements ButtonStateChangeListener {
     }
 
     @Override
-    public void onStateChanged(ConnectButtonState currentState, ConnectButtonState previousState, Connection connection) {
-        if (currentState == ConnectButtonState.Enabled) {
+    public void onStateChanged(
+        ConnectButtonState currentState,
+        ConnectButtonState previousState,
+        Connection connection
+    ) {
+        if (currentState == ConnectButtonState.Enabled
+            || currentState == ConnectButtonState.Disabled
+            || currentState == ConnectButtonState.Initial) {
             geofenceProvider.updateGeofences(connection.features);
         }
     }
