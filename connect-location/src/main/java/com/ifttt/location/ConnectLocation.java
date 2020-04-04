@@ -41,7 +41,7 @@ public final class ConnectLocation implements ButtonStateChangeListener {
         connectButton.addButtonStateChangeListener(this);
     }
 
-    private ConnectLocation(GeofenceProvider geofenceProvider, ConnectionApiClient connectionApiClient) {
+    ConnectLocation(GeofenceProvider geofenceProvider, ConnectionApiClient connectionApiClient) {
         this.connectionApiClient = connectionApiClient;
         this.geofenceProvider = geofenceProvider;
     }
