@@ -69,9 +69,11 @@ public final class ConnectLocation implements ButtonStateChangeListener {
     }
 
     private void setUpPolling() {
-        // Execute periodic work request builder
-        // Check connection state, if disabled stop polling.
-        // When the connection is enabled, onStateChanged will be called.
+        /*
+        * TODO: Execute periodic work request builder
+        * TODO: Check connection state, if disabled stop polling.
+        * When the connection is enabled, onStateChanged will be called, and polling will restart there
+        * */
     }
 
     @Override
@@ -82,8 +84,11 @@ public final class ConnectLocation implements ButtonStateChangeListener {
                 geofenceProvider.updateGeofences(connection.features);
             }
 
-        // Check if the user token needs to be refreshed, when the status changes, the user token may have changed.
-        // If user token needs to be refreshed, change this method to accept the `result` and set new user token on the api client.
+
+        /*
+        * TODO: Check if the user token needs to be refreshed, when the status changes, the user token may have changed.
+        * TODO: If user token needs to be refreshed, change this method to accept the `result` and set new user token on the api client.
+        * */
         setUpPolling();
     }
 
