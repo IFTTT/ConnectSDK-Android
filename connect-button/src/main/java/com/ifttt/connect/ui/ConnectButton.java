@@ -29,6 +29,7 @@ import com.ifttt.connect.ConnectionApiClient;
 import com.ifttt.connect.CredentialsProvider;
 import com.ifttt.connect.ErrorResponse;
 import com.ifttt.connect.R;
+import com.ifttt.connect.UserTokenAsyncTask;
 import com.ifttt.connect.api.PendingResult;
 
 import static android.animation.ValueAnimator.INFINITE;
@@ -133,7 +134,8 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
 
         pulseLoading();
 
-        UserTokenAsyncTask task = new UserTokenAsyncTask(configuration.credentialsProvider, clientToUse, () -> {
+        UserTokenAsyncTask
+                task = new UserTokenAsyncTask(configuration.credentialsProvider, clientToUse, () -> {
             if (configuration.connection != null) {
                 if (configuration.listener != null) {
                     configuration.listener.onFetchConnectionSuccessful(configuration.connection);

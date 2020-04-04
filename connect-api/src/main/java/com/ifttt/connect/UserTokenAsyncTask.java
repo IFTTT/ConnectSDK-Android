@@ -1,11 +1,11 @@
-package com.ifttt.connect.ui;
+package com.ifttt.connect;
 
 import androidx.annotation.Nullable;
 import com.ifttt.connect.BuildConfig;
 import com.ifttt.connect.ConnectionApiClient;
 import com.ifttt.connect.CredentialsProvider;
 
-final class UserTokenAsyncTask extends android.os.AsyncTask<Void, Void, String> {
+public class UserTokenAsyncTask extends android.os.AsyncTask<Void, Void, String> {
 
     public interface UserTokenCallback {
         void onComplete();

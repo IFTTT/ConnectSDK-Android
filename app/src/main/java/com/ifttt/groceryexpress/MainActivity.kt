@@ -65,7 +65,7 @@ class MainActivity : AppCompatActivity() {
         }.build()
 
         connectButton.setup(configuration)
-        ConnectLocation.init(this, credentialsProvider)
+        ConnectLocation.init(this, CONNECTION_ID, credentialsProvider)
         ConnectLocation.getInstance().setUpWithConnectButton(connectButton)
 
         if (!hasEmailSet) {
