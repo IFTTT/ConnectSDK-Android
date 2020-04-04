@@ -30,9 +30,10 @@ android {
 dependencies {
     api project(':connect-api')
     implementation project(':connect-button')
+    
     implementation "com.google.android.gms:play-services-awareness:$awarenessVersion"
-
     implementation "androidx.work:work-runtime:$workManagerVersion"
+
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.robolectric:robolectric:4.3'
     testImplementation 'androidx.test:runner:1.2.0'
@@ -40,4 +41,5 @@ dependencies {
     testImplementation 'androidx.test.ext:truth:1.2.0'
     testImplementation 'androidx.test.ext:junit:1.1.1'
     testImplementation "com.squareup.retrofit2:retrofit-mock:$retrofitVersion"
+    testImplementation "androidx.work:work-testing:$workManagerVersion"
 }
