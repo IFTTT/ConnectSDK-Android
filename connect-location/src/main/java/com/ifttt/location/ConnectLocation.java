@@ -1,6 +1,7 @@
 package com.ifttt.location;
 
 import android.content.Context;
+import androidx.annotation.VisibleForTesting;
 import com.ifttt.connect.Connection;
 import com.ifttt.connect.ConnectionApiClient;
 import com.ifttt.connect.CredentialsProvider;
@@ -41,14 +42,23 @@ public final class ConnectLocation implements ButtonStateChangeListener {
         connectButton.addButtonStateChangeListener(this);
     }
 
-    private ConnectLocation(GeofenceProvider geofenceProvider, ConnectionApiClient connectionApiClient) {
+    @VisibleForTesting
+    ConnectLocation(GeofenceProvider geofenceProvider, ConnectionApiClient connectionApiClient) {
         this.connectionApiClient = connectionApiClient;
         this.geofenceProvider = geofenceProvider;
     }
 
     @Override
-    public void onStateChanged(ConnectButtonState currentState, ConnectButtonState previousState, Connection connection) {
-        geofenceProvider.updateGeofences(connection.features);
+    public void onStateChanged(
+        ConnectButtonState currentState,
+        ConnectButtonState previousState,
+        Connection connection
+    ) {
+        if (currentState == ConnectButtonState.Enabled
+            || currentState == ConnectButtonState.Disabled
+            || currentState == ConnectButtonState.Initial) {
+            geofenceProvider.updateGeofences(connection.features);
+        }
     }
 
     @Override

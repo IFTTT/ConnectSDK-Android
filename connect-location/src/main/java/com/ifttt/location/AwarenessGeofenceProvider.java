@@ -29,10 +29,12 @@ final class AwarenessGeofenceProvider implements GeofenceProvider {
 
     private final static String FIELD_TYPE_LOCATION_ENTER = "LOCATION_ENTER";
     private final static String FIELD_TYPE_LOCATION_EXIT = "LOCATION_EXIT";
-    private final static String FIELD_TYPE_LOCATION_ENTER_EXIT =
-            "LOCATION_ENTER_OR_EXIT";
+    private final static String FIELD_TYPE_LOCATION_ENTER_EXIT = "LOCATION_ENTER_OR_EXIT";
 
-    private final static List<String> locationFieldTypesList = Arrays.asList(FIELD_TYPE_LOCATION_ENTER, FIELD_TYPE_LOCATION_EXIT, FIELD_TYPE_LOCATION_ENTER_EXIT);
+    private final static List<String> locationFieldTypesList = Arrays.asList(FIELD_TYPE_LOCATION_ENTER,
+        FIELD_TYPE_LOCATION_EXIT,
+        FIELD_TYPE_LOCATION_ENTER_EXIT
+    );
 
     AwarenessGeofenceProvider(Context context) {
         this.fenceClient = Awareness.getFenceClient(context);
@@ -56,26 +58,21 @@ final class AwarenessGeofenceProvider implements GeofenceProvider {
     public void updateGeofences(final List<Feature> features) {
         final List<String> updatedIds = new ArrayList<>();
 
-        List<UserFeatureStep> userFeatureSteps = new ArrayList<>();
-
-        for (Feature feature : features) {
-            if (feature.userFeatures != null) {
-                for (UserFeature userFeature : feature.userFeatures) {
-                    if (userFeature.userFeatureSteps != null) {
-                        userFeatureSteps.addAll(userFeature.userFeatureSteps);
-                    }
-                }
-            }
-        }
-
         List<UserFeatureField> userFeatureFields = new ArrayList<>();
 
-        for (UserFeatureStep userFeatureStep: userFeatureSteps) {
-            if (userFeatureStep.fields != null) {
-                for (UserFeatureField userFeatureField : userFeatureStep.fields) {
-                    if (locationFieldTypesList.contains(userFeatureField.fieldType)) {
+        for (Feature feature : features) {
+            if (feature.userFeatures == null) {
+                continue;
+            }
+
+            for (UserFeature userFeature : feature.userFeatures) {
+                for (UserFeatureStep step : userFeature.userFeatureSteps) {
+                    for (UserFeatureField userFeatureField : step.fields) {
+                        if (!locationFieldTypesList.contains(userFeatureField.fieldType)) {
+                            continue;
+                        }
+
                         userFeatureFields.add(userFeatureField);
-                        if (userFeatureField.fieldId == null) { throw new IllegalStateException("Field Id cannot be null for location feature fields"); }
                         if (userFeatureField.fieldType.equals(FIELD_TYPE_LOCATION_ENTER_EXIT)) {
                             updatedIds.add(getEnterFenceKey(userFeatureField.fieldId));
                             updatedIds.add(getExitFenceKey(userFeatureField.fieldId));

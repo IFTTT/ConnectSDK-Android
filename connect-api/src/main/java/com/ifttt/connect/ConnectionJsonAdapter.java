@@ -269,10 +269,14 @@ final class ConnectionJsonAdapter {
                                         if (FIELD_TYPES_LOCATION.contains(fieldType)) {
                                             LocationFieldValue locationFieldValue
                                                 = locationDelegate.fromJson(jsonReader);
+                                            checkNonNull(locationFieldValue);
+
                                             fields.add(new UserFeatureField<>(locationFieldValue, fieldType, fieldId));
                                         } else if (FIELD_TYPES_COLLECTION.contains(fieldType)) {
                                             CollectionFieldValue collectionFieldValue
                                                 = collectionFieldDelegate.fromJson(jsonReader);
+                                            checkNonNull(collectionFieldDelegate);
+
                                             fields.add(new UserFeatureField<>(collectionFieldValue,
                                                 fieldType,
                                                 fieldId
