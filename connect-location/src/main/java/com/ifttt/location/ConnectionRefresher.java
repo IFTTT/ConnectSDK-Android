@@ -2,7 +2,6 @@ package com.ifttt.location;
 
 import android.content.Context;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 import com.ifttt.connect.BuildConfig;
@@ -25,37 +24,34 @@ public final class ConnectionRefresher extends Worker {
             throw new IllegalStateException("Connection Id cannot be null");
         }
 
-        @Nullable String userToken;
-
-        try {
-            userToken = ConnectLocation.getInstance().credentialsProvider.getUserToken();
-        } catch (Exception e) {
-            if (BuildConfig.DEBUG) {
-                e.printStackTrace();
-            }
-
-            userToken = null;
-        }
-
         ConnectionApiClient connectionApiClient = ConnectLocation.getInstance().connectionApiClient;
 
-        if (userToken != null) {
-            connectionApiClient.setUserToken(userToken);
-
-            PendingResult<Connection> pendingResult = connectionApiClient.api().showConnection(connectionId);
-
-            pendingResult.execute(new PendingResult.ResultCallback<Connection>() {
-                @Override
-                public void onSuccess(Connection result) {
-                    ConnectLocation.getInstance().geofenceProvider.updateGeofences(result);
+        if (!connectionApiClient.isUserAuthorized()) {
+            try {
+                String userToken = ConnectLocation.getInstance().credentialsProvider.getUserToken();
+                connectionApiClient.setUserToken(userToken);
+            } catch (Exception e) {
+                if (BuildConfig.DEBUG) {
+                    e.printStackTrace();
                 }
-
-                @Override
-                public void onFailure(ErrorResponse errorResponse) {
-                    // Do nothing
-                }
-            });
+                return Result.failure();
+            }
         }
+
+        PendingResult<Connection> pendingResult =
+                connectionApiClient.api().showConnection(connectionId);
+
+        pendingResult.execute(new PendingResult.ResultCallback<Connection>() {
+            @Override
+            public void onSuccess(Connection result) {
+                ConnectLocation.getInstance().geofenceProvider.updateGeofences(result);
+            }
+
+            @Override
+            public void onFailure(ErrorResponse errorResponse) {
+                // Do nothing
+            }
+        });
 
         return Result.success();
     }
