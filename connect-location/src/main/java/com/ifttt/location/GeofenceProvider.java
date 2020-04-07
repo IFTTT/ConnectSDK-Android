@@ -1,11 +1,9 @@
 package com.ifttt.location;
 
-import com.ifttt.connect.Feature;
-import com.ifttt.connect.UserFeatureField;
-import java.util.List;
+import com.ifttt.connect.Connection;
 
 interface GeofenceProvider {
 
-    void updateGeofences(final List<Feature> features);
+    void updateGeofences(final Connection connection);
 
 }
