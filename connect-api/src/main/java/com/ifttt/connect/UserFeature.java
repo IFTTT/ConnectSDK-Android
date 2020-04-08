@@ -12,17 +12,20 @@ public final class UserFeature implements Parcelable  {
 
     public final String id;
     public final String featureId;
+    public final boolean enabled;
     public final List<UserFeatureStep> userFeatureSteps;
 
-    public UserFeature(String id, String featureId, List<UserFeatureStep> userFeatureSteps) {
+    public UserFeature(String id, String featureId, boolean enabled, List<UserFeatureStep> userFeatureSteps) {
         this.id = id;
         this.featureId = featureId;
+        this.enabled = enabled;
         this.userFeatureSteps = userFeatureSteps;
     }
 
     protected UserFeature(Parcel in) {
         id = in.readString();
         featureId = in.readString();
+        enabled = in.readBoolean();
         userFeatureSteps = in.createTypedArrayList(UserFeatureStep.CREATOR);
     }
 
@@ -47,6 +50,7 @@ public final class UserFeature implements Parcelable  {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(id);
         dest.writeString(featureId);
+        dest.writeBoolean(enabled);
         dest.writeTypedList(userFeatureSteps);
     }
 }

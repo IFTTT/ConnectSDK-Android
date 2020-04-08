@@ -71,12 +71,11 @@ public class ConnectLocationTest {
     @Test
     public void shouldUpdateGeofencesWhenEnabled() {
         AtomicBoolean ref = new AtomicBoolean();
-        ConnectLocation location = new ConnectLocation(
-                "id",
-                features -> ref.set(true),
-                credentialsProvider,
-                apiClient,
-                workManager
+        ConnectLocation location = new ConnectLocation("id",
+            connection -> ref.set(true),
+            credentialsProvider,
+            apiClient,
+            workManager
         );
 
         location.onStateChanged(ConnectButtonState.Enabled, ConnectButtonState.Initial, connection);
@@ -86,12 +85,11 @@ public class ConnectLocationTest {
     @Test
     public void shouldUpdateGeofencesWhenDisabled() {
         AtomicBoolean ref = new AtomicBoolean();
-        ConnectLocation location = new ConnectLocation(
-                "id",
-                features -> ref.set(true),
-                credentialsProvider,
-                apiClient,
-                workManager
+        ConnectLocation location = new ConnectLocation("id",
+            connection -> ref.set(true),
+            credentialsProvider,
+            apiClient,
+            workManager
         );
 
         location.onStateChanged(ConnectButtonState.Disabled, ConnectButtonState.Enabled, connection);
@@ -101,12 +99,11 @@ public class ConnectLocationTest {
     @Test
     public void shouldUpdateGeofencesWhenInitial() {
         AtomicBoolean ref = new AtomicBoolean();
-        ConnectLocation location = new ConnectLocation(
-                "id",
-                features -> ref.set(true),
-                credentialsProvider,
-                apiClient,
-                workManager
+        ConnectLocation location = new ConnectLocation("id",
+            connection -> ref.set(true),
+            credentialsProvider,
+            apiClient,
+            workManager
         );
 
         location.onStateChanged(ConnectButtonState.Initial, ConnectButtonState.Enabled, connection);
@@ -115,12 +112,11 @@ public class ConnectLocationTest {
 
     @Test
     public void shouldNotUpdateGeofencesWhenCreateAccountOrLogin() {
-        ConnectLocation location = new ConnectLocation(
-                "id",
-                connection -> fail(),
-                credentialsProvider,
-                apiClient,
-                workManager
+        ConnectLocation location = new ConnectLocation("id",
+            connection -> fail(),
+            credentialsProvider,
+            apiClient,
+            workManager
         );
 
         location.onStateChanged(ConnectButtonState.CreateAccount, ConnectButtonState.Initial, connection);

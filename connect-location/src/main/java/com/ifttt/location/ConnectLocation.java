@@ -30,10 +30,10 @@ public final class ConnectLocation implements ButtonStateChangeListener {
     private final long CONNECTION_REFRESH_POLLING_INTERVAL = 1;
 
     public static synchronized ConnectLocation init(Context context, String connectionId,
-            CredentialsProvider credentialsProvider, ConnectionApiClient apiClient) {
+        CredentialsProvider credentialsProvider, ConnectionApiClient apiClient) {
         if (INSTANCE == null) {
             INSTANCE = new ConnectLocation(connectionId, new AwarenessGeofenceProvider(context),
-                    credentialsProvider, apiClient, WorkManager.getInstance(context));
+                credentialsProvider, apiClient, WorkManager.getInstance(context));
         }
         return INSTANCE;
     }

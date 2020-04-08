@@ -139,6 +139,7 @@
         "id": "5c7f6d49-5fa9-4305-a7db-39ca38484e6e",
         "feature_id": "pmtch6832j",
         "user_fields": [],
+        "enabled": true,
         "user_feature_triggers": [
           {
             "feature_trigger_id": "606",
@@ -181,6 +182,7 @@
         "id": "6888021f-47b0-4d3a-8058-bbf57e260173",
         "feature_id": "sxfkrzwujy",
         "user_fields": [],
+        "enabled": true,
         "user_feature_triggers": [
           {
             "feature_trigger_id": "564",
