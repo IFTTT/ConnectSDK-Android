@@ -52,7 +52,6 @@ public final class ConnectionApiClient {
      *
      * @param userToken A user token String, cannot be null.
      */
-    @MainThread
     public void setUserToken(String userToken) {
         tokenInterceptor.setToken(userToken);
     }
@@ -60,7 +59,6 @@ public final class ConnectionApiClient {
     /**
      * @return true if this instance of ConnectionApiClient has a user token, or false otherwise.
      */
-    @MainThread
     @CheckReturnValue
     public boolean isUserAuthorized() {
         return tokenInterceptor.isUserAuthenticated();

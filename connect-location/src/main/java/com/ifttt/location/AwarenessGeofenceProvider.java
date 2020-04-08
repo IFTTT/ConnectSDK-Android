@@ -8,6 +8,7 @@ import com.google.android.gms.awareness.FenceClient;
 import com.google.android.gms.awareness.fence.FenceQueryRequest;
 import com.google.android.gms.awareness.fence.FenceUpdateRequest;
 import com.google.android.gms.awareness.fence.LocationFence;
+import com.ifttt.connect.Connection;
 import com.ifttt.connect.Feature;
 import com.ifttt.connect.LocationFieldValue;
 import com.ifttt.connect.UserFeature;
@@ -55,12 +56,12 @@ final class AwarenessGeofenceProvider implements GeofenceProvider {
     }
 
     @Override
-    public void updateGeofences(final List<Feature> features) {
+    public void updateGeofences(final Connection connection) {
         final List<String> updatedIds = new ArrayList<>();
 
         List<UserFeatureField> userFeatureFields = new ArrayList<>();
 
-        for (Feature feature : features) {
+        for (Feature feature : connection.features) {
             if (feature.userFeatures == null) {
                 continue;
             }
@@ -83,6 +84,7 @@ final class AwarenessGeofenceProvider implements GeofenceProvider {
                 }
             }
         }
+
 
         fenceClient.queryFences(
                 FenceQueryRequest.all()).addOnSuccessListener(fenceQueryResponse -> {

@@ -133,7 +133,8 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
 
         pulseLoading();
 
-        UserTokenAsyncTask task = new UserTokenAsyncTask(configuration.credentialsProvider, clientToUse, () -> {
+        UserTokenAsyncTask
+                task = new UserTokenAsyncTask(configuration.credentialsProvider, clientToUse, () -> {
             if (configuration.connection != null) {
                 if (configuration.listener != null) {
                     configuration.listener.onFetchConnectionSuccessful(configuration.connection);
