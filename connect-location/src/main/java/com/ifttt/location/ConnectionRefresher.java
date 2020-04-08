@@ -10,19 +10,16 @@ import com.ifttt.connect.ConnectionApiClient;
 import com.ifttt.connect.ErrorResponse;
 import com.ifttt.connect.api.PendingResult;
 
-public final class ConnectionRefresher extends Worker {
+final class ConnectionRefresher extends Worker {
 
-    public ConnectionRefresher(Context context, WorkerParameters params) {
+    ConnectionRefresher(Context context, WorkerParameters params) {
         super(context, params);
     }
 
     @Override
     @NonNull
     public Result doWork() {
-        String connectionId = getInputData().getString("connectionId");
-        if (connectionId == null) {
-            throw new IllegalStateException("Connection Id cannot be null");
-        }
+        String connectionId = ConnectLocation.getInstance().connectionId;
 
         ConnectionApiClient connectionApiClient = ConnectLocation.getInstance().connectionApiClient;
 

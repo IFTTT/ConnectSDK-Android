@@ -3,6 +3,7 @@ package com.ifttt.location;
 import android.content.Context;
 import androidx.annotation.VisibleForTesting;
 import androidx.work.Constraints;
+import androidx.work.Data;
 import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.NetworkType;
 import androidx.work.PeriodicWorkRequest;
@@ -24,7 +25,7 @@ public final class ConnectLocation implements ButtonStateChangeListener {
     final CredentialsProvider credentialsProvider;
     private final WorkManager workManager;
 
-    private final String connectionId;
+    final String connectionId;
 
     private final String WORK_ID_CONNECTION_POLLING = "connection_refresh_polling";
     private final long CONNECTION_REFRESH_POLLING_INTERVAL = 1;
@@ -68,6 +69,7 @@ public final class ConnectLocation implements ButtonStateChangeListener {
         this.credentialsProvider = credentialsProvider;
         this.connectionApiClient = connectionApiClient;
         this.workManager = workManager;
+        setUpPolling();
     }
 
     private void setUpPolling() {
@@ -75,9 +77,10 @@ public final class ConnectLocation implements ButtonStateChangeListener {
                 new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build();
         workManager.enqueueUniquePeriodicWork(WORK_ID_CONNECTION_POLLING,
                 ExistingPeriodicWorkPolicy.KEEP,
-                new PeriodicWorkRequest.Builder(ConnectionRefresher.class,
-                        CONNECTION_REFRESH_POLLING_INTERVAL, TimeUnit.HOURS).setConstraints(
-                        constraints).build());
+                new PeriodicWorkRequest.Builder(ConnectionRefresher.class, CONNECTION_REFRESH_POLLING_INTERVAL, TimeUnit.HOURS)
+                        .setConstraints(constraints)
+                        .build()
+        );
     }
 
     @Override
