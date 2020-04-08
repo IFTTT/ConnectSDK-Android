@@ -3,7 +3,6 @@ package com.ifttt.location;
 import android.content.Context;
 import androidx.annotation.VisibleForTesting;
 import androidx.work.Constraints;
-import androidx.work.Data;
 import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.NetworkType;
 import androidx.work.PeriodicWorkRequest;

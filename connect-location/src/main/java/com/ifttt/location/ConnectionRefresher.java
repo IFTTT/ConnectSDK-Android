@@ -35,8 +35,11 @@ final class ConnectionRefresher extends Worker {
 
         try {
             Response<Connection> connectionResult = connectionApiClient.api().showConnection(ConnectLocation.getInstance().connectionId).getCall().execute();
-            Connection connection = connectionResult.body();
-            if (connectionResult.isSuccessful() && connection != null) {
+            if (connectionResult.isSuccessful()) {
+                Connection connection = connectionResult.body();
+                if (connection == null) {
+                    throw new IllegalStateException("Connection cannot be null");
+                }
                 ConnectLocation.getInstance().geofenceProvider.updateGeofences(connection);
             }
         } catch (IOException e) {
