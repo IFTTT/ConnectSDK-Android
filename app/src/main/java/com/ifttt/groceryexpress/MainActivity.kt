@@ -18,7 +18,6 @@ import com.ifttt.connect.ui.ConnectResult
 import com.ifttt.connect.CredentialsProvider
 import com.ifttt.groceryexpress.ApiHelper.REDIRECT_URI
 import com.ifttt.location.ConnectLocation
-import org.w3c.dom.Text
 
 class MainActivity : AppCompatActivity() {
 
