@@ -28,7 +28,7 @@ import java.util.Set;
  *
  * The process includes:
  * - registering any new geofences
- * - un-regisstering any outdated geofences
+ * - un-registering any outdated geofences
  */
 final class AwarenessGeofenceProvider implements GeofenceProvider {
 
@@ -130,10 +130,6 @@ final class AwarenessGeofenceProvider implements GeofenceProvider {
                     for (UserFeatureField userFeatureField : step.fields) {
                         if (!locationFieldTypesList.contains(userFeatureField.fieldType)) {
                             continue;
-                        }
-
-                        if (!(userFeatureField.value instanceof LocationFieldValue)) {
-                            throw new IllegalStateException("Location field should have LocationFieldValue data.");
                         }
 
                         LocationFieldValue region = (LocationFieldValue) userFeatureField.value;

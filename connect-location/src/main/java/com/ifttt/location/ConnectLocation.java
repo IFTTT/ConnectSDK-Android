@@ -29,21 +29,31 @@ public final class ConnectLocation implements ButtonStateChangeListener {
     private final String WORK_ID_CONNECTION_POLLING = "connection_refresh_polling";
     private final long CONNECTION_REFRESH_POLLING_INTERVAL = 1;
 
-    public static synchronized ConnectLocation init(Context context, String connectionId,
-        CredentialsProvider credentialsProvider, ConnectionApiClient apiClient) {
+    public static synchronized ConnectLocation init(
+        Context context, String connectionId, CredentialsProvider credentialsProvider, ConnectionApiClient apiClient
+    ) {
         if (INSTANCE == null) {
-            INSTANCE = new ConnectLocation(connectionId, new AwarenessGeofenceProvider(context),
-                credentialsProvider, apiClient, WorkManager.getInstance(context));
+            INSTANCE = new ConnectLocation(connectionId,
+                new AwarenessGeofenceProvider(context),
+                credentialsProvider,
+                apiClient,
+                WorkManager.getInstance(context)
+            );
         }
         return INSTANCE;
     }
 
-    public static synchronized ConnectLocation init(Context context, String connectionId,
-            CredentialsProvider credentialsProvider) {
+    public static synchronized ConnectLocation init(
+        Context context, String connectionId, CredentialsProvider credentialsProvider
+    ) {
         if (INSTANCE == null) {
             ConnectionApiClient.Builder clientBuilder = new ConnectionApiClient.Builder(context);
-            INSTANCE = new ConnectLocation(connectionId, new AwarenessGeofenceProvider(context),
-                    credentialsProvider, clientBuilder.build(), WorkManager.getInstance(context));
+            INSTANCE = new ConnectLocation(connectionId,
+                new AwarenessGeofenceProvider(context),
+                credentialsProvider,
+                clientBuilder.build(),
+                WorkManager.getInstance(context)
+            );
         }
         return INSTANCE;
     }
@@ -60,36 +70,44 @@ public final class ConnectLocation implements ButtonStateChangeListener {
     }
 
     @VisibleForTesting
-    ConnectLocation(String connectionId, GeofenceProvider geofenceProvider,
-            CredentialsProvider credentialsProvider, ConnectionApiClient connectionApiClient,
-            WorkManager workManager) {
+    ConnectLocation(
+        String connectionId,
+        GeofenceProvider geofenceProvider,
+        CredentialsProvider credentialsProvider,
+        ConnectionApiClient connectionApiClient,
+        WorkManager workManager
+    ) {
         this.connectionId = connectionId;
         this.geofenceProvider = geofenceProvider;
         this.credentialsProvider = credentialsProvider;
         this.connectionApiClient = connectionApiClient;
         this.workManager = workManager;
+
         setUpPolling();
     }
 
     private void setUpPolling() {
-        Constraints constraints =
-                new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build();
+        Constraints constraints = new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build();
         workManager.enqueueUniquePeriodicWork(WORK_ID_CONNECTION_POLLING,
-                ExistingPeriodicWorkPolicy.KEEP,
-                new PeriodicWorkRequest.Builder(ConnectionRefresher.class, CONNECTION_REFRESH_POLLING_INTERVAL, TimeUnit.HOURS)
-                        .setConstraints(constraints)
-                        .build()
+            ExistingPeriodicWorkPolicy.KEEP,
+            new PeriodicWorkRequest.Builder(
+                ConnectionRefresher.class,
+                CONNECTION_REFRESH_POLLING_INTERVAL,
+                TimeUnit.HOURS
+            ).setConstraints(constraints).build()
         );
     }
 
     @Override
-    public void onStateChanged(ConnectButtonState currentState, ConnectButtonState previousState,
-            Connection connection) {
-            if (currentState == ConnectButtonState.Enabled
-                    || currentState == ConnectButtonState.Disabled
-                    || currentState == ConnectButtonState.Initial) {
-                geofenceProvider.updateGeofences(connection);
-            }
+    public void onStateChanged(
+        ConnectButtonState currentState, ConnectButtonState previousState, Connection connection
+    ) {
+        if (currentState == ConnectButtonState.Enabled
+            || currentState == ConnectButtonState.Disabled
+            || currentState == ConnectButtonState.Initial) {
+            geofenceProvider.updateGeofences(connection);
+        }
+
         if (currentState == ConnectButtonState.Enabled) {
             setUpPolling();
         }
