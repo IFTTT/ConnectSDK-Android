@@ -32,8 +32,9 @@ final class ConnectionJsonAdapter {
         "user_connection"
     );
     private final JsonReader.Options userConnectionOptions = JsonReader.Options.of("user_features");
-    private final JsonReader.Options featureOptions = JsonReader.Options.of("id",
+    private final JsonReader.Options userFeatureOptions = JsonReader.Options.of("id",
         "feature_id",
+        "enabled",
         "user_feature_triggers",
         "user_feature_queries",
         "user_feature_actions"
@@ -152,11 +153,12 @@ final class ConnectionJsonAdapter {
             while (jsonReader.hasNext()) {
                 String id = null;
                 String featureId = null;
+                boolean enabled = true;
                 List<UserFeatureStep> steps = new ArrayList<>();
 
                 jsonReader.beginObject();
                 while (jsonReader.hasNext()) {
-                    int featureIndex = jsonReader.selectName(featureOptions);
+                    int featureIndex = jsonReader.selectName(userFeatureOptions);
                     switch (featureIndex) {
                         case 0:
                             id = jsonReader.nextString();
@@ -165,6 +167,9 @@ final class ConnectionJsonAdapter {
                             featureId = jsonReader.nextString();
                             break;
                         case 2:
+                            enabled = jsonReader.nextBoolean();
+                            break;
+                        case 3:
                             // Triggers
                             parseUserSteps(jsonReader,
                                 FeatureStep.StepType.Trigger,
@@ -175,7 +180,7 @@ final class ConnectionJsonAdapter {
                                 steps
                             );
                             break;
-                        case 3:
+                        case 4:
                             // Queries
                             parseUserSteps(jsonReader,
                                 FeatureStep.StepType.Query,
@@ -186,7 +191,7 @@ final class ConnectionJsonAdapter {
                                 steps
                             );
                             break;
-                        case 4:
+                        case 5:
                             // Actions.
                             parseUserSteps(jsonReader,
                                 FeatureStep.StepType.Action,
@@ -206,7 +211,7 @@ final class ConnectionJsonAdapter {
                 checkNonNull(id);
                 checkNonNull(featureId);
 
-                userFeatures.add(new UserFeature(id, featureId, steps));
+                userFeatures.add(new UserFeature(id, featureId, enabled, steps));
             }
             jsonReader.endArray();
         }
