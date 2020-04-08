@@ -7,8 +7,8 @@ import androidx.work.WorkerParameters;
 import com.ifttt.connect.BuildConfig;
 import com.ifttt.connect.Connection;
 import com.ifttt.connect.ConnectionApiClient;
-import com.ifttt.connect.ErrorResponse;
-import com.ifttt.connect.api.PendingResult;
+import java.io.IOException;
+import retrofit2.Response;
 
 final class ConnectionRefresher extends Worker {
 
@@ -19,8 +19,6 @@ final class ConnectionRefresher extends Worker {
     @Override
     @NonNull
     public Result doWork() {
-        String connectionId = ConnectLocation.getInstance().connectionId;
-
         ConnectionApiClient connectionApiClient = ConnectLocation.getInstance().connectionApiClient;
 
         if (!connectionApiClient.isUserAuthorized()) {
@@ -35,20 +33,15 @@ final class ConnectionRefresher extends Worker {
             }
         }
 
-        PendingResult<Connection> pendingResult =
-                connectionApiClient.api().showConnection(connectionId);
-
-        pendingResult.execute(new PendingResult.ResultCallback<Connection>() {
-            @Override
-            public void onSuccess(Connection result) {
-                ConnectLocation.getInstance().geofenceProvider.updateGeofences(result);
+        try {
+            Response<Connection> connectionResult = connectionApiClient.api().showConnection(ConnectLocation.getInstance().connectionId).getCall().execute();
+            Connection connection = connectionResult.body();
+            if (connectionResult.isSuccessful() && connection != null) {
+                ConnectLocation.getInstance().geofenceProvider.updateGeofences(connection);
             }
-
-            @Override
-            public void onFailure(ErrorResponse errorResponse) {
-                // Do nothing
-            }
-        });
+        } catch (IOException e) {
+            return Result.failure();
+        }
 
         return Result.success();
     }
