@@ -54,7 +54,6 @@
             android:layout_marginStart="@dimen/margin_horizontal"
             android:drawablePadding="16dp"
             android:drawableStart="@drawable/ic_house"
-            android:text="@string/value_props_1"
             android:textColor="@android:color/black"
             android:textSize="16sp"/>
 
@@ -67,7 +66,6 @@
             android:layout_marginStart="@dimen/margin_horizontal"
             android:drawablePadding="16dp"
             android:drawableStart="@drawable/ic_calendar"
-            android:text="@string/value_props_2"
             android:textColor="@android:color/black"
             android:textSize="16sp"/>
 
@@ -80,7 +78,6 @@
             android:layout_marginStart="@dimen/margin_horizontal"
             android:drawablePadding="16dp"
             android:drawableStart="@drawable/ic_gift"
-            android:text="@string/value_props_3"
             android:textColor="@android:color/black"
             android:textSize="16sp"/>
 

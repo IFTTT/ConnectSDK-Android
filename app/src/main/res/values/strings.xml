@@ -11,10 +11,14 @@
     <string name="enable">Enable</string>
     <string name="turn_on">Turn on</string>
     <string name="configure">Configure</string>
-    <string name="value_props_1">Schedule grocery delivery when you’re available</string>
-    <string name="value_props_2">Add delivery date and time to your calendar</string>
-    <string name="value_props_3">Unlock discount delivery rates</string>
+    <string name="value_props_1_gcal_connection">Schedule grocery delivery when you’re available</string>
+    <string name="value_props_2_gcal_connection">Add delivery date and time to your calendar</string>
+    <string name="value_props_3_gcal_connection">Unlock discount delivery rates</string>
+    <string name="value_props_1_loc_connection">Delivery grocery to your location</string>
+    <string name="value_props_2_loc_connection">Add delivery location</string>
+    <string name="value_props_3_loc_connection">Unlock discount delivery rates</string>
     <string name="email_title">Please enter your email</string>
     <string name="logout">Logout</string>
     <string name="login">Login</string>
+    <string name="select_connection">Select a connection.</string>
 </resources>

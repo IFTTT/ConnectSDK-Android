@@ -1,6 +1,5 @@
 package com.ifttt.groceryexpress
 
-import android.Manifest
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
@@ -12,8 +11,6 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.core.app.ActivityCompat
-import androidx.core.content.PermissionChecker
 import com.google.android.material.textfield.TextInputLayout
 import com.ifttt.connect.ConnectionApiClient
 import com.ifttt.connect.ui.ConnectButton
@@ -21,12 +18,18 @@ import com.ifttt.connect.ui.ConnectResult
 import com.ifttt.connect.CredentialsProvider
 import com.ifttt.groceryexpress.ApiHelper.REDIRECT_URI
 import com.ifttt.location.ConnectLocation
+import org.w3c.dom.Text
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var connectButton: ConnectButton
     private lateinit var toolbar: Toolbar
     private lateinit var emailPreferencesHelper: EmailPreferencesHelper
+    private lateinit var connectionId: String
+
+    private lateinit var valueProps1: TextView
+    private lateinit var valueProps2: TextView
+    private lateinit var valueProps3: TextView
 
     private val credentialsProvider = object :
         CredentialsProvider {
@@ -47,30 +50,58 @@ class MainActivity : AppCompatActivity() {
         title = null
 
         connectButton = findViewById(R.id.connect_button)
+        valueProps1 = findViewById(R.id.value_prop_1)
+        valueProps2 = findViewById(R.id.value_prop_2)
+        valueProps3 = findViewById(R.id.value_prop_3)
 
-        val hasEmailSet = !TextUtils.isEmpty(emailPreferencesHelper.getEmail())
-        val suggestedEmail = if (!hasEmailSet) {
-            EMAIL
-        } else {
-            emailPreferencesHelper.getEmail()!!
+        val setUpConnectButton = {
+            val hasEmailSet = !TextUtils.isEmpty(emailPreferencesHelper.getEmail())
+            val suggestedEmail = if (!hasEmailSet) {
+                EMAIL
+            } else {
+                emailPreferencesHelper.getEmail()!!
+            }
+
+            val configuration = ConnectButton.Configuration.Builder.withConnectionId(
+                connectionId,
+                suggestedEmail,
+                credentialsProvider
+                , REDIRECT_URI
+            ).setOnFetchCompleteListener { connection ->
+                findViewById<TextView>(R.id.connection_title).text = connection.name
+            }.build()
+
+            connectButton.setup(configuration)
+
+            ConnectLocation.init(this, connectionId, credentialsProvider)
+            ConnectLocation.getInstance().setUpWithConnectButton(connectButton)
+
+            if (!hasEmailSet) {
+                promptLogin()
+            }
         }
 
-        val configuration = ConnectButton.Configuration.Builder.withConnectionId(
-            CONNECTION_ID,
-            suggestedEmail,
-            credentialsProvider
-            , REDIRECT_URI
-        ).setOnFetchCompleteListener { connection ->
-            findViewById<TextView>(R.id.connection_title).text = connection.name
-        }.build()
-
-        connectButton.setup(configuration)
-        ConnectLocation.init(this, CONNECTION_ID, credentialsProvider)
-        ConnectLocation.getInstance().setUpWithConnectButton(connectButton)
-
-        if (!hasEmailSet) {
-            promptLogin()
-        }
+        AlertDialog.Builder(this)
+            .setTitle(resources.getString(R.string.select_connection))
+            .setItems(
+                resources.getStringArray(R.array.connections)
+            ) { _, connection ->
+                if (connection == 0) {
+                    connectionId = CONNECTION_ID_GOOGLE_CALENDAR
+                    valueProps1.text = resources.getString(R.string.value_props_1_gcal_connection)
+                    valueProps2.text = resources.getString(R.string.value_props_2_gcal_connection)
+                    valueProps3.text = resources.getString(R.string.value_props_3_gcal_connection)
+                } else {
+                    connectionId = CONNECTION_ID_LOCATION
+                    valueProps1.text = resources.getString(R.string.value_props_1_loc_connection)
+                    valueProps2.text = resources.getString(R.string.value_props_2_loc_connection)
+                    valueProps3.text = resources.getString(R.string.value_props_3_loc_connection)
+                }
+                setUpConnectButton()
+            }
+            .setCancelable(false)
+            .create()
+            .show()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -112,7 +143,7 @@ class MainActivity : AppCompatActivity() {
                 val newEmail = emailView.editText!!.text.toString()
                 emailPreferencesHelper.setEmail(newEmail)
                 val configuration = ConnectButton.Configuration.Builder.withConnectionId(
-                    CONNECTION_ID,
+                    connectionId,
                     newEmail,
                     credentialsProvider
                     , REDIRECT_URI
@@ -123,7 +154,7 @@ class MainActivity : AppCompatActivity() {
             }.setNegativeButton(R.string.logout) { _, _ ->
                 emailPreferencesHelper.clear()
                 val configuration = ConnectButton.Configuration.Builder.withConnectionId(
-                        CONNECTION_ID,
+                        connectionId,
                         EMAIL,
                         credentialsProvider
                         , REDIRECT_URI
@@ -140,7 +171,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private companion object {
-        const val CONNECTION_ID = "fWj4fxYg"
+        const val CONNECTION_ID_GOOGLE_CALENDAR = "fWj4fxYg"
+        const val CONNECTION_ID_LOCATION = "pWisyzm7"
         const val EMAIL = "user@email.com"
     }
 }

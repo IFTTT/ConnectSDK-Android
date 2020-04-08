@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="connections">
+        <item>"Google Calendar"</item>
+        <item>"Location"</item>
+    </array>
+</resources>
