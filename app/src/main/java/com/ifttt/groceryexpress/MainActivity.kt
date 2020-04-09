@@ -172,7 +172,7 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
-    private companion object {
+    companion object {
         const val CONNECTION_ID_GOOGLE_CALENDAR = "fWj4fxYg"
         const val CONNECTION_ID_LOCATION = "pWisyzm7"
         const val EMAIL = "user@email.com"
