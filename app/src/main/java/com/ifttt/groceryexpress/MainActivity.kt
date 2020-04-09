@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.Window
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -18,6 +19,7 @@ import com.ifttt.connect.ui.ConnectResult
 import com.ifttt.connect.CredentialsProvider
 import com.ifttt.groceryexpress.ApiHelper.REDIRECT_URI
 import com.ifttt.location.ConnectLocation
+import com.squareup.picasso.Picasso
 
 class MainActivity : AppCompatActivity() {
 
@@ -26,9 +28,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var emailPreferencesHelper: EmailPreferencesHelper
     private lateinit var connectionId: String
 
-    private lateinit var valueProps1: TextView
-    private lateinit var valueProps2: TextView
-    private lateinit var valueProps3: TextView
+    private lateinit var features: LinearLayout
 
     private val credentialsProvider = object :
         CredentialsProvider {
@@ -49,9 +49,7 @@ class MainActivity : AppCompatActivity() {
         title = null
 
         connectButton = findViewById(R.id.connect_button)
-        valueProps1 = findViewById(R.id.value_prop_1)
-        valueProps2 = findViewById(R.id.value_prop_2)
-        valueProps3 = findViewById(R.id.value_prop_3)
+        features = findViewById(R.id.features)
 
         val setUpConnectButton = {
             val hasEmailSet = !TextUtils.isEmpty(emailPreferencesHelper.getEmail())
@@ -61,14 +59,32 @@ class MainActivity : AppCompatActivity() {
                 emailPreferencesHelper.getEmail()!!
             }
 
+            val fetchCompleteListener = ConnectButton.OnFetchConnectionListener {
+                findViewById<TextView>(R.id.connection_title).text = it.name
+                it.features.forEach {
+                    val featureView = FeatureView(this@MainActivity).apply {
+                        text = it.description
+                        Picasso.get().load(it.iconUrl).into(this)
+                        layoutParams = LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT
+                        ).apply {
+                            val margin = resources.getDimensionPixelSize(R.dimen.feature_margin_horizontal)
+                            setMargins(0, 0, 0, margin)
+                        }
+                    }
+
+                    features.addView(featureView)
+                }
+            }
+
             val configuration = ConnectButton.Configuration.Builder.withConnectionId(
                 connectionId,
                 suggestedEmail,
                 credentialsProvider
                 , REDIRECT_URI
-            ).setOnFetchCompleteListener { connection ->
-                findViewById<TextView>(R.id.connection_title).text = connection.name
-            }.build()
+            ).setOnFetchCompleteListener(fetchCompleteListener)
+                .build()
 
             connectButton.setup(configuration)
 
@@ -87,14 +103,8 @@ class MainActivity : AppCompatActivity() {
             ) { _, connection ->
                 if (connection == 0) {
                     connectionId = CONNECTION_ID_GOOGLE_CALENDAR
-                    valueProps1.text = resources.getString(R.string.value_props_1_gcal_connection)
-                    valueProps2.text = resources.getString(R.string.value_props_2_gcal_connection)
-                    valueProps3.text = resources.getString(R.string.value_props_3_gcal_connection)
                 } else {
                     connectionId = CONNECTION_ID_LOCATION
-                    valueProps1.text = resources.getString(R.string.value_props_1_loc_connection)
-                    valueProps2.text = resources.getString(R.string.value_props_2_loc_connection)
-                    valueProps3.text = resources.getString(R.string.value_props_3_loc_connection)
                 }
                 setUpConnectButton()
             }
