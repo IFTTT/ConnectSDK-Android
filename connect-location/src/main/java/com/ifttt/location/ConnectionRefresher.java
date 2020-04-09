@@ -10,9 +10,9 @@ import com.ifttt.connect.ConnectionApiClient;
 import java.io.IOException;
 import retrofit2.Response;
 
-final class ConnectionRefresher extends Worker {
+public final class ConnectionRefresher extends Worker {
 
-    ConnectionRefresher(Context context, WorkerParameters params) {
+    public ConnectionRefresher(Context context, WorkerParameters params) {
         super(context, params);
     }
 

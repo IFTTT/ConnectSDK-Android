@@ -26,16 +26,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var connectButton: ConnectButton
     private lateinit var toolbar: Toolbar
     private lateinit var emailPreferencesHelper: EmailPreferencesHelper
+    private lateinit var credentialsProvider: CredentialsProvider
     private lateinit var connectionId: String
 
     private lateinit var features: LinearLayout
-
-    private val credentialsProvider = object :
-        CredentialsProvider {
-        override fun getUserToken() = ApiHelper.getUserToken(emailPreferencesHelper.getEmail())
-
-        override fun getOAuthCode() = emailPreferencesHelper.getEmail()
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,6 +37,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         emailPreferencesHelper = EmailPreferencesHelper(this)
+        credentialsProvider = GroceryExpressCredentialsProvider(emailPreferencesHelper);
 
         toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -87,8 +82,6 @@ class MainActivity : AppCompatActivity() {
                 .build()
 
             connectButton.setup(configuration)
-
-            ConnectLocation.init(this, connectionId, credentialsProvider)
             ConnectLocation.getInstance().setUpWithConnectButton(connectButton)
 
             if (!hasEmailSet) {
