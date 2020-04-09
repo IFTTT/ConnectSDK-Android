@@ -317,7 +317,6 @@ final class ConnectionJsonAdapter {
             }
             jsonReader.endObject();
             checkNonNull(stepId);
-            checkNonNull(id);
 
             steps.add(new UserFeatureStep(type, id, stepId, fields));
         }
