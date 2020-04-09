@@ -3,6 +3,7 @@ package com.ifttt.connect;
 import android.os.Parcel;
 import android.os.Parcelable;
 import java.util.List;
+import javax.annotation.Nullable;
 
 /**
  * Data structure representing an enabled instance of a {@link FeatureStep}. The configuration information for this step
@@ -11,12 +12,13 @@ import java.util.List;
 public final class UserFeatureStep implements Parcelable {
 
     public final FeatureStep.StepType stepType;
-    public final String id;
     public final String stepId;
     public final List<UserFeatureField> fields;
 
+    @Nullable public final String id;
+
     public UserFeatureStep(
-        FeatureStep.StepType stepType, String id, String stepId, List<UserFeatureField> fields
+        FeatureStep.StepType stepType, @Nullable String id, String stepId, List<UserFeatureField> fields
     ) {
         this.stepType = stepType;
         this.id = id;

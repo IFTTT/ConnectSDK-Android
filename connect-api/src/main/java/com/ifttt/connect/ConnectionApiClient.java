@@ -3,7 +3,6 @@ package com.ifttt.connect;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.provider.Settings;
-import androidx.annotation.MainThread;
 import com.ifttt.connect.api.ConnectionApi;
 import com.ifttt.connect.api.PendingResult;
 import com.squareup.moshi.JsonAdapter;
