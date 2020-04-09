@@ -2,6 +2,7 @@ package com.ifttt.groceryexpress
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.Menu
@@ -89,6 +90,12 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        if (savedInstanceState?.containsKey(KEY_CONNECTION_ID) == true) {
+            connectionId = savedInstanceState.getString(KEY_CONNECTION_ID)!!
+            setUpConnectButton()
+            return
+        }
+
         AlertDialog.Builder(this)
             .setTitle(resources.getString(R.string.select_connection))
             .setItems(
@@ -124,6 +131,13 @@ class MainActivity : AppCompatActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         connectButton.setConnectResult(ConnectResult.fromIntent(intent))
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        if (::connectionId.isInitialized) {
+            outState.putString(KEY_CONNECTION_ID, connectionId)
+        }
     }
 
     // For development and testing purpose: this dialog simulates a login process, where the user enters their
@@ -176,5 +190,6 @@ class MainActivity : AppCompatActivity() {
         const val CONNECTION_ID_GOOGLE_CALENDAR = "fWj4fxYg"
         const val CONNECTION_ID_LOCATION = "pWisyzm7"
         const val EMAIL = "user@email.com"
+        const val KEY_CONNECTION_ID = "key_connection_id"
     }
 }
