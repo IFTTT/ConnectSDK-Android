@@ -13,9 +13,9 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.google.android.material.textfield.TextInputLayout
-import com.ifttt.connect.CredentialsProvider
 import com.ifttt.connect.ui.ConnectButton
 import com.ifttt.connect.ui.ConnectResult
+import com.ifttt.connect.ui.CredentialsProvider
 import com.ifttt.groceryexpress.ApiHelper.REDIRECT_URI
 import com.ifttt.location.ConnectLocation
 import com.squareup.picasso.Picasso
@@ -98,12 +98,10 @@ class MainActivity : AppCompatActivity() {
      */
     private fun setupForConnection() {
         val suggestedEmail = emailPreferencesHelper.getEmail() ?: EMAIL
-        val configuration = ConnectButton.Configuration.Builder.withConnectionId(
-            connectionId,
-            suggestedEmail,
-            credentialsProvider
-            , REDIRECT_URI
-        ).setOnFetchCompleteListener(fetchCompleteListener)
+        val configuration = ConnectButton.Configuration.newBuilder(suggestedEmail, REDIRECT_URI)
+            .withConnectionId(connectionId)
+            .withCredentialProvider(credentialsProvider)
+            .setOnFetchCompleteListener(fetchCompleteListener)
             .build()
 
         connectButton.setup(configuration)

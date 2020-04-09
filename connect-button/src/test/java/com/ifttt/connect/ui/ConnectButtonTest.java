@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.net.Uri;
 import android.view.View;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
-import com.ifttt.connect.CredentialsProvider;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;

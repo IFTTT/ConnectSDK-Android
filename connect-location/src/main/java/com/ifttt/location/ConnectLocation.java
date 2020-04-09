@@ -7,10 +7,10 @@ import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.NetworkType;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
-import com.ifttt.connect.Connection;
-import com.ifttt.connect.ConnectionApiClient;
-import com.ifttt.connect.CredentialsProvider;
-import com.ifttt.connect.ErrorResponse;
+import com.ifttt.connect.api.Connection;
+import com.ifttt.connect.api.ConnectionApiClient;
+import com.ifttt.connect.api.ErrorResponse;
+import com.ifttt.connect.api.UserTokenProvider;
 import com.ifttt.connect.ui.ButtonStateChangeListener;
 import com.ifttt.connect.ui.ConnectButton;
 import com.ifttt.connect.ui.ConnectButtonState;
@@ -21,7 +21,6 @@ public final class ConnectLocation implements ButtonStateChangeListener {
     private static ConnectLocation INSTANCE = null;
     final GeofenceProvider geofenceProvider;
     final ConnectionApiClient connectionApiClient;
-    final CredentialsProvider credentialsProvider;
     private final WorkManager workManager;
 
     final String connectionId;
@@ -30,12 +29,11 @@ public final class ConnectLocation implements ButtonStateChangeListener {
     private final long CONNECTION_REFRESH_POLLING_INTERVAL = 1;
 
     public static synchronized ConnectLocation init(
-        Context context, String connectionId, CredentialsProvider credentialsProvider, ConnectionApiClient apiClient
+        Context context, String connectionId, ConnectionApiClient apiClient
     ) {
         if (INSTANCE == null) {
             INSTANCE = new ConnectLocation(connectionId,
                 new AwarenessGeofenceProvider(context),
-                credentialsProvider,
                 apiClient,
                 WorkManager.getInstance(context)
             );
@@ -44,14 +42,13 @@ public final class ConnectLocation implements ButtonStateChangeListener {
     }
 
     public static synchronized ConnectLocation init(
-        Context context, String connectionId, CredentialsProvider credentialsProvider
+        Context context, String connectionId, UserTokenProvider userTokenProvider
     ) {
         if (INSTANCE == null) {
-            ConnectionApiClient.Builder clientBuilder = new ConnectionApiClient.Builder(context);
+            ConnectionApiClient client = new ConnectionApiClient.Builder(context, userTokenProvider).build();
             INSTANCE = new ConnectLocation(connectionId,
                 new AwarenessGeofenceProvider(context),
-                credentialsProvider,
-                clientBuilder.build(),
+                client,
                 WorkManager.getInstance(context)
             );
         }
@@ -73,13 +70,11 @@ public final class ConnectLocation implements ButtonStateChangeListener {
     ConnectLocation(
         String connectionId,
         GeofenceProvider geofenceProvider,
-        CredentialsProvider credentialsProvider,
         ConnectionApiClient connectionApiClient,
         WorkManager workManager
     ) {
         this.connectionId = connectionId;
         this.geofenceProvider = geofenceProvider;
-        this.credentialsProvider = credentialsProvider;
         this.connectionApiClient = connectionApiClient;
         this.workManager = workManager;
 
@@ -90,8 +85,7 @@ public final class ConnectLocation implements ButtonStateChangeListener {
         Constraints constraints = new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build();
         workManager.enqueueUniquePeriodicWork(WORK_ID_CONNECTION_POLLING,
             ExistingPeriodicWorkPolicy.KEEP,
-            new PeriodicWorkRequest.Builder(
-                ConnectionRefresher.class,
+            new PeriodicWorkRequest.Builder(ConnectionRefresher.class,
                 CONNECTION_REFRESH_POLLING_INTERVAL,
                 TimeUnit.HOURS
             ).setConstraints(constraints).build()

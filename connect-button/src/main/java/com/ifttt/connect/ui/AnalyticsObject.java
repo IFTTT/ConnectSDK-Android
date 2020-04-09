@@ -1,7 +1,7 @@
 package com.ifttt.connect.ui;
 
 import androidx.annotation.VisibleForTesting;
-import com.ifttt.connect.Connection;
+import com.ifttt.connect.api.Connection;
 
 class AnalyticsObject {
 

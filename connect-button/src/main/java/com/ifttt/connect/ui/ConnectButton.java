@@ -24,12 +24,12 @@ import androidx.core.view.ViewCompat;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LifecycleRegistry;
-import com.ifttt.connect.Connection;
-import com.ifttt.connect.ConnectionApiClient;
-import com.ifttt.connect.CredentialsProvider;
-import com.ifttt.connect.ErrorResponse;
 import com.ifttt.connect.R;
+import com.ifttt.connect.api.Connection;
+import com.ifttt.connect.api.ConnectionApiClient;
+import com.ifttt.connect.api.ErrorResponse;
 import com.ifttt.connect.api.PendingResult;
+import com.ifttt.connect.api.UserTokenProvider;
 
 import static android.animation.ValueAnimator.INFINITE;
 import static androidx.core.text.HtmlCompat.FROM_HTML_MODE_COMPACT;
@@ -43,9 +43,10 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
     private static final long ANIM_DURATION = 1000L;
     private static ConnectionApiClient API_CLIENT;
 
+    private ConnectResultCredentialProvider connectResultCredentialProvider;
+
     private final BaseConnectButton connectButton;
     private final TextView loadingView;
-
 
     private final LifecycleRegistry lifecycleRegistry = new LifecycleRegistry(this);
 
@@ -85,12 +86,14 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
         });
     }
 
-    /*
+    /**
      * Method to disable analytics tracking for the SDK. Analytics tracking is enabled by default,
-     * Call this method before setting up the ConnectButton using{@link #ConnectButton.setup(Configuration) if you want to disable event tracking.
+     * Call this method before setting up the ConnectButton using{@link ConnectButton#setup(Configuration) if you want
+     * to disable event tracking.
+     *
      * You only need to call this method once while setting up the first ConnectButton
      * Tracking will be disabled for all following instances of the ConnectButton.
-     * */
+     */
     public static void disableTracking(Context context) {
         AnalyticsManager.getInstance(context).disableTracking();
     }
@@ -103,7 +106,7 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
      */
     public void setup(Configuration configuration) {
         if (ButtonUiHelper.isEmailInvalid(configuration.suggestedUserEmail) && !ButtonUiHelper.isIftttInstalled(
-                getContext().getPackageManager())) {
+            getContext().getPackageManager())) {
             connectButton.setVisibility(View.GONE);
             loadingView.setVisibility(View.GONE);
             Log.e(ConnectButton.class.getSimpleName(), configuration.suggestedUserEmail + " is invalid.");
@@ -115,8 +118,11 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
 
         ConnectionApiClient clientToUse;
         if (configuration.connectionApiClient == null) {
+            connectResultCredentialProvider = new ConnectResultCredentialProvider(configuration.credentialsProvider);
             if (API_CLIENT == null) {
-                ConnectionApiClient.Builder clientBuilder = new ConnectionApiClient.Builder(getContext());
+                ConnectionApiClient.Builder clientBuilder = new ConnectionApiClient.Builder(getContext(),
+                    connectResultCredentialProvider
+                );
                 if (configuration.inviteCode != null) {
                     clientBuilder.setInviteCode(configuration.inviteCode);
                 }
@@ -128,69 +134,74 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
             clientToUse = configuration.connectionApiClient;
         }
 
-        connectButton.setup(configuration.suggestedUserEmail, clientToUse, configuration.connectRedirectUri,
-                configuration.credentialsProvider, configuration.inviteCode);
+        connectButton.setup(configuration.suggestedUserEmail,
+            clientToUse,
+            configuration.connectRedirectUri,
+            configuration.credentialsProvider,
+            configuration.inviteCode
+        );
 
         pulseLoading();
 
-        UserTokenAsyncTask
-                task = new UserTokenAsyncTask(configuration.credentialsProvider, clientToUse, () -> {
-            if (configuration.connection != null) {
+        if (configuration.connection != null) {
+            if (configuration.listener != null) {
+                configuration.listener.onFetchConnectionSuccessful(configuration.connection);
+            }
+
+            connectButton.setConnection(configuration.connection);
+            loadingView.setVisibility(GONE);
+            ((Animator) loadingView.getTag()).cancel();
+            return;
+        }
+
+        if (configuration.connectionId == null) {
+            throw new IllegalStateException("Connection id cannot be null.");
+        }
+
+        PendingResult<Connection> pendingResult = clientToUse.api().showConnection(configuration.connectionId);
+        pendingResult.execute(new PendingResult.ResultCallback<Connection>() {
+            @Override
+            public void onSuccess(Connection result) {
                 if (configuration.listener != null) {
-                    configuration.listener.onFetchConnectionSuccessful(configuration.connection);
+                    configuration.listener.onFetchConnectionSuccessful(result);
                 }
 
-                connectButton.setConnection(configuration.connection);
+                connectButton.setConnection(result);
                 loadingView.setVisibility(GONE);
                 ((Animator) loadingView.getTag()).cancel();
-                return;
             }
 
-            if (configuration.connectionId == null) {
-                throw new IllegalStateException("Connection id cannot be null.");
+            @Override
+            public void onFailure(ErrorResponse errorResponse) {
+                CharSequence errorText
+                    = HtmlCompat.fromHtml(getResources().getString(R.string.ifttt_error_fetching_connection),
+                    FROM_HTML_MODE_COMPACT
+                );
+                SpannableString errorSpan = new SpannableString(errorText);
+                errorSpan.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getContext(),
+                    R.color.ifttt_error_red
+                    )),
+                    0,
+                    errorText.length(),
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                );
+
+                connectButton.setErrorMessage(errorSpan, v -> {
+                    PendingResult<Connection> pendingResult = clientToUse.api()
+                        .showConnection(configuration.connectionId);
+                    pendingResult.execute(this);
+                    lifecycleRegistry.addObserver(new PendingResultLifecycleObserver<>(pendingResult));
+                });
             }
-
-            PendingResult<Connection> pendingResult = clientToUse.api().showConnection(configuration.connectionId);
-            pendingResult.execute(new PendingResult.ResultCallback<Connection>() {
-                @Override
-                public void onSuccess(Connection result) {
-                    if (configuration.listener != null) {
-                        configuration.listener.onFetchConnectionSuccessful(result);
-                    }
-
-                    connectButton.setConnection(result);
-                    loadingView.setVisibility(GONE);
-                    ((Animator) loadingView.getTag()).cancel();
-                }
-
-                @Override
-                public void onFailure(ErrorResponse errorResponse) {
-                    CharSequence errorText =
-                            HtmlCompat.fromHtml(getResources().getString(R.string.ifttt_error_fetching_connection),
-                                    FROM_HTML_MODE_COMPACT);
-                    SpannableString errorSpan = new SpannableString(errorText);
-                    errorSpan.setSpan(
-                            new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.ifttt_error_red)), 0,
-                            errorText.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-                    connectButton.setErrorMessage(errorSpan, v -> {
-                        PendingResult<Connection> pendingResult =
-                                clientToUse.api().showConnection(configuration.connectionId);
-                        pendingResult.execute(this);
-                        lifecycleRegistry.addObserver(new PendingResultLifecycleObserver<>(pendingResult));
-                    });
-                }
-            });
-
-            lifecycleRegistry.addObserver(new PendingResultLifecycleObserver<>(pendingResult));
         });
-        task.execute();
-        lifecycleRegistry.addObserver(new AsyncTaskObserver(task));
+
+        lifecycleRegistry.addObserver(new PendingResultLifecycleObserver<>(pendingResult));
     }
 
     /**
      * Use this method if you want to change the default colors for rendering `ConnectButton` depending on the activity background
      * Default setting for this flag is false
+     *
      * @param onDarkBackground true for rendering ConnectButton on a dark background, false for light background
      */
     public void setOnDarkBackground(boolean onDarkBackground) {
@@ -222,6 +233,10 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
      * @param result Authentication flow redirect result from the web view.
      */
     public void setConnectResult(@Nullable ConnectResult result) {
+        if (result != null && result.userToken != null) {
+            connectResultCredentialProvider.userToken = result.userToken;
+        }
+
         if (ViewCompat.isLaidOut(connectButton)) {
             connectButton.setConnectResult(result);
         } else {
@@ -256,8 +271,11 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
 
     private void pulseLoading() {
         ValueAnimator animator = ValueAnimator.ofInt(255, 200);
-        animator.addUpdateListener(
-                animation -> loadingView.setTextColor(Color.argb((int) animation.getAnimatedValue(), 255, 255, 255)));
+        animator.addUpdateListener(animation -> loadingView.setTextColor(Color.argb((int) animation.getAnimatedValue(),
+            255,
+            255,
+            255
+        )));
         animator.setRepeatCount(INFINITE);
         animator.setDuration(ANIM_DURATION);
         animator.start();
@@ -297,11 +315,33 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
         @Nullable private String inviteCode;
 
         /**
+         * Factory method to build a new {@link Configuration} instance. There are a few steps to be taken in order to
+         * complete the instantiation, taking into account several use cases:
+         * - Building a ConnectButton with a connection ID String. This setup will let ConnectButton fetch the
+         * connection data automatically.
+         * - Building a ConnectButton with a pre-processed {@link Connection} object. This setup can be used if you
+         * prefer parsing or constructing Connection on your own.
+         * - Building a ConnectButton with just the {@link CredentialsProvider}. This setup allows ConnectButton to
+         * instantiate a global ConnectionApiClient automatically.
+         * - Building a ConnectButton with a {@link ConnectionApiClient} instance. This setup can be used if
+         * you want a better control on the ConnectionApiClient, e.g controlling the authentication mechanism, user
+         * login, etc.
+         *
+         * @param suggestedUserEmail Email address string provided as the suggested email for the user. Must be a
+         * valid email address.
+         * @param connectRedirectUri Redirect {@link Uri} object that the ConnectButton is going to use to
+         * redirect users back to your app after the connection enable flow is completed or failed.
+         */
+        public static ConnectionStep newBuilder(String suggestedUserEmail, Uri connectRedirectUri) {
+            return new Builder(suggestedUserEmail, connectRedirectUri);
+        }
+
+        /**
          * Builder class for constructing a Configuration object.
          */
-        public static final class Builder {
+        public static final class Builder implements ConnectionStep, ApiClientStep, ConfigurationStep {
             private final String suggestedUserEmail;
-            private final CredentialsProvider credentialsProvider;
+            private CredentialsProvider credentialsProvider;
             private final Uri connectRedirectUri;
             @Nullable private ConnectionApiClient connectionApiClient;
 
@@ -310,93 +350,59 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
             @Nullable private Connection connection;
             @Nullable private String inviteCode;
 
-            /**
-             * Factory method for creating a new Configuration builder.
-             *
-             * @param connection {@link Connection} object.
-             * @param suggestedUserEmail Email address string provided as the suggested email for the user. Must be a
-             * valid email address.
-             * @param credentialsProvider {@link CredentialsProvider} object that helps facilitate connection enable
-             * flow from a ConnectButton.
-             * @param connectRedirectUri Redirect {@link Uri} object that the ConnectButton is going to use to
-             * redirect users back to your app after the connection enable flow is completed or failed.
-             * @return The Builder object itself for chaining.
-             */
-            public static Builder withConnection(Connection connection, String suggestedUserEmail,
-                    CredentialsProvider credentialsProvider, Uri connectRedirectUri) {
-                Builder builder = new Builder(suggestedUserEmail, credentialsProvider, connectRedirectUri);
-                builder.connection = connection;
-                return builder;
-            }
-
-            /**
-             * Factory method for creating a new Configuration builder.
-             *
-             * @param connectionId A Connection id that the {@link ConnectionApiClient} can use to fetch the
-             * associated Connection object.
-             * @param suggestedUserEmail Email address string provided as the suggested email for the user. Must be a
-             * valid email address.
-             * @param credentialsProvider {@link CredentialsProvider} object that helps facilitate connection enable
-             * flow from a ConnectButton.
-             * @param connectRedirectUri Redirect {@link Uri} object that the ConnectButton is going to use to
-             * redirect users back to your app after the connection enable flow is completed or failed.
-             * @return The Builder object itself for chaining.
-             */
-            public static Builder withConnectionId(String connectionId, String suggestedUserEmail,
-                    CredentialsProvider credentialsProvider, Uri connectRedirectUri) {
-                Builder builder = new Builder(suggestedUserEmail, credentialsProvider, connectRedirectUri);
-                builder.connectionId = connectionId;
-                return builder;
-            }
-
-            private Builder(String suggestedUserEmail, CredentialsProvider credentialsProvider,
-                    Uri connectRedirectUri) {
+            private Builder(String suggestedUserEmail, Uri connectRedirectUri) {
                 this.suggestedUserEmail = suggestedUserEmail;
-                this.credentialsProvider = credentialsProvider;
                 this.connectRedirectUri = connectRedirectUri;
             }
 
-            /**
-             * @param onFetchCompleteListener an optional {@link OnFetchConnectionListener}.
-             *
-             * Note that this callback will not be invoked if the Configuration is built through
-             * {@link #withConnection(Connection, String, CredentialsProvider, Uri)}.
-             * @return The Builder object itself for chaining.
-             */
-            public Builder setOnFetchCompleteListener(OnFetchConnectionListener onFetchCompleteListener) {
+            @Override
+            public ConfigurationStep setOnFetchCompleteListener(OnFetchConnectionListener onFetchCompleteListener) {
                 this.listener = onFetchCompleteListener;
                 return this;
             }
 
-            /**
-             * @param connectionApiClient an optional {@link ConnectionApiClient} that will be used for the ConnectButton
-             * instead of the default one.
-             * @return The Builder object itself for chaining.
-             */
-            public Builder setConnectionApiClient(ConnectionApiClient connectionApiClient) {
-                this.connectionApiClient = connectionApiClient;
+            @Override
+            public ConfigurationStep withClient(ConnectionApiClient client, CredentialsProvider provider) {
+                this.connectionApiClient = client;
+                this.credentialsProvider = provider;
                 return this;
             }
 
-            /**
-             * @param inviteCode an optional string as the invite code, this is needed if your service is not yet
-             * published on IFTTT Platform.
-             * @return The Builder object itself for chaining.
-             * @see ConnectionApiClient.Builder#setInviteCode(String)
-             */
-            public Builder setInviteCode(String inviteCode) {
+            @Override
+            public ConfigurationStep withCredentialProvider(CredentialsProvider credentialProvider) {
+                this.credentialsProvider = credentialProvider;
+                return this;
+            }
+
+            @Override
+            public ApiClientStep withConnectionId(String id) {
+                this.connectionId = id;
+                return this;
+            }
+
+            @Override
+            public ApiClientStep withConnection(Connection connection) {
+                this.connection = connection;
+                return this;
+            }
+
+            @Override
+            public ApiClientStep setInviteCode(String inviteCode) {
                 this.inviteCode = inviteCode;
                 return this;
             }
 
+            @Override
             public Configuration build() {
                 if (connection == null && connectionId == null) {
                     throw new IllegalStateException("Either connection or connectionId must be non-null.");
                 }
 
-                Configuration configuration =
-                        new Configuration(suggestedUserEmail, credentialsProvider, connectRedirectUri,
-                                connectionApiClient);
+                Configuration configuration = new Configuration(suggestedUserEmail,
+                    credentialsProvider,
+                    connectRedirectUri,
+                    connectionApiClient
+                );
                 configuration.connection = connection;
                 configuration.connectionId = connectionId;
                 configuration.listener = listener;
@@ -405,12 +411,64 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
             }
         }
 
-        private Configuration(String suggestedUserEmail, CredentialsProvider credentialsProvider,
-                Uri connectRedirectUri, @Nullable ConnectionApiClient connectionApiClient) {
+        private Configuration(
+            String suggestedUserEmail,
+            CredentialsProvider credentialsProvider,
+            Uri connectRedirectUri,
+            @Nullable ConnectionApiClient connectionApiClient
+        ) {
             this.suggestedUserEmail = suggestedUserEmail;
             this.credentialsProvider = credentialsProvider;
             this.connectRedirectUri = connectRedirectUri;
             this.connectionApiClient = connectionApiClient;
+        }
+
+        /**
+         * A {@link Configuration.Builder} step to provide connection data related setup.
+         */
+        public interface ConnectionStep {
+            ApiClientStep withConnectionId(String id);
+
+            ApiClientStep withConnection(Connection connection);
+
+            ApiClientStep setInviteCode(String inviteCode);
+        }
+
+        /**
+         * A {@link Configuration.Builder} step to provide ConnectionApiClient related setup.
+         */
+        public interface ApiClientStep {
+            ConfigurationStep withClient(ConnectionApiClient client, CredentialsProvider provider);
+
+            ConfigurationStep withCredentialProvider(CredentialsProvider credentialProvider);
+        }
+
+        /**
+         * A {@link Configuration.Builder} step to complete the construction of a {@link Configuration} object.
+         */
+        public interface ConfigurationStep {
+            ConfigurationStep setOnFetchCompleteListener(OnFetchConnectionListener onFetchCompleteListener);
+
+            Configuration build();
+        }
+    }
+
+    private static final class ConnectResultCredentialProvider implements UserTokenProvider {
+
+        private final CredentialsProvider delegate;
+        String userToken;
+
+        ConnectResultCredentialProvider(CredentialsProvider delegate) {
+            this.delegate = delegate;
+        }
+
+        @Override
+        public String getUserToken() {
+            if (userToken != null) {
+                return userToken;
+            }
+
+            return delegate.getUserToken();
         }
     }
 }

@@ -1,7 +1,7 @@
 package com.ifttt.connect.ui;
 
-import com.ifttt.connect.Connection;
-import com.ifttt.connect.ErrorResponse;
+import com.ifttt.connect.api.Connection;
+import com.ifttt.connect.api.ErrorResponse;
 
 /**
  * Callback interface for listening to state changes of the {@link BaseConnectButton}.

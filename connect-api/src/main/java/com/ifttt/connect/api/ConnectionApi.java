@@ -1,9 +1,5 @@
 package com.ifttt.connect.api;
 
-import com.ifttt.connect.Connection;
-import com.ifttt.connect.ConnectionApiClient;
-import com.ifttt.connect.User;
-
 /**
  * IFTTT API wrapper interface. You may use the instance from {@link ConnectionApiClient#api()} to make API calls
  * asynchronously.

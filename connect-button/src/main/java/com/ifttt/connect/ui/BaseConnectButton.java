@@ -46,12 +46,11 @@ import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LifecycleRegistry;
 import androidx.lifecycle.OnLifecycleEvent;
-import com.ifttt.connect.Connection;
-import com.ifttt.connect.ConnectionApiClient;
-import com.ifttt.connect.CredentialsProvider;
-import com.ifttt.connect.ErrorResponse;
+import com.ifttt.connect.api.Connection;
+import com.ifttt.connect.api.ConnectionApiClient;
+import com.ifttt.connect.api.ErrorResponse;
 import com.ifttt.connect.R;
-import com.ifttt.connect.Service;
+import com.ifttt.connect.api.Service;
 import com.ifttt.connect.api.PendingResult;
 import java.util.ArrayList;
 import javax.annotation.CheckReturnValue;
@@ -62,10 +61,10 @@ import static android.graphics.Color.BLACK;
 import static androidx.lifecycle.Lifecycle.State.CREATED;
 import static androidx.lifecycle.Lifecycle.State.DESTROYED;
 import static androidx.lifecycle.Lifecycle.State.STARTED;
-import static com.ifttt.connect.Connection.Status.disabled;
-import static com.ifttt.connect.Connection.Status.enabled;
-import static com.ifttt.connect.Connection.Status.never_enabled;
-import static com.ifttt.connect.Connection.Status.unknown;
+import static com.ifttt.connect.api.Connection.Status.disabled;
+import static com.ifttt.connect.api.Connection.Status.enabled;
+import static com.ifttt.connect.api.Connection.Status.never_enabled;
+import static com.ifttt.connect.api.Connection.Status.unknown;
 import static com.ifttt.connect.ui.ButtonUiHelper.adjustTextViewLayout;
 import static com.ifttt.connect.ui.ButtonUiHelper.buildButtonBackground;
 import static com.ifttt.connect.ui.ButtonUiHelper.findWorksWithService;
@@ -342,10 +341,6 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         cleanUpViews(ProgressView.class);
         switch (result.nextStep) {
             case Complete:
-                if (result.userToken != null) {
-                    buttonApiHelper.setUserToken(result.userToken);
-                }
-
                 CharSequence text = getResources().getString(R.string.ifttt_connecting);
                 ProgressView progressView = ProgressView.addTo(buttonRoot, worksWithService.brandColor,
                         getDarkerColor(worksWithService.brandColor));
@@ -679,12 +674,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                     }
                 };
 
-                if (buttonApiHelper.isUserAuthorized()) {
-                    buttonApiHelper.fetchConnection(lifecycleRegistry, connection.id, callback);
-                } else {
-                    buttonApiHelper.fetchUserToken(lifecycleRegistry, () ->
-                        buttonApiHelper.fetchConnection(lifecycleRegistry, connection.id, callback));
-                }
+                buttonApiHelper.fetchConnection(lifecycleRegistry, connection.id, callback);
             }
         });
 
