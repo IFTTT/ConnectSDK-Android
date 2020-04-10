@@ -4,11 +4,11 @@ import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.work.WorkManager;
 import com.google.common.truth.Truth;
-import com.ifttt.connect.Connection;
-import com.ifttt.connect.ConnectionApiClient;
-import com.ifttt.connect.ui.CredentialsProvider;
+import com.ifttt.connect.api.Connection;
+import com.ifttt.connect.api.ConnectionApiClient;
 import com.ifttt.connect.ui.ConnectButton;
 import com.ifttt.connect.ui.ConnectButtonState;
+import com.ifttt.connect.ui.CredentialsProvider;
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.Before;
@@ -38,7 +38,8 @@ public class ConnectLocationTest {
             workManager = WorkManager.getInstance(activity);
         });
 
-        connection = new Connection("id",
+        connection = new Connection(
+            "id",
             "name",
             "description",
             Connection.Status.enabled,
@@ -59,8 +60,7 @@ public class ConnectLocationTest {
                 return null;
             }
         };
-        apiClient = new ConnectionApiClient.Builder(button.getContext()).setCredentialsProvider(credentialsProvider)
-            .build();
+        apiClient = new ConnectionApiClient.Builder(button.getContext(), credentialsProvider).build();
     }
 
     @Test(expected = IllegalStateException.class)

@@ -20,18 +20,18 @@ public final class ConnectButtonTest {
     @Test
     public void shouldHideUiWithInvalidEmail() {
         ConnectButton connectButton = new ConnectButton(activity);
-        connectButton.setup(ConnectButton.Configuration.Builder.withConnectionId("123", "Not a valid email",
-                new CredentialsProvider() {
-                    @Override
-                    public String getOAuthCode() {
-                        return null;
-                    }
+        connectButton.setup(ConnectButton.Configuration.newBuilder("Not a valid email", Uri.EMPTY).withConnectionId(
+            "123").withCredentialProvider(new CredentialsProvider() {
+            @Override
+            public String getOAuthCode() {
+                return null;
+            }
 
-                    @Override
-                    public String getUserToken() {
-                        return null;
-                    }
-                }, Uri.EMPTY).build());
+            @Override
+            public String getUserToken() {
+                return null;
+            }
+        }).build());
 
         for (int i = 0; i < connectButton.getChildCount(); i++) {
             View child = connectButton.getChildAt(i);
@@ -42,18 +42,20 @@ public final class ConnectButtonTest {
     @Test
     public void shouldShowUiWithValidEmail() {
         ConnectButton connectButton = new ConnectButton(activity);
-        connectButton.setup(ConnectButton.Configuration.Builder.withConnectionId("123", "email@ifttt.com",
-                new CredentialsProvider() {
-                    @Override
-                    public String getOAuthCode() {
-                        return null;
-                    }
+        connectButton.setup(ConnectButton.Configuration.newBuilder("email@ifttt.com", Uri.EMPTY)
+            .withConnectionId("123")
+            .withCredentialProvider(new CredentialsProvider() {
+                @Override
+                public String getOAuthCode() {
+                    return null;
+                }
 
-                    @Override
-                    public String getUserToken() {
-                        return null;
-                    }
-                }, Uri.EMPTY).build());
+                @Override
+                public String getUserToken() {
+                    return null;
+                }
+            })
+            .build());
 
         for (int i = 0; i < connectButton.getChildCount(); i++) {
             View child = connectButton.getChildAt(i);

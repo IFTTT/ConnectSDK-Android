@@ -8,10 +8,10 @@ import android.widget.TextView;
 import androidx.core.content.ContextCompat;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
-import com.ifttt.connect.Connection;
-import com.ifttt.connect.ConnectionApiClient;
-import com.ifttt.connect.ErrorResponse;
 import com.ifttt.connect.R;
+import com.ifttt.connect.api.Connection;
+import com.ifttt.connect.api.ConnectionApiClient;
+import com.ifttt.connect.api.ErrorResponse;
 import com.ifttt.connect.api.TestUtils;
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,7 +44,7 @@ public final class BaseConnectButtonTest {
         ActivityScenario<TestActivity> scenario = ActivityScenario.launch(TestActivity.class);
         scenario.onActivity(activity -> {
             button = activity.findViewById(R.id.ifttt_connect_button_test);
-            client = new ConnectionApiClient.Builder(activity).build();
+            client = new ConnectionApiClient.Builder(activity, () -> null).build();
         });
 
         credentialsProvider = new CredentialsProvider() {
@@ -161,7 +161,7 @@ public final class BaseConnectButtonTest {
         server.start();
 
         button.setup("a@b.com",
-            TestUtils.getMockConnectionApiClient(button.getContext(), server),
+            TestUtils.getMockConnectionApiClient(button.getContext(), server, () -> null),
             Uri.parse("https://google.com"),
             credentialsProvider,
             null

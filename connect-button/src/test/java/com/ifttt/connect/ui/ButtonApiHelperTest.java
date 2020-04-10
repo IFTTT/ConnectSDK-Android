@@ -1,7 +1,7 @@
 package com.ifttt.connect.ui;
 
 import android.net.Uri;
-import com.ifttt.connect.Connection;
+import com.ifttt.connect.api.Connection;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;

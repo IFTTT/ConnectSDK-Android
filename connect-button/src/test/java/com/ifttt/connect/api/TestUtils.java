@@ -1,4 +1,4 @@
-package com.ifttt.connect;
+package com.ifttt.connect.api;
 
 import android.content.Context;
 import com.squareup.moshi.JsonAdapter;
@@ -13,10 +13,8 @@ import okio.Okio;
 
 public final class TestUtils {
 
-    private static final Moshi MOSHI = new Moshi.Builder().add(Date.class, new Rfc3339DateJsonAdapter().nullSafe())
-        .add(new HexColorJsonAdapter())
-        .add(new ConnectionJsonAdapter())
-        .build();
+    private static final Moshi MOSHI = new Moshi.Builder().add(Date.class, new Rfc3339DateJsonAdapter().nullSafe()).add(
+        new HexColorJsonAdapter()).add(new ConnectionJsonAdapter()).build();
 
     private static final JsonAdapter<Connection> CONNECTION_ADAPTER = MOSHI.adapter(Connection.class);
 
@@ -26,8 +24,10 @@ public final class TestUtils {
         return CONNECTION_ADAPTER.fromJson(jsonReader);
     }
 
-    public static ConnectionApiClient getMockConnectionApiClient(Context context, MockWebServer server) {
-        return new ConnectionApiClient.Builder(context).buildWithBaseUrl(server.url("").toString());
+    public static ConnectionApiClient getMockConnectionApiClient(
+        Context context, MockWebServer server, UserTokenProvider provider
+    ) {
+        return new ConnectionApiClient.Builder(context, provider).buildWithBaseUrl(server.url("").toString());
     }
 
     private TestUtils() {
