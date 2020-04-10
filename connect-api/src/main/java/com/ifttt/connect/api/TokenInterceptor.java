@@ -1,7 +1,6 @@
 package com.ifttt.connect.api;
 
 import java.io.IOException;
-import javax.annotation.Nullable;
 import okhttp3.Interceptor;
 import okhttp3.Response;
 
@@ -9,37 +8,40 @@ import okhttp3.Response;
  * {@link Interceptor} for setting user authentication header.
  */
 final class TokenInterceptor implements Interceptor {
-    @Nullable private String token;
-    @Nullable private UserTokenProvider credentialsProvider;
+    private final UserTokenProvider credentialsProvider;
+
+    private boolean isUserAuthenticated = false;
 
     TokenInterceptor(UserTokenProvider credentialsProvider) {
         this.credentialsProvider = credentialsProvider;
     }
 
+    /**
+     * @return true if the Interceptor has a valid user token, false otherwise. This is represented as whether the
+     * most recent {@link UserTokenProvider#getUserToken()} returned a non-null value and the API response did not have
+     * a 401 status code.
+     */
     boolean isUserAuthenticated() {
-        return token != null;
+        return isUserAuthenticated;
     }
 
     @Override
     public Response intercept(Chain chain) throws IOException {
-        if (token == null) {
-            if (credentialsProvider != null) {
-                try {
-                    token = credentialsProvider.getUserToken();
-                    if (token == null) {
-                        // If token is still null, proceed without it.
-                        return chain.proceed(chain.request());
-                    }
-                } catch (Exception e) {
-                    if (BuildConfig.DEBUG) {
-                        e.printStackTrace();
-                    }
-
-                    return chain.proceed(chain.request());
-                }
-            } else {
+        String token;
+        try {
+            token = credentialsProvider.getUserToken();
+            if (token == null) {
+                // If token is still null, proceed without it.
+                isUserAuthenticated = false;
                 return chain.proceed(chain.request());
             }
+        } catch (Exception e) {
+            if (BuildConfig.DEBUG) {
+                e.printStackTrace();
+            }
+
+            isUserAuthenticated = false;
+            return chain.proceed(chain.request());
         }
 
         Response response = chain.proceed(chain.request()
@@ -47,10 +49,8 @@ final class TokenInterceptor implements Interceptor {
             .addHeader("Authorization", "Bearer " + token)
             .build());
 
-        if (response.code() == 401) {
-            // If we are getting 401, invalid the cached token.
-            token = null;
-        }
+        // If we are getting 401, reset the user authentication flag.
+        isUserAuthenticated = response.code() != 401;
 
         return response;
     }
