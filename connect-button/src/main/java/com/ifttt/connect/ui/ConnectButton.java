@@ -332,14 +332,14 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
          * @param connectRedirectUri Redirect {@link Uri} object that the ConnectButton is going to use to
          * redirect users back to your app after the connection enable flow is completed or failed.
          */
-        public static ConnectionStep newBuilder(String suggestedUserEmail, Uri connectRedirectUri) {
+        public static ConnectionSetup newBuilder(String suggestedUserEmail, Uri connectRedirectUri) {
             return new Builder(suggestedUserEmail, connectRedirectUri);
         }
 
         /**
          * Builder class for constructing a Configuration object.
          */
-        public static final class Builder implements ConnectionStep, ApiClientStep, ConfigurationStep {
+        public static final class Builder implements ConnectionSetup, ApiClientSetup, ConfigurationSetup {
             private final String suggestedUserEmail;
             private CredentialsProvider credentialsProvider;
             private final Uri connectRedirectUri;
@@ -356,38 +356,38 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
             }
 
             @Override
-            public ConfigurationStep setOnFetchCompleteListener(OnFetchConnectionListener onFetchCompleteListener) {
+            public ConfigurationSetup setOnFetchCompleteListener(OnFetchConnectionListener onFetchCompleteListener) {
                 this.listener = onFetchCompleteListener;
                 return this;
             }
 
             @Override
-            public ConfigurationStep withClient(ConnectionApiClient client, CredentialsProvider provider) {
+            public ConfigurationSetup withClient(ConnectionApiClient client, CredentialsProvider provider) {
                 this.connectionApiClient = client;
                 this.credentialsProvider = provider;
                 return this;
             }
 
             @Override
-            public ConfigurationStep withCredentialProvider(CredentialsProvider credentialProvider) {
+            public ConfigurationSetup withCredentialProvider(CredentialsProvider credentialProvider) {
                 this.credentialsProvider = credentialProvider;
                 return this;
             }
 
             @Override
-            public ApiClientStep withConnectionId(String id) {
+            public ApiClientSetup withConnectionId(String id) {
                 this.connectionId = id;
                 return this;
             }
 
             @Override
-            public ApiClientStep withConnection(Connection connection) {
+            public ApiClientSetup withConnection(Connection connection) {
                 this.connection = connection;
                 return this;
             }
 
             @Override
-            public ApiClientStep setInviteCode(String inviteCode) {
+            public ApiClientSetup setInviteCode(String inviteCode) {
                 this.inviteCode = inviteCode;
                 return this;
             }
@@ -426,28 +426,28 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
         /**
          * A {@link Configuration.Builder} step to provide connection data related setup.
          */
-        public interface ConnectionStep {
-            ApiClientStep withConnectionId(String id);
+        public interface ConnectionSetup {
+            ApiClientSetup withConnectionId(String id);
 
-            ApiClientStep withConnection(Connection connection);
+            ApiClientSetup withConnection(Connection connection);
 
-            ApiClientStep setInviteCode(String inviteCode);
+            ApiClientSetup setInviteCode(String inviteCode);
         }
 
         /**
          * A {@link Configuration.Builder} step to provide ConnectionApiClient related setup.
          */
-        public interface ApiClientStep {
-            ConfigurationStep withClient(ConnectionApiClient client, CredentialsProvider provider);
+        public interface ApiClientSetup {
+            ConfigurationSetup withClient(ConnectionApiClient client, CredentialsProvider provider);
 
-            ConfigurationStep withCredentialProvider(CredentialsProvider credentialProvider);
+            ConfigurationSetup withCredentialProvider(CredentialsProvider credentialProvider);
         }
 
         /**
          * A {@link Configuration.Builder} step to complete the construction of a {@link Configuration} object.
          */
-        public interface ConfigurationStep {
-            ConfigurationStep setOnFetchCompleteListener(OnFetchConnectionListener onFetchCompleteListener);
+        public interface ConfigurationSetup {
+            ConfigurationSetup setOnFetchCompleteListener(OnFetchConnectionListener onFetchCompleteListener);
 
             Configuration build();
         }
