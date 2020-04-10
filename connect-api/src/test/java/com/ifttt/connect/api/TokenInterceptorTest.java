@@ -1,7 +1,6 @@
 package com.ifttt.connect.api;
 
 import java.io.IOException;
-import java.util.concurrent.atomic.AtomicInteger;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.mockwebserver.MockResponse;
@@ -25,7 +24,7 @@ public final class TokenInterceptorTest {
     }
 
     @Test
-    public void shouldCallProviderWhenTokenIsNull() throws IOException {
+    public void shouldCallProviderForApiCalls() throws IOException {
         TokenInterceptor interceptor = new TokenInterceptor(() -> "token");
 
         OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
@@ -33,26 +32,6 @@ public final class TokenInterceptorTest {
         server.enqueue(new MockResponse());
         client.newCall(TokenInterceptorTest.this.request()).execute();
         assertThat(interceptor.isUserAuthenticated()).isTrue();
-    }
-
-    @Test
-    public void shouldNotCallProviderIfTokenNotNull() throws IOException {
-        AtomicInteger callCountRef = new AtomicInteger();
-        TokenInterceptor interceptor = new TokenInterceptor(() -> {
-            callCountRef.incrementAndGet();
-            return "token";
-        });
-
-        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
-
-        server.enqueue(new MockResponse());
-        server.enqueue(new MockResponse());
-
-        client.newCall(request()).execute();
-        assertThat(callCountRef.get()).isEqualTo(1);
-
-        client.newCall(request()).execute();
-        assertThat(callCountRef.get()).isEqualTo(1);
     }
 
     @Test
