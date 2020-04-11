@@ -45,46 +45,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
-        <TextView
-            android:id="@+id/value_prop_1"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/features"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            android:layout_marginEnd="@dimen/margin_horizontal"
+            android:orientation="vertical"
             android:layout_marginStart="@dimen/margin_horizontal"
-            android:drawablePadding="16dp"
-            android:drawableStart="@drawable/ic_house"
-            android:text="@string/value_props_1"
-            android:textColor="@android:color/black"
-            android:textSize="16sp"/>
-
-        <TextView
-            android:id="@+id/value_prop_2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            android:layout_marginEnd="@dimen/margin_horizontal"
-            android:layout_marginStart="@dimen/margin_horizontal"
-            android:drawablePadding="16dp"
-            android:drawableStart="@drawable/ic_calendar"
-            android:text="@string/value_props_2"
-            android:textColor="@android:color/black"
-            android:textSize="16sp"/>
-
-        <TextView
-            android:id="@+id/value_prop_3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            android:layout_marginEnd="@dimen/margin_horizontal"
-            android:layout_marginStart="@dimen/margin_horizontal"
-            android:drawablePadding="16dp"
-            android:drawableStart="@drawable/ic_gift"
-            android:text="@string/value_props_3"
-            android:textColor="@android:color/black"
-            android:textSize="16sp"/>
+            android:layout_marginEnd="@dimen/margin_horizontal">
+        </LinearLayout>
 
     </LinearLayout>
-
-
 </ScrollView>

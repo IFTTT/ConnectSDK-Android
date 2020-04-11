@@ -11,10 +11,8 @@
     <string name="enable">Enable</string>
     <string name="turn_on">Turn on</string>
     <string name="configure">Configure</string>
-    <string name="value_props_1">Schedule grocery delivery when you’re available</string>
-    <string name="value_props_2">Add delivery date and time to your calendar</string>
-    <string name="value_props_3">Unlock discount delivery rates</string>
     <string name="email_title">Please enter your email</string>
     <string name="logout">Logout</string>
     <string name="login">Login</string>
+    <string name="select_connection">Select a connection.</string>
 </resources>
