@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <array name="connections">
-        <item>"Connect Google Calendar"</item>
-        <item>"Connect Location"</item>
-    </array>
+    <string-array name="connections">
+        <item>Connect Google Calendar</item>
+        <item>Connect Location</item>
+    </string-array>
 </resources>
