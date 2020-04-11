@@ -16,7 +16,7 @@ class FeatureView @JvmOverloads constructor(
 ) : AppCompatTextView(context, attributeSet, defAttrStyle), Target {
 
     override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
-        setCompoundDrawables(placeHolderDrawable, null, null, null)
+        // We aren't setting a placeholder while loading the icon using picasso, so don't do anything here
     }
 
     override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
@@ -30,7 +30,7 @@ class FeatureView @JvmOverloads constructor(
                 setBounds(0, 0, size, size)
             }, null, null, null)
 
-            setCompoundDrawablePadding(resources.getDimension(R.dimen.feature_drawable_padding).toInt())
+            compoundDrawablePadding = resources.getDimensionPixelSize(R.dimen.feature_drawable_padding)
         } else {
             setCompoundDrawables(null, null, null, null)
         }
