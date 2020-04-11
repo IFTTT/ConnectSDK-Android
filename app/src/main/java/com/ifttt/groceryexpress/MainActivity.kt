@@ -47,52 +47,12 @@ class MainActivity : AppCompatActivity() {
         connectButton = findViewById(R.id.connect_button)
         features = findViewById(R.id.features)
 
-        val setUpConnectButton = {
-            val hasEmailSet = !TextUtils.isEmpty(emailPreferencesHelper.getEmail())
-            val suggestedEmail = if (!hasEmailSet) {
-                EMAIL
-            } else {
-                emailPreferencesHelper.getEmail()!!
-            }
-
-            val fetchCompleteListener = ConnectButton.OnFetchConnectionListener {
-                findViewById<TextView>(R.id.connection_title).text = it.name
-                it.features.forEach {
-                    val featureView = FeatureView(this@MainActivity).apply {
-                        text = it.description
-                        Picasso.get().load(it.iconUrl).into(this)
-                        layoutParams = LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.MATCH_PARENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT
-                        ).apply {
-                            val margin = resources.getDimensionPixelSize(R.dimen.feature_margin_horizontal)
-                            setMargins(0, 0, 0, margin)
-                        }
-                    }
-
-                    features.addView(featureView)
-                }
-            }
-
-            val configuration = ConnectButton.Configuration.Builder.withConnectionId(
-                connectionId,
-                suggestedEmail,
-                credentialsProvider
-                , REDIRECT_URI
-            ).setOnFetchCompleteListener(fetchCompleteListener)
-                .build()
-
-            connectButton.setup(configuration)
-            ConnectLocation.getInstance().setUpWithConnectButton(connectButton)
-
-            if (!hasEmailSet) {
-                promptLogin()
-            }
-        }
-
         if (savedInstanceState?.containsKey(KEY_CONNECTION_ID) == true) {
             connectionId = savedInstanceState.getString(KEY_CONNECTION_ID)!!
             setUpConnectButton()
+            if (connectionId == CONNECTION_ID_LOCATION) {
+                setUpLocation()
+            }
             return
         }
 
@@ -105,12 +65,58 @@ class MainActivity : AppCompatActivity() {
                     connectionId = CONNECTION_ID_GOOGLE_CALENDAR
                 } else {
                     connectionId = CONNECTION_ID_LOCATION
+                    setUpLocation()
                 }
                 setUpConnectButton()
             }
             .setCancelable(false)
-            .create()
             .show()
+    }
+
+    private fun setUpLocation() {
+        ConnectLocation.getInstance().setUpWithConnectButton(connectButton)
+    }
+
+    private fun setUpConnectButton() {
+        val hasEmailSet = !TextUtils.isEmpty(emailPreferencesHelper.getEmail())
+        val suggestedEmail = if (!hasEmailSet) {
+            EMAIL
+        } else {
+            emailPreferencesHelper.getEmail()!!
+        }
+
+        val fetchCompleteListener = ConnectButton.OnFetchConnectionListener {
+            findViewById<TextView>(R.id.connection_title).text = it.name
+            it.features.forEach {
+                val featureView = FeatureView(this@MainActivity).apply {
+                    text = it.description
+                    Picasso.get().load(it.iconUrl).into(this)
+                    layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    ).apply {
+                        val margin = resources.getDimensionPixelSize(R.dimen.feature_margin_horizontal)
+                        setMargins(0, 0, 0, margin)
+                    }
+                }
+
+                features.addView(featureView)
+            }
+        }
+
+        val configuration = ConnectButton.Configuration.Builder.withConnectionId(
+            connectionId,
+            suggestedEmail,
+            credentialsProvider
+            , REDIRECT_URI
+        ).setOnFetchCompleteListener(fetchCompleteListener)
+            .build()
+
+        connectButton.setup(configuration)
+
+        if (!hasEmailSet) {
+            promptLogin()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
