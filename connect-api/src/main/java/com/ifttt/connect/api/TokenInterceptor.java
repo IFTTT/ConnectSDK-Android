@@ -8,12 +8,12 @@ import okhttp3.Response;
  * {@link Interceptor} for setting user authentication header.
  */
 final class TokenInterceptor implements Interceptor {
-    private final UserTokenProvider credentialsProvider;
+    private final UserTokenProvider userTokenProvider;
 
     private boolean isUserAuthenticated = false;
 
-    TokenInterceptor(UserTokenProvider credentialsProvider) {
-        this.credentialsProvider = credentialsProvider;
+    TokenInterceptor(UserTokenProvider userTokenProvider) {
+        this.userTokenProvider = userTokenProvider;
     }
 
     /**
@@ -29,7 +29,7 @@ final class TokenInterceptor implements Interceptor {
     public Response intercept(Chain chain) throws IOException {
         String token;
         try {
-            token = credentialsProvider.getUserToken();
+            token = userTokenProvider.getUserToken();
             if (token == null) {
                 // If token is still null, proceed without it.
                 isUserAuthenticated = false;
