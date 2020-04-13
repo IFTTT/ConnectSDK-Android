@@ -7,13 +7,13 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import com.google.android.gms.awareness.fence.AwarenessFence;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.ifttt.connect.Connection;
-import com.ifttt.connect.Feature;
-import com.ifttt.connect.FeatureStep;
-import com.ifttt.connect.LocationFieldValue;
-import com.ifttt.connect.UserFeature;
-import com.ifttt.connect.UserFeatureField;
-import com.ifttt.connect.UserFeatureStep;
+import com.ifttt.connect.api.Connection;
+import com.ifttt.connect.api.Feature;
+import com.ifttt.connect.api.FeatureStep;
+import com.ifttt.connect.api.LocationFieldValue;
+import com.ifttt.connect.api.UserFeature;
+import com.ifttt.connect.api.UserFeatureField;
+import com.ifttt.connect.api.UserFeatureStep;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -28,7 +28,8 @@ public final class AwarenessGeofenceProviderTest {
 
     private LocationFieldValue value = new LocationFieldValue(1.0D, 1.0D, 100D, "");
     private UserFeatureField<LocationFieldValue> field = new UserFeatureField<>(value, "LOCATION_ENTER", "id");
-    private UserFeatureStep step = new UserFeatureStep(FeatureStep.StepType.Trigger,
+    private UserFeatureStep step = new UserFeatureStep(
+        FeatureStep.StepType.Trigger,
         "step_id",
         "stepId", ImmutableList.of(field)
     );

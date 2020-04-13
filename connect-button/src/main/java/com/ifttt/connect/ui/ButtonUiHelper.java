@@ -19,9 +19,9 @@ import androidx.annotation.ColorInt;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.core.view.ViewCompat;
-import com.ifttt.connect.Connection;
 import com.ifttt.connect.R;
-import com.ifttt.connect.Service;
+import com.ifttt.connect.api.Connection;
+import com.ifttt.connect.api.Service;
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 

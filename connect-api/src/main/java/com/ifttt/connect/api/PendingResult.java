@@ -1,6 +1,5 @@
 package com.ifttt.connect.api;
 
-import com.ifttt.connect.ErrorResponse;
 import retrofit2.Call;
 
 /**

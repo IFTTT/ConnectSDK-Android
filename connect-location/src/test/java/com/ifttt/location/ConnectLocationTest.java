@@ -4,11 +4,11 @@ import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.work.WorkManager;
 import com.google.common.truth.Truth;
-import com.ifttt.connect.Connection;
-import com.ifttt.connect.ConnectionApiClient;
-import com.ifttt.connect.CredentialsProvider;
+import com.ifttt.connect.api.Connection;
+import com.ifttt.connect.api.ConnectionApiClient;
 import com.ifttt.connect.ui.ConnectButton;
 import com.ifttt.connect.ui.ConnectButtonState;
+import com.ifttt.connect.ui.CredentialsProvider;
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.Before;
@@ -38,7 +38,8 @@ public class ConnectLocationTest {
             workManager = WorkManager.getInstance(activity);
         });
 
-        connection = new Connection("id",
+        connection = new Connection(
+            "id",
             "name",
             "description",
             Connection.Status.enabled,
@@ -48,7 +49,6 @@ public class ConnectLocationTest {
             Collections.emptyList()
         );
 
-        apiClient = new ConnectionApiClient.Builder(button.getContext()).build();
         credentialsProvider = new CredentialsProvider() {
             @Override
             public String getOAuthCode() {
@@ -60,6 +60,7 @@ public class ConnectLocationTest {
                 return null;
             }
         };
+        apiClient = new ConnectionApiClient.Builder(button.getContext(), credentialsProvider).build();
     }
 
     @Test(expected = IllegalStateException.class)
@@ -71,12 +72,7 @@ public class ConnectLocationTest {
     @Test
     public void shouldUpdateGeofencesWhenEnabled() {
         AtomicBoolean ref = new AtomicBoolean();
-        ConnectLocation location = new ConnectLocation("id",
-            connection -> ref.set(true),
-            credentialsProvider,
-            apiClient,
-            workManager
-        );
+        ConnectLocation location = new ConnectLocation("id", connection -> ref.set(true), apiClient, workManager);
 
         location.onStateChanged(ConnectButtonState.Enabled, ConnectButtonState.Initial, connection);
         Truth.assertThat(ref.get()).isTrue();
@@ -85,12 +81,7 @@ public class ConnectLocationTest {
     @Test
     public void shouldUpdateGeofencesWhenDisabled() {
         AtomicBoolean ref = new AtomicBoolean();
-        ConnectLocation location = new ConnectLocation("id",
-            connection -> ref.set(true),
-            credentialsProvider,
-            apiClient,
-            workManager
-        );
+        ConnectLocation location = new ConnectLocation("id", connection -> ref.set(true), apiClient, workManager);
 
         location.onStateChanged(ConnectButtonState.Disabled, ConnectButtonState.Enabled, connection);
         Truth.assertThat(ref.get()).isTrue();
@@ -99,12 +90,7 @@ public class ConnectLocationTest {
     @Test
     public void shouldUpdateGeofencesWhenInitial() {
         AtomicBoolean ref = new AtomicBoolean();
-        ConnectLocation location = new ConnectLocation("id",
-            connection -> ref.set(true),
-            credentialsProvider,
-            apiClient,
-            workManager
-        );
+        ConnectLocation location = new ConnectLocation("id", connection -> ref.set(true), apiClient, workManager);
 
         location.onStateChanged(ConnectButtonState.Initial, ConnectButtonState.Enabled, connection);
         Truth.assertThat(ref.get()).isTrue();
@@ -112,12 +98,7 @@ public class ConnectLocationTest {
 
     @Test
     public void shouldNotUpdateGeofencesWhenCreateAccountOrLogin() {
-        ConnectLocation location = new ConnectLocation("id",
-            connection -> fail(),
-            credentialsProvider,
-            apiClient,
-            workManager
-        );
+        ConnectLocation location = new ConnectLocation("id", connection -> fail(), apiClient, workManager);
 
         location.onStateChanged(ConnectButtonState.CreateAccount, ConnectButtonState.Initial, connection);
         location.onStateChanged(ConnectButtonState.Login, ConnectButtonState.Initial, connection);

@@ -5,7 +5,7 @@ import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 import androidx.annotation.VisibleForTesting;
-import com.ifttt.connect.ConnectionApiClient;
+import com.ifttt.connect.api.ConnectionApiClient;
 import javax.annotation.Nullable;
 
 import static com.ifttt.connect.ui.ConnectResult.NextStep.Complete;

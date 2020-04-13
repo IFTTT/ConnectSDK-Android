@@ -13,10 +13,9 @@ import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.OnLifecycleEvent;
 import com.ifttt.connect.BuildConfig;
-import com.ifttt.connect.Connection;
-import com.ifttt.connect.ConnectionApiClient;
-import com.ifttt.connect.CredentialsProvider;
-import com.ifttt.connect.ErrorResponse;
+import com.ifttt.connect.api.Connection;
+import com.ifttt.connect.api.ConnectionApiClient;
+import com.ifttt.connect.api.ErrorResponse;
 import com.ifttt.connect.api.PendingResult;
 import com.ifttt.connect.api.PendingResult.ResultCallback;
 import java.util.List;
@@ -139,22 +138,7 @@ final class ButtonApiHelper {
         return connectionApiClient.isUserAuthorized();
     }
 
-    void setUserToken(String userToken) {
-        connectionApiClient.setUserToken(userToken);
-    }
-
-    void fetchUserToken(Lifecycle lifecycle, UserTokenAsyncTask.UserTokenCallback callback) {
-        UserTokenAsyncTask asyncTask = new UserTokenAsyncTask(
-            credentialsProvider,
-            connectionApiClient,
-            callback
-        );
-        asyncTask.execute();
-
-        lifecycle.addObserver(new AsyncTaskObserver(asyncTask));
-    }
-
-    void fetchConnection(Lifecycle lifecycle, String connectionId, PendingResult.ResultCallback<Connection> callback) {
+    void fetchConnection(Lifecycle lifecycle, String connectionId, ResultCallback<Connection> callback) {
         PendingResult<Connection> pendingResult = connectionApiClient.api().showConnection(connectionId);
         pendingResult.execute(callback);
 

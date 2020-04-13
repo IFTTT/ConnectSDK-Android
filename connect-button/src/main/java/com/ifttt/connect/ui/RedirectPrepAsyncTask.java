@@ -2,8 +2,7 @@ package com.ifttt.connect.ui;
 
 import android.os.AsyncTask;
 import com.ifttt.connect.BuildConfig;
-import com.ifttt.connect.CredentialsProvider;
-import com.ifttt.connect.User;
+import com.ifttt.connect.api.User;
 import com.ifttt.connect.api.PendingResult;
 import java.io.IOException;
 import javax.annotation.Nullable;

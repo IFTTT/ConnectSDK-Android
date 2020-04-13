@@ -19,9 +19,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
-import com.ifttt.connect.Connection;
 import com.ifttt.connect.R;
-import com.ifttt.connect.Service;
+import com.ifttt.connect.api.Connection;
+import com.ifttt.connect.api.Service;
 
 import static com.ifttt.connect.ui.ButtonApiHelper.redirectToConnection;
 import static com.ifttt.connect.ui.ButtonApiHelper.redirectToService;

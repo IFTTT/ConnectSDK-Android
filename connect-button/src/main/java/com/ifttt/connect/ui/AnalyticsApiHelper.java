@@ -1,6 +1,6 @@
 package com.ifttt.connect.ui;
 
-import com.ifttt.connect.SdkInfoInterceptor;
+import com.ifttt.connect.api.SdkInfoInterceptor;
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Retrofit;

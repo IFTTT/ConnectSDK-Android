@@ -34,10 +34,12 @@ This SDK uses the following libraries as dependencies:
 ## Installation
 ### Gradle
 ```groovy
-implementation "com.ifttt:connect-button:2.1.0"
+implementation "com.ifttt:connect-button:2.2.0"
 ```
 
 ## Usage
+If you are upgrading from 2.1.0 or lower to 2.2.0, please see the [Change Log](https://github.com/IFTTT/ConnectSDK-Android/blob/master/CHANGELOG.md) section for details.
+
 ### Set up ConnectButton
 To get started, after setting up the dependency, add a `ConnectButton` to your layout and set it up with a `Configuration`. For example, in your layout xml file,
 
@@ -79,8 +81,10 @@ public class YourActivity extends Activity {
         };
         
         ConnectButton.Configuration configuration =  
-                ConnectButton.Configuration.Builder.withConnectionId("connection_id", "user_email", provider,  
-          Uri.parse("redirect_url")).build();
+                ConnectButton.Configuration.newBuilder("user_email", Uri.parse("redirect_uri"))
+                    .withConnectionId("connection_id")
+                    .withCredentialProvider(provider)  
+                    .build();
         connectButton.setup(configuration);       
     }
 }
