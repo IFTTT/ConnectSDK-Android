@@ -1,6 +1,8 @@
 package com.ifttt.groceryexpress
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.LayoutInflater
@@ -12,6 +14,8 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.google.android.material.textfield.TextInputLayout
 import com.ifttt.connect.ui.ConnectButton
 import com.ifttt.connect.ui.ConnectResult
@@ -90,7 +94,12 @@ class MainActivity : AppCompatActivity() {
      */
     private fun setupForLocationConnection() {
         setupForConnection()
-        ConnectLocation.getInstance().setUpWithConnectButton(connectButton)
+        ConnectLocation.getInstance().setUpWithConnectButton(connectButton) {
+            val permissionGrant = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+            if (permissionGrant != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 0);
+            }
+        }
     }
 
     /*
@@ -137,6 +146,23 @@ class MainActivity : AppCompatActivity() {
         super.onSaveInstanceState(outState)
         if (::connectionId.isInitialized) {
             outState.putString(KEY_CONNECTION_ID, connectionId)
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        /*
+         Check if the location permission wasn't granted.
+         */
+        if (grantResults.firstOrNull { it != PackageManager.PERMISSION_GRANTED } != null) {
+            /*
+            Possibly show a message or any other error/warning indication for the connection not being able to work as expected
+             */
         }
     }
 
