@@ -31,10 +31,7 @@ public final class ConnectionRefresher extends Worker {
                     throw new IllegalStateException("Connection cannot be null");
                 }
 
-                if (connection.status == Connection.Status.enabled
-                        || connection.status == Connection.Status.disabled) {
-                    ConnectLocation.getInstance().geofenceProvider.updateGeofences(connection);
-                }
+                ConnectLocation.getInstance().geofenceProvider.updateGeofences(connection);
             }
         } catch (IOException e) {
             return Result.failure();
