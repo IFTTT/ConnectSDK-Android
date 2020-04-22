@@ -28,7 +28,15 @@ import java.util.concurrent.TimeUnit;
  */
 public final class ConnectLocation implements ButtonStateChangeListener {
 
+    /**
+     * Callback interface used to listen to connection status change in {@link ConnectButton}.
+     */
     public interface LocationPermissionCallback {
+
+        /**
+         * Called when a connection is enabled, it has an enabled {@link UserFeature} that uses at least one Location
+         * trigger.
+         */
         void onRequestLocationPermission();
     }
 
@@ -80,7 +88,8 @@ public final class ConnectLocation implements ButtonStateChangeListener {
 
     /**
      * This is a required method to provide the Location SDK with a listener for state change events from {@link ConnectButton}.
-     * The Connect Location SDK will not be able to handle state change events and register/unregister geofences if you don't call this method.
+     * The Connect Location SDK will not be able to handle state change events and register/unregister geofences
+     * if you don't call this method.
      *
      * @param connectButton button instance initialized to display the connection.
      * @param permissionCallback {@link LocationPermissionCallback to be registered}. you will be notified when the
