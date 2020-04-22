@@ -16,7 +16,6 @@ import com.ifttt.connect.api.LocationFieldValue;
 import com.ifttt.connect.api.UserFeature;
 import com.ifttt.connect.api.UserFeatureField;
 import com.ifttt.connect.api.UserFeatureStep;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -38,15 +37,6 @@ final class AwarenessGeofenceProvider implements GeofenceProvider {
     private final FenceClient fenceClient;
     private final PendingIntent enterPendingIntent;
     private final PendingIntent exitPendingIntent;
-
-    private final static String FIELD_TYPE_LOCATION_ENTER = "LOCATION_ENTER";
-    private final static String FIELD_TYPE_LOCATION_EXIT = "LOCATION_EXIT";
-    private final static String FIELD_TYPE_LOCATION_ENTER_EXIT = "LOCATION_ENTER_OR_EXIT";
-
-    private final static List<String> locationFieldTypesList = Arrays.asList(FIELD_TYPE_LOCATION_ENTER,
-        FIELD_TYPE_LOCATION_EXIT,
-        FIELD_TYPE_LOCATION_ENTER_EXIT
-    );
 
     AwarenessGeofenceProvider(Context context) {
         this.fenceClient = Awareness.getFenceClient(context);
@@ -128,7 +118,7 @@ final class AwarenessGeofenceProvider implements GeofenceProvider {
 
                 for (UserFeatureStep step : userFeature.userFeatureSteps) {
                     for (UserFeatureField userFeatureField : step.fields) {
-                        if (!locationFieldTypesList.contains(userFeatureField.fieldType)) {
+                        if (!LOCATION_FIELD_TYPES_LIST.contains(userFeatureField.fieldType)) {
                             continue;
                         }
 
