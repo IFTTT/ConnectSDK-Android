@@ -163,6 +163,8 @@ class MainActivity : AppCompatActivity() {
             /*
             Possibly show a message or any other error/warning indication for the connection not being able to work as expected
              */
+        } else {
+            ConnectLocation.getInstance().checkLocationPermission(this, null)
         }
     }
 
