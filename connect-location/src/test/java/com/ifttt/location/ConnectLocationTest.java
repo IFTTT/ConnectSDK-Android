@@ -73,8 +73,8 @@ public class ConnectLocationTest {
     public void shouldUpdateGeofencesWhenEnabled() {
         AtomicBoolean ref = new AtomicBoolean();
         ConnectLocation location = new ConnectLocation("id", connection -> ref.set(true), apiClient, workManager);
-
-        location.onStateChanged(ConnectButtonState.Enabled, ConnectButtonState.Initial, connection);
+        LocationButtonStateChangeListener listener = new LocationButtonStateChangeListener(button.getContext(), () -> {});
+        listener.onStateChanged(ConnectButtonState.Enabled, ConnectButtonState.Initial, connection);
         Truth.assertThat(ref.get()).isTrue();
     }
 

@@ -55,7 +55,7 @@ public final class ConnectLocation {
     final ConnectionApiClient connectionApiClient;
     final String connectionId;
 
-    @Nullable private WeakReference<Connection> connectionWeakReference;
+    @Nullable WeakReference<Connection> connectionWeakReference;
 
     public static synchronized ConnectLocation init(
         Context context, String connectionId, ConnectionApiClient apiClient
@@ -100,8 +100,6 @@ public final class ConnectLocation {
      * connection is enabled and location permissions need to be granted.
      */
     public void setUpWithConnectButton(ConnectButton connectButton, LocationPermissionCallback permissionCallback) {
-        checkInit(this);
-
         connectButton.addButtonStateChangeListener(new LocationButtonStateChangeListener(connectButton.getContext(),
             permissionCallback
         ));
@@ -133,8 +131,6 @@ public final class ConnectLocation {
     public PendingResult<Connection> checkLocationPermission(
         Activity activity, @Nullable LocationPermissionCallback permissionCallback
     ) {
-        checkInit(this);
-
         Connection cachedConnection;
         if (connectionWeakReference != null && (cachedConnection = connectionWeakReference.get()) != null) {
             if (checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION)

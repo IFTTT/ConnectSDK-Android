@@ -7,6 +7,7 @@ import com.ifttt.connect.api.Connection;
 import com.ifttt.connect.api.ErrorResponse;
 import com.ifttt.connect.ui.ButtonStateChangeListener;
 import com.ifttt.connect.ui.ConnectButtonState;
+import java.lang.ref.WeakReference;
 
 import static androidx.core.content.ContextCompat.checkSelfPermission;
 import static com.ifttt.location.ConnectLocation.hasEnabledLocationUserFeature;
@@ -43,6 +44,7 @@ final class LocationButtonStateChangeListener implements ButtonStateChangeListen
 
         boolean hasEnabledLocationTrigger = hasEnabledLocationUserFeature(connection);
         if (!hasLocationPermission && hasEnabledLocationTrigger) {
+            ConnectLocation.getInstance().connectionWeakReference = new WeakReference<>(connection);
             locationPermissionCallback.onRequestLocationPermission();
         }
     }
