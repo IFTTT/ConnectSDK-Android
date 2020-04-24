@@ -76,6 +76,7 @@ import static com.ifttt.connect.ui.ConnectButtonState.Disabled;
 import static com.ifttt.connect.ui.ConnectButtonState.Enabled;
 import static com.ifttt.connect.ui.ConnectButtonState.Initial;
 import static com.ifttt.connect.ui.ConnectButtonState.Login;
+import static com.ifttt.connect.ui.ConnectButtonState.Unknown;
 
 /**
  * Internal implementation of a Connect Button widget, all of the states and transitions are implemented here.
@@ -116,7 +117,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
     private final int borderSize = getResources().getDimensionPixelSize(R.dimen.ifttt_button_border_width);
     private final Drawable borderDrawable = ContextCompat.getDrawable(getContext(), R.drawable.ifttt_button_border);
 
-    private ConnectButtonState buttonState = Initial;
+    private ConnectButtonState buttonState = Unknown;
     private Connection connection;
     private Service worksWithService;
 

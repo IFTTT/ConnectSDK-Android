@@ -27,5 +27,10 @@ public enum ConnectButtonState {
     /**
      * A button stat for displaying a Connection that is disabled.
      */
-    Disabled
+    Disabled,
+
+    /**
+     * Default button state.
+     */
+    Unknown
 }
