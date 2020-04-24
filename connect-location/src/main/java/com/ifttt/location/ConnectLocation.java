@@ -21,7 +21,9 @@ import com.ifttt.connect.api.UserFeature;
 import com.ifttt.connect.api.UserFeatureField;
 import com.ifttt.connect.api.UserFeatureStep;
 import com.ifttt.connect.api.UserTokenProvider;
+import com.ifttt.connect.ui.ButtonStateChangeListener;
 import com.ifttt.connect.ui.ConnectButton;
+import com.ifttt.connect.ui.ConnectButtonState;
 import java.lang.ref.WeakReference;
 import java.util.concurrent.TimeUnit;
 
@@ -85,7 +87,10 @@ public final class ConnectLocation {
     }
 
     public static ConnectLocation getInstance() {
-        checkInit(INSTANCE);
+        if (INSTANCE == null) {
+            throw new IllegalStateException(
+                "ConnectLocation is not initialized correctly. Please call ConnectLocation.init first.");
+        }
 
         return INSTANCE;
     }
@@ -100,9 +105,35 @@ public final class ConnectLocation {
      * connection is enabled and location permissions need to be granted.
      */
     public void setUpWithConnectButton(ConnectButton connectButton, LocationPermissionCallback permissionCallback) {
-        connectButton.addButtonStateChangeListener(new LocationButtonStateChangeListener(connectButton.getContext(),
-            permissionCallback
-        ));
+        connectButton.addButtonStateChangeListener(new ButtonStateChangeListener() {
+            @Override
+            public void onStateChanged(
+                ConnectButtonState currentState, ConnectButtonState previousState, Connection connection
+            ) {
+                boolean hasLocationPermission = checkSelfPermission(connectButton.getContext(),
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                )
+                    == PackageManager.PERMISSION_GRANTED;
+                if (currentState == ConnectButtonState.Enabled
+                    || currentState == ConnectButtonState.Disabled
+                    || currentState == ConnectButtonState.Initial) {
+                    if (hasLocationPermission) {
+                        geofenceProvider.updateGeofences(connection);
+                    }
+                }
+
+                boolean hasEnabledLocationTrigger = hasEnabledLocationUserFeature(connection);
+                if (!hasLocationPermission && hasEnabledLocationTrigger) {
+                    connectionWeakReference = new WeakReference<>(connection);
+                    permissionCallback.onRequestLocationPermission();
+                }
+            }
+
+            @Override
+            public void onError(ErrorResponse errorResponse) {
+                // No-op.
+            }
+        });
     }
 
     /**
@@ -123,7 +154,6 @@ public final class ConnectLocation {
      * @param permissionCallback Nullable {@link LocationPermissionCallback} instance, if non-null, it will be invoked
      * when the connection is enabled, has an enabled UserFeature that has at least one Location service trigger, and
      * the app doesn't have ACCESS_FINE_LOCATION permission.
-     *
      * @return a {@link PendingResult} instance if we need to fetch the connection data, or null if we can reuse the
      * cached data.
      */
@@ -190,7 +220,7 @@ public final class ConnectLocation {
     }
 
     @CheckResult
-    static boolean hasEnabledLocationUserFeature(Connection connection) {
+    private static boolean hasEnabledLocationUserFeature(Connection connection) {
         if (connection.status != Connection.Status.enabled) {
             return false;
         }
@@ -216,16 +246,5 @@ public final class ConnectLocation {
         }
 
         return false;
-    }
-
-    private static void checkInit(ConnectLocation connectLocation) {
-        if (connectLocation.connectionApiClient != null
-            && connectLocation.geofenceProvider != null
-            && connectLocation.connectionId != null) {
-            return;
-        }
-
-        throw new IllegalStateException(
-            "ConnectLocation is not initialized correctly. Please call ConnectLocation.init first.");
     }
 }
