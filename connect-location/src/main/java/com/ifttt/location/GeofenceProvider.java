@@ -1,5 +1,7 @@
 package com.ifttt.location;
 
+import android.Manifest;
+import androidx.annotation.RequiresPermission;
 import com.ifttt.connect.api.Connection;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -20,5 +22,6 @@ interface GeofenceProvider {
         FIELD_TYPE_LOCATION_ENTER_EXIT
     ));
 
+    @RequiresPermission(Manifest.permission.ACCESS_FINE_LOCATION)
     void updateGeofences(final Connection connection);
 }

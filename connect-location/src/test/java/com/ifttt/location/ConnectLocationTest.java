@@ -1,22 +1,36 @@
 package com.ifttt.location;
 
+import android.Manifest;
+import android.app.Application;
+import android.graphics.Color;
+import android.net.Uri;
 import androidx.test.core.app.ActivityScenario;
+import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.work.WorkManager;
-import com.google.common.truth.Truth;
 import com.ifttt.connect.api.Connection;
 import com.ifttt.connect.api.ConnectionApiClient;
+import com.ifttt.connect.api.Feature;
+import com.ifttt.connect.api.FeatureStep;
+import com.ifttt.connect.api.LocationFieldValue;
+import com.ifttt.connect.api.Service;
+import com.ifttt.connect.api.UserFeature;
+import com.ifttt.connect.api.UserFeatureField;
+import com.ifttt.connect.api.UserFeatureStep;
 import com.ifttt.connect.ui.ConnectButton;
-import com.ifttt.connect.ui.ConnectButtonState;
 import com.ifttt.connect.ui.CredentialsProvider;
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
 import org.robolectric.annotation.LooperMode;
+import org.robolectric.shadows.ShadowApplication;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.fail;
 
 @RunWith(AndroidJUnit4.class)
@@ -25,7 +39,6 @@ import static org.junit.Assert.fail;
 public class ConnectLocationTest {
 
     private ConnectButton button;
-    private Connection connection;
     private ConnectionApiClient apiClient;
     private CredentialsProvider credentialsProvider;
     private WorkManager workManager;
@@ -37,17 +50,6 @@ public class ConnectLocationTest {
             button = new ConnectButton(activity);
             workManager = WorkManager.getInstance(activity);
         });
-
-        connection = new Connection(
-            "id",
-            "name",
-            "description",
-            Connection.Status.enabled,
-            "url",
-            Collections.emptyList(),
-            null,
-            Collections.emptyList()
-        );
 
         credentialsProvider = new CredentialsProvider() {
             @Override
@@ -65,42 +67,152 @@ public class ConnectLocationTest {
 
     @Test(expected = IllegalStateException.class)
     public void setUpWithoutInit() {
-        ConnectLocation.getInstance().setUpWithConnectButton(button, () -> {});
+        ConnectLocation.getInstance().setUpWithConnectButton(button, () -> {
+        });
         fail();
     }
 
     @Test
-    public void shouldUpdateGeofencesWhenEnabled() {
-        AtomicBoolean ref = new AtomicBoolean();
-        ConnectLocation location = new ConnectLocation("id", connection -> ref.set(true), apiClient, workManager);
+    public void shouldPromptPermission() {
+        Connection connection = connection(Connection.Status.enabled);
 
-        location.onStateChanged(ConnectButtonState.Enabled, ConnectButtonState.Initial, connection);
-        Truth.assertThat(ref.get()).isTrue();
+        AtomicBoolean ref = new AtomicBoolean();
+        ConnectLocation location = new ConnectLocation("id", c -> fail(), apiClient, workManager);
+        location.setUpWithConnectButton(button, () -> ref.set(true));
+        button.setup(ConnectButton.Configuration.newBuilder("email@ifttt.com", Uri.EMPTY)
+            .withConnection(connection)
+            .withCredentialProvider(new CredentialsProvider() {
+                @Override
+                public String getOAuthCode() {
+                    return "";
+                }
+
+                @Override
+                public String getUserToken() {
+                    return "";
+                }
+            })
+            .build());
+
+        assertThat(ref.get()).isTrue();
+    }
+
+    @Test
+    public void shouldUpdateGeofenceAfterPermissionGranted() {
+        ShadowApplication application = Shadows.shadowOf((Application) ApplicationProvider.getApplicationContext());
+        application.grantPermissions(Manifest.permission.ACCESS_FINE_LOCATION);
+
+        Connection connection = connection(Connection.Status.enabled);
+
+        AtomicBoolean ref = new AtomicBoolean();
+        ConnectLocation location = new ConnectLocation("id", c -> ref.set(true), apiClient, workManager);
+        location.setUpWithConnectButton(button, Assert::fail);
+        button.setup(ConnectButton.Configuration.newBuilder("email@ifttt.com", Uri.EMPTY)
+            .withConnection(connection)
+            .withCredentialProvider(new CredentialsProvider() {
+                @Override
+                public String getOAuthCode() {
+                    return "";
+                }
+
+                @Override
+                public String getUserToken() {
+                    return "";
+                }
+            })
+            .build());
+
+        assertThat(ref.get()).isTrue();
     }
 
     @Test
     public void shouldUpdateGeofencesWhenDisabled() {
-        AtomicBoolean ref = new AtomicBoolean();
-        ConnectLocation location = new ConnectLocation("id", connection -> ref.set(true), apiClient, workManager);
+        ShadowApplication application = Shadows.shadowOf((Application) ApplicationProvider.getApplicationContext());
+        application.grantPermissions(Manifest.permission.ACCESS_FINE_LOCATION);
 
-        location.onStateChanged(ConnectButtonState.Disabled, ConnectButtonState.Enabled, connection);
-        Truth.assertThat(ref.get()).isTrue();
+        Connection connection = connection(Connection.Status.disabled);
+
+        AtomicBoolean ref = new AtomicBoolean();
+        ConnectLocation location = new ConnectLocation("id", c -> ref.set(true), apiClient, workManager);
+        location.setUpWithConnectButton(button, Assert::fail);
+        button.setup(ConnectButton.Configuration.newBuilder("email@ifttt.com", Uri.EMPTY)
+            .withConnection(connection)
+            .withCredentialProvider(new CredentialsProvider() {
+                @Override
+                public String getOAuthCode() {
+                    return "";
+                }
+
+                @Override
+                public String getUserToken() {
+                    return "";
+                }
+            })
+            .build());
+
+        assertThat(ref.get()).isTrue();
     }
 
     @Test
     public void shouldUpdateGeofencesWhenInitial() {
-        AtomicBoolean ref = new AtomicBoolean();
-        ConnectLocation location = new ConnectLocation("id", connection -> ref.set(true), apiClient, workManager);
+        ShadowApplication application = Shadows.shadowOf((Application) ApplicationProvider.getApplicationContext());
+        application.grantPermissions(Manifest.permission.ACCESS_FINE_LOCATION);
 
-        location.onStateChanged(ConnectButtonState.Initial, ConnectButtonState.Enabled, connection);
-        Truth.assertThat(ref.get()).isTrue();
+        Connection connection = connection(Connection.Status.never_enabled);
+
+        AtomicBoolean ref = new AtomicBoolean();
+        ConnectLocation location = new ConnectLocation("id", c -> ref.set(true), apiClient, workManager);
+        location.setUpWithConnectButton(button, Assert::fail);
+        button.setup(ConnectButton.Configuration.newBuilder("email@ifttt.com", Uri.EMPTY)
+            .withConnection(connection)
+            .withCredentialProvider(new CredentialsProvider() {
+                @Override
+                public String getOAuthCode() {
+                    return "";
+                }
+
+                @Override
+                public String getUserToken() {
+                    return "";
+                }
+            })
+            .build());
+
+        assertThat(ref.get()).isTrue();
     }
 
-    @Test
-    public void shouldNotUpdateGeofencesWhenCreateAccountOrLogin() {
-        ConnectLocation location = new ConnectLocation("id", connection -> fail(), apiClient, workManager);
-
-        location.onStateChanged(ConnectButtonState.CreateAccount, ConnectButtonState.Initial, connection);
-        location.onStateChanged(ConnectButtonState.Login, ConnectButtonState.Initial, connection);
+    private Connection connection(Connection.Status status) {
+        return new Connection("id",
+            "name",
+            "description",
+            status,
+            "url",
+            Collections.singletonList(new Service("id",
+                "name",
+                "shortName",
+                true,
+                "http://image.com/image",
+                Color.BLACK,
+                ""
+            )),
+            null,
+            Collections.singletonList(new Feature("id",
+                "title",
+                "description",
+                "icon",
+                Collections.singletonList(new UserFeature("id",
+                    "featureId",
+                    true,
+                    Collections.singletonList(new UserFeatureStep(FeatureStep.StepType.Trigger,
+                        "id",
+                        "stepId",
+                        Collections.singletonList(new UserFeatureField<>(new LocationFieldValue(0.0D, 0.0D, 100D, ""),
+                            "LOCATION_ENTER",
+                            "fieldId"
+                        ))
+                    ))
+                ))
+            ))
+        );
     }
 }
