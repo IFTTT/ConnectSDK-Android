@@ -15,4 +15,5 @@
     <string name="logout">Logout</string>
     <string name="login">Login</string>
     <string name="select_connection">Select a connection.</string>
+    <string name="skip_config">Skip configuration</string>
 </resources>

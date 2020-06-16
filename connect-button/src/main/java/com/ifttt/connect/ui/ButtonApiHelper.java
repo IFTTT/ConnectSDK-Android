@@ -169,7 +169,8 @@ final class ButtonApiHelper {
             userLogin,
             anonymousId,
             oAuthCode,
-            inviteCode, skipConnectionConfiguration
+            inviteCode,
+            skipConnectionConfiguration
         );
         CustomTabsIntent intent = new CustomTabsIntent.Builder().build();
         intent.launchUrl(context, uri);
@@ -191,7 +192,8 @@ final class ButtonApiHelper {
             userLogin,
             anonymousId,
             oAuthCode,
-            inviteCode, skipConnectionConfiguration
+            inviteCode,
+            skipConnectionConfiguration
         ));
         launchIntent.setPackage(PACKAGE_NAME_IFTTT);
 
