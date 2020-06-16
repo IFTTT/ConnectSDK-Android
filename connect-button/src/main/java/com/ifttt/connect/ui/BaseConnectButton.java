@@ -262,9 +262,10 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
      * @param inviteCode Optional invite code to access an IFTTT service that has not yet published.
      */
     void setup(String email, ConnectionApiClient connectionApiClient, Uri redirectUri,
-            CredentialsProvider credentialsProvider, @Nullable String inviteCode) {
+            CredentialsProvider credentialsProvider, @Nullable String inviteCode, boolean skipConfiguration) {
         buttonApiHelper =
-                new ButtonApiHelper(connectionApiClient, redirectUri, inviteCode, credentialsProvider, getLifecycle());
+                new ButtonApiHelper(connectionApiClient, redirectUri, inviteCode, credentialsProvider, getLifecycle(),
+                    skipConfiguration);
         emailEdt.setText(email);
     }
 
