@@ -1,3 +1,2 @@
-include ':scripts'
 include ':app'
 include ':connect-api', ':connect-button', ':connect-location'
