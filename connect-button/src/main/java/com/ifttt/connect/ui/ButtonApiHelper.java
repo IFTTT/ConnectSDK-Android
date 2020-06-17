@@ -6,10 +6,10 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.provider.Settings;
-import android.util.Log;
 import androidx.annotation.MainThread;
 import androidx.annotation.VisibleForTesting;
 import androidx.browser.customtabs.CustomTabsIntent;
+import androidx.core.os.ConfigurationCompat;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.OnLifecycleEvent;
@@ -42,7 +42,6 @@ final class ButtonApiHelper {
     private final Uri redirectUri;
     private final boolean skipConnectionConfiguration;
     @Nullable private final String inviteCode;
-    private final Locale locale;
 
     @Nullable private String oAuthCode;
     @Nullable private String userLogin;
@@ -60,14 +59,13 @@ final class ButtonApiHelper {
         Uri redirectUri,
         @Nullable String inviteCode,
         CredentialsProvider provider,
-        Lifecycle lifecycle, boolean skipConnectionConfiguration, Locale locale
+        Lifecycle lifecycle, boolean skipConnectionConfiguration
     ) {
         this.lifecycle = lifecycle;
         this.redirectUri = redirectUri;
         this.inviteCode = inviteCode;
         this.connectionApiClient = client;
         this.skipConnectionConfiguration = skipConnectionConfiguration;
-        this.locale = locale;
         credentialsProvider = provider;
     }
 
@@ -173,7 +171,7 @@ final class ButtonApiHelper {
             userLogin,
             anonymousId,
             oAuthCode,
-            inviteCode, skipConnectionConfiguration, locale
+            inviteCode, skipConnectionConfiguration, ConfigurationCompat.getLocales(context.getResources().getConfiguration()).get(0)
         );
         CustomTabsIntent intent = new CustomTabsIntent.Builder().build();
         intent.launchUrl(context, uri);
@@ -195,7 +193,7 @@ final class ButtonApiHelper {
             userLogin,
             anonymousId,
             oAuthCode,
-            inviteCode, skipConnectionConfiguration, locale
+            inviteCode, skipConnectionConfiguration, ConfigurationCompat.getLocales(context.getResources().getConfiguration()).get(0)
         ));
         launchIntent.setPackage(PACKAGE_NAME_IFTTT);
 

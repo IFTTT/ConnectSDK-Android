@@ -274,7 +274,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
     ) {
         buttonApiHelper =
                 new ButtonApiHelper(connectionApiClient, redirectUri, inviteCode, credentialsProvider, getLifecycle(),
-                    skipConnectionConfiguration, ConfigurationCompat.getLocales(getContext().getResources().getConfiguration()).get(0));
+                    skipConnectionConfiguration);
         emailEdt.setText(email);
     }
 
