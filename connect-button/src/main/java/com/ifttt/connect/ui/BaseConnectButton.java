@@ -38,6 +38,7 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.core.os.ConfigurationCompat;
 import androidx.core.view.ViewCompat;
 import androidx.customview.widget.ViewDragHelper;
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
@@ -169,7 +170,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         helperTxt = findViewById(R.id.ifttt_helper_text);
         iftttLogo = ContextCompat.getDrawable(getContext(), R.drawable.ic_ifttt_logo_black);
         worksWithIfttt = new SpannableString(replaceKeyWithImage((TextView) helperTxt.getCurrentView(),
-                getResources().getString(R.string.ifttt_powered_by_ifttt), "IFTTT", iftttLogo));
+                getResources().getString(R.string.works_with_ifttt), "IFTTT", iftttLogo));
 
         // Tint the logo Drawable within the text to black.
         DrawableCompat.setTint(DrawableCompat.wrap(iftttLogo), ContextCompat.getColor(context, R.color.ifttt_footer_text_black));
@@ -273,7 +274,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
     ) {
         buttonApiHelper =
                 new ButtonApiHelper(connectionApiClient, redirectUri, inviteCode, credentialsProvider, getLifecycle(),
-                    skipConnectionConfiguration);
+                    skipConnectionConfiguration, ConfigurationCompat.getLocales(getContext().getResources().getConfiguration()).get(0));
         emailEdt.setText(email);
     }
 
@@ -351,7 +352,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         cleanUpViews(ProgressView.class);
         switch (result.nextStep) {
             case Complete:
-                CharSequence text = getResources().getString(R.string.ifttt_connecting);
+                CharSequence text = getResources().getString(R.string.connecting);
                 ProgressView progressView = ProgressView.addTo(buttonRoot, worksWithService.brandColor,
                         getDarkerColor(worksWithService.brandColor));
                 Animator progress = progressView.progress(0f, 1f, text, ANIM_DURATION_LONG);
@@ -417,7 +418,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
         if (connection.status == enabled) {
             dispatchState(Enabled);
-            connectStateTxt.setCurrentText(getResources().getString(R.string.ifttt_connected));
+            connectStateTxt.setCurrentText(getResources().getString(R.string.connected));
             adjustTextViewLayout(connectStateTxt, buttonState);
 
             OnClickListener onClickListener = v -> {
@@ -456,13 +457,13 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
             if (connection.status == Connection.Status.disabled) {
                 dispatchState(Disabled);
                 connectStateTxt.setCurrentText(
-                        getResources().getString(R.string.ifttt_connect_to, worksWithService.shortName));
+                        getResources().getString(R.string.connect_service, worksWithService.shortName));
                 adjustTextViewLayout(connectStateTxt, buttonState);
                 iconDragHelperCallback.setTrackEndColor(BLACK);
             } else {
                 dispatchState(Initial);
                 connectStateTxt.setCurrentText(
-                        getResources().getString(R.string.ifttt_connect_to, worksWithService.shortName));
+                        getResources().getString(R.string.connect_service, worksWithService.shortName));
                 adjustTextViewLayout(connectStateTxt, buttonState);
 
                 // Depending on whether we need to show the email field, use different track colors.
@@ -503,7 +504,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                             ContextCompat.getColor(getContext(), R.color.ifttt_progress_background_color);
                     ProgressView progressView = ProgressView.addTo(buttonRoot, BLACK, primaryProgressColor);
                     Animator progress =
-                            progressView.progress(0f, 1f, getResources().getString(R.string.ifttt_connecting),
+                            progressView.progress(0f, 1f, getResources().getString(R.string.connecting),
                                     ANIM_DURATION_LONG);
                     progress.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
                         @Override
@@ -574,7 +575,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
             StartIconDrawable placeHolderImage = new StartIconDrawable(getContext(), new ColorDrawable(), 0, 0);
             placeHolderImage.setBackgroundColor(worksWithService.brandColor);
             iconImg.setBackground(placeHolderImage);
-            iconImg.setContentDescription(getContext().getString(R.string.start_button_content_description));
+            iconImg.setContentDescription(getContext().getString(R.string.content_desc_start_icon));
         } else {
             int iconBackgroundMargin = getResources().getDimensionPixelSize(R.dimen.ifttt_icon_margin);
             BitmapDrawable serviceIcon = new BitmapDrawable(getResources(), bitmap);
@@ -584,7 +585,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
             iconImg.setBackground(drawable);
             drawable.setBackgroundColor(worksWithService.brandColor);
             iconImg.setContentDescription(
-                    getContext().getString(R.string.service_icon_content_description, worksWithService.name));
+                    getContext().getString(R.string.content_desc_service_icon, worksWithService.name));
         }
 
         // Set elevation.
@@ -658,7 +659,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
                 // Reset Button text.
                 connectStateTxt.setAlpha(1f);
-                connectStateTxt.setText(getResources().getString(R.string.ifttt_connected));
+                connectStateTxt.setText(getResources().getString(R.string.connected));
                 adjustTextViewLayout(connectStateTxt, Enabled);
             }
 
@@ -696,7 +697,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         int primaryProgressColor = ContextCompat.getColor(getContext(), R.color.ifttt_progress_background_color);
         ProgressView progressView = ProgressView.addTo(buttonRoot, primaryProgressColor, BLACK);
 
-        CharSequence text = getResources().getString(R.string.ifttt_connecting);
+        CharSequence text = getResources().getString(R.string.connecting);
         Animator showProgress = progressView.progress(0f, 0.5f, text, ANIM_DURATION_LONG);
         showProgress.setInterpolator(LINEAR_INTERPOLATOR);
         showProgress.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
@@ -739,7 +740,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                 if (buttonApiHelper.shouldPresentCreateAccount(getContext())) {
                     AnimatorSet set = new AnimatorSet();
                     Animator completeProgress =
-                            progressView.progress(0.5f, 1f, getResources().getString(R.string.ifttt_creating_account),
+                            progressView.progress(0.5f, 1f, getResources().getString(R.string.creating_account),
                                     ANIM_DURATION_LONG);
                     completeProgress.setInterpolator(LINEAR_INTERPOLATOR);
                     completeProgress.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
@@ -753,7 +754,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                             dispatchState(CreateAccount);
                             CharSequence emailPrompt = new SpannableString(
                                     replaceKeyWithImage((TextView) helperTxt.getCurrentView(),
-                                            getContext().getString(R.string.ifttt_new_account_with, emailEdt.getText()),
+                                            getContext().getString(R.string.new_account_for, emailEdt.getText()),
                                             "IFTTT", iftttLogo));
                             helperTxt.setText(emailPrompt);
                         }
@@ -763,7 +764,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                     set.start();
                 } else {
                     Animator completeProgress =
-                            progressView.progress(0.5f, 1f, getResources().getString(R.string.ifttt_connecting),
+                            progressView.progress(0.5f, 1f, getResources().getString(R.string.connecting),
                                     ANIM_DURATION_MEDIUM);
                     completeProgress.setInterpolator(LINEAR_INTERPOLATOR);
                     completeProgress.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
@@ -874,7 +875,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                     @Override
                     public void run() {
                         SpannableString errorMessage =
-                                new SpannableString(getResources().getString(R.string.ifttt_enter_valid_email));
+                                new SpannableString(getResources().getString(R.string.enter_valid_email));
                         errorMessage.setSpan(
                                 new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.ifttt_error_red)),
                                 0, errorMessage.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -907,7 +908,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
                 SpannableString authorizePrompt = new SpannableString(
                         replaceKeyWithImage((TextView) helperTxt.getCurrentView(),
-                                getContext().getString(R.string.ifttt_authorize_with), "IFTTT", iftttLogo));
+                                getContext().getString(R.string.secured_with_ifttt), "IFTTT", iftttLogo));
                 authorizePrompt.setSpan(new UnderlineSpan(), authorizePrompt.length() - 10, authorizePrompt.length(),
                         Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 helperTxt.setText(authorizePrompt);
@@ -954,7 +955,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         });
 
         Animator animator =
-                progressView.progress(0f, 1f, getResources().getString(R.string.ifttt_continue_to, service.name),
+                progressView.progress(0f, 1f, getResources().getString(R.string.going_to_service, service.name),
                         AUTO_ADVANCE_DELAY);
         animator.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
             @Override
@@ -1001,7 +1002,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
     private Animator buildDisconnectAnimator() {
         int primaryProgressColor = ContextCompat.getColor(getContext(), R.color.ifttt_progress_background_color);
         ProgressView progressView = ProgressView.addTo(buttonRoot, BLACK, primaryProgressColor);
-        Animator showProgress = progressView.progress(0f, 1f, getResources().getString(R.string.ifttt_disconnecting),
+        Animator showProgress = progressView.progress(0f, 1f, getResources().getString(R.string.disconnecting),
                 ANIM_DURATION_LONG);
         showProgress.setInterpolator(LINEAR_INTERPOLATOR);
         showProgress.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
@@ -1017,7 +1018,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                             @Override
                             public void onSuccess(Connection result) {
                                 processAndRun(animation, () -> {
-                                    progressView.setProgressText(getResources().getString(R.string.ifttt_disconnected));
+                                    progressView.setProgressText(getResources().getString(R.string.disconnected));
                                     progressView.postDelayed(() -> {
                                         cleanUpViews(ProgressView.class);
                                         dispatchState(Disabled);

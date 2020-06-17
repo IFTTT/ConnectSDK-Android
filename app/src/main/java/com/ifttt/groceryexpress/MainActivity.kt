@@ -244,4 +244,5 @@ class MainActivity : AppCompatActivity() {
         private const val KEY_CONNECTION_ID = "key_connection_id"
         private const val KEY_SKIP_CONFIG = "key_skip_config"
     }
+
 }

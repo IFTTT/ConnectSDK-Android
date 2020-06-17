@@ -18,7 +18,7 @@
             android:layout_gravity="center"
             android:background="@null"
             android:fontFamily="@font/avenir_next_ltpro_demi"
-            android:hint="@string/ifttt_email"
+            android:hint="@string/email"
             android:selectAllOnFocus="true"
             android:imeOptions="actionGo"
             android:inputType="textEmailAddress"
