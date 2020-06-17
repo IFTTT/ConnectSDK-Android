@@ -85,7 +85,7 @@ public final class BaseConnectButtonTest {
     public void setConnection() throws IOException {
         Connection connection = loadConnection(getClass().getClassLoader());
 
-        button.setup("a@b.com", client, Uri.parse("https://google.com"), credentialsProvider, null);
+        button.setup("a@b.com", client, Uri.parse("https://google.com"), credentialsProvider, null, false);
         button.setConnection(connection);
 
         TextSwitcher connectText = button.findViewById(R.id.connect_with_ifttt);
@@ -121,7 +121,7 @@ public final class BaseConnectButtonTest {
 
     @Test
     public void testDispatchStates() throws IOException {
-        button.setup("a@b.com", client, Uri.parse("https://google.com"), credentialsProvider, null);
+        button.setup("a@b.com", client, Uri.parse("https://google.com"), credentialsProvider, null, false);
 
         AtomicReference<ConnectButtonState> currentStateRef = new AtomicReference<>(ConnectButtonState.Initial);
         AtomicReference<ConnectButtonState> prevStateRef = new AtomicReference<>();
@@ -164,7 +164,8 @@ public final class BaseConnectButtonTest {
             TestUtils.getMockConnectionApiClient(button.getContext(), server, () -> null),
             Uri.parse("https://google.com"),
             credentialsProvider,
-            null
+            null,
+            false
         );
 
         Connection connection = loadConnection(getClass().getClassLoader());

@@ -38,6 +38,7 @@ final class ButtonApiHelper {
     private final CredentialsProvider credentialsProvider;
     private final Lifecycle lifecycle;
     private final Uri redirectUri;
+    private final boolean skipConnectionConfiguration;
     @Nullable private final String inviteCode;
 
     @Nullable private String oAuthCode;
@@ -56,12 +57,13 @@ final class ButtonApiHelper {
         Uri redirectUri,
         @Nullable String inviteCode,
         CredentialsProvider provider,
-        Lifecycle lifecycle
+        Lifecycle lifecycle, boolean skipConnectionConfiguration
     ) {
         this.lifecycle = lifecycle;
         this.redirectUri = redirectUri;
         this.inviteCode = inviteCode;
         this.connectionApiClient = client;
+        this.skipConnectionConfiguration = skipConnectionConfiguration;
         credentialsProvider = provider;
     }
 
@@ -167,7 +169,7 @@ final class ButtonApiHelper {
             userLogin,
             anonymousId,
             oAuthCode,
-            inviteCode
+            inviteCode, skipConnectionConfiguration
         );
         CustomTabsIntent intent = new CustomTabsIntent.Builder().build();
         intent.launchUrl(context, uri);
@@ -189,7 +191,7 @@ final class ButtonApiHelper {
             userLogin,
             anonymousId,
             oAuthCode,
-            inviteCode
+            inviteCode, skipConnectionConfiguration
         ));
         launchIntent.setPackage(PACKAGE_NAME_IFTTT);
 
@@ -229,7 +231,8 @@ final class ButtonApiHelper {
         @Nullable String userLogin,
         String anonymousId,
         @Nullable String oAuthCode,
-        @Nullable String inviteCode
+        @Nullable String inviteCode,
+        boolean skipConnectionConfiguration
     ) {
         Uri.Builder builder = Uri.parse(SHOW_CONNECTION_API_URL + connection.id)
             .buildUpon()
@@ -265,6 +268,10 @@ final class ButtonApiHelper {
             builder.appendQueryParameter("username", userLogin);
         } else {
             builder.appendQueryParameter("email", email);
+        }
+
+        if (skipConnectionConfiguration) {
+            builder.appendQueryParameter("skip_config", "true");
         }
 
         return builder.build();

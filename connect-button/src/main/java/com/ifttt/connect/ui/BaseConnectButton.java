@@ -260,11 +260,20 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
      * @param credentialsProvider CredentialsProvider implementation that returns your user's OAuth code. The code will be
      * used to automatically connect your service on IFTTT for this user.
      * @param inviteCode Optional invite code to access an IFTTT service that has not yet published.
+     * @param skipConnectionConfiguration Optional flag that configures the ConnectButton so that the connection
+     * configuration step is skipped.
      */
-    void setup(String email, ConnectionApiClient connectionApiClient, Uri redirectUri,
-            CredentialsProvider credentialsProvider, @Nullable String inviteCode) {
+    void setup(
+        String email,
+        ConnectionApiClient connectionApiClient,
+        Uri redirectUri,
+        CredentialsProvider credentialsProvider,
+        @Nullable String inviteCode,
+        boolean skipConnectionConfiguration
+    ) {
         buttonApiHelper =
-                new ButtonApiHelper(connectionApiClient, redirectUri, inviteCode, credentialsProvider, getLifecycle());
+                new ButtonApiHelper(connectionApiClient, redirectUri, inviteCode, credentialsProvider, getLifecycle(),
+                    skipConnectionConfiguration);
         emailEdt.setText(email);
     }
 
