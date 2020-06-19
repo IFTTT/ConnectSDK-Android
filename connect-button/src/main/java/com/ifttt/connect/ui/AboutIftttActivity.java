@@ -72,7 +72,7 @@ public final class AboutIftttActivity extends AppCompatActivity {
         });
 
         TextView title = findViewById(R.id.ifttt_about_title);
-        String aboutTitleString = getString(R.string.ifttt_about_title, secondaryService.name, primaryService.name);
+        String aboutTitleString = getString(R.string.about_ifttt_connects_x_to_y, secondaryService.name, primaryService.name);
         CharSequence replacedWithIftttLogo = ButtonUiHelper.replaceKeyWithImage(title, aboutTitleString, "IFTTT",
                 ContextCompat.getDrawable(this, R.drawable.ic_ifttt_logo_white));
         Typeface bold = ResourcesCompat.getFont(this, R.font.avenir_next_ltpro_bold);
@@ -101,7 +101,7 @@ public final class AboutIftttActivity extends AppCompatActivity {
 
         // Set up links to terms of use and privacy policy.
         TextView termsAndPrivacy = findViewById(R.id.term_and_privacy);
-        termsAndPrivacy.setText(Html.fromHtml(getString(R.string.terms_and_privacy)));
+        termsAndPrivacy.setText(Html.fromHtml(getString(R.string.about_ifttt_privacy_and_terms)));
         termsAndPrivacy.setLinkTextColor(Color.WHITE);
         termsAndPrivacy.setMovementMethod(LinkMovementMethod.getInstance());
 

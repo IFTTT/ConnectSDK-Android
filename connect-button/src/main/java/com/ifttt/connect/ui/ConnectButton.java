@@ -175,7 +175,7 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
             @Override
             public void onFailure(ErrorResponse errorResponse) {
                 CharSequence errorText
-                    = HtmlCompat.fromHtml(getResources().getString(R.string.ifttt_error_fetching_connection),
+                    = HtmlCompat.fromHtml(getResources().getString(R.string.error_internet_connection),
                     FROM_HTML_MODE_COMPACT
                 );
                 SpannableString errorSpan = new SpannableString(errorText);

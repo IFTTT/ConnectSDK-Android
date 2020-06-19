@@ -5,6 +5,7 @@ import com.ifttt.connect.api.Connection;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -25,7 +26,7 @@ public final class ButtonApiHelperTest {
     @Test
     public void testRequiredFields() {
         Uri uri = ButtonApiHelper.getEmbedUri(connection, Initial, redirectUri, Collections.emptyList(), "abc@efg.com",
-                null, "", "auth_code", null, false
+                null, "", "auth_code", null, false, "en"
         );
 
         assertThat(uri.getQueryParameter("sdk_return_to")).isEqualTo("http://redirect");
@@ -36,7 +37,7 @@ public final class ButtonApiHelperTest {
     @Test
     public void testInviteCode() {
         Uri uri = ButtonApiHelper.getEmbedUri(connection, Initial, redirectUri, Collections.emptyList(), "abc@efg.com",
-                null, "", "auth_code", "abcd", false
+                null, "", "auth_code", "abcd", false, "en"
         );
         assertThat(uri.getQueryParameter("invite_code")).isEqualTo("abcd");
     }
@@ -44,17 +45,17 @@ public final class ButtonApiHelperTest {
     @Test
     public void testOAuthCode() {
         Uri uri = ButtonApiHelper.getEmbedUri(connection, Initial, redirectUri, Collections.emptyList(), "abc@efg.com",
-                null, "", "auth_code", "abcd", false
+                null, "", "auth_code", "abcd", false, "en"
         );
         assertThat(uri.getQueryParameter("code")).isNull();
 
         Uri uri1 = ButtonApiHelper.getEmbedUri(connection, CreateAccount, redirectUri, Collections.emptyList(),
-                "abc@efg.com", null, "", "auth_code", "abcd", false
+                "abc@efg.com", null, "", "auth_code", "abcd", false, "en"
         );
         assertThat(uri1.getQueryParameter("code")).isEqualTo("auth_code");
 
         Uri uri2 = ButtonApiHelper.getEmbedUri(connection, Login, redirectUri, Collections.emptyList(), "abc@efg.com",
-                null, "", "auth_code", "abcd", false
+                null, "", "auth_code", "abcd", false, "en"
         );
         assertThat(uri2.getQueryParameter("code")).isEqualTo("auth_code");
     }
@@ -62,12 +63,12 @@ public final class ButtonApiHelperTest {
     @Test
     public void testSdkCreateAccount() {
         Uri uri = ButtonApiHelper.getEmbedUri(connection, Initial, redirectUri, Collections.emptyList(), "abc@efg.com",
-                null, "", "auth_code", "abcd", false
+                null, "", "auth_code", "abcd", false, "en"
         );
         assertThat(uri.getQueryParameter("sdk_create_account")).isNull();
 
         Uri uri1 = ButtonApiHelper.getEmbedUri(connection, CreateAccount, redirectUri, Collections.emptyList(),
-                "abc@efg.com", null, "", "auth_code", "abcd", false
+                "abc@efg.com", null, "", "auth_code", "abcd", false, "en"
         );
         assertThat(uri1.getQueryParameter("sdk_create_account")).isEqualTo("true");
     }
@@ -75,7 +76,7 @@ public final class ButtonApiHelperTest {
     @Test
     public void testUsername() {
         Uri uri = ButtonApiHelper.getEmbedUri(connection, Initial, redirectUri, Collections.emptyList(), "abc@efg.com",
-                "user_name", "", "auth_code", "abcd", false
+                "user_name", "", "auth_code", "abcd", false, "en"
         );
         assertThat(uri.getQueryParameter("username")).isEqualTo("user_name");
         assertThat(uri.getQueryParameter("email")).isNull();
@@ -84,7 +85,7 @@ public final class ButtonApiHelperTest {
     @Test
     public void testEmailAppsDetectorWhenLogin() {
         Uri uri = ButtonApiHelper.getEmbedUri(connection, Login, redirectUri, Arrays.asList("a", "b"), "abc@efg.com",
-                null, "", "auth_code", "abcd", false
+                null, "", "auth_code", "abcd", false, "en"
         );
         List<String> params = uri.getQueryParameters("available_email_app_schemes[]");
         assertThat(params).hasSize(2);
@@ -95,7 +96,7 @@ public final class ButtonApiHelperTest {
     @Test
     public void testEmailAppsDetectorWhenCreateAccount() {
         Uri uri = ButtonApiHelper.getEmbedUri(connection, CreateAccount, redirectUri, Arrays.asList("a", "b"),
-                "abc@efg.com", null, "", "auth_code", "abcd", false
+                "abc@efg.com", null, "", "auth_code", "abcd", false, "en"
         );
         List<String> params = uri.getQueryParameters("available_email_app_schemes[]");
         assertThat(params).hasSize(0);
@@ -104,9 +105,27 @@ public final class ButtonApiHelperTest {
     @Test
     public void testSkipConfigurationFlag() {
         Uri uri = ButtonApiHelper.getEmbedUri(connection, CreateAccount, redirectUri, Arrays.asList("a", "b"),
-            "abc@efg.com", null, "", "auth_code", "abcd", true
+            "abc@efg.com", null, "", "auth_code", "abcd", true, "en"
         );
 
         assertThat(uri.getQueryParameter("skip_config")).isEqualTo("true");
+    }
+
+    @Test
+    public void testDefaultLocaleParam() {
+        Uri uri = ButtonApiHelper.getEmbedUri(connection, CreateAccount, redirectUri, Arrays.asList("a", "b"),
+                "abc@efg.com", null, "", "auth_code", "abcd", true, ""
+        );
+
+        assertThat(uri.toString().contains("locale")).isFalse();
+    }
+
+    @Test
+    public void testTranditionalChineseLocaleParam() {
+        Uri uri = ButtonApiHelper.getEmbedUri(connection, CreateAccount, redirectUri, Arrays.asList("a", "b"),
+                "abc@efg.com", null, "", "auth_code", "abcd", true, "zh-Hant"
+        );
+
+        assertThat(uri.getQueryParameter("locale")).isEqualTo("zh-Hant");
     }
 }

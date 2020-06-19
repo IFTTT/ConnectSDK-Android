@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<resources>
+<string name="disconnect"/>
+<string name="about_ifttt_protect_and_monitor_data"/>
+<string name="learn_more"/>
+<string name="disconnecting"/>
+<string name="content_desc_start_icon"/>
+<string name="error_internet_connection"/>
+<string name="disconnected"/>
+<string name="enter_valid_email"/>
+<string name="about_ifttt_unplug_any_time"/>
+<string name="new_account_for"/>
+<string name="connect"/>
+<string name="email"/>
+<string name="going_to_service"/>
+<string name="content_desc_service_icon"/>
+<string name="language_tag">sv</string>
+<string name="works_with_ifttt"/>
+<string name="loading"/>
+<string name="creating_account"/>
+<string name="manage"/>
+<string name="connected"/>
+<string name="about_ifttt_privacy_and_terms"/>
+<string name="about_ifttt_connects_x_to_y"/>
+<string name="connecting"/>
+<string name="connect_service"/>
+<string name="about_ifttt_control_which_services_access_data"/>
+<string name="secured_with_ifttt"/>
+<string name="about_ifttt_unlock_new_features"/>
+</resources>

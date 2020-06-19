@@ -19,7 +19,7 @@
         android:layout_marginBottom="@dimen/ifttt_connect_button_margin_bottom"
         android:background="@drawable/button_background_default"
         android:gravity="center"
-        android:text="@string/ifttt_loading"
+        android:text="@string/loading"
         android:textColor="@android:color/white"
         android:textSize="@dimen/ifttt_service_name_max_text_size"
         app:fontFamily="@font/avenir_next_ltpro_bold"/>
