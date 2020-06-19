@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.provider.Settings;
+import android.util.Log;
 import androidx.annotation.MainThread;
 import androidx.annotation.VisibleForTesting;
 import androidx.browser.customtabs.CustomTabsIntent;
@@ -14,6 +15,7 @@ import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.OnLifecycleEvent;
 import com.ifttt.connect.BuildConfig;
+import com.ifttt.connect.R;
 import com.ifttt.connect.api.Connection;
 import com.ifttt.connect.api.ConnectionApiClient;
 import com.ifttt.connect.api.ErrorResponse;
@@ -171,7 +173,7 @@ final class ButtonApiHelper {
             userLogin,
             anonymousId,
             oAuthCode,
-            inviteCode, skipConnectionConfiguration, ConfigurationCompat.getLocales(context.getResources().getConfiguration()).get(0)
+            inviteCode, skipConnectionConfiguration, context.getString(R.string.language_tag)
         );
         CustomTabsIntent intent = new CustomTabsIntent.Builder().build();
         intent.launchUrl(context, uri);
@@ -193,7 +195,7 @@ final class ButtonApiHelper {
             userLogin,
             anonymousId,
             oAuthCode,
-            inviteCode, skipConnectionConfiguration, ConfigurationCompat.getLocales(context.getResources().getConfiguration()).get(0)
+            inviteCode, skipConnectionConfiguration, context.getString(R.string.language_tag)
         ));
         launchIntent.setPackage(PACKAGE_NAME_IFTTT);
 
@@ -234,7 +236,7 @@ final class ButtonApiHelper {
         String anonymousId,
         @Nullable String oAuthCode,
         @Nullable String inviteCode,
-        boolean skipConnectionConfiguration, Locale locale
+        boolean skipConnectionConfiguration, String localeLanguageTag
     ) {
         Uri.Builder builder = Uri.parse(SHOW_CONNECTION_API_URL + connection.id)
             .buildUpon()
@@ -276,7 +278,9 @@ final class ButtonApiHelper {
             builder.appendQueryParameter("skip_config", "true");
         }
 
-        builder.appendQueryParameter("locale", locale.toString());
+        if (!localeLanguageTag.isEmpty()) {
+            builder.appendQueryParameter("locale", localeLanguageTag);
+        }
         return builder.build();
     }
 

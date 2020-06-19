@@ -29,4 +29,6 @@
     <string name="content_desc_service_icon">%1$s service icon</string>
     <string name="content_desc_start_icon">Start icon</string>
     <string name="disconnected">Disconnected</string>
+
+    <string name="language_tag"></string>
 </resources>
