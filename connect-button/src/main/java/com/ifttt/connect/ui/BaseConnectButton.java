@@ -928,8 +928,10 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                     return false;
                 });
 
-                AnalyticsManager.getInstance(getContext())
-                        .trackUiImpression(AnalyticsObject.CONNECT_BUTTON_EMAIL, AnalyticsLocation.fromConnectButtonWithId(connection.id));
+                AnalyticsManager.getInstance(getContext()).trackUiImpression(
+                    AnalyticsObject.fromConnectionEmail(connection.id),
+                    AnalyticsLocation.fromConnectButtonWithId(connection.id)
+                );
                 helperTxt.setClickable(true);
             }
         });
