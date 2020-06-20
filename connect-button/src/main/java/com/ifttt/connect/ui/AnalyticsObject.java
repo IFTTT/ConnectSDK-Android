@@ -9,7 +9,6 @@ class AnalyticsObject {
     final String type;
 
     private static String TYPE_CONNECTION = "connection";
-    private static String TYPE_CONNECTION_EMAIL = "connection_email";
     private static String TYPE_BUTTON = "button";
     private static String TYPE_MODAL = "modal";
 
@@ -49,6 +48,6 @@ class AnalyticsObject {
     }
 
     static AnalyticsObject fromConnectionEmail(String connectionId) {
-        return new AnalyticsObject(connectionId, TYPE_CONNECTION_EMAIL);
+        return new AnalyticsObject(connectionId, "connection_email");
     }
 }

@@ -859,7 +859,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
         OnClickListener startAuthOnClickListener = v -> {
             AnalyticsManager.getInstance(getContext())
-                    .trackUiClick(AnalyticsObject.CONNECT_BUTTON_EMAIL,
+                    .trackUiClick(AnalyticsObject.fromConnectionEmail(connection.id),
                     AnalyticsLocation.fromConnectButtonWithId(connection.id));
 
             revertableHandler.revertAll();
