@@ -22,8 +22,3 @@
   * `UserFeatureField`: representing a user configured field in the enabled feature
   * `LocationFieldValue`, `CollectionFieldValue`, `StringArrayFieldValue`, `StringFieldValue`: representing different types of the configured field value
 
-## ConnectLocation
-### v1.0
-* Initial release
-
-
