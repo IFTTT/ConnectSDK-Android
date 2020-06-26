@@ -141,7 +141,7 @@ public class YourActivity extends Activity {
 At this point, the ConnectButton is set up to display the connection status for a given user, as well as initiating a connection flow.
 
 ## Authentication
-To enable the SDK to retrieve connection status for a specific user, as well as allowing the SDK to facilitate disabling a connection, it needs to be user-authenticated, which requires an IFTTT user token.
+To enable the SDK to retrieve connection status for a specific user, as well as allowing the SDK to facilitate disabling a connection, it needs to be user-authenticated, which requires an IFTTT user token. This token is identical to the token returned by your service when a user authenticates via the [service authentication flow](https://platform.ifttt.com/docs/api_reference#authentication-flow).
 
 A user-authenticated request is one that includes an `Authorization` header containing a user-specific token that IFTTT has issued to your service. This approach lets you make calls to the API from places like mobile apps or browsers where it would be inappropriate to expose your service key.
 
