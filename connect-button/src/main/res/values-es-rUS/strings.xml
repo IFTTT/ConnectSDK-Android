@@ -7,13 +7,13 @@
 <string name="disconnected">Desconectado</string>
 <string name="enter_valid_email">Ingrese un correo electrónico válido</string>
 <string name="about_ifttt_unplug_any_time">Desconéctese en cualquier momento</string>
-<string name="new_account_for">Nueva cuenta SIEEE para %1$s</string>
+<string name="new_account_for">Nueva cuenta IFTTT para %1$s</string>
 <string name="term_learn_more">Más información</string>
 <string name="connect">Conectarse</string>
 <string name="going_to_service">Yendo a %1$s...</string>
 <string name="content_desc_service_icon">Icono de servicio de %1$s</string>
 <string name="language_tag">es-419</string>
-<string name="works_with_ifttt">FUNCIONA CON SIEEE</string>
+<string name="works_with_ifttt">FUNCIONA CON IFTTT</string>
 <string name="term_disconnect">Desconectar</string>
 <string name="loading">Cargando...</string>
 <string name="creating_account">Creando cuenta...</string>
@@ -21,11 +21,11 @@
 <string name="connected">Se conectó con</string>
 <string name="about_ifttt_privacy_and_terms">Al usar esta conexión, acepta nuestros Términos y privacidad</string>
 <string name="term_privacy_and_terms">Términos y privacidad</string>
-<string name="about_ifttt_connects_x_to_y">SIEEE conecta %1$s con %2$s</string>
+<string name="about_ifttt_connects_x_to_y">IFTTT conecta %1$s con %2$s</string>
 <string name="term_email">Correo electrónico</string>
 <string name="connecting">Conectando</string>
 <string name="connect_service">Conectar %1$s</string>
 <string name="about_ifttt_control_which_services_access_data">Controle qué servicios acceden a sus datos y cómo los usan</string>
-<string name="secured_with_ifttt">Protegido con SIEEE. Más información</string>
+<string name="secured_with_ifttt">Protegido con IFTTT. Más información</string>
 <string name="about_ifttt_unlock_new_features">Desbloquee nuevas funciones cuando sus cosas favoritas funcionan juntas</string>
 </resources>
