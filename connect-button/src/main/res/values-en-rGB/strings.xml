@@ -9,6 +9,7 @@
 <string name="about_ifttt_unplug_any_time">Unplug any time</string>
 <string name="new_account_for">New IFTTT account for %1$s</string>
 <string name="term_learn_more">Learn more</string>
+<string name="retry">Retry</string>
 <string name="connect">Connect</string>
 <string name="going_to_service">Going to %1$s...</string>
 <string name="content_desc_service_icon">%1$s service icon</string>

@@ -9,6 +9,7 @@
 <string name="about_ifttt_unplug_any_time">언제든지 플러그 분리</string>
 <string name="new_account_for">%1$s을(를) 위한 새 IFTTT 계정</string>
 <string name="term_learn_more">자세히 알아보기</string>
+<string name="retry">재시도</string>
 <string name="connect">연결</string>
 <string name="going_to_service">%1$s(으)로 이동하는 중...</string>
 <string name="content_desc_service_icon">%1$s 서비스 아이콘</string>

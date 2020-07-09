@@ -22,8 +22,9 @@
     <string name="secured_with_ifttt">Secured with IFTTT Learn more</string>
     <string name="manage">Manage</string>
     <string name="loading">Loading…</string>
-    <string name="error_internet_connection"><![CDATA[Make sure your phone has internet connection. <u>Retry</u>]]></string>
+    <string name="error_internet_connection">Make sure your phone has internet connection. Retry</string>
     <string name="new_account_for">New IFTTT account for %1$s</string>
+    <string name="retry">Retry</string>
 
     <!-- Content description string -->
 

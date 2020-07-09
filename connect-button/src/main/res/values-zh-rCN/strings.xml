@@ -9,6 +9,7 @@
 <string name="about_ifttt_unplug_any_time">可随时断电</string>
 <string name="new_account_for">为 %1$s 新建 IFTTT 帐户</string>
 <string name="term_learn_more">了解更多</string>
+<string name="retry">重试</string>
 <string name="connect">连接</string>
 <string name="going_to_service">正在转到 %1$s...</string>
 <string name="content_desc_service_icon">%1$s 服务图标</string>

@@ -9,6 +9,7 @@
 <string name="about_ifttt_unplug_any_time">Możesz odłączyć w dowolnym momencie</string>
 <string name="new_account_for">Nowe konto IFTTT dla %1$s</string>
 <string name="term_learn_more">Dowiedz się więcej</string>
+<string name="retry">Spróbuj ponownie</string>
 <string name="connect">Połącz</string>
 <string name="going_to_service">Przechodzenie do %1$s...</string>
 <string name="content_desc_service_icon">Ikona usługi %1$s</string>

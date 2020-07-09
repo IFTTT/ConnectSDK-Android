@@ -11,6 +11,7 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
+import android.text.style.UnderlineSpan;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -101,8 +102,15 @@ public final class AboutIftttActivity extends AppCompatActivity {
 
         // Set up links to terms of use and privacy policy.
         TextView termsAndPrivacy = findViewById(R.id.term_and_privacy);
-        termsAndPrivacy.setText(Html.fromHtml(getString(R.string.about_ifttt_privacy_and_terms)));
-        termsAndPrivacy.setLinkTextColor(Color.WHITE);
+
+        String content = getString(R.string.about_ifttt_privacy_and_terms);
+        String termPrivacyAndTerms = getString(R.string.term_privacy_and_terms);
+
+        int termPrivacyAndTermsIndex = content.indexOf(termPrivacyAndTerms);
+
+        SpannableString spanContent = new SpannableString(content);
+        spanContent.setSpan(new UnderlineSpan(), termPrivacyAndTermsIndex, termPrivacyAndTermsIndex + termPrivacyAndTerms.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        termsAndPrivacy.setText(spanContent);
         termsAndPrivacy.setMovementMethod(LinkMovementMethod.getInstance());
 
         Intent redirectToTermsIntent = redirectToTerms(this);

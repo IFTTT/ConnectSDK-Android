@@ -9,6 +9,7 @@
 <string name="about_ifttt_unplug_any_time">いつでも停止可能</string>
 <string name="new_account_for">%1$sの新規アカウント</string>
 <string name="term_learn_more">詳細を確認する</string>
+<string name="retry">再試行</string>
 <string name="connect">接続</string>
 <string name="going_to_service">%1$sに移動中...</string>
 <string name="content_desc_service_icon">%1$sサービスアイコン</string>

@@ -9,6 +9,7 @@
 <string name="about_ifttt_unplug_any_time">隨時斷開</string>
 <string name="new_account_for">%1$s​ 的 IFTTT 新帳戶</string>
 <string name="term_learn_more">了解更多</string>
+<string name="retry">重試</string>
 <string name="connect">連線</string>
 <string name="going_to_service">正在前往 %1$s...</string>
 <string name="content_desc_service_icon">%1$s 服務圖示</string>

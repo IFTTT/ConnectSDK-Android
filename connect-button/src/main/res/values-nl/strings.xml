@@ -9,6 +9,7 @@
 <string name="about_ifttt_unplug_any_time">Op elk gewenst moment loskoppelen</string>
 <string name="new_account_for">Nieuw IFTTT-account voor %1$s</string>
 <string name="term_learn_more">Meer informatie</string>
+<string name="retry">Opnieuw proberen</string>
 <string name="connect">Verbinden</string>
 <string name="going_to_service">Gaat %1$s naar...</string>
 <string name="content_desc_service_icon">%1$s-servicepictogram</string>

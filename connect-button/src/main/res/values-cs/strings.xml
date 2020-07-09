@@ -9,6 +9,7 @@
 <string name="about_ifttt_unplug_any_time">Můžete kdykoli odpojit</string>
 <string name="new_account_for">Nový účet IFTTT pro %1$s</string>
 <string name="term_learn_more">Další informace</string>
+<string name="retry">Zkusit znovu</string>
 <string name="connect">Připojit</string>
 <string name="going_to_service">Přechod na %1$s...</string>
 <string name="content_desc_service_icon">Ikona služby %1$s</string>

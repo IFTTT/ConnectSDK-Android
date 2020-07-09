@@ -9,6 +9,7 @@
 <string name="about_ifttt_unplug_any_time">Koppla ur när som helst</string>
 <string name="new_account_for">Nytt IFTTT-konto för %1$s</string>
 <string name="term_learn_more">Läs mer</string>
+<string name="retry">Försök igen</string>
 <string name="connect">Anslut</string>
 <string name="going_to_service">Går till %1$s…</string>
 <string name="content_desc_service_icon">Servicesymbol för %1$s</string>
