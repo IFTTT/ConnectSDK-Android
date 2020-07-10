@@ -3,14 +3,11 @@ package com.ifttt.connect.ui;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
-import android.text.method.LinkMovementMethod;
 import android.text.style.UnderlineSpan;
 import android.view.View;
 import android.widget.ImageView;
@@ -111,7 +108,6 @@ public final class AboutIftttActivity extends AppCompatActivity {
         SpannableString spanContent = new SpannableString(content);
         spanContent.setSpan(new UnderlineSpan(), termPrivacyAndTermsIndex, termPrivacyAndTermsIndex + termPrivacyAndTerms.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         termsAndPrivacy.setText(spanContent);
-        termsAndPrivacy.setMovementMethod(LinkMovementMethod.getInstance());
 
         Intent redirectToTermsIntent = redirectToTerms(this);
         if (redirectToTermsIntent != null) {
