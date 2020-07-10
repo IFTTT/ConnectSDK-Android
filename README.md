@@ -278,3 +278,8 @@ You may call the `ConnectButton.disableTracking(context)` if you wish to opt-out
 
 ### Configuration skipping
 You can use `Configuration.Builder#skipConnectionConfiguration()` if you want to use your own connection configuration UI. Setting this parameter will instruct IFTTT to skip the connection configuration screen. Once a user clicks the connect button they will be taken through the usual connection flow however they will not see the connection configuration screen but will be redirected back to your app instead. After that you will be able to use the [field options endpoint](https://platform.ifttt.com/docs/connect_api#field-options) and the [update a connection endpoint](https://platform.ifttt.com/docs/connect_api#update-a-connection) to support your UI and allow the user to configure the connection. A user connection created with `skipConfig=true` is considered pending and will not fire it's triggers or allow you to run it's actions or queries until it's updated using the [update a connection endpoint](https://platform.ifttt.com/docs/connect_api#update-a-connection). This feature is available <a href="mailto:platform-support+via-docs-connection-api@ifttt.com" class="open_intercom_messenger">upon request</a>.
+
+### Localization
+The `ConnectButton` and the corresponding flow can display translated text.
+No additional setup is required to display translated text, the SDK infers user locale from the `Context` within which the `ConnectButton` is initialized.
+If no translations are found for the inferred locale, the default locale i.e.English will be used.
