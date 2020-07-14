@@ -106,7 +106,10 @@ public final class AboutIftttActivity extends AppCompatActivity {
         int termPrivacyAndTermsIndex = content.indexOf(termPrivacyAndTerms);
 
         SpannableString spanContent = new SpannableString(content);
-        spanContent.setSpan(new UnderlineSpan(), termPrivacyAndTermsIndex, termPrivacyAndTermsIndex + termPrivacyAndTerms.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        if (termPrivacyAndTermsIndex != -1) {
+            spanContent.setSpan(new UnderlineSpan(), termPrivacyAndTermsIndex,
+                    termPrivacyAndTermsIndex + termPrivacyAndTerms.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
         termsAndPrivacy.setText(spanContent);
 
         Intent redirectToTermsIntent = redirectToTerms(this);

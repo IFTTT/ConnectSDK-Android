@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
+<file original="ifttt.strings" source-language="en" datatype="plaintext" target-language="nb">
+<body>
+  <trans-unit id="loading">
+    <source>Loading...</source>
+    <target><LIOXtranslate>Laster inn ...</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="works_with_ifttt">
+    <source>WORKS WITH IFTTT</source>
+    <target><LIOXtranslate>FUNGERER MED IFTTT</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="works_with">
+    <source>WORKS WITH</source>
+    <target><LIOXtranslate>FUNGERER MED</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="verify">
+    <source>Verify</source>
+    <target><LIOXtranslate>Kontroller</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="verifying">
+    <source>Verifying...</source>
+    <target><LIOXtranslate>Kontrollerer ...</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="verify_connection">
+    <source>Verify connection</source>
+    <target><LIOXtranslate>Kontroller tilkobling</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="creating_account">
+    <source>Creating account...</source>
+    <target><LIOXtranslate>Oppretter konto ...</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="creating_account_for">
+    <source>Creating account for %@</source>
+    <target><LIOXtranslate>Oppretter konto for %@</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="new_account_for">
+    <source>New IFTTT account for %@</source>
+    <target><LIOXtranslate>Ny IFTTT-konto for %@</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="going_to_service">
+    <source>Going to %@...</source>
+    <target><LIOXtranslate>Går til %@ ...</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="going">
+    <source>Going</source>
+    <target><LIOXtranslate>Går</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="go_to_service">
+    <source>Go to %@</source>
+    <target><LIOXtranslate>Gå til %@</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="go_to">
+    <source>Go to</source>
+    <target><LIOXtranslate>Gå til</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="sign_in">
+    <source>Sign in</source>
+    <target><LIOXtranslate>Logg på</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="saving_settings">
+    <source>Saving settings...</source>
+    <target><LIOXtranslate>Lagrer innstillinger ...</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="connected">
+    <source>Connected</source>
+    <target><LIOXtranslate>Tilkoblet</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="slide_to_disconnect">
+    <source>Slide to disconnect</source>
+    <target><LIOXtranslate>Skyv for å koble fra</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="disconnecting">
+    <source>Disconnecting...</source>
+    <target><LIOXtranslate>Kobler fra ...</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="disconnected">
+    <source>Disconnected</source>
+    <target><LIOXtranslate>Frakoblet</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="your_email">
+    <source>Your email</source>
+    <target><LIOXtranslate>E-postadressen din</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="enter_valid_email">
+    <source>Enter valid email</source>
+    <target><LIOXtranslate>Angi en gyldig e-postadresse</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="retry">
+    <source>Retry</source>
+    <target><LIOXtranslate>Prøv igjen</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="new">
+    <source>New</source>
+    <target><LIOXtranslate>Ny</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="connect_service">
+    <source>Connect %@</source>
+    <target><LIOXtranslate>Koble til %@</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="connect">
+    <source>Connect</source>
+    <target><LIOXtranslate>Koble til</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="connecting">
+    <source>Connecting</source>
+    <target><LIOXtranslate>Kobler til</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="secured_with_ifttt">
+    <source>Secured with IFTTT. Learn More</source>
+    <target><LIOXtranslate>Sikret med IFTTT. Finn ut mer</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="secure_connections_with_ifttt">
+    <source>Secure connections with IFTTT. Learn more</source>
+    <target><LIOXtranslate>Sikre tilkoblinger med IFTTT. Finn ut mer</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="about_ifttt_connects_x_to_y">
+    <source>IFTTT connects %@ to %@</source>
+    <target><LIOXtranslate>IFTTT kobler %@ til %@</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="ifttt">
+    <source>IFTTT</source>
+    <target><LIOXtranslate>IFTTT</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="connects">
+    <source>connects</source>
+    <target><LIOXtranslate>kobler til</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="to">
+    <source>to</source>
+    <target><LIOXtranslate>til</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="about_ifttt_unlock_new_features">
+    <source>Unlock new features when your favorite things work together</source>
+    <target><LIOXtranslate>Lås opp nye funksjoner når favorittingene dine samarbeider</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="about_ifttt_control_which_services_access_data">
+    <source>Control which services access your data and how they use it</source>
+    <target><LIOXtranslate>Kontroller hvilke tjenester som har tilgang til dataene dine og hvordan de bruker dem</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="about_ifttt_protect_and_monitor_data">
+    <source>Protect and monitor your data</source>
+    <target><LIOXtranslate>Beskytt og overvåk dataene dine</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="about_ifttt_unplug_any_time">
+    <source>Unplug any time</source>
+    <target><LIOXtranslate>Koble ut når som helst</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="about_ifttt_privacy_and_terms">
+    <source>By using this connection, you agree to our Privacy &amp; Terms</source>
+    <target><LIOXtranslate>Ved å bruke denne koblingen, godtar du våre retningslinjer for personvern og vilkår</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="connect_x_to_y">
+    <source>Connect %@ to %@</source>
+    <target><LIOXtranslate>Koble %@ til %@</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="connected_x_to_y">
+    <source>Connected %@ to %@</source>
+    <target><LIOXtranslate>Koblet %@ til %@</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="verification_email_sent_to">
+    <source>Verification email sent to %@</source>
+    <target><LIOXtranslate>E-postbekreftelse er sendt til %@</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="verification_email_sent">
+    <source>Verification email sent to your email</source>
+    <target><LIOXtranslate>E-postbekreftelse er sendt til din e-postadresse</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="sign_in_to_ifttt">
+    <source>Sign in to IFTTT</source>
+    <target><LIOXtranslate>Logg på IFTTT</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="go_back">
+    <source>Go back</source>
+    <target><LIOXtranslate>Gå tilbake</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="continue">
+    <source>Continue</source>
+    <target><LIOXtranslate>Fortsett</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="error_service_authentication">
+    <source>Could not authenticate service</source>
+    <target><LIOXtranslate>Kan ikke godkjenne tjenesten</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="error_internet_connection">
+    <source>Make sure your phone has internet connection</source>
+    <target><LIOXtranslate>Kontroller at telefonen har tilkobling til Internett</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="error_could_not_connect">
+    <source>Could not connect. Please check your internet connection</source>
+    <target><LIOXtranslate>Kan ikke koble til. Kontroller tilkoblingen til Internett</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="error_connect_failed">
+    <source>Failed to connect</source>
+    <target><LIOXtranslate>Tilkoblingen mislyktes</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="error_internet_connection_try_again">
+    <source>Please check your internet connection and try again</source>
+    <target><LIOXtranslate>Kontroller tilkoblingen din til internett, og prøv på nytt.</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="error_app_version">
+    <source>Please try updating to the latest version of IFTTT from the App Store</source>
+    <target><LIOXtranslate>Prøv å oppdatere til den nyeste versjonen av IFTTT fra App Store</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="error_connection_already_exists">
+    <source>A connection already exists with this %@ account</source>
+    <target><LIOXtranslate>Det finnes allerede en kobling til denne %@-kontoen</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="error_missing_email_param">
+    <source>The email parameter is missing!</source>
+    <target><LIOXtranslate>E-postparameteren mangler!</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="try_again">
+    <source>Try again</source>
+    <target><LIOXtranslate>Prøv igjen</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="manage">
+    <source>Manage</source>
+    <target><LIOXtranslate>Administrer</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="continue_face_ID">
+    <source>Continue with Face ID</source>
+    <target><LIOXtranslate>Fortsett med Face ID</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="continue_touch_id">
+    <source>Continue with Touch ID</source>
+    <target><LIOXtranslate>Fortsett med Touch ID</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="use_passcode">
+    <source>Use passcode</source>
+    <target><LIOXtranslate>Bruk passkode</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="content_desc_service_icon">
+    <source>%@ service icon</source>
+    <target><LIOXtranslate>%@-tjenesteikon</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="content_desc_start_icon">
+    <source>Start icon</source>
+    <target><LIOXtranslate>Start-ikon</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="email_verify_connection_body">
+    <source>%@ would like to connect with %@</source>
+    <target><LIOXtranslate>%@ vil koble til %@</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="error_redirect_back">
+    <source>Could not go back to the application</source>
+    <target><LIOXtranslate>Kan ikke gå tilbake til appen</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="prompt_valid_email_address">
+    <source>Please enter a valid email address</source>
+    <target><LIOXtranslate>Oppgi en gyldig e-postadresse</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="term_privacy_and_terms">
+    <source>Privacy &amp; Terms</source>
+    <target><LIOXtranslate>Personvern og vilkår</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="term_learn_more">
+    <source>Learn more</source>
+    <target><LIOXtranslate>Finn ut mer</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="term_email">
+    <source>Email</source>
+    <target><LIOXtranslate>E-post</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="term_disconnect">
+    <source>Disconnect</source>
+    <target><LIOXtranslate>Koble fra</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="error_could_not_login">
+    <source>Could not login</source>
+    <target><LIOXtranslate>Kan ikke logg på</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="error_developer_missing_email_param">
+    <source>Developer error: Missing email param</source>
+    <target><LIOXtranslate>Utviklerfeil: Mangler e-postparameter</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="error_developer_invalid_connection_id">
+    <source>Developer error: Invalid connection ID</source>
+    <target><LIOXtranslate>Utviklerfeil: Ugyldig tilkoblings-ID</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="error_generic">
+    <source>Something went wrong</source>
+    <target><LIOXtranslate>Noe gikk galt</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="back_to_app">
+    <source>Back to %@</source>
+    <target><LIOXtranslate>Tilbake til %@</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="connecting_service">
+    <source>Connecting %@...</source>
+    <target><LIOXtranslate>Kobler til %@ ...</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="content_desc_up_button">
+    <source>Navigate up</source>
+    <target><LIOXtranslate>Gå opp</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="error_failed_to_connect">
+    <source>Failed to connect</source>
+    <target><LIOXtranslate>Tilkoblingen mislyktes</LIOXtranslate></target>
+  </trans-unit>
+</body>
+</file>
+</xliff>

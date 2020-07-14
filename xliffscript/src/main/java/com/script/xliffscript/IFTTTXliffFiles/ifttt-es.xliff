@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
+<file original="ifttt.strings" source-language="en" datatype="plaintext" target-language="es">
+<body>
+  <trans-unit id="loading">
+    <source>Loading...</source>
+    <target><LIOXtranslate>Cargando...</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="works_with_ifttt">
+    <source>WORKS WITH IFTTT</source>
+    <target><LIOXtranslate>FUNCIONA CON IFTTT</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="works_with">
+    <source>WORKS WITH</source>
+    <target><LIOXtranslate>FUNCIONA CON</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="verify">
+    <source>Verify</source>
+    <target><LIOXtranslate>Verificar</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="verifying">
+    <source>Verifying...</source>
+    <target><LIOXtranslate>Verificando...</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="verify_connection">
+    <source>Verify connection</source>
+    <target><LIOXtranslate>Verificar conexión</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="creating_account">
+    <source>Creating account...</source>
+    <target><LIOXtranslate>Creando cuenta...</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="creating_account_for">
+    <source>Creating account for %@</source>
+    <target><LIOXtranslate>Creando cuenta para %@</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="new_account_for">
+    <source>New IFTTT account for %@</source>
+    <target><LIOXtranslate>Nueva cuenta IFTTT para %@</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="going_to_service">
+    <source>Going to %@...</source>
+    <target><LIOXtranslate>Yendo a %@ ...</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="going">
+    <source>Going</source>
+    <target><LIOXtranslate>Yendo</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="go_to_service">
+    <source>Go to %@</source>
+    <target><LIOXtranslate>Ir a %@</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="go_to">
+    <source>Go to</source>
+    <target><LIOXtranslate>Ir a</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="sign_in">
+    <source>Sign in</source>
+    <target><LIOXtranslate>Iniciar sesión</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="saving_settings">
+    <source>Saving settings...</source>
+    <target><LIOXtranslate>Guardando ajustes ...</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="connected">
+    <source>Connected</source>
+    <target><LIOXtranslate>Conectado</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="slide_to_disconnect">
+    <source>Slide to disconnect</source>
+    <target><LIOXtranslate>Desliza para desconectar</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="disconnecting">
+    <source>Disconnecting...</source>
+    <target><LIOXtranslate>Desconectando...</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="disconnected">
+    <source>Disconnected</source>
+    <target><LIOXtranslate>Desconectado</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="your_email">
+    <source>Your email</source>
+    <target><LIOXtranslate>Tu correo electrónico</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="enter_valid_email">
+    <source>Enter valid email</source>
+    <target><LIOXtranslate>Introduce un correo electrónico válido</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="retry">
+    <source>Retry</source>
+    <target><LIOXtranslate>Reintentar</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="new">
+    <source>New</source>
+    <target><LIOXtranslate>Nuevo</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="connect_service">
+    <source>Connect %@</source>
+    <target><LIOXtranslate>Conectar %@</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="connect">
+    <source>Connect</source>
+    <target><LIOXtranslate>Conectar</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="connecting">
+    <source>Connecting</source>
+    <target><LIOXtranslate>Conectando</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="secured_with_ifttt">
+    <source>Secured with IFTTT. Learn More</source>
+    <target><LIOXtranslate>Asegurado con IFTTT. Más información</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="secure_connections_with_ifttt">
+    <source>Secure connections with IFTTT. Learn more</source>
+    <target><LIOXtranslate>Conexiones seguras con IFTTT. Más información</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="about_ifttt_connects_x_to_y">
+    <source>IFTTT connects %@ to %@</source>
+    <target><LIOXtranslate>IFTTT conecta %@ con %@</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="ifttt">
+    <source>IFTTT</source>
+    <target><LIOXtranslate>IFTTT</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="connects">
+    <source>connects</source>
+    <target><LIOXtranslate>conecta</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="to">
+    <source>to</source>
+    <target><LIOXtranslate>con</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="about_ifttt_unlock_new_features">
+    <source>Unlock new features when your favorite things work together</source>
+    <target><LIOXtranslate>Desbloquea nuevas funciones cuando tus dispositivos favoritos trabajen juntos</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="about_ifttt_control_which_services_access_data">
+    <source>Control which services access your data and how they use it</source>
+    <target><LIOXtranslate>Controla qué servicios acceden a tus datos y cómo los usan</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="about_ifttt_protect_and_monitor_data">
+    <source>Protect and monitor your data</source>
+    <target><LIOXtranslate>Protege y supervisa tus datos</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="about_ifttt_unplug_any_time">
+    <source>Unplug any time</source>
+    <target><LIOXtranslate>Desconecta en cualquier momento</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="about_ifttt_privacy_and_terms">
+    <source>By using this connection, you agree to our Privacy &amp; Terms</source>
+    <target><LIOXtranslate>Al usar esta conexión, aceptas nuestros Privacidad y términos</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="connect_x_to_y">
+    <source>Connect %@ to %@</source>
+    <target><LIOXtranslate>Conectar %@ con %@</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="connected_x_to_y">
+    <source>Connected %@ to %@</source>
+    <target><LIOXtranslate>Conectado %@ con %@</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="verification_email_sent_to">
+    <source>Verification email sent to %@</source>
+    <target><LIOXtranslate>Correo electrónico de verificación enviado a %@</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="verification_email_sent">
+    <source>Verification email sent to your email</source>
+    <target><LIOXtranslate>Correo electrónico de verificación enviado a tu correo electrónico</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="sign_in_to_ifttt">
+    <source>Sign in to IFTTT</source>
+    <target><LIOXtranslate>Iniciar sesión en IFTTT</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="go_back">
+    <source>Go back</source>
+    <target><LIOXtranslate>Volver</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="continue">
+    <source>Continue</source>
+    <target><LIOXtranslate>Continuar</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="error_service_authentication">
+    <source>Could not authenticate service</source>
+    <target><LIOXtranslate>No se ha podido autenticar el servicio</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="error_internet_connection">
+    <source>Make sure your phone has internet connection</source>
+    <target><LIOXtranslate>Asegúrate de que tu teléfono tenga conexión a Internet</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="error_could_not_connect">
+    <source>Could not connect. Please check your internet connection</source>
+    <target><LIOXtranslate>No ha podido conectar. Revisa tu conexión a Internet</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="error_connect_failed">
+    <source>Failed to connect</source>
+    <target><LIOXtranslate>Error de conexión</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="error_internet_connection_try_again">
+    <source>Please check your internet connection and try again</source>
+    <target><LIOXtranslate>Comprueba tu conexión a Internet e inténtalo de nuevo</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="error_app_version">
+    <source>Please try updating to the latest version of IFTTT from the App Store</source>
+    <target><LIOXtranslate>Intenta actualizar a la última versión de IFTTT desde App Store</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="error_connection_already_exists">
+    <source>A connection already exists with this %@ account</source>
+    <target><LIOXtranslate>Ya existe una conexión con esta cuenta %@</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="error_missing_email_param">
+    <source>The email parameter is missing!</source>
+    <target><LIOXtranslate>¡Falta rellenar el correo electrónico!</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="try_again">
+    <source>Try again</source>
+    <target><LIOXtranslate>Inténtalo de nuevo</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="manage">
+    <source>Manage</source>
+    <target><LIOXtranslate>Gestionar</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="continue_face_ID">
+    <source>Continue with Face ID</source>
+    <target><LIOXtranslate>Continuar con Face ID</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="continue_touch_id">
+    <source>Continue with Touch ID</source>
+    <target><LIOXtranslate>Continuar con Touch ID</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="use_passcode">
+    <source>Use passcode</source>
+    <target><LIOXtranslate>Usar contraseña</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="content_desc_service_icon">
+    <source>%@ service icon</source>
+    <target><LIOXtranslate>Icono de servicio de %@</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="content_desc_start_icon">
+    <source>Start icon</source>
+    <target><LIOXtranslate>Icono de inicio</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="email_verify_connection_body">
+    <source>%@ would like to connect with %@</source>
+    <target><LIOXtranslate>%@ quisiera conectarse con %@</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="error_redirect_back">
+    <source>Could not go back to the application</source>
+    <target><LIOXtranslate>No se pudo volver a la aplicación</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="prompt_valid_email_address">
+    <source>Please enter a valid email address</source>
+    <target><LIOXtranslate>Escriba una dirección de correo electrónico válida</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="term_privacy_and_terms">
+    <source>Privacy &amp; Terms</source>
+    <target><LIOXtranslate>Privacidad y términos</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="term_learn_more">
+    <source>Learn more</source>
+    <target><LIOXtranslate>Más información</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="term_email">
+    <source>Email</source>
+    <target><LIOXtranslate>Correo electrónico</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="term_disconnect">
+    <source>Disconnect</source>
+    <target><LIOXtranslate>Desconectar</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="error_could_not_login">
+    <source>Could not login</source>
+    <target><LIOXtranslate>No se ha podido acceder a la cuenta</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="error_developer_missing_email_param">
+    <source>Developer error: Missing email param</source>
+    <target><LIOXtranslate>Error del desarrollador: Falta el parámetro de correo electrónico</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="error_developer_invalid_connection_id">
+    <source>Developer error: Invalid connection ID</source>
+    <target><LIOXtranslate>Error del desarrollador: ID de conexión no válido</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="error_generic">
+    <source>Something went wrong</source>
+    <target><LIOXtranslate>Algo salió mal</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="back_to_app">
+    <source>Back to %@</source>
+    <target><LIOXtranslate>Volver a %@</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="connecting_service">
+    <source>Connecting %@...</source>
+    <target><LIOXtranslate>Conectando %@...</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="content_desc_up_button">
+    <source>Navigate up</source>
+    <target><LIOXtranslate>Navegar hacia arriba</LIOXtranslate></target>
+  </trans-unit>
+  <trans-unit id="error_failed_to_connect">
+    <source>Failed to connect</source>
+    <target><LIOXtranslate>No se ha podido conectar</LIOXtranslate></target>
+  </trans-unit>
+</body>
+</file>
+</xliff>
