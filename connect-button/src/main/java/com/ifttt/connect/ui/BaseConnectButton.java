@@ -909,8 +909,13 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                 SpannableString authorizePrompt = new SpannableString(
                         replaceKeyWithImage((TextView) helperTxt.getCurrentView(),
                                 getContext().getString(R.string.secured_with_ifttt), "IFTTT", iftttLogo));
-                authorizePrompt.setSpan(new UnderlineSpan(), authorizePrompt.length() - 10, authorizePrompt.length(),
-                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                String termLearnMore = getContext().getString(R.string.term_learn_more);
+                int learnMoreIndex = getContext().getString(R.string.secured_with_ifttt).indexOf(termLearnMore);
+                if (learnMoreIndex != -1) {
+                    authorizePrompt.setSpan(new UnderlineSpan(), learnMoreIndex, learnMoreIndex + termLearnMore.length(),
+                            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                }
                 helperTxt.setText(authorizePrompt);
             }
 

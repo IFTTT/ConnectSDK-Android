@@ -8,7 +8,9 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
+import android.text.style.UnderlineSpan;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -174,11 +176,13 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
 
             @Override
             public void onFailure(ErrorResponse errorResponse) {
-                CharSequence errorText
-                    = HtmlCompat.fromHtml(getResources().getString(R.string.error_internet_connection),
-                    FROM_HTML_MODE_COMPACT
-                );
+                String errorText = getResources().getString(R.string.error_internet_connection);
+                SpannableString termRetry = new SpannableString(getResources().getString(R.string.retry));
+                termRetry.setSpan(new UnderlineSpan(), 0, termRetry.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
                 SpannableString errorSpan = new SpannableString(errorText);
+                TextUtils.concat(errorSpan, " ", termRetry);
+
                 errorSpan.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getContext(),
                     R.color.ifttt_error_red
                     )),
