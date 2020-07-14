@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<resources>
+    <string name="about_ifttt_protect_and_monitor_data">Beskytt og overvåk dataene dine</string>
+    <string name="disconnecting">Kobler fra ...</string>
+    <string name="content_desc_start_icon">Start-ikon</string>
+    <string name="error_internet_connection">Kontroller at telefonen har tilkobling til Internett</string>
+    <string name="disconnected">Frakoblet</string>
+    <string name="enter_valid_email">Angi en gyldig e-postadresse</string>
+    <string name="about_ifttt_unplug_any_time">Koble ut når som helst</string>
+    <string name="new_account_for">Ny IFTTT-konto for %1$s</string>
+    <string name="term_learn_more">Finn ut mer</string>
+    <string name="retry">Prøv igjen</string>
+    <string name="connect">Koble til</string>
+    <string name="going_to_service">Går til %1$s ...</string>
+    <string name="content_desc_service_icon">%1$s-tjenesteikon</string>
+    <string name="language_tag">nb</string>
+    <string name="works_with_ifttt">FUNGERER MED IFTTT</string>
+    <string name="term_disconnect">Koble fra</string>
+    <string name="loading">Laster inn ...</string>
+    <string name="creating_account">Oppretter konto ...</string>
+    <string name="manage">Administrer</string>
+    <string name="connected">Tilkoblet</string>
+    <string name="about_ifttt_privacy_and_terms">Ved å bruke denne koblingen, godtar du våre retningslinjer for Personvern og vilkår</string>
+    <string name="term_privacy_and_terms">Personvern og vilkår</string>
+    <string name="about_ifttt_connects_x_to_y">IFTTT kobler %1$s til %2$s</string>
+    <string name="term_email">E-post</string>
+    <string name="connecting">Kobler til</string>
+    <string name="connect_service">Koble til %1$s</string>
+    <string name="about_ifttt_control_which_services_access_data">Kontroller hvilke tjenester som har tilgang til dataene dine og hvordan de bruker dem</string>
+    <string name="secured_with_ifttt">Sikret med IFTTT. Finn ut mer</string>
+    <string name="about_ifttt_unlock_new_features">Lås opp nye funksjoner når favorittingene dine samarbeider</string>
+</resources>

@@ -8,7 +8,9 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
+import android.text.style.UnderlineSpan;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -138,7 +140,8 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
             clientToUse,
             configuration.connectRedirectUri,
             configuration.credentialsProvider,
-            configuration.inviteCode
+            configuration.inviteCode,
+            configuration.skipConnectionConfiguration
         );
 
         pulseLoading();
@@ -173,11 +176,13 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
 
             @Override
             public void onFailure(ErrorResponse errorResponse) {
-                CharSequence errorText
-                    = HtmlCompat.fromHtml(getResources().getString(R.string.ifttt_error_fetching_connection),
-                    FROM_HTML_MODE_COMPACT
-                );
+                String errorText = getResources().getString(R.string.error_internet_connection);
+                SpannableString termRetry = new SpannableString(getResources().getString(R.string.retry));
+                termRetry.setSpan(new UnderlineSpan(), 0, termRetry.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
                 SpannableString errorSpan = new SpannableString(errorText);
+                TextUtils.concat(errorSpan, " ", termRetry);
+
                 errorSpan.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getContext(),
                     R.color.ifttt_error_red
                     )),
@@ -307,6 +312,7 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
         private final String suggestedUserEmail;
         private final CredentialsProvider credentialsProvider;
         private final Uri connectRedirectUri;
+        private final boolean skipConnectionConfiguration;
 
         @Nullable private final ConnectionApiClient connectionApiClient;
         @Nullable private String connectionId;
@@ -349,6 +355,7 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
             @Nullable private OnFetchConnectionListener listener;
             @Nullable private Connection connection;
             @Nullable private String inviteCode;
+            private boolean skipConnectionConfiguration;
 
             private Builder(String suggestedUserEmail, Uri connectRedirectUri) {
                 this.suggestedUserEmail = suggestedUserEmail;
@@ -358,6 +365,12 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
             @Override
             public ConfigurationSetup setOnFetchCompleteListener(OnFetchConnectionListener onFetchCompleteListener) {
                 this.listener = onFetchCompleteListener;
+                return this;
+            }
+
+            @Override
+            public ConfigurationSetup skipConnectionConfiguration() {
+                this.skipConnectionConfiguration = true;
                 return this;
             }
 
@@ -400,8 +413,7 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
 
                 Configuration configuration = new Configuration(suggestedUserEmail,
                     credentialsProvider,
-                    connectRedirectUri,
-                    connectionApiClient
+                    connectRedirectUri, skipConnectionConfiguration, connectionApiClient
                 );
                 configuration.connection = connection;
                 configuration.connectionId = connectionId;
@@ -414,12 +426,12 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
         private Configuration(
             String suggestedUserEmail,
             CredentialsProvider credentialsProvider,
-            Uri connectRedirectUri,
-            @Nullable ConnectionApiClient connectionApiClient
+            Uri connectRedirectUri, boolean skipConnectionConfiguration, @Nullable ConnectionApiClient connectionApiClient
         ) {
             this.suggestedUserEmail = suggestedUserEmail;
             this.credentialsProvider = credentialsProvider;
             this.connectRedirectUri = connectRedirectUri;
+            this.skipConnectionConfiguration = skipConnectionConfiguration;
             this.connectionApiClient = connectionApiClient;
         }
 
@@ -448,6 +460,17 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
          */
         public interface ConfigurationSetup {
             ConfigurationSetup setOnFetchCompleteListener(OnFetchConnectionListener onFetchCompleteListener);
+
+            /**
+             * Set up the {@link ConnectButton} such that the Connection enable flow skips the configuration step, which
+             * is previously required for users to configure the Connection with appropriate feature field values.
+             *
+             * Setting this means that the user will have a partially enabled Connection after the enable flow is
+             * completed, and it is the developers' responsibility to update the Connection with required field values
+             * via Connect API. The partially enabled Connection will NOT be functional until all required fields are
+             * configured.
+             */
+            ConfigurationSetup skipConnectionConfiguration();
 
             Configuration build();
         }

@@ -1,35 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="ifttt_connect_to">Connect %1$s</string>
-    <string name="ifttt_connect">Connect</string>
-    <string name="ifttt_email">Email</string>
-    <string name="ifttt_about_title">IFTTT connects %1$s to %2$s</string>
-    <string name="ifttt_more_about_ifttt">Learn more</string>
-    <string name="ifttt_powered_by_ifttt">WORKS WITH IFTTT</string>
-    <string name="ifttt_about_1">Unlock new features when your favorite things work together</string>
-    <string name="ifttt_about_2">Control which services access your data and how they use it</string>
-    <string name="ifttt_about_3">Protect and monitor your data</string>
-    <string name="ifttt_about_4">Unplug any time</string>
-    <string name="ifttt_creating_account">Creating account…</string>
-    <string name="ifttt_continue_to">Going to %1$s…</string>
-    <string name="ifttt_connected">Connected</string>
-    <string name="ifttt_connecting">Connecting…</string>
-    <string name="ifttt_disconnecting">Disconnecting…</string>
-    <string name="ifttt_connection_off">Disconnect</string>
-    <string name="ifttt_sign_in_to_ifttt_or_create_new_account"><![CDATA[You are creating or using your IFTTT account subject to <a href=\"https://ifttt.com/terms\">Terms</a> & <a href=\"https://ifttt.com/privacy\">Privacy Policy</a>.]]></string>
-    <string name="ifttt_enter_valid_email">Please enter a valid email address</string>
-    <string name="terms_and_privacy"><![CDATA[By using this connection you agree to our <a href=\"https://ifttt.com/terms\">Privacy & Terms</a>]]></string>
+    <string name="connect_service">Connect %1$s</string>
+    <string name="connect">Connect</string>
+    <string name="term_email">Email</string>
+    <string name="about_ifttt_connects_x_to_y">IFTTT connects %1$s to %2$s</string>
+    <string name="term_learn_more">Learn more</string>
+    <string name="works_with_ifttt">WORKS WITH IFTTT</string>
+    <string name="about_ifttt_unlock_new_features">Unlock new features when your favorite things work together</string>
+    <string name="about_ifttt_control_which_services_access_data">Control which services access your data and how they use it</string>
+    <string name="about_ifttt_protect_and_monitor_data">Protect and monitor your data</string>
+    <string name="about_ifttt_unplug_any_time">Unplug any time</string>
+    <string name="creating_account">Creating account…</string>
+    <string name="going_to_service">Going to %1$s…</string>
+    <string name="connected">Connected</string>
+    <string name="connecting">Connecting…</string>
     <string name="disconnecting">Disconnecting…</string>
-    <string name="ifttt_authorize_with">Secured with IFTTT Learn more</string>
-    <string name="ifttt_manage_connection">Manage</string>
-    <string name="ifttt_no_activity_to_open">Could not find an app to open this link.</string>
-    <string name="ifttt_loading">Loading…</string>
-    <string name="ifttt_error_fetching_connection"><![CDATA[Make sure your phone has internet connection. <u>Retry</u>]]></string>
-    <string name="ifttt_new_account_with">New IFTTT account for %1$s</string>
+    <string name="term_disconnect">Disconnect</string>
+    <string name="enter_valid_email">Please enter a valid email address</string>
+    <string name="about_ifttt_privacy_and_terms">By using this connection you agree to our Privacy &amp; Terms</string>
+    <string name="term_privacy_and_terms">Privacy &amp; Terms</string>
+    <string name="secured_with_ifttt">Secured with IFTTT Learn more</string>
+    <string name="manage">Manage</string>
+    <string name="loading">Loading…</string>
+    <string name="error_internet_connection">Make sure your phone has internet connection</string>
+    <string name="new_account_for">New IFTTT account for %1$s</string>
+    <string name="retry">Retry</string>
 
     <!-- Content description string -->
 
-    <string name="service_icon_content_description">%1$s service icon</string>
-    <string name="start_button_content_description">Start icon</string>
-    <string name="ifttt_disconnected">Disconnected</string>
+    <string name="content_desc_service_icon">%1$s service icon</string>
+    <string name="content_desc_start_icon">Start icon</string>
+    <string name="disconnected">Disconnected</string>
+
+    <string name="language_tag"></string>
 </resources>

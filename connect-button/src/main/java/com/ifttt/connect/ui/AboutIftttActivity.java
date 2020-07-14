@@ -3,14 +3,12 @@ package com.ifttt.connect.ui;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
-import android.text.method.LinkMovementMethod;
+import android.text.style.UnderlineSpan;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -72,7 +70,7 @@ public final class AboutIftttActivity extends AppCompatActivity {
         });
 
         TextView title = findViewById(R.id.ifttt_about_title);
-        String aboutTitleString = getString(R.string.ifttt_about_title, secondaryService.name, primaryService.name);
+        String aboutTitleString = getString(R.string.about_ifttt_connects_x_to_y, secondaryService.name, primaryService.name);
         CharSequence replacedWithIftttLogo = ButtonUiHelper.replaceKeyWithImage(title, aboutTitleString, "IFTTT",
                 ContextCompat.getDrawable(this, R.drawable.ic_ifttt_logo_white));
         Typeface bold = ResourcesCompat.getFont(this, R.font.avenir_next_ltpro_bold);
@@ -101,9 +99,18 @@ public final class AboutIftttActivity extends AppCompatActivity {
 
         // Set up links to terms of use and privacy policy.
         TextView termsAndPrivacy = findViewById(R.id.term_and_privacy);
-        termsAndPrivacy.setText(Html.fromHtml(getString(R.string.terms_and_privacy)));
-        termsAndPrivacy.setLinkTextColor(Color.WHITE);
-        termsAndPrivacy.setMovementMethod(LinkMovementMethod.getInstance());
+
+        String content = getString(R.string.about_ifttt_privacy_and_terms);
+        String termPrivacyAndTerms = getString(R.string.term_privacy_and_terms);
+
+        int termPrivacyAndTermsIndex = content.indexOf(termPrivacyAndTerms);
+
+        SpannableString spanContent = new SpannableString(content);
+        if (termPrivacyAndTermsIndex != -1) {
+            spanContent.setSpan(new UnderlineSpan(), termPrivacyAndTermsIndex,
+                    termPrivacyAndTermsIndex + termPrivacyAndTerms.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
+        termsAndPrivacy.setText(spanContent);
 
         Intent redirectToTermsIntent = redirectToTerms(this);
         if (redirectToTermsIntent != null) {

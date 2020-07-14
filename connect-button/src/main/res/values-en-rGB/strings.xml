@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<resources>
+    <string name="about_ifttt_protect_and_monitor_data">Protect and monitor your data</string>
+    <string name="disconnecting">Disconnecting...</string>
+    <string name="content_desc_start_icon">Start icon</string>
+    <string name="error_internet_connection">Make sure your phone has internet connection</string>
+    <string name="disconnected">Disconnected</string>
+    <string name="enter_valid_email">Enter valid email</string>
+    <string name="about_ifttt_unplug_any_time">Unplug any time</string>
+    <string name="new_account_for">New IFTTT account for %1$s</string>
+    <string name="term_learn_more">Learn more</string>
+    <string name="retry">Retry</string>
+    <string name="connect">Connect</string>
+    <string name="going_to_service">Going to %1$s...</string>
+    <string name="content_desc_service_icon">%1$s service icon</string>
+    <string name="language_tag">en-GB</string>
+    <string name="works_with_ifttt">WORKS WITH IFTTT</string>
+    <string name="term_disconnect">Disconnect</string>
+    <string name="loading">Loading...</string>
+    <string name="creating_account">Creating account...</string>
+    <string name="manage">Manage</string>
+    <string name="connected">Connected </string>
+    <string name="about_ifttt_privacy_and_terms">By using this connection, you agree to our Privacy &amp; Terms</string>
+    <string name="term_privacy_and_terms">Privacy &amp; Terms</string>
+    <string name="about_ifttt_connects_x_to_y">IFTTT connects %1$s to %2$s</string>
+    <string name="term_email">Email</string>
+    <string name="connecting">Connecting...</string>
+    <string name="connect_service">Connect %1$s</string>
+    <string name="about_ifttt_control_which_services_access_data">Control which services access your data and how they use it</string>
+    <string name="secured_with_ifttt">Secured with IFTTT. Learn More</string>
+    <string name="about_ifttt_unlock_new_features">Unlock new features when your favourite things work together</string>
+</resources>

@@ -13,6 +13,7 @@ import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.OnLifecycleEvent;
 import com.ifttt.connect.BuildConfig;
+import com.ifttt.connect.R;
 import com.ifttt.connect.api.Connection;
 import com.ifttt.connect.api.ConnectionApiClient;
 import com.ifttt.connect.api.ErrorResponse;
@@ -38,6 +39,7 @@ final class ButtonApiHelper {
     private final CredentialsProvider credentialsProvider;
     private final Lifecycle lifecycle;
     private final Uri redirectUri;
+    private final boolean skipConnectionConfiguration;
     @Nullable private final String inviteCode;
 
     @Nullable private String oAuthCode;
@@ -56,12 +58,13 @@ final class ButtonApiHelper {
         Uri redirectUri,
         @Nullable String inviteCode,
         CredentialsProvider provider,
-        Lifecycle lifecycle
+        Lifecycle lifecycle, boolean skipConnectionConfiguration
     ) {
         this.lifecycle = lifecycle;
         this.redirectUri = redirectUri;
         this.inviteCode = inviteCode;
         this.connectionApiClient = client;
+        this.skipConnectionConfiguration = skipConnectionConfiguration;
         credentialsProvider = provider;
     }
 
@@ -167,7 +170,7 @@ final class ButtonApiHelper {
             userLogin,
             anonymousId,
             oAuthCode,
-            inviteCode
+            inviteCode, skipConnectionConfiguration, context.getString(R.string.language_tag)
         );
         CustomTabsIntent intent = new CustomTabsIntent.Builder().build();
         intent.launchUrl(context, uri);
@@ -189,7 +192,7 @@ final class ButtonApiHelper {
             userLogin,
             anonymousId,
             oAuthCode,
-            inviteCode
+            inviteCode, skipConnectionConfiguration, context.getString(R.string.language_tag)
         ));
         launchIntent.setPackage(PACKAGE_NAME_IFTTT);
 
@@ -229,7 +232,8 @@ final class ButtonApiHelper {
         @Nullable String userLogin,
         String anonymousId,
         @Nullable String oAuthCode,
-        @Nullable String inviteCode
+        @Nullable String inviteCode,
+        boolean skipConnectionConfiguration, String localeLanguageTag
     ) {
         Uri.Builder builder = Uri.parse(SHOW_CONNECTION_API_URL + connection.id)
             .buildUpon()
@@ -267,6 +271,13 @@ final class ButtonApiHelper {
             builder.appendQueryParameter("email", email);
         }
 
+        if (skipConnectionConfiguration) {
+            builder.appendQueryParameter("skip_config", "true");
+        }
+
+        if (!localeLanguageTag.isEmpty()) {
+            builder.appendQueryParameter("locale", localeLanguageTag);
+        }
         return builder.build();
     }
 

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<resources>
+    <string name="about_ifttt_protect_and_monitor_data">保護並監控您的資料</string>
+    <string name="disconnecting">正在中斷連線...</string>
+    <string name="content_desc_start_icon">開始圖示</string>
+    <string name="error_internet_connection">請確定您的手機有網際網路連線</string>
+    <string name="disconnected">已中斷連線</string>
+    <string name="enter_valid_email">輸入有效的電子郵件</string>
+    <string name="about_ifttt_unplug_any_time">隨時斷開</string>
+    <string name="new_account_for">%1$s​ 的 IFTTT 新帳戶</string>
+    <string name="term_learn_more">了解更多</string>
+    <string name="retry">重試</string>
+    <string name="connect">連線</string>
+    <string name="going_to_service">正在前往 %1$s...</string>
+    <string name="content_desc_service_icon">%1$s 服務圖示</string>
+    <string name="language_tag">zh-Hant</string>
+    <string name="works_with_ifttt">搭配使用 IFTTT</string>
+    <string name="term_disconnect">中斷連線</string>
+    <string name="loading">正在載入...</string>
+    <string name="creating_account">正在建立帳戶...</string>
+    <string name="manage">管理</string>
+    <string name="connected">已連線</string>
+    <string name="about_ifttt_privacy_and_terms">使用此連線，即表示您同意我們的隱私權與條款</string>
+    <string name="term_privacy_and_terms">隱私權與條款</string>
+    <string name="about_ifttt_connects_x_to_y">IFTTT 會將 %1$s 連線至 %2$s</string>
+    <string name="term_email">電子郵件</string>
+    <string name="connecting">正在連線</string>
+    <string name="connect_service">連線 %1$s</string>
+    <string name="about_ifttt_control_which_services_access_data">控制哪些服務可存取您的資料，以及使用資料的方式</string>
+    <string name="secured_with_ifttt">透過 IFTTT 保護。了解更多</string>
+    <string name="about_ifttt_unlock_new_features">讓您喜愛的事物彼此合作，就能發掘出新功能</string>
+</resources>
