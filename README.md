@@ -283,3 +283,27 @@ You can use `Configuration.Builder#skipConnectionConfiguration()` if you want to
 The `ConnectButton` and the corresponding flow can display translated text.
 No additional setup is required to display translated text, the SDK infers user locale from the `Context` within which the `ConnectButton` is initialized.
 If no translations are found for the inferred locale, the default locale i.e.English will be used.
+Text translation is supported for the following languages:
+* English (Default)
+* English - United Kingdom (en-rGB)
+* Czech (cs)
+* Danish (da)
+* German (de)
+* Spanish (es)
+* Spanish - United States (es-rUS)
+* Finnish (fi)
+* French (fr)
+* French - Canada (fr-rCA)
+* Italian (it)
+* Japanese (ja)
+* Korean (ko)
+* Norwegian-Bokmål (nb)
+* Dutch (nl)
+* Polish (pl)
+* Portuguese - Brazil (pt-rBR)
+* Portuguese - Portugal (pt-rPT)
+* Russian (ru)
+* Swedish (sv)
+* Simplified Chinese (zh-rCN)
+* Traditional Chinese (zh-rTW)
+
