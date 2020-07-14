@@ -29,323 +29,183 @@ public final class LocalizationTest {
         assertThat(context.getString(R.string.connect)).isEqualTo("Connect");
     }
 
-    @Test
-    public void testCzechLocale() {
+    private Context fetchLocalizedContext(String localeTag) {
         Configuration configuration = new Configuration(activity.getBaseContext().getResources().getConfiguration());
-        configuration.setLocale(Locale.forLanguageTag("cs"));
-        Context context = activity.getBaseContext().createConfigurationContext(configuration);
+        configuration.setLocale(Locale.forLanguageTag(localeTag));
+        return activity.getBaseContext().createConfigurationContext(configuration);
+    }
 
+    private boolean checkPrivacyAndTermsString(Context context) {
         String termsAndPrivacyTerm = context.getString(R.string.term_privacy_and_terms);
         String aboutIftttString = context.getString(R.string.about_ifttt_privacy_and_terms);
 
+        return aboutIftttString.contains(termsAndPrivacyTerm);
+    }
+
+    private boolean checkLearnMoreString(Context context) {
         String learnMoreTerm = context.getString(R.string.term_learn_more);
         String securedWithIftttString = context.getString(R.string.secured_with_ifttt);
 
-        assertThat(aboutIftttString.contains(termsAndPrivacyTerm)).isTrue();
-        assertThat(securedWithIftttString.contains(learnMoreTerm)).isTrue();
+        return securedWithIftttString.contains(learnMoreTerm);
+    }
+
+    @Test
+    public void testCzechLocale() {
+        Context context = fetchLocalizedContext("cs");
+
+        assertThat(checkPrivacyAndTermsString(context)).isTrue();
+        assertThat(checkLearnMoreString(context)).isTrue();
     }
 
     @Test
     public void testDanishLocale() {
-        Configuration configuration = new Configuration(activity.getBaseContext().getResources().getConfiguration());
-        configuration.setLocale(Locale.forLanguageTag("da"));
-        Context context = activity.getBaseContext().createConfigurationContext(configuration);
+        Context context = fetchLocalizedContext("da");
 
-        String termsAndPrivacyTerm = context.getString(R.string.term_privacy_and_terms);
-        String aboutIftttString = context.getString(R.string.about_ifttt_privacy_and_terms);
-
-        String learnMoreTerm = context.getString(R.string.term_learn_more);
-        String securedWithIftttString = context.getString(R.string.secured_with_ifttt);
-
-        assertThat(aboutIftttString.contains(termsAndPrivacyTerm)).isTrue();
-        assertThat(securedWithIftttString.contains(learnMoreTerm)).isTrue();
+        assertThat(checkPrivacyAndTermsString(context)).isTrue();
+        assertThat(checkLearnMoreString(context)).isTrue();
     }
 
     @Test
     public void testGermanLocale() {
-        Configuration configuration = new Configuration(activity.getBaseContext().getResources().getConfiguration());
-        configuration.setLocale(Locale.forLanguageTag("de"));
-        Context context = activity.getBaseContext().createConfigurationContext(configuration);
+        Context context = fetchLocalizedContext("de");
 
-        String termsAndPrivacyTerm = context.getString(R.string.term_privacy_and_terms);
-        String aboutIftttString = context.getString(R.string.about_ifttt_privacy_and_terms);
-
-        String learnMoreTerm = context.getString(R.string.term_learn_more);
-        String securedWithIftttString = context.getString(R.string.secured_with_ifttt);
-
-        assertThat(aboutIftttString.contains(termsAndPrivacyTerm)).isTrue();
-        assertThat(securedWithIftttString.contains(learnMoreTerm)).isTrue();
+        assertThat(checkPrivacyAndTermsString(context)).isTrue();
+        assertThat(checkLearnMoreString(context)).isTrue();
     }
 
     @Test
     public void testSpanishLocale() {
-        Configuration configuration = new Configuration(activity.getBaseContext().getResources().getConfiguration());
-        configuration.setLocale(Locale.forLanguageTag("es"));
-        Context context = activity.getBaseContext().createConfigurationContext(configuration);
+        Context context = fetchLocalizedContext("es");
 
-        String termsAndPrivacyTerm = context.getString(R.string.term_privacy_and_terms);
-        String aboutIftttString = context.getString(R.string.about_ifttt_privacy_and_terms);
-
-        String learnMoreTerm = context.getString(R.string.term_learn_more);
-        String securedWithIftttString = context.getString(R.string.secured_with_ifttt);
-
-        assertThat(aboutIftttString.contains(termsAndPrivacyTerm)).isTrue();
-        assertThat(securedWithIftttString.contains(learnMoreTerm)).isTrue();
+        assertThat(checkPrivacyAndTermsString(context)).isTrue();
+        assertThat(checkLearnMoreString(context)).isTrue();
     }
 
     @Test
     public void testSpanishEnglishLocale() {
-        Configuration configuration = new Configuration(activity.getBaseContext().getResources().getConfiguration());
-        configuration.setLocale(Locale.forLanguageTag("es-419"));
-        Context context = activity.getBaseContext().createConfigurationContext(configuration);
+        Context context = fetchLocalizedContext("es-419");
 
-        String termsAndPrivacyTerm = context.getString(R.string.term_privacy_and_terms);
-        String aboutIftttString = context.getString(R.string.about_ifttt_privacy_and_terms);
-
-        String learnMoreTerm = context.getString(R.string.term_learn_more);
-        String securedWithIftttString = context.getString(R.string.secured_with_ifttt);
-
-        assertThat(aboutIftttString.contains(termsAndPrivacyTerm)).isTrue();
-        assertThat(securedWithIftttString.contains(learnMoreTerm)).isTrue();
+        assertThat(checkPrivacyAndTermsString(context)).isTrue();
+        assertThat(checkLearnMoreString(context)).isTrue();
     }
 
     @Test
     public void testFinnishLocale() {
-        Configuration configuration = new Configuration(activity.getBaseContext().getResources().getConfiguration());
-        configuration.setLocale(Locale.forLanguageTag("fi"));
-        Context context = activity.getBaseContext().createConfigurationContext(configuration);
+        Context context = fetchLocalizedContext("fi");
 
-        String termsAndPrivacyTerm = context.getString(R.string.term_privacy_and_terms);
-        String aboutIftttString = context.getString(R.string.about_ifttt_privacy_and_terms);
-
-        String learnMoreTerm = context.getString(R.string.term_learn_more);
-        String securedWithIftttString = context.getString(R.string.secured_with_ifttt);
-
-        assertThat(aboutIftttString.contains(termsAndPrivacyTerm)).isTrue();
-        assertThat(securedWithIftttString.contains(learnMoreTerm)).isTrue();
+        assertThat(checkPrivacyAndTermsString(context)).isTrue();
+        assertThat(checkLearnMoreString(context)).isTrue();
     }
 
     @Test
     public void testFrenchLocale() {
-        Configuration configuration = new Configuration(activity.getBaseContext().getResources().getConfiguration());
-        configuration.setLocale(Locale.forLanguageTag("fr"));
-        Context context = activity.getBaseContext().createConfigurationContext(configuration);
+        Context context = fetchLocalizedContext("fr");
 
-        String termsAndPrivacyTerm = context.getString(R.string.term_privacy_and_terms);
-        String aboutIftttString = context.getString(R.string.about_ifttt_privacy_and_terms);
-
-        String learnMoreTerm = context.getString(R.string.term_learn_more);
-        String securedWithIftttString = context.getString(R.string.secured_with_ifttt);
-
-        assertThat(aboutIftttString.contains(termsAndPrivacyTerm)).isTrue();
-        assertThat(securedWithIftttString.contains(learnMoreTerm)).isTrue();
+        assertThat(checkPrivacyAndTermsString(context)).isTrue();
+        assertThat(checkLearnMoreString(context)).isTrue();
     }
 
     @Test
     public void testFrenchCanadaLocale() {
-        Configuration configuration = new Configuration(activity.getBaseContext().getResources().getConfiguration());
-        configuration.setLocale(Locale.forLanguageTag("fr-CA"));
-        Context context = activity.getBaseContext().createConfigurationContext(configuration);
+        Context context = fetchLocalizedContext("fr-CA");
 
-        String termsAndPrivacyTerm = context.getString(R.string.term_privacy_and_terms);
-        String aboutIftttString = context.getString(R.string.about_ifttt_privacy_and_terms);
-
-        String learnMoreTerm = context.getString(R.string.term_learn_more);
-        String securedWithIftttString = context.getString(R.string.secured_with_ifttt);
-
-        assertThat(aboutIftttString.contains(termsAndPrivacyTerm)).isTrue();
-        assertThat(securedWithIftttString.contains(learnMoreTerm)).isTrue();
+        assertThat(checkPrivacyAndTermsString(context)).isTrue();
+        assertThat(checkLearnMoreString(context)).isTrue();
     }
 
     @Test
     public void testItalianLocale() {
-        Configuration configuration = new Configuration(activity.getBaseContext().getResources().getConfiguration());
-        configuration.setLocale(Locale.forLanguageTag("it"));
-        Context context = activity.getBaseContext().createConfigurationContext(configuration);
+        Context context = fetchLocalizedContext("it");
 
-        String termsAndPrivacyTerm = context.getString(R.string.term_privacy_and_terms);
-        String aboutIftttString = context.getString(R.string.about_ifttt_privacy_and_terms);
-
-        String learnMoreTerm = context.getString(R.string.term_learn_more);
-        String securedWithIftttString = context.getString(R.string.secured_with_ifttt);
-
-        assertThat(aboutIftttString.contains(termsAndPrivacyTerm)).isTrue();
-        assertThat(securedWithIftttString.contains(learnMoreTerm)).isTrue();
+        assertThat(checkPrivacyAndTermsString(context)).isTrue();
+        assertThat(checkLearnMoreString(context)).isTrue();
     }
 
     @Test
     public void testJapaneseLocale() {
-        Configuration configuration = new Configuration(activity.getBaseContext().getResources().getConfiguration());
-        configuration.setLocale(Locale.forLanguageTag("ja"));
-        Context context = activity.getBaseContext().createConfigurationContext(configuration);
+        Context context = fetchLocalizedContext("ja");
 
-        String termsAndPrivacyTerm = context.getString(R.string.term_privacy_and_terms);
-        String aboutIftttString = context.getString(R.string.about_ifttt_privacy_and_terms);
-
-        String learnMoreTerm = context.getString(R.string.term_learn_more);
-        String securedWithIftttString = context.getString(R.string.secured_with_ifttt);
-
-        assertThat(aboutIftttString.contains(termsAndPrivacyTerm)).isTrue();
-        assertThat(securedWithIftttString.contains(learnMoreTerm)).isTrue();
+        assertThat(checkPrivacyAndTermsString(context)).isTrue();
+        assertThat(checkLearnMoreString(context)).isTrue();
     }
 
     @Test
     public void testKoreanLocale() {
-        Configuration configuration = new Configuration(activity.getBaseContext().getResources().getConfiguration());
-        configuration.setLocale(Locale.forLanguageTag("ko"));
-        Context context = activity.getBaseContext().createConfigurationContext(configuration);
+        Context context = fetchLocalizedContext("ko");
 
-        String termsAndPrivacyTerm = context.getString(R.string.term_privacy_and_terms);
-        String aboutIftttString = context.getString(R.string.about_ifttt_privacy_and_terms);
-
-        String learnMoreTerm = context.getString(R.string.term_learn_more);
-        String securedWithIftttString = context.getString(R.string.secured_with_ifttt);
-
-        assertThat(aboutIftttString.contains(termsAndPrivacyTerm)).isTrue();
-        assertThat(securedWithIftttString.contains(learnMoreTerm)).isTrue();
+        assertThat(checkPrivacyAndTermsString(context)).isTrue();
+        assertThat(checkLearnMoreString(context)).isTrue();
     }
 
     @Test
     public void testNorwegianLocale() {
-        Configuration configuration = new Configuration(activity.getBaseContext().getResources().getConfiguration());
-        configuration.setLocale(Locale.forLanguageTag("nb"));
-        Context context = activity.getBaseContext().createConfigurationContext(configuration);
+        Context context = fetchLocalizedContext("nb");
 
-        String termsAndPrivacyTerm = context.getString(R.string.term_privacy_and_terms);
-        String aboutIftttString = context.getString(R.string.about_ifttt_privacy_and_terms);
-
-        String learnMoreTerm = context.getString(R.string.term_learn_more);
-        String securedWithIftttString = context.getString(R.string.secured_with_ifttt);
-
-        assertThat(aboutIftttString.contains(termsAndPrivacyTerm)).isTrue();
-        assertThat(securedWithIftttString.contains(learnMoreTerm)).isTrue();
+        assertThat(checkPrivacyAndTermsString(context)).isTrue();
+        assertThat(checkLearnMoreString(context)).isTrue();
     }
 
     @Test
     public void testDutchLocale() {
-        Configuration configuration = new Configuration(activity.getBaseContext().getResources().getConfiguration());
-        configuration.setLocale(Locale.forLanguageTag("nl"));
-        Context context = activity.getBaseContext().createConfigurationContext(configuration);
+        Context context = fetchLocalizedContext("nl");
 
-        String termsAndPrivacyTerm = context.getString(R.string.term_privacy_and_terms);
-        String aboutIftttString = context.getString(R.string.about_ifttt_privacy_and_terms);
-
-        String learnMoreTerm = context.getString(R.string.term_learn_more);
-        String securedWithIftttString = context.getString(R.string.secured_with_ifttt);
-
-        assertThat(aboutIftttString.contains(termsAndPrivacyTerm)).isTrue();
-        assertThat(securedWithIftttString.contains(learnMoreTerm)).isTrue();
+        assertThat(checkPrivacyAndTermsString(context)).isTrue();
+        assertThat(checkLearnMoreString(context)).isTrue();
     }
 
     @Test
     public void testPolishLocale() {
-        Configuration configuration = new Configuration(activity.getBaseContext().getResources().getConfiguration());
-        configuration.setLocale(Locale.forLanguageTag("pl"));
-        Context context = activity.getBaseContext().createConfigurationContext(configuration);
+        Context context = fetchLocalizedContext("pl");
 
-        String termsAndPrivacyTerm = context.getString(R.string.term_privacy_and_terms);
-        String aboutIftttString = context.getString(R.string.about_ifttt_privacy_and_terms);
-
-        String learnMoreTerm = context.getString(R.string.term_learn_more);
-        String securedWithIftttString = context.getString(R.string.secured_with_ifttt);
-
-        assertThat(aboutIftttString.contains(termsAndPrivacyTerm)).isTrue();
-        assertThat(securedWithIftttString.contains(learnMoreTerm)).isTrue();
+        assertThat(checkPrivacyAndTermsString(context)).isTrue();
+        assertThat(checkLearnMoreString(context)).isTrue();
     }
 
     @Test
     public void testPortugueseBrazilLocale() {
-        Configuration configuration = new Configuration(activity.getBaseContext().getResources().getConfiguration());
-        configuration.setLocale(Locale.forLanguageTag("pt-BR"));
-        Context context = activity.getBaseContext().createConfigurationContext(configuration);
+        Context context = fetchLocalizedContext("pt-BR");
 
-        String termsAndPrivacyTerm = context.getString(R.string.term_privacy_and_terms);
-        String aboutIftttString = context.getString(R.string.about_ifttt_privacy_and_terms);
-
-        String learnMoreTerm = context.getString(R.string.term_learn_more);
-        String securedWithIftttString = context.getString(R.string.secured_with_ifttt);
-
-        assertThat(aboutIftttString.contains(termsAndPrivacyTerm)).isTrue();
-        assertThat(securedWithIftttString.contains(learnMoreTerm)).isTrue();
+        assertThat(checkPrivacyAndTermsString(context)).isTrue();
+        assertThat(checkLearnMoreString(context)).isTrue();
     }
 
     @Test
     public void testPortuguesePortugalLocale() {
-        Configuration configuration = new Configuration(activity.getBaseContext().getResources().getConfiguration());
-        configuration.setLocale(Locale.forLanguageTag("pt-PT"));
-        Context context = activity.getBaseContext().createConfigurationContext(configuration);
+        Context context = fetchLocalizedContext("pt-PT");
 
-        String termsAndPrivacyTerm = context.getString(R.string.term_privacy_and_terms);
-        String aboutIftttString = context.getString(R.string.about_ifttt_privacy_and_terms);
-
-        String learnMoreTerm = context.getString(R.string.term_learn_more);
-        String securedWithIftttString = context.getString(R.string.secured_with_ifttt);
-
-        assertThat(aboutIftttString.contains(termsAndPrivacyTerm)).isTrue();
-        assertThat(securedWithIftttString.contains(learnMoreTerm)).isTrue();
+        assertThat(checkPrivacyAndTermsString(context)).isTrue();
+        assertThat(checkLearnMoreString(context)).isTrue();
     }
 
     @Test
     public void testRussianLocale() {
-        Configuration configuration = new Configuration(activity.getBaseContext().getResources().getConfiguration());
-        configuration.setLocale(Locale.forLanguageTag("ru"));
-        Context context = activity.getBaseContext().createConfigurationContext(configuration);
+        Context context = fetchLocalizedContext("ru");
 
-        String termsAndPrivacyTerm = context.getString(R.string.term_privacy_and_terms);
-        String aboutIftttString = context.getString(R.string.about_ifttt_privacy_and_terms);
-
-        String learnMoreTerm = context.getString(R.string.term_learn_more);
-        String securedWithIftttString = context.getString(R.string.secured_with_ifttt);
-
-        assertThat(aboutIftttString.contains(termsAndPrivacyTerm)).isTrue();
-        assertThat(securedWithIftttString.contains(learnMoreTerm)).isTrue();
+        assertThat(checkPrivacyAndTermsString(context)).isTrue();
+        assertThat(checkLearnMoreString(context)).isTrue();
     }
 
     @Test
     public void testSwedishLocale() {
-        Configuration configuration = new Configuration(activity.getBaseContext().getResources().getConfiguration());
-        configuration.setLocale(Locale.forLanguageTag("sv"));
-        Context context = activity.getBaseContext().createConfigurationContext(configuration);
+        Context context = fetchLocalizedContext("sv");
 
-        String termsAndPrivacyTerm = context.getString(R.string.term_privacy_and_terms);
-        String aboutIftttString = context.getString(R.string.about_ifttt_privacy_and_terms);
-
-        String learnMoreTerm = context.getString(R.string.term_learn_more);
-        String securedWithIftttString = context.getString(R.string.secured_with_ifttt);
-
-        assertThat(aboutIftttString.contains(termsAndPrivacyTerm)).isTrue();
-        assertThat(securedWithIftttString.contains(learnMoreTerm)).isTrue();
+        assertThat(checkPrivacyAndTermsString(context)).isTrue();
+        assertThat(checkLearnMoreString(context)).isTrue();
     }
 
     @Test
     public void testSimplifiedChineseLocale() {
-        Configuration configuration = new Configuration(activity.getBaseContext().getResources().getConfiguration());
-        configuration.setLocale(Locale.forLanguageTag("zh-CN"));
-        Context context = activity.getBaseContext().createConfigurationContext(configuration);
+        Context context = fetchLocalizedContext("zh-CN");
 
-        String termsAndPrivacyTerm = context.getString(R.string.term_privacy_and_terms);
-        String aboutIftttString = context.getString(R.string.about_ifttt_privacy_and_terms);
-
-        String learnMoreTerm = context.getString(R.string.term_learn_more);
-        String securedWithIftttString = context.getString(R.string.secured_with_ifttt);
-
-        assertThat(aboutIftttString.contains(termsAndPrivacyTerm)).isTrue();
-        assertThat(securedWithIftttString.contains(learnMoreTerm)).isTrue();
+        assertThat(checkPrivacyAndTermsString(context)).isTrue();
+        assertThat(checkLearnMoreString(context)).isTrue();
     }
 
     @Test
     public void testTraditionalChineseLocale() {
-        Configuration configuration = new Configuration(activity.getBaseContext().getResources().getConfiguration());
-        configuration.setLocale(Locale.forLanguageTag("zh-TW"));
-        Context context = activity.getBaseContext().createConfigurationContext(configuration);
+        Context context = fetchLocalizedContext("zh-TW");
 
-        String termsAndPrivacyTerm = context.getString(R.string.term_privacy_and_terms);
-        String aboutIftttString = context.getString(R.string.about_ifttt_privacy_and_terms);
-
-        String learnMoreTerm = context.getString(R.string.term_learn_more);
-        String securedWithIftttString = context.getString(R.string.secured_with_ifttt);
-
-        assertThat(aboutIftttString.contains(termsAndPrivacyTerm)).isTrue();
-        assertThat(securedWithIftttString.contains(learnMoreTerm)).isTrue();
+        assertThat(checkPrivacyAndTermsString(context)).isTrue();
+        assertThat(checkLearnMoreString(context)).isTrue();
     }
 }

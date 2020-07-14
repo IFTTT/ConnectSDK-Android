@@ -20,7 +20,7 @@
     <string name="creating_account">Oppretter konto ...</string>
     <string name="manage">Administrer</string>
     <string name="connected">Tilkoblet</string>
-    <string name="about_ifttt_privacy_and_terms">Ved å bruke denne koblingen, godtar du våre retningslinjer for personvern og vilkår</string>
+    <string name="about_ifttt_privacy_and_terms">Ved å bruke denne koblingen, godtar du våre retningslinjer for Personvern og vilkår</string>
     <string name="term_privacy_and_terms">Personvern og vilkår</string>
     <string name="about_ifttt_connects_x_to_y">IFTTT kobler %1$s til %2$s</string>
     <string name="term_email">E-post</string>

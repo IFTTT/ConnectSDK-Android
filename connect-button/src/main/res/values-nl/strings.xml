@@ -20,7 +20,7 @@
     <string name="creating_account">Account maken...</string>
     <string name="manage">Beheren</string>
     <string name="connected">Verbonden</string>
-    <string name="about_ifttt_privacy_and_terms">Door deze verbinding te gebruiken, gaat u akkoord met onze privacy en voorwaarden</string>
+    <string name="about_ifttt_privacy_and_terms">Door deze verbinding te gebruiken, gaat u akkoord met onze Privacy en voorwaarden</string>
     <string name="term_privacy_and_terms">Privacy en voorwaarden</string>
     <string name="about_ifttt_connects_x_to_y">IFTTT verbindt %1$s met %2$s</string>
     <string name="term_email">E-mail</string>
