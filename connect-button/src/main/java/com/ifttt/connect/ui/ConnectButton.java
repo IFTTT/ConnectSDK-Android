@@ -90,7 +90,7 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
 
     /**
      * Method to disable analytics tracking for the SDK. Analytics tracking is enabled by default,
-     * Call this method before setting up the ConnectButton using{@link ConnectButton#setup(Configuration) if you want
+     * Call this method before setting up the ConnectButton using{@link ConnectButton#setup(Configuration)} if you want
      * to disable event tracking.
      *
      * You only need to call this method once while setting up the first ConnectButton

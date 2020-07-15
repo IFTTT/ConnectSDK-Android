@@ -24,13 +24,13 @@ import okio.Buffer;
 import okio.BufferedSink;
 import okio.Okio;
 
-/*
+/**
  * This is the main class implementing analytics for the ConnectButton SDK. It is responsible for :
  * 1. Providing different analytics tracking methods
  * 2. A Queue for storing the events, including synchronous add, read and remove operations.
  * 3. Setting up the WorkManager with a one time work request to schedule event uploads to server.
  * Events are scheduled to be uploaded for every 5 events or when submitFlush is explicitly called by the ConnectButton class
- * */
+ */
 final class AnalyticsManager {
 
     private static AnalyticsManager INSTANCE = null;
