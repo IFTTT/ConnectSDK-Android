@@ -24,15 +24,9 @@ android {
     testOptions.unitTests.includeAndroidResources = true
 }
 
-repositories {
-    flatDir {
-        dirs 'src/main/libs'
-    }
-}
-
 dependencies {
     api project(':connect-api')
-    compile(name:'connect-api-release', ext:'aar')
+    implementation(name:'connect-api-release', ext:'aar')
 
     implementation 'androidx.browser:browser:1.2.0'
     implementation "androidx.work:work-runtime:$workManagerVersion"
