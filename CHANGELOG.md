@@ -21,6 +21,4 @@
   * `UserFeatureStep`: representing a trigger/action/query in the user-enabled feature
   * `UserFeatureField`: representing a user configured field in the enabled feature
   * `LocationFieldValue`, `CollectionFieldValue`, `StringArrayFieldValue`, `StringFieldValue`: representing different types of the configured field value
-* Feature addition:
-  * Configuration skipping - Details in README
-  * Localization - Details in README
+* API addition: Added an "unknown" state as the default value for a ConnectButton.
