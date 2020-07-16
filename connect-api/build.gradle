@@ -6,8 +6,8 @@ android {
 
     defaultConfig {
         minSdkVersion rootProject.minSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode 6
+        versionName "$libVersion"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -43,3 +43,4 @@ dependencies {
     testImplementation 'com.squareup.okhttp3:mockwebserver:4.4.0'
     testImplementation "com.squareup.retrofit2:retrofit-mock:$retrofitVersion"
 }
+apply from: 'publish.gradle'
