@@ -27,7 +27,7 @@ android {
 }
 
 dependencies {
-    implementation "com.ifttt:connect-button:2.2.0"
+    implementation project(':connect-button')
     implementation project(':connect-location')
     implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
     implementation "com.squareup.retrofit2:converter-moshi:$retrofitVersion"
