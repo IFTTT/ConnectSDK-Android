@@ -25,8 +25,7 @@ android {
 }
 
 dependencies {
-    api project(':connect-api')
-    implementation(name:'connect-api-release', ext:'aar')
+    implementation project(':connect-api')
 
     implementation 'androidx.browser:browser:1.2.0'
     implementation "androidx.work:work-runtime:$workManagerVersion"

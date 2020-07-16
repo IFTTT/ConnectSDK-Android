@@ -22,7 +22,7 @@ allprojects {
         google()
         jcenter()
         flatDir {
-            dirs 'libs', 'src/main/libs'
+            dirs 'src/main/libs'
         }
     }
 }
