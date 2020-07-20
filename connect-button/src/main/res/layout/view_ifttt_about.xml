@@ -67,7 +67,6 @@
                 android:fontFamily="@font/avenir_next_ltpro_demi"
                 android:gravity="center"
                 android:lineSpacingExtra="@dimen/ifttt_about_text_line_space"
-                android:text="@string/about_ifttt_connects_x_to_y"
                 android:textSize="@dimen/ifttt_about_title_size"
                 android:textAppearance="@style/AboutIfttt.Title"
                 android:background="?selectableItemBackground"/>
@@ -81,7 +80,6 @@
                 android:drawableStart="@drawable/ic_ifttt_about_1"
                 android:fontFamily="@font/avenir_next_ltpro_demi"
                 android:lineSpacingExtra="@dimen/ifttt_about_text_line_space"
-                android:text="@string/about_ifttt_unlock_new_features"
                 android:textAppearance="@style/AboutIfttt.Description"/>
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -93,7 +91,6 @@
                 android:drawableStart="@drawable/ic_ifttt_about_2"
                 android:fontFamily="@font/avenir_next_ltpro_demi"
                 android:lineSpacingExtra="@dimen/ifttt_about_text_line_space"
-                android:text="@string/about_ifttt_control_which_services_access_data"
                 android:textAppearance="@style/AboutIfttt.Description"/>
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -105,7 +102,6 @@
                 android:drawableStart="@drawable/ic_ifttt_about_3"
                 android:fontFamily="@font/avenir_next_ltpro_demi"
                 android:lineSpacingExtra="@dimen/ifttt_about_text_line_space"
-                android:text="@string/about_ifttt_protect_and_monitor_data"
                 android:textAppearance="@style/AboutIfttt.Description"/>
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -117,7 +113,6 @@
                 android:drawableStart="@drawable/ic_ifttt_about_4"
                 android:fontFamily="@font/avenir_next_ltpro_demi"
                 android:lineSpacingExtra="@dimen/ifttt_about_text_line_space"
-                android:text="@string/about_ifttt_unplug_any_time"
                 android:textAppearance="@style/AboutIfttt.Description"/>
 
             <TextView
@@ -132,7 +127,6 @@
                 android:paddingStart="@dimen/ifttt_space_large"
                 android:paddingTop="@dimen/ifttt_about_button_padding_vertical"
                 android:gravity="center"
-                android:text="@string/manage"
                 android:textColor="@android:color/white"
                 android:textSize="@dimen/ifttt_about_button_text_size"/>
 
