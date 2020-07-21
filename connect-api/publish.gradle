@@ -10,7 +10,7 @@ ext {
     artifact = 'connect-api'
 
     libraryDescription =
-            'Connect Api is a library that helps facilitate network calls and data for the Connect Button SDK. It is not meant to be used as a stand-alone library'
+            'Connect Button SDK is a library that helps facilitate the integration of the Connect Button and Connection API.'
 
     siteUrl = 'https://github.com/IFTTT/ConnectSDK-Android'
     gitUrl = 'https://github.com/IFTTT/ConnectSDK-Android.git'
