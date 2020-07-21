@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         minSdkVersion rootProject.minSdkVersion
-        versionCode 6
+        versionCode 7
         versionName "$libVersion"
     }
 

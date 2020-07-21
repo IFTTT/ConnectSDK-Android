@@ -34,7 +34,7 @@ This SDK uses the following libraries as dependencies:
 ## Installation
 ### Gradle
 ```groovy
-implementation "com.ifttt:connect-button:2.2.0"
+implementation "com.ifttt:connect-button:2.2.1"
 ```
 
 ## Usage
