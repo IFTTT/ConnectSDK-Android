@@ -3,7 +3,9 @@ package com.ifttt.connect.ui;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -20,6 +22,7 @@ import androidx.core.content.res.ResourcesCompat;
 import com.ifttt.connect.R;
 import com.ifttt.connect.api.Connection;
 import com.ifttt.connect.api.Service;
+import java.util.Locale;
 
 import static com.ifttt.connect.ui.ButtonApiHelper.redirectToConnection;
 import static com.ifttt.connect.ui.ButtonApiHelper.redirectToService;
@@ -32,6 +35,16 @@ import static com.ifttt.connect.ui.ButtonUiHelper.findWorksWithService;
 public final class AboutIftttActivity extends AppCompatActivity {
 
     private AnalyticsManager analyticsManager;
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        // Use the application's locale for the activity.
+        Locale applicationLocale = getLocaleFromContext(newBase.getApplicationContext());
+        Configuration newConfiguration = new Configuration((newBase.getResources().getConfiguration()));
+        newConfiguration.setLocale(applicationLocale);
+        super.attachBaseContext(newBase.createConfigurationContext(newConfiguration));
+    }
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -158,5 +171,16 @@ public final class AboutIftttActivity extends AppCompatActivity {
 
     public static Intent intent(Context context, Connection connection) {
         return new Intent(context, AboutIftttActivity.class).putExtra(EXTRA_CONNECTION, connection);
+    }
+
+    private static Locale getLocaleFromContext(Context context) {
+        Locale locale;
+        if (Build.VERSION.SDK_INT>= Build.VERSION_CODES.N) {
+            locale = context.getResources().getConfiguration().getLocales().get(0);
+        } else {
+            locale = context.getResources().getConfiguration().locale;
+        }
+
+        return locale;
     }
 }
