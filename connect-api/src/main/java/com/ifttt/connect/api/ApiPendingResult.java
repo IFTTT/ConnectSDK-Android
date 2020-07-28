@@ -1,5 +1,6 @@
 package com.ifttt.connect.api;
 
+import android.util.Log;
 import com.squareup.moshi.JsonAdapter;
 import java.io.IOException;
 import retrofit2.Call;
@@ -39,6 +40,7 @@ final class ApiPendingResult<T> implements PendingResult<T> {
                             return;
                         }
 
+                        Log.w(ApiPendingResult.class.getSimpleName(), errorResponse.toString());
                         callback.onFailure(errorResponse);
                     } catch (IOException e) {
                         callback.onFailure(UNEXPECTED_ERROR_RESPONSE);
@@ -49,6 +51,7 @@ final class ApiPendingResult<T> implements PendingResult<T> {
 
                 T result = response.body();
                 if (result == null) {
+                    Log.w(ApiPendingResult.class.getSimpleName(), UNEXPECTED_ERROR_RESPONSE.toString());
                     callback.onFailure(UNEXPECTED_ERROR_RESPONSE);
                     return;
                 }
@@ -58,6 +61,7 @@ final class ApiPendingResult<T> implements PendingResult<T> {
 
             @Override
             public void onFailure(Call<T> call, Throwable t) {
+                Log.w(ApiPendingResult.class.getSimpleName(), UNEXPECTED_ERROR_RESPONSE.toString());
                 callback.onFailure(UNEXPECTED_ERROR_RESPONSE);
             }
         });
