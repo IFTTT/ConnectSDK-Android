@@ -209,7 +209,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
         this.buttonState = savedState.buttonState;
         if (savedState.connection != null) {
-            setConnection(savedState.connection);
+            setConnection(savedState.connection, false);
         }
     }
 
@@ -391,7 +391,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
      *
      * @param connection Connection instance to be displayed.
      */
-    void setConnection(Connection connection) {
+    void setConnection(Connection connection, boolean withAnimation) {
         if (buttonApiHelper == null) {
             throw new IllegalStateException("Connect Button is not set up, please call setup() first.");
         }
@@ -418,7 +418,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         buttonRoot.setBackground(buildButtonBackground(getContext(), BLACK));
 
         // Set button position.
-        setIconPosition(connection.status, buttonState);
+        setIconPosition(connection.status, withAnimation);
 
         if (connection.status == enabled) {
             dispatchState(Enabled);
@@ -499,11 +499,11 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                 AnalyticsLocation.fromConnectButtonWithId(connection.id));
     }
 
-    private void setIconPosition(Connection.Status status, ConnectButtonState buttonState) {
+    private void setIconPosition(Connection.Status status, boolean withAnimation) {
         Runnable updatePosition = () -> {
             int startPosition = status == enabled ? 0 : iconEnabledPosition();
             int endPosition = status == enabled ? iconEnabledPosition() : 0;
-            if (endPosition == iconImg.getLeft() || buttonState == Unknown) {
+            if (endPosition == iconImg.getLeft() || !withAnimation) {
                 buttonRoot.trackViewLeftAndRightOffset(iconImg, endPosition);
             } else {
                 buildSlideIconAnimator(startPosition, endPosition, false).start();
@@ -589,7 +589,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                             @Override
                             public void onSuccess(Connection result) {
                                 processAndRun(progress, () -> {
-                                    setConnection(result);
+                                    setConnection(result, false);
 
                                     progressView.setProgressText(null);
                                     complete(progressView);
@@ -714,7 +714,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                 PendingResult.ResultCallback<Connection> callback = new PendingResult.ResultCallback<Connection>() {
                     @Override
                     public void onSuccess(Connection result) {
-                        setConnection(result);
+                        setConnection(result, false);
                     }
 
                     @Override
@@ -1067,7 +1067,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                                     progressView.postDelayed(() -> {
                                         cleanUpViews(ProgressView.class);
                                         dispatchState(Disabled);
-                                        setConnection(result);
+                                        setConnection(result, false);
                                     }, ANIM_DURATION_LONG);
                                 });
                             }
@@ -1157,7 +1157,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
             animator.start();
             animator.end();
         } else if (connection != null) {
-            setConnection(connection);
+            setConnection(connection, true);
 
             cleanUpViews(ProgressView.class);
             cleanUpViews(CheckMarkView.class);
@@ -1191,7 +1191,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                         animator.start();
                         animator.end();
                     } else if (connection != null) {
-                        setConnection(connection);
+                        setConnection(connection, true);
                     }
 
                     activity.getApplication().unregisterActivityLifecycleCallbacks(this);
