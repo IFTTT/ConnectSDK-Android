@@ -417,6 +417,9 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         connectStateTxt.setAlpha(1f);
         buttonRoot.setBackground(buildButtonBackground(getContext(), BLACK));
 
+        // Set button position.
+        setIconPosition(connection.status, buttonState);
+
         if (connection.status == enabled) {
             dispatchState(Enabled);
             connectStateTxt.setCurrentText(getResources().getString(R.string.connected));
@@ -483,9 +486,6 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
             iconImg.setOnClickListener(onClickListener);
         }
 
-        // Set button position.
-        setIconPosition(connection.status);
-
         StartIconDrawable.setPressListener(iconImg);
 
         helperTxt.setOnClickListener(v -> {
@@ -499,11 +499,11 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                 AnalyticsLocation.fromConnectButtonWithId(connection.id));
     }
 
-    private void setIconPosition(Connection.Status status) {
+    private void setIconPosition(Connection.Status status, ConnectButtonState buttonState) {
         Runnable updatePosition = () -> {
             int startPosition = status == enabled ? 0 : iconEnabledPosition();
             int endPosition = status == enabled ? iconEnabledPosition() : 0;
-            if (endPosition == iconImg.getLeft()) {
+            if (endPosition == iconImg.getLeft() || buttonState == Unknown) {
                 buttonRoot.trackViewLeftAndRightOffset(iconImg, endPosition);
             } else {
                 buildSlideIconAnimator(startPosition, endPosition, false).start();
