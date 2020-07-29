@@ -77,7 +77,7 @@ public final class BaseConnectButtonTest {
     @Test(expected = IllegalStateException.class)
     public void testWithoutSetup() throws Exception {
         Connection connection = loadConnection(getClass().getClassLoader());
-        button.setConnection(connection);
+        button.setConnection(connection, false);
         fail();
     }
 
@@ -86,7 +86,7 @@ public final class BaseConnectButtonTest {
         Connection connection = loadConnection(getClass().getClassLoader());
 
         button.setup("a@b.com", client, Uri.parse("https://google.com"), credentialsProvider, null, false);
-        button.setConnection(connection);
+        button.setConnection(connection, false);
 
         TextSwitcher connectText = button.findViewById(R.id.connect_with_ifttt);
         assertThat(connectText.getCurrentView()).isInstanceOf(TextView.class);
@@ -142,7 +142,7 @@ public final class BaseConnectButtonTest {
         });
 
         Connection connection = loadConnection(getClass().getClassLoader());
-        button.setConnection(connection);
+        button.setConnection(connection, false);
         assertThat(currentStateRef.get()).isEqualTo(ConnectButtonState.Initial);
 
         button.setConnectResult(new ConnectResult(ConnectResult.NextStep.Error, null, "error"));
@@ -169,7 +169,7 @@ public final class BaseConnectButtonTest {
         );
 
         Connection connection = loadConnection(getClass().getClassLoader());
-        button.setConnection(connection);
+        button.setConnection(connection, false);
         button.addButtonStateChangeListener(new ButtonStateChangeListener() {
             @Override
             public void onStateChanged(

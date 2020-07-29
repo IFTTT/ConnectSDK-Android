@@ -64,6 +64,7 @@ import static androidx.lifecycle.Lifecycle.State.STARTED;
 import static com.ifttt.connect.api.Connection.Status.disabled;
 import static com.ifttt.connect.api.Connection.Status.enabled;
 import static com.ifttt.connect.api.Connection.Status.never_enabled;
+import static com.ifttt.connect.api.Connection.Status.unknown;
 import static com.ifttt.connect.ui.ButtonUiHelper.adjustTextViewLayout;
 import static com.ifttt.connect.ui.ButtonUiHelper.buildButtonBackground;
 import static com.ifttt.connect.ui.ButtonUiHelper.findWorksWithService;
@@ -1289,7 +1290,9 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                     // Connection is already in enabled status.
                     settleView(releasedChild, left, null);
                 } else {
-                    if (buttonApiHelper.shouldPresentEmail(getContext()) && connection.status == never_enabled) {
+                    if (buttonApiHelper.shouldPresentEmail(getContext()) &&
+                        (connection.status == never_enabled || connection.status == unknown)
+                    ) {
                         // Special case for the animation as we don't use the typical icon sliding animation, but
                         // instead a completely different, transitioning to email TextView animation.
                         settledAt = left;
