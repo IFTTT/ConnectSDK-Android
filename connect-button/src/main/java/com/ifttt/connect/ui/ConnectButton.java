@@ -33,7 +33,6 @@ import com.ifttt.connect.api.PendingResult;
 import com.ifttt.connect.api.UserTokenProvider;
 
 import static android.animation.ValueAnimator.INFINITE;
-import static androidx.core.text.HtmlCompat.FROM_HTML_MODE_COMPACT;
 
 /**
  * The main UI component for the Connect Button SDK. This class handles both displaying {@link Connection} status for a
@@ -150,7 +149,7 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
                 configuration.listener.onFetchConnectionSuccessful(configuration.connection);
             }
 
-            connectButton.setConnection(configuration.connection);
+            connectButton.setConnection(configuration.connection, false);
             loadingView.setVisibility(GONE);
             ((Animator) loadingView.getTag()).cancel();
             return;
@@ -168,7 +167,7 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
                     configuration.listener.onFetchConnectionSuccessful(result);
                 }
 
-                connectButton.setConnection(result);
+                connectButton.setConnection(result, false);
                 loadingView.setVisibility(GONE);
                 ((Animator) loadingView.getTag()).cancel();
             }
