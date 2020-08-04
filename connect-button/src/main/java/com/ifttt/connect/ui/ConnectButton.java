@@ -41,7 +41,6 @@ import static android.animation.ValueAnimator.INFINITE;
 public class ConnectButton extends FrameLayout implements LifecycleOwner {
 
     private static final long ANIM_DURATION = 1000L;
-    private static ConnectionApiClient API_CLIENT;
 
     private ConnectResultCredentialProvider connectResultCredentialProvider;
 
@@ -118,18 +117,14 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
 
         ConnectionApiClient clientToUse;
         if (configuration.connectionApiClient == null) {
-            connectResultCredentialProvider = new ConnectResultCredentialProvider(configuration.credentialsProvider);
-            if (API_CLIENT == null) {
-                ConnectionApiClient.Builder clientBuilder = new ConnectionApiClient.Builder(getContext(),
-                    connectResultCredentialProvider
-                );
-                if (configuration.inviteCode != null) {
-                    clientBuilder.setInviteCode(configuration.inviteCode);
-                }
-                API_CLIENT = clientBuilder.build();
+            ConnectionApiClient.Builder clientBuilder = new ConnectionApiClient.Builder(getContext(),
+                connectResultCredentialProvider
+            );
+            if (configuration.inviteCode != null) {
+                clientBuilder.setInviteCode(configuration.inviteCode);
             }
 
-            clientToUse = API_CLIENT;
+            clientToUse = clientBuilder.build();
         } else {
             clientToUse = configuration.connectionApiClient;
         }
