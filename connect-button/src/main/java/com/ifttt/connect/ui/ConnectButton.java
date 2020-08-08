@@ -42,7 +42,7 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
 
     private static final long ANIM_DURATION = 1000L;
 
-    private ConnectResultCredentialProvider connectResultCredentialProvider;
+    @Nullable private ConnectResultCredentialProvider connectResultCredentialProvider;
 
     private final BaseConnectButton connectButton;
     private final TextView loadingView;
@@ -117,6 +117,7 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
 
         ConnectionApiClient clientToUse;
         if (configuration.connectionApiClient == null) {
+            connectResultCredentialProvider = new ConnectResultCredentialProvider(configuration.credentialsProvider);
             ConnectionApiClient.Builder clientBuilder = new ConnectionApiClient.Builder(getContext(),
                 connectResultCredentialProvider
             );
@@ -231,7 +232,7 @@ public class ConnectButton extends FrameLayout implements LifecycleOwner {
      * @param result Authentication flow redirect result from the web view.
      */
     public void setConnectResult(@Nullable ConnectResult result) {
-        if (result != null && result.userToken != null) {
+        if (result != null && result.userToken != null && connectResultCredentialProvider != null) {
             connectResultCredentialProvider.userToken = result.userToken;
         }
 
