@@ -775,74 +775,65 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         int primaryProgressColor = ContextCompat.getColor(getContext(), R.color.ifttt_progress_background_color);
         ProgressView progressView = ProgressView.addTo(buttonRoot, primaryProgressColor, BLACK);
 
-        CancelAnimatorListenerAdapter onAuthPreparedAnimatorListener = new CancelAnimatorListenerAdapter(
-            animatorLifecycleObserver) {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                if (isCanceled()) {
-                    return;
-                }
+        Runnable onAuthPrepared = () -> {
+            ((StartIconDrawable) iconImg.getBackground()).reset();
+            ((StartIconDrawable) iconImg.getBackground()).setBackgroundColor(worksWithService.brandColor);
 
-                ((StartIconDrawable) iconImg.getBackground()).reset();
-                ((StartIconDrawable) iconImg.getBackground()).setBackgroundColor(worksWithService.brandColor);
-
-                if (buttonApiHelper.shouldPresentCreateAccount(getContext())) {
-                    AnimatorSet set = new AnimatorSet();
-                    Animator completeProgress = progressView.progress(0.5f,
-                        1f,
-                        getResources().getString(R.string.creating_account),
-                        ANIM_DURATION_LONG
-                    );
-                    completeProgress.setInterpolator(LINEAR_INTERPOLATOR);
-                    completeProgress.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
-                        @Override
-                        public void onAnimationStart(Animator animation) {
-                            super.onAnimationStart(animation);
-                            if (isCanceled()) {
-                                return;
-                            }
-
-                            dispatchState(CreateAccount);
-                            CharSequence emailPrompt
-                                = new SpannableString(replaceKeyWithImage((TextView) helperTxt.getCurrentView(),
-                                getContext().getString(R.string.new_account_for, emailEdt.getText()),
-                                "IFTTT",
-                                iftttLogo
-                            ));
-                            helperTxt.setText(emailPrompt);
+            if (buttonApiHelper.shouldPresentCreateAccount(getContext())) {
+                AnimatorSet set = new AnimatorSet();
+                Animator completeProgress = progressView.progress(0.5f,
+                    1f,
+                    getResources().getString(R.string.creating_account),
+                    ANIM_DURATION_LONG
+                );
+                completeProgress.setInterpolator(LINEAR_INTERPOLATOR);
+                completeProgress.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+                        super.onAnimationStart(animation);
+                        if (isCanceled()) {
+                            return;
                         }
-                    });
 
-                    set.playSequentially(completeProgress, buildStartServiceAuthAnimator(worksWithService));
-                    set.start();
-                } else {
-                    Animator completeProgress = progressView.progress(0.5f,
-                        1f,
-                        getResources().getString(R.string.connecting),
-                        ANIM_DURATION_MEDIUM
-                    );
-                    completeProgress.setInterpolator(LINEAR_INTERPOLATOR);
-                    completeProgress.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
-                            super.onAnimationEnd(animation);
-                            if (isCanceled()) {
-                                return;
-                            }
+                        dispatchState(CreateAccount);
+                        CharSequence emailPrompt
+                            = new SpannableString(replaceKeyWithImage((TextView) helperTxt.getCurrentView(),
+                            getContext().getString(R.string.new_account_for, emailEdt.getText()),
+                            "IFTTT",
+                            iftttLogo
+                        ));
+                        helperTxt.setText(emailPrompt);
+                    }
+                });
 
-                            dispatchState(Login);
-                            buttonApiHelper.connect(getContext(),
-                                connection,
-                                emailEdt.getText().toString(),
-                                buttonState
-                            );
-                            monitorRedirect();
+                set.playSequentially(completeProgress, buildStartServiceAuthAnimator(worksWithService));
+                set.start();
+            } else {
+                Animator completeProgress = progressView.progress(0.5f,
+                    1f,
+                    getResources().getString(R.string.connecting),
+                    ANIM_DURATION_MEDIUM
+                );
+                completeProgress.setInterpolator(LINEAR_INTERPOLATOR);
+                completeProgress.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        super.onAnimationEnd(animation);
+                        if (isCanceled()) {
+                            return;
                         }
-                    });
 
-                    completeProgress.start();
-                }
+                        dispatchState(Login);
+                        buttonApiHelper.connect(getContext(),
+                            connection,
+                            emailEdt.getText().toString(),
+                            buttonState
+                        );
+                        monitorRedirect();
+                    }
+                });
+
+                completeProgress.start();
             }
         };
 
@@ -860,13 +851,8 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
                 // Remove icon elevation when the progress bar is visible.
                 ViewCompat.setElevation(iconImg, 0f);
-
                 buttonApiHelper.prepareAuthentication(emailEdt.getText().toString(), () -> {
-                    if (!animation.isRunning()) {
-                        onAuthPreparedAnimatorListener.onAnimationEnd(animation);
-                    } else {
-                        animation.addListener(onAuthPreparedAnimatorListener);
-                    }
+                    processAndRun(animation, onAuthPrepared);
                 });
 
                 // When the animation starts, disable the click on buttonRoot, so that the flow will not be started
