@@ -204,7 +204,7 @@ final class ButtonApiHelper {
     }
 
     @MainThread
-    void prepareAuthentication(String email) {
+    void prepareAuthentication(String email, Runnable onPrepared) {
         RedirectPrepAsyncTask task = new RedirectPrepAsyncTask(credentialsProvider,
             connectionApiClient.isUserAuthorized() ? connectionApiClient.api().user() : null,
             email,
@@ -212,6 +212,8 @@ final class ButtonApiHelper {
                 this.oAuthCode = prepResult.oauthToken;
                 this.accountFound = prepResult.accountFound;
                 this.userLogin = prepResult.userLogin;
+
+                onPrepared.run();
             }
         );
         lifecycle.addObserver(new OAuthTokenExchangeTaskObserver(task));

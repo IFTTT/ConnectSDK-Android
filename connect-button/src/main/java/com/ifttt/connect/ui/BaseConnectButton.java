@@ -159,8 +159,9 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         buttonRoot = findViewById(R.id.ifttt_button_root);
 
         emailEdt = findViewById(R.id.ifttt_email);
-        emailEdt.setBackground(
-                buildButtonBackground(context, ContextCompat.getColor(getContext(), R.color.ifttt_button_background)));
+        emailEdt.setBackground(buildButtonBackground(context,
+            ContextCompat.getColor(getContext(), R.color.ifttt_button_background)
+        ));
 
         connectStateTxt = findViewById(R.id.connect_with_ifttt);
         iconImg = findViewById(R.id.ifttt_icon);
@@ -170,10 +171,15 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         helperTxt = findViewById(R.id.ifttt_helper_text);
         iftttLogo = ContextCompat.getDrawable(getContext(), R.drawable.ic_ifttt_logo_black);
         worksWithIfttt = new SpannableString(replaceKeyWithImage((TextView) helperTxt.getCurrentView(),
-                getResources().getString(R.string.works_with_ifttt), "IFTTT", iftttLogo));
+            getResources().getString(R.string.works_with_ifttt),
+            "IFTTT",
+            iftttLogo
+        ));
 
         // Tint the logo Drawable within the text to black.
-        DrawableCompat.setTint(DrawableCompat.wrap(iftttLogo), ContextCompat.getColor(context, R.color.ifttt_footer_text_black));
+        DrawableCompat.setTint(DrawableCompat.wrap(iftttLogo),
+            ContextCompat.getColor(context, R.color.ifttt_footer_text_black)
+        );
 
         helperTxt.setCurrentText(worksWithIfttt);
 
@@ -185,15 +191,13 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         lifecycleRegistry.setCurrentState(STARTED);
-        AnalyticsManager.getInstance(getContext())
-                .flushTrackedEvents();
+        AnalyticsManager.getInstance(getContext()).flushTrackedEvents();
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        AnalyticsManager.getInstance(getContext())
-                .flushTrackedEvents();
+        AnalyticsManager.getInstance(getContext()).flushTrackedEvents();
         lifecycleRegistry.setCurrentState(DESTROYED);
         revertableHandler.clear();
     }
@@ -225,8 +229,11 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         super.onLayout(changed, l, t, r, b);
 
         // Prepare the border Drawable to have the right size and positioning.
-        borderDrawable.setBounds(buttonRoot.getLeft() - borderSize, buttonRoot.getTop() - borderSize,
-                buttonRoot.getRight() + borderSize, buttonRoot.getBottom() + borderSize);
+        borderDrawable.setBounds(buttonRoot.getLeft() - borderSize,
+            buttonRoot.getTop() - borderSize,
+            buttonRoot.getRight() + borderSize,
+            buttonRoot.getBottom() + borderSize
+        );
     }
 
     @Override
@@ -272,9 +279,13 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         @Nullable String inviteCode,
         boolean skipConnectionConfiguration
     ) {
-        buttonApiHelper =
-                new ButtonApiHelper(connectionApiClient, redirectUri, inviteCode, credentialsProvider, getLifecycle(),
-                    skipConnectionConfiguration);
+        buttonApiHelper = new ButtonApiHelper(connectionApiClient,
+            redirectUri,
+            inviteCode,
+            credentialsProvider,
+            getLifecycle(),
+            skipConnectionConfiguration
+        );
         emailEdt.setText(email);
 
         this.skipConnectionConfiguration = skipConnectionConfiguration;
@@ -282,6 +293,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
     /**
      * If the button is used in a dark background, set this flag to true so that the button can adapt the UI.
+     *
      * @param onDarkBackground True if the button is used in a dark background, false otherwise.
      */
     void setOnDarkBackground(boolean onDarkBackground) {
@@ -355,8 +367,10 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         switch (result.nextStep) {
             case Complete:
                 CharSequence text = getResources().getString(R.string.connecting);
-                ProgressView progressView = ProgressView.addTo(buttonRoot, worksWithService.brandColor,
-                        getDarkerColor(worksWithService.brandColor));
+                ProgressView progressView = ProgressView.addTo(buttonRoot,
+                    worksWithService.brandColor,
+                    getDarkerColor(worksWithService.brandColor)
+                );
                 Animator progress = progressView.progress(0f, 1f, text, ANIM_DURATION_LONG);
                 progress.addListener(new AnimatorListenerAdapter() {
                     @Override
@@ -435,7 +449,9 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                 set.playSequentially(moveToggle, buildDisconnectAnimator());
                 set.start();
                 AnalyticsManager.getInstance(getContext())
-                        .trackUiClick(AnalyticsObject.ConnectionAnalyticsObject.fromConnection(connection), AnalyticsLocation.fromConnectButton(getContext()));
+                    .trackUiClick(AnalyticsObject.ConnectionAnalyticsObject.fromConnection(connection),
+                        AnalyticsLocation.fromConnectButton(getContext())
+                    );
             };
 
             buttonRoot.setOnClickListener(onClickListener);
@@ -445,19 +461,22 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         } else {
             if (connection.status == Connection.Status.disabled) {
                 dispatchState(Disabled);
-                connectStateTxt.setCurrentText(
-                        getResources().getString(R.string.connect_service, worksWithService.shortName));
+                connectStateTxt.setCurrentText(getResources().getString(R.string.connect_service,
+                    worksWithService.shortName
+                ));
                 adjustTextViewLayout(connectStateTxt, buttonState);
                 iconDragHelperCallback.setTrackEndColor(BLACK);
             } else {
                 dispatchState(Initial);
-                connectStateTxt.setCurrentText(
-                        getResources().getString(R.string.connect_service, worksWithService.shortName));
+                connectStateTxt.setCurrentText(getResources().getString(R.string.connect_service,
+                    worksWithService.shortName
+                ));
                 adjustTextViewLayout(connectStateTxt, buttonState);
 
                 // Depending on whether we need to show the email field, use different track colors.
-                int trackEndColor = !buttonApiHelper.shouldPresentEmail(getContext()) ? BLACK
-                        : ContextCompat.getColor(getContext(), R.color.ifttt_button_background);
+                int trackEndColor = !buttonApiHelper.shouldPresentEmail(getContext()) ? BLACK : ContextCompat.getColor(getContext(),
+                    R.color.ifttt_button_background
+                );
 
                 iconDragHelperCallback.setTrackEndColor(trackEndColor);
             }
@@ -479,7 +498,9 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                 startEnableFlow(0f, 0, iconEnabledPosition());
 
                 AnalyticsManager.getInstance(getContext())
-                        .trackUiClick(AnalyticsObject.ConnectionAnalyticsObject.fromConnection(connection), AnalyticsLocation.fromConnectButton(getContext()));
+                    .trackUiClick(AnalyticsObject.ConnectionAnalyticsObject.fromConnection(connection),
+                        AnalyticsLocation.fromConnectButton(getContext())
+                    );
             };
 
             // Clicking both the button or the icon ImageView starts the flow.
@@ -491,13 +512,15 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
         helperTxt.setOnClickListener(v -> {
             getContext().startActivity(AboutIftttActivity.intent(getContext(), connection));
-            AnalyticsManager.getInstance(getContext())
-                    .trackUiClick(AnalyticsObject.WORKS_WITH_IFTTT, AnalyticsLocation.WORKS_WITH_IFTTT);
+            AnalyticsManager.getInstance(getContext()).trackUiClick(AnalyticsObject.WORKS_WITH_IFTTT,
+                AnalyticsLocation.WORKS_WITH_IFTTT
+            );
         });
 
         AnalyticsManager.getInstance(getContext())
-                .trackUiImpression(AnalyticsObject.ConnectionAnalyticsObject.fromConnection(connection),
-                AnalyticsLocation.fromConnectButtonWithId(connection.id));
+            .trackUiImpression(AnalyticsObject.ConnectionAnalyticsObject.fromConnection(connection),
+                AnalyticsLocation.fromConnectButtonWithId(connection.id)
+            );
     }
 
     private void setIconPosition(Connection.Status status, boolean withAnimation) {
@@ -516,8 +539,17 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         } else {
             buttonRoot.addOnLayoutChangeListener(new OnLayoutChangeListener() {
                 @Override
-                public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft,
-                    int oldTop, int oldRight, int oldBottom) {
+                public void onLayoutChange(
+                    View v,
+                    int left,
+                    int top,
+                    int right,
+                    int bottom,
+                    int oldLeft,
+                    int oldTop,
+                    int oldRight,
+                    int oldBottom
+                ) {
                     buttonRoot.removeOnLayoutChangeListener(this);
                     updatePosition.run();
                 }
@@ -535,13 +567,17 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         } else {
             int iconBackgroundMargin = getResources().getDimensionPixelSize(R.dimen.ifttt_icon_margin);
             BitmapDrawable serviceIcon = new BitmapDrawable(getResources(), bitmap);
-            StartIconDrawable drawable = new StartIconDrawable(getContext(), serviceIcon, iconSize,
-                    iconImg.getHeight() - iconBackgroundMargin * 2);
+            StartIconDrawable drawable = new StartIconDrawable(getContext(),
+                serviceIcon,
+                iconSize,
+                iconImg.getHeight() - iconBackgroundMargin * 2
+            );
 
             iconImg.setBackground(drawable);
             drawable.setBackgroundColor(worksWithService.brandColor);
-            iconImg.setContentDescription(
-                    getContext().getString(R.string.content_desc_service_icon, worksWithService.name));
+            iconImg.setContentDescription(getContext().getString(R.string.content_desc_service_icon,
+                worksWithService.name
+            ));
         }
 
         // Set elevation.
@@ -566,14 +602,13 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
             }
         } else {
             // For disabled state, try using the re-enable API to enable the connection.
-            int primaryProgressColor =
-                ContextCompat.getColor(getContext(), R.color.ifttt_progress_background_color);
+            int primaryProgressColor = ContextCompat.getColor(getContext(), R.color.ifttt_progress_background_color);
             ProgressView progressView = ProgressView.addTo(buttonRoot, BLACK, primaryProgressColor);
-            Animator progress = progressView.progress(
-                0f,
+            Animator progress = progressView.progress(0f,
                 1f,
                 getResources().getString(R.string.connecting),
-                ANIM_DURATION_LONG);
+                ANIM_DURATION_LONG
+            );
             progress.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
                 @Override
                 public void onAnimationStart(Animator animation) {
@@ -585,7 +620,8 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                     // Remove icon elevation when the progress bar is visible.
                     ViewCompat.setElevation(iconImg, 0f);
 
-                    buttonApiHelper.reenableConnection(getLifecycle(), connection.id,
+                    buttonApiHelper.reenableConnection(getLifecycle(),
+                        connection.id,
                         new PendingResult.ResultCallback<Connection>() {
                             @Override
                             public void onSuccess(Connection result) {
@@ -616,7 +652,8 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                                     }
                                 });
                             }
-                        });
+                        }
+                    );
                 }
             });
 
@@ -638,15 +675,16 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
         int iconMargin = getResources().getDimensionPixelSize(R.dimen.ifttt_icon_margin);
         int fullDistance = iconEnabledPosition();
-        ValueAnimator iconMovement =
-                ValueAnimator.ofInt(fullDistance / 2 + iconMargin, fullDistance).setDuration(ANIM_DURATION_MEDIUM);
+        ValueAnimator iconMovement = ValueAnimator.ofInt(fullDistance / 2 + iconMargin, fullDistance).setDuration(
+            ANIM_DURATION_MEDIUM);
         iconMovement.setInterpolator(EASE_INTERPOLATOR);
         iconMovement.addUpdateListener(new SlideIconAnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 super.onAnimationUpdate(animation);
                 ViewCompat.offsetLeftAndRight(checkMarkView,
-                        ((Integer) animation.getAnimatedValue()) - checkMarkView.getLeft());
+                    ((Integer) animation.getAnimatedValue()) - checkMarkView.getLeft()
+                );
             }
         });
 
@@ -658,16 +696,17 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
         int elevation = getResources().getDimensionPixelSize(R.dimen.ifttt_icon_elevation);
         ValueAnimator changeElevation = ValueAnimator.ofFloat(ViewCompat.getElevation(iconImg), elevation);
-        changeElevation.addUpdateListener(
-                animation -> ViewCompat.setElevation(iconImg, (Float) animation.getAnimatedValue()));
+        changeElevation.addUpdateListener(animation -> ViewCompat.setElevation(iconImg,
+            (Float) animation.getAnimatedValue()
+        ));
         changeElevation.setInterpolator(EASE_INTERPOLATOR);
         changeElevation.setDuration(ANIM_DURATION_MEDIUM);
 
         AnimatorSet animatorSet = new AnimatorSet();
 
         animatorSet.playSequentially(check, iconMovement);
-        Animator fadeOutProgress =
-                ObjectAnimator.ofFloat(currentProgress, "alpha", 1f, 0f).setDuration(ANIM_DURATION_MEDIUM);
+        Animator fadeOutProgress = ObjectAnimator.ofFloat(currentProgress, "alpha", 1f, 0f).setDuration(
+            ANIM_DURATION_MEDIUM);
         fadeOutProgress.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
             @Override
             public void onAnimationStart(Animator animation) {
@@ -736,6 +775,68 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         int primaryProgressColor = ContextCompat.getColor(getContext(), R.color.ifttt_progress_background_color);
         ProgressView progressView = ProgressView.addTo(buttonRoot, primaryProgressColor, BLACK);
 
+        Runnable onAuthPrepared = () -> {
+            ((StartIconDrawable) iconImg.getBackground()).reset();
+            ((StartIconDrawable) iconImg.getBackground()).setBackgroundColor(worksWithService.brandColor);
+
+            if (buttonApiHelper.shouldPresentCreateAccount(getContext())) {
+                AnimatorSet set = new AnimatorSet();
+                Animator completeProgress = progressView.progress(0.5f,
+                    1f,
+                    getResources().getString(R.string.creating_account),
+                    ANIM_DURATION_LONG
+                );
+                completeProgress.setInterpolator(LINEAR_INTERPOLATOR);
+                completeProgress.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+                        super.onAnimationStart(animation);
+                        if (isCanceled()) {
+                            return;
+                        }
+
+                        dispatchState(CreateAccount);
+                        CharSequence emailPrompt
+                            = new SpannableString(replaceKeyWithImage((TextView) helperTxt.getCurrentView(),
+                            getContext().getString(R.string.new_account_for, emailEdt.getText()),
+                            "IFTTT",
+                            iftttLogo
+                        ));
+                        helperTxt.setText(emailPrompt);
+                    }
+                });
+
+                set.playSequentially(completeProgress, buildStartServiceAuthAnimator(worksWithService));
+                set.start();
+            } else {
+                Animator completeProgress = progressView.progress(0.5f,
+                    1f,
+                    getResources().getString(R.string.connecting),
+                    ANIM_DURATION_MEDIUM
+                );
+                completeProgress.setInterpolator(LINEAR_INTERPOLATOR);
+                completeProgress.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        super.onAnimationEnd(animation);
+                        if (isCanceled()) {
+                            return;
+                        }
+
+                        dispatchState(Login);
+                        buttonApiHelper.connect(getContext(),
+                            connection,
+                            emailEdt.getText().toString(),
+                            buttonState
+                        );
+                        monitorRedirect();
+                    }
+                });
+
+                completeProgress.start();
+            }
+        };
+
         CharSequence text = getResources().getString(R.string.connecting);
         Animator showProgress = progressView.progress(0f, 0.5f, text, ANIM_DURATION_LONG);
         showProgress.setInterpolator(LINEAR_INTERPOLATOR);
@@ -750,8 +851,9 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
                 // Remove icon elevation when the progress bar is visible.
                 ViewCompat.setElevation(iconImg, 0f);
-
-                buttonApiHelper.prepareAuthentication(emailEdt.getText().toString());
+                buttonApiHelper.prepareAuthentication(emailEdt.getText().toString(), () -> {
+                    processAndRun(animation, onAuthPrepared);
+                });
 
                 // When the animation starts, disable the click on buttonRoot, so that the flow will not be started
                 // again.
@@ -765,65 +867,6 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                 emailEdt.setVisibility(VISIBLE);
                 cleanUpViews(ProgressView.class);
             }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                if (isCanceled()) {
-                    return;
-                }
-
-                ((StartIconDrawable) iconImg.getBackground()).reset();
-                ((StartIconDrawable) iconImg.getBackground()).setBackgroundColor(worksWithService.brandColor);
-
-                if (buttonApiHelper.shouldPresentCreateAccount(getContext())) {
-                    AnimatorSet set = new AnimatorSet();
-                    Animator completeProgress =
-                            progressView.progress(0.5f, 1f, getResources().getString(R.string.creating_account),
-                                    ANIM_DURATION_LONG);
-                    completeProgress.setInterpolator(LINEAR_INTERPOLATOR);
-                    completeProgress.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
-                        @Override
-                        public void onAnimationStart(Animator animation) {
-                            super.onAnimationStart(animation);
-                            if (isCanceled()) {
-                                return;
-                            }
-
-                            dispatchState(CreateAccount);
-                            CharSequence emailPrompt = new SpannableString(
-                                    replaceKeyWithImage((TextView) helperTxt.getCurrentView(),
-                                            getContext().getString(R.string.new_account_for, emailEdt.getText()),
-                                            "IFTTT", iftttLogo));
-                            helperTxt.setText(emailPrompt);
-                        }
-                    });
-
-                    set.playSequentially(completeProgress, buildStartServiceAuthAnimator(worksWithService));
-                    set.start();
-                } else {
-                    Animator completeProgress =
-                            progressView.progress(0.5f, 1f, getResources().getString(R.string.connecting),
-                                    ANIM_DURATION_MEDIUM);
-                    completeProgress.setInterpolator(LINEAR_INTERPOLATOR);
-                    completeProgress.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
-                            super.onAnimationEnd(animation);
-                            if (isCanceled()) {
-                                return;
-                            }
-
-                            dispatchState(Login);
-                            buttonApiHelper.connect(getContext(), connection, emailEdt.getText().toString(),
-                                    buttonState);
-                            monitorRedirect();
-                        }
-                    });
-
-                    completeProgress.start();
-                }
-            }
         });
 
         return showProgress;
@@ -835,8 +878,11 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
     @CheckReturnValue
     private Animator buildEmailTransitionAnimator(float xvel) {
         // Fade out "Connect X" text.
-        ObjectAnimator fadeOutConnect =
-                ObjectAnimator.ofFloat(connectStateTxt, "alpha", connectStateTxt.getAlpha(), 0f);
+        ObjectAnimator fadeOutConnect = ObjectAnimator.ofFloat(connectStateTxt,
+            "alpha",
+            connectStateTxt.getAlpha(),
+            0f
+        );
         fadeOutConnect.setDuration(ANIM_DURATION_MEDIUM);
 
         // Move service icon.
@@ -844,8 +890,9 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         int endPosition = iconEnabledPosition();
 
         // Adjust duration based on the dragging velocity.
-        long duration = xvel > 0 ? (long) ((endPosition - startPosition) / xvel * 1000L)
-                : (long) (ANIM_DURATION_MEDIUM * (1f - startPosition / (float) endPosition));
+        long duration = xvel > 0
+            ? (long) ((endPosition - startPosition) / xvel * 1000L)
+            : (long) (ANIM_DURATION_MEDIUM * (1f - startPosition / (float) endPosition));
         ValueAnimator slideIcon = ValueAnimator.ofInt(startPosition, endPosition);
         slideIcon.addUpdateListener(new SlideIconAnimatorUpdateListener());
         slideIcon.setDuration(duration);
@@ -879,8 +926,9 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         });
 
         ValueAnimator elevationChange = ValueAnimator.ofFloat(ViewCompat.getElevation(iconImg), 0f);
-        elevationChange.addUpdateListener(
-                animation -> ViewCompat.setElevation(iconImg, (Float) animation.getAnimatedValue()));
+        elevationChange.addUpdateListener(animation -> ViewCompat.setElevation(iconImg,
+            (Float) animation.getAnimatedValue()
+        ));
 
         AnimatorSet set = new AnimatorSet();
         set.playTogether(fadeOutConnect, fadeInEmailEdit, slideIcon, elevationChange, fadeOutButtonRootBackground);
@@ -898,9 +946,9 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         set.setInterpolator(EASE_INTERPOLATOR);
 
         OnClickListener startAuthOnClickListener = v -> {
-            AnalyticsManager.getInstance(getContext())
-                    .trackUiClick(AnalyticsObject.fromConnectionEmail(connection.id),
-                    AnalyticsLocation.fromConnectButtonWithId(connection.id));
+            AnalyticsManager.getInstance(getContext()).trackUiClick(AnalyticsObject.fromConnectionEmail(connection.id),
+                AnalyticsLocation.fromConnectButtonWithId(connection.id)
+            );
 
             revertableHandler.revertAll();
             if (ButtonUiHelper.isEmailInvalid(emailEdt.getText())) {
@@ -913,11 +961,15 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
                     @Override
                     public void run() {
-                        SpannableString errorMessage =
-                                new SpannableString(getResources().getString(R.string.enter_valid_email));
-                        errorMessage.setSpan(
-                                new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.ifttt_error_red)),
-                                0, errorMessage.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        SpannableString errorMessage
+                            = new SpannableString(getResources().getString(R.string.enter_valid_email));
+                        errorMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getContext(),
+                            R.color.ifttt_error_red
+                            )),
+                            0,
+                            errorMessage.length(),
+                            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                        );
                         helperTxt.setText(errorMessage);
                         helperTxt.getCurrentView().setAlpha(1f);
                         helperTxt.setClickable(false);
@@ -930,8 +982,8 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
             v.setOnClickListener(null);
             // Dismiss keyboard if needed.
-            InputMethodManager inputMethodManager =
-                    (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+            InputMethodManager inputMethodManager
+                = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
             inputMethodManager.hideSoftInputFromWindow(emailEdt.getWindowToken(), 0);
 
             buildEmailValidationAnimator().start();
@@ -945,15 +997,21 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
             public void onAnimationStart(Animator animation) {
                 super.onAnimationStart(animation);
 
-                SpannableString authorizePrompt = new SpannableString(
-                        replaceKeyWithImage((TextView) helperTxt.getCurrentView(),
-                                getContext().getString(R.string.secured_with_ifttt), "IFTTT", iftttLogo));
+                SpannableString authorizePrompt
+                    = new SpannableString(replaceKeyWithImage((TextView) helperTxt.getCurrentView(),
+                    getContext().getString(R.string.secured_with_ifttt),
+                    "IFTTT",
+                    iftttLogo
+                ));
 
                 String termLearnMore = getContext().getString(R.string.term_learn_more);
                 int learnMoreIndex = getContext().getString(R.string.secured_with_ifttt).indexOf(termLearnMore);
                 if (learnMoreIndex != -1) {
-                    authorizePrompt.setSpan(new UnderlineSpan(), learnMoreIndex, learnMoreIndex + termLearnMore.length(),
-                            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    authorizePrompt.setSpan(new UnderlineSpan(),
+                        learnMoreIndex,
+                        learnMoreIndex + termLearnMore.length(),
+                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                    );
                 }
                 helperTxt.setText(authorizePrompt);
             }
@@ -973,8 +1031,8 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                     return false;
                 });
 
-                AnalyticsManager.getInstance(getContext()).trackUiImpression(
-                    AnalyticsObject.fromConnectionEmail(connection.id),
+                AnalyticsManager.getInstance(getContext()).trackUiImpression(AnalyticsObject.fromConnectionEmail(
+                    connection.id),
                     AnalyticsLocation.fromConnectButtonWithId(connection.id)
                 );
                 helperTxt.setClickable(true);
@@ -989,8 +1047,10 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
      */
     @CheckReturnValue
     private Animator buildStartServiceAuthAnimator(Service service) {
-        ProgressView progressView =
-                ProgressView.addTo(buttonRoot, service.brandColor, ButtonUiHelper.getDarkerColor(service.brandColor));
+        ProgressView progressView = ProgressView.addTo(buttonRoot,
+            service.brandColor,
+            ButtonUiHelper.getDarkerColor(service.brandColor)
+        );
         Runnable clickRunnable = progressView::performClick;
         progressView.setOnClickListener(v -> {
             // Cancel auto advance.
@@ -1000,9 +1060,11 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
             monitorRedirect();
         });
 
-        Animator animator =
-                progressView.progress(0f, 1f, getResources().getString(R.string.going_to_service, service.name),
-                        AUTO_ADVANCE_DELAY);
+        Animator animator = progressView.progress(0f,
+            1f,
+            getResources().getString(R.string.going_to_service, service.name),
+            AUTO_ADVANCE_DELAY
+        );
         animator.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
             @Override
             public void onAnimationStart(Animator animation) {
@@ -1048,8 +1110,11 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
     private Animator buildDisconnectAnimator() {
         int primaryProgressColor = ContextCompat.getColor(getContext(), R.color.ifttt_progress_background_color);
         ProgressView progressView = ProgressView.addTo(buttonRoot, BLACK, primaryProgressColor);
-        Animator showProgress = progressView.progress(0f, 1f, getResources().getString(R.string.disconnecting),
-                ANIM_DURATION_LONG);
+        Animator showProgress = progressView.progress(0f,
+            1f,
+            getResources().getString(R.string.disconnecting),
+            ANIM_DURATION_LONG
+        );
         showProgress.setInterpolator(LINEAR_INTERPOLATOR);
         showProgress.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
             @Override
@@ -1059,32 +1124,34 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                 // Remove icon elevation when the progress bar is visible.
                 ViewCompat.setElevation(iconImg, 0f);
 
-                buttonApiHelper.disableConnection(getLifecycle(), connection.id,
-                        new PendingResult.ResultCallback<Connection>() {
-                            @Override
-                            public void onSuccess(Connection result) {
-                                processAndRun(animation, () -> {
-                                    progressView.setProgressText(getResources().getString(R.string.disconnected));
-                                    progressView.postDelayed(() -> {
-                                        cleanUpViews(ProgressView.class);
-                                        dispatchState(Disabled);
-                                        setConnection(result, false);
-                                    }, ANIM_DURATION_LONG);
-                                });
-                            }
-
-                            @Override
-                            public void onFailure(ErrorResponse errorResponse) {
-                                processAndRun(animation, () -> {
-                                    connectStateTxt.setAlpha(1f);
+                buttonApiHelper.disableConnection(getLifecycle(),
+                    connection.id,
+                    new PendingResult.ResultCallback<Connection>() {
+                        @Override
+                        public void onSuccess(Connection result) {
+                            processAndRun(animation, () -> {
+                                progressView.setProgressText(getResources().getString(R.string.disconnected));
+                                progressView.postDelayed(() -> {
                                     cleanUpViews(ProgressView.class);
-                                    dispatchError(errorResponse);
+                                    dispatchState(Disabled);
+                                    setConnection(result, false);
+                                }, ANIM_DURATION_LONG);
+                            });
+                        }
 
-                                    // Reset knob position.
-                                    buildSlideIconAnimator(iconImg.getLeft(), iconEnabledPosition(), false).start();
-                                });
-                            }
-                        });
+                        @Override
+                        public void onFailure(ErrorResponse errorResponse) {
+                            processAndRun(animation, () -> {
+                                connectStateTxt.setAlpha(1f);
+                                cleanUpViews(ProgressView.class);
+                                dispatchError(errorResponse);
+
+                                // Reset knob position.
+                                buildSlideIconAnimator(iconImg.getLeft(), iconEnabledPosition(), false).start();
+                            });
+                        }
+                    }
+                );
             }
         });
 
@@ -1255,7 +1322,8 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
             float progress = Math.abs((left - settledAt) / (float) (iconEnabledPosition()));
 
             DrawableCompat.setTint(DrawableCompat.wrap(buttonRoot.getBackground()),
-                    (Integer) EVALUATOR.evaluate(progress, Color.BLACK, trackEndColor));
+                (Integer) EVALUATOR.evaluate(progress, Color.BLACK, trackEndColor)
+            );
 
             float textFadingProgress = Math.max(Math.min(1f, progress * 1.5f), 0f);
             setProgressStateTextAlpha(textFadingProgress);
@@ -1290,9 +1358,8 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                     // Connection is already in enabled status.
                     settleView(releasedChild, left, null);
                 } else {
-                    if (buttonApiHelper.shouldPresentEmail(getContext()) &&
-                        (connection.status == never_enabled || connection.status == unknown)
-                    ) {
+                    if (buttonApiHelper.shouldPresentEmail(getContext()) && (connection.status == never_enabled
+                        || connection.status == unknown)) {
                         // Special case for the animation as we don't use the typical icon sliding animation, but
                         // instead a completely different, transitioning to email TextView animation.
                         settledAt = left;
