@@ -25,7 +25,8 @@ android {
 }
 
 dependencies {
-    api "com.ifttt:connect-api:$libVersion"
+    debugApi project(':connect-api')
+    releaseApi "com.ifttt:connect-api:$libVersion"
 
     implementation 'androidx.browser:browser:1.2.0'
     implementation "androidx.work:work-runtime:$workManagerVersion"
