@@ -1053,8 +1053,8 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         showProgress.setInterpolator(LINEAR_INTERPOLATOR);
         showProgress.addListener(new CancelAnimatorListenerAdapter(animatorLifecycleObserver) {
             @Override
-            public void onAnimationStart(Animator animation, boolean isReverse) {
-                super.onAnimationStart(animation, isReverse);
+            public void onAnimationStart(Animator animation) {
+                super.onAnimationStart(animation);
 
                 // Remove icon elevation when the progress bar is visible.
                 ViewCompat.setElevation(iconImg, 0f);
