@@ -15,16 +15,17 @@ import androidx.work.WorkManager;
 import com.ifttt.connect.api.Connection;
 import com.ifttt.connect.api.ConnectionApiClient;
 import com.ifttt.connect.api.ErrorResponse;
-import com.ifttt.connect.api.Feature;
+import com.ifttt.connect.api.LocationFieldValue;
 import com.ifttt.connect.api.PendingResult;
 import com.ifttt.connect.api.UserFeature;
 import com.ifttt.connect.api.UserFeatureField;
-import com.ifttt.connect.api.UserFeatureStep;
 import com.ifttt.connect.api.UserTokenProvider;
 import com.ifttt.connect.ui.ButtonStateChangeListener;
 import com.ifttt.connect.ui.ConnectButton;
 import com.ifttt.connect.ui.ConnectButtonState;
 import java.lang.ref.WeakReference;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static androidx.core.content.ContextCompat.checkSelfPermission;
@@ -225,26 +226,8 @@ public final class ConnectLocation {
             return false;
         }
 
-        for (Feature feature : connection.features) {
-            if (feature.userFeatures == null) {
-                continue;
-            }
-
-            for (UserFeature userFeature : feature.userFeatures) {
-                if (!userFeature.enabled) {
-                    continue;
-                }
-
-                for (UserFeatureStep step : userFeature.userFeatureSteps) {
-                    for (UserFeatureField field : step.fields) {
-                        if (GeofenceProvider.LOCATION_FIELD_TYPES_LIST.contains(field.fieldType)) {
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-
-        return false;
+        Map<String, List<UserFeatureField<LocationFieldValue>>> result
+            = LocationEventUploadHelper.extractLocationUserFeatures(connection.features);
+        return !result.isEmpty();
     }
 }

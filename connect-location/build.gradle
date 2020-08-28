@@ -27,7 +27,8 @@ android {
 }
 
 dependencies {
-    implementation project(':connect-button')
+    debugImplementation project(':connect-button')
+    releaseImplementation "com.ifttt:connect-button:$libVersion"
     
     implementation "com.google.android.gms:play-services-awareness:$awarenessVersion"
     implementation "androidx.work:work-runtime:$workManagerVersion"

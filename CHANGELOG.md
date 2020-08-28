@@ -1,6 +1,10 @@
 # Change Log
 
 ## ConnectButton
+### v2.3.0
+#### Location SDK
+In v2.3.0 we added the Connect Location SDK, which is an add-on functionality to the ConnectButton SDK, to provide native [Location](https://ifttt.com/location) trigger functionality to the apps.
+
 ### v2.2.0
 #### Breaking API changes
 * Namespace changes: the following classes have been moved to `com.ifttt.connect.api`:
