@@ -158,7 +158,7 @@ public final class ConnectLocation {
      * cached data.
      */
     @Nullable
-    public PendingResult<Connection> checkLocationPermission(
+    public PendingResult<Connection> activate(
         Activity activity, @Nullable LocationPermissionCallback permissionCallback
     ) {
         Connection cachedConnection;

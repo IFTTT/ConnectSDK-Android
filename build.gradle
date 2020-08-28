@@ -41,6 +41,6 @@ ext {
     compileSdkVersion = 29
     minSdkVersion = 18
     buildToolsVersion = '29.0.2'
-    awarenessVersion = '18.0.0'
+    awarenessVersion = '18.0.1'
     picassoVersion = '2.71828'
 }
