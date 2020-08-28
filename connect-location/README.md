@@ -50,5 +50,6 @@ To help "activating" the geo-fences for a given user, call `ConnectLocation.getI
   * If the app has the permission, it will update the registered geo-fences if necessary
   * If the app doesn't have the permission, it will call the `LocationPermissionCallback#onRequestLocationPermission` to inform your app to prompt the permission request
 
+Once your app received the location permission grant, you can call `ConnectLocation.getInstance().activate`, without passing the LocationPermissionCallback instance, to activate the geo-fences.
 
 
