@@ -52,4 +52,7 @@ To help "activating" the geo-fences for a given user, call `ConnectLocation.getI
 
 Once your app received the location permission grant, you can call `ConnectLocation.getInstance().activate`, without passing the LocationPermissionCallback instance, to activate the geo-fences.
 
+### Deactivate geo-fences
+When your user logs out, you should reflect this state via returning null in the `UserTokenProvider` passed to the ConnectLocation instance, doing so allows it to unregister the geo-fences accordingly. However, if you would like to make sure the geo-fences are correctly removed as soon as the users log out from your app, you can call `ConnectLocation.getInstance().deactivate()` directly.
+
 
