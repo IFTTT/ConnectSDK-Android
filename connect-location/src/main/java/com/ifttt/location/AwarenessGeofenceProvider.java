@@ -83,6 +83,14 @@ final class AwarenessGeofenceProvider implements GeofenceProvider {
         });
     }
 
+    @Override
+    public void removeGeofences() {
+        fenceClient.updateFences(new FenceUpdateRequest.Builder()
+            .removeFence(exitPendingIntent)
+            .removeFence(enterPendingIntent)
+            .build());
+    }
+
     interface DiffCallback {
         void onAddFence(String key, AwarenessFence value, PendingIntent pendingIntent);
 

@@ -56,11 +56,18 @@ public final class LocationEventUploader extends Worker {
                     throw new IllegalStateException("Unsupported type: " + eventType);
             }
 
-            ConnectionApiClient client = ConnectLocation.getInstance().connectionApiClient;
+            ConnectLocation location = ConnectLocation.getInstance();
+            ConnectionApiClient client = location.connectionApiClient;
             Response<Void> uploadResponse
                 = new RetrofitLocationApi.Client(client.interceptor()).api.upload(Collections.singletonList(info))
                 .execute();
             if (!uploadResponse.isSuccessful()) {
+                if (uploadResponse.code() == 401) {
+                    // The token is invalid, unregister all geo-fences and return.
+                    location.deactivate();
+                    return Result.failure();
+                }
+
                 return failureResult();
             }
 

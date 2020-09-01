@@ -65,7 +65,7 @@ public final class ConnectLocation {
     ) {
         if (INSTANCE == null) {
             INSTANCE = new ConnectLocation(connectionId,
-                new AwarenessGeofenceProvider(context),
+                new AwarenessGeofenceProvider(context.getApplicationContext()),
                 apiClient,
                 WorkManager.getInstance(context)
             );
@@ -79,7 +79,7 @@ public final class ConnectLocation {
         if (INSTANCE == null) {
             ConnectionApiClient client = new ConnectionApiClient.Builder(context, userTokenProvider).build();
             INSTANCE = new ConnectLocation(connectionId,
-                new AwarenessGeofenceProvider(context),
+                new AwarenessGeofenceProvider(context.getApplicationContext()),
                 client,
                 WorkManager.getInstance(context)
             );
@@ -196,6 +196,13 @@ public final class ConnectLocation {
         });
 
         return pendingResult;
+    }
+
+    /**
+     * Remove all registered geo-fences.
+     */
+    public void deactivate() {
+        geofenceProvider.removeGeofences();
     }
 
     @VisibleForTesting
