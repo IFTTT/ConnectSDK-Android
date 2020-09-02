@@ -17,6 +17,7 @@ IFTTT Connect Button SDK is a library that helps facilitate the integration of t
 ## Features
 * A lightweight wrapper around the IFTTT Connection API, with predefined data structures and JSON adapters.
 * Connect Button UI representation.
+* [Native IFTTT Location service support.](https://github.com/IFTTT/ConnectSDK-Android/tree/master/connect-location/README.md).
 
 ## Dependencies
 This SDK uses the following libraries as dependencies:
@@ -34,7 +35,7 @@ This SDK uses the following libraries as dependencies:
 ## Installation
 ### Gradle
 ```groovy
-implementation "com.ifttt:connect-button:2.2.6"
+implementation "com.ifttt:connect-button:2.3.0"
 ```
 
 ## Usage

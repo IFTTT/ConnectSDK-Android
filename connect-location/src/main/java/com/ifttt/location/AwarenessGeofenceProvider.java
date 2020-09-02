@@ -15,10 +15,14 @@ import com.ifttt.connect.api.Feature;
 import com.ifttt.connect.api.LocationFieldValue;
 import com.ifttt.connect.api.UserFeature;
 import com.ifttt.connect.api.UserFeatureField;
-import com.ifttt.connect.api.UserFeatureStep;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
+import static com.ifttt.location.LocationEventUploadHelper.extractLocationUserFeatures;
+import static com.ifttt.location.LocationEventUploadHelper.getEnterFenceKey;
+import static com.ifttt.location.LocationEventUploadHelper.getExitFenceKey;
 
 /**
  * {@link GeofenceProvider} implementation using {@link Awareness} API. This implementation processes a list of
@@ -79,12 +83,12 @@ final class AwarenessGeofenceProvider implements GeofenceProvider {
         });
     }
 
-    private static String getEnterFenceKey(String id) {
-        return id.concat("/enter");
-    }
-
-    private static String getExitFenceKey(String id) {
-        return id.concat("/exit");
+    @Override
+    public void removeGeofences() {
+        fenceClient.updateFences(new FenceUpdateRequest.Builder()
+            .removeFence(exitPendingIntent)
+            .removeFence(enterPendingIntent)
+            .build());
     }
 
     interface DiffCallback {
@@ -104,71 +108,63 @@ final class AwarenessGeofenceProvider implements GeofenceProvider {
     ) {
         Set<String> fenceKeysToRemove = new HashSet<>(registeredFenceKeys);
 
-        for (Feature feature : features) {
-            if (feature.userFeatures == null || state != Connection.Status.enabled) {
-                // Skip registration if the UserFeature is null or the connection is not enabled.
-                continue;
+        if (state != Connection.Status.enabled) {
+            // Unregister outdated geofences.
+            for (String fenceKey : fenceKeysToRemove) {
+                callback.onRemoveFence(fenceKey);
             }
+            return;
+        }
 
-            for (UserFeature userFeature : feature.userFeatures) {
-                if (!userFeature.enabled) {
-                    // Skip processing disabled UserFeatureSteps.
-                    continue;
-                }
-
-                for (UserFeatureStep step : userFeature.userFeatureSteps) {
-                    for (UserFeatureField userFeatureField : step.fields) {
-                        if (!LOCATION_FIELD_TYPES_LIST.contains(userFeatureField.fieldType)) {
-                            continue;
+        Map<String, List<UserFeatureField<LocationFieldValue>>> locations = extractLocationUserFeatures(features);
+        for (Map.Entry<String, List<UserFeatureField<LocationFieldValue>>> entry : locations.entrySet()) {
+            String id = entry.getKey();
+            for (UserFeatureField<LocationFieldValue> userFeatureField : entry.getValue()) {
+                LocationFieldValue region = (LocationFieldValue) userFeatureField.value;
+                switch (userFeatureField.fieldType) {
+                    case FIELD_TYPE_LOCATION_ENTER:
+                        if (!fenceKeysToRemove.contains(id)) {
+                            callback.onAddFence(id,
+                                LocationFence.entering(region.lat, region.lng, region.radius),
+                                enterPendingIntent
+                            );
+                        } else {
+                            fenceKeysToRemove.remove(id);
+                        }
+                        break;
+                    case FIELD_TYPE_LOCATION_EXIT:
+                        if (!fenceKeysToRemove.contains(id)) {
+                            callback.onAddFence(id,
+                                LocationFence.exiting(region.lat, region.lng, region.radius),
+                                exitPendingIntent
+                            );
+                        } else {
+                            fenceKeysToRemove.remove(id);
+                        }
+                        break;
+                    case FIELD_TYPE_LOCATION_ENTER_EXIT:
+                        String enterFenceKey = getEnterFenceKey(id);
+                        if (!fenceKeysToRemove.contains(enterFenceKey)) {
+                            callback.onAddFence(enterFenceKey,
+                                LocationFence.entering(region.lat, region.lng, region.radius),
+                                enterPendingIntent
+                            );
+                        } else {
+                            fenceKeysToRemove.remove(enterFenceKey);
                         }
 
-                        LocationFieldValue region = (LocationFieldValue) userFeatureField.value;
-                        switch (userFeatureField.fieldType) {
-                            case FIELD_TYPE_LOCATION_ENTER:
-                                if (!fenceKeysToRemove.contains(step.id)) {
-                                    callback.onAddFence(step.id,
-                                        LocationFence.entering(region.lat, region.lng, region.radius),
-                                        enterPendingIntent
-                                    );
-                                } else {
-                                    fenceKeysToRemove.remove(step.id);
-                                }
-                                break;
-                            case FIELD_TYPE_LOCATION_EXIT:
-                                if (!fenceKeysToRemove.contains(step.id)) {
-                                    callback.onAddFence(step.id,
-                                        LocationFence.exiting(region.lat, region.lng, region.radius),
-                                        exitPendingIntent
-                                    );
-                                } else {
-                                    fenceKeysToRemove.remove(step.id);
-                                }
-                                break;
-                            case FIELD_TYPE_LOCATION_ENTER_EXIT:
-                                String enterFenceKey = getEnterFenceKey(step.id);
-                                if (!fenceKeysToRemove.contains(enterFenceKey)) {
-                                    callback.onAddFence(enterFenceKey,
-                                        LocationFence.entering(region.lat, region.lng, region.radius),
-                                        enterPendingIntent
-                                    );
-                                } else {
-                                    fenceKeysToRemove.remove(enterFenceKey);
-                                }
-
-                                String exitFenceKey = getExitFenceKey(step.id);
-                                if (!fenceKeysToRemove.contains(exitFenceKey)) {
-                                    callback.onAddFence(exitFenceKey,
-                                        LocationFence.exiting(region.lat, region.lng, region.radius),
-                                        exitPendingIntent
-                                    );
-                                } else {
-                                    fenceKeysToRemove.remove(exitFenceKey);
-                                }
-                                break;
-                            default:
-                                // No-op for other location types.
+                        String exitFenceKey = getExitFenceKey(id);
+                        if (!fenceKeysToRemove.contains(exitFenceKey)) {
+                            callback.onAddFence(exitFenceKey,
+                                LocationFence.exiting(region.lat, region.lng, region.radius),
+                                exitPendingIntent
+                            );
+                        } else {
+                            fenceKeysToRemove.remove(exitFenceKey);
                         }
-                    }
+                        break;
+                    default:
+                        // No-op for other location types.
                 }
             }
         }
