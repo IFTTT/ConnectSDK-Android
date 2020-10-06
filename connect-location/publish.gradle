@@ -2,10 +2,10 @@ apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.dcendents.android-maven'
 
 ext {
-    libraryName = 'connect-api'
-    artifact = 'connect-api'
+    libraryName = 'connect-location'
+    artifact = 'connect-location'
 
-    libraryDescription = 'Connect API integration for Connect Button and Connect Location.'
+    libraryDescription = 'Connect Location SDK provides integration to IFTTT Location service.'
 }
 
 group = publishedGroupId
@@ -57,9 +57,9 @@ bintray {
 
     Properties properties = new Properties()
     properties.load(project.rootProject.file('local.properties').newDataInputStream())
-    user = properties.getProperty('bintra1y.user')
-    key = properties.getProperty('bintray1.apikey')
-    pkg.version.gpg.passphrase = properties.getProperty('bintray.1gpg.passphrase')
+    user = properties.getProperty('bintray.user')
+    key = properties.getProperty('bintray.apikey')
+    pkg.version.gpg.passphrase = properties.getProperty('bintray.gpg.passphrase')
 
     configurations = ['archives']
     pkg {
