@@ -6,6 +6,18 @@ ext {
     artifact = 'connect-api'
 
     libraryDescription = 'Connect API integration for Connect Button and Connect Location.'
+
+    bintrayRepo = 'Maven'
+    bintrayName = 'ConnectSDK-Android'
+
+    publishedGroupId = 'com.ifttt'
+
+    siteUrl = 'https://github.com/IFTTT/ConnectSDK-Android'
+    gitUrl = 'https://github.com/IFTTT/ConnectSDK-Android.git'
+
+    licenseName = 'MIT'
+    licenseUrl = 'https://github.com/IFTTT/ConnectSDK-Android/blob/master/LICENSE'
+    allLicenses = ['MIT']
 }
 
 group = publishedGroupId

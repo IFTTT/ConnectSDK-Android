@@ -32,19 +32,6 @@ task clean(type: Delete) {
 }
 
 ext {
-    bintrayRepo = 'Maven'
-    bintrayName = 'ConnectSDK-Android'
-
-    publishedGroupId = 'com.ifttt'
-
-    siteUrl = 'https://github.com/IFTTT/ConnectSDK-Android'
-    gitUrl = 'https://github.com/IFTTT/ConnectSDK-Android.git'
-
-    licenseName = 'MIT'
-    licenseUrl = 'https://github.com/IFTTT/ConnectSDK-Android/blob/master/LICENSE'
-    allLicenses = ['MIT']
-
-
     libVersion = '2.3.0'
     okHttpVersion = '3.14.2'
     retrofitVersion = '2.6.0'
