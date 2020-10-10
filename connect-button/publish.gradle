@@ -2,28 +2,23 @@ apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.dcendents.android-maven'
 
 ext {
+    libraryName = 'connect-button'
+    artifact = 'connect-button'
+
     bintrayRepo = 'Maven'
     bintrayName = 'ConnectSDK-Android'
 
     publishedGroupId = 'com.ifttt'
-    libraryName = 'connect-button'
-    artifact = 'connect-button'
-
-    libraryDescription =
-            'Connect Button SDK is a library that helps facilitate the integration of the Connect Button and Connection API.'
 
     siteUrl = 'https://github.com/IFTTT/ConnectSDK-Android'
     gitUrl = 'https://github.com/IFTTT/ConnectSDK-Android.git'
 
-    libraryVersion = "$libVersion"
-
-    developerId = 'lzanita09'
-    developerName = 'Zhe Lu'
-    developerEmail = 'zhe@ifttt.com'
-
     licenseName = 'MIT'
     licenseUrl = 'https://github.com/IFTTT/ConnectSDK-Android/blob/master/LICENSE'
     allLicenses = ['MIT']
+
+    libraryDescription =
+            'Connect Button SDK is a library that helps facilitate the integration of the Connect Button and Connection API.'
 }
 
 group = publishedGroupId
@@ -49,9 +44,14 @@ install {
                 }
                 developers {
                     developer {
-                        id developerId
-                        name developerName
-                        email developerEmail
+                        id 'lzanita09'
+                        name 'Zhe Lu'
+                        email 'zhe@ifttt.com'
+                    }
+                    developer {
+                        id 'priyaashah'
+                        name 'Priya Shah'
+                        email 'priya@ifttt.com'
                     }
                 }
                 scm {
@@ -64,7 +64,7 @@ install {
     }
 }
 
-version = libraryVersion
+version = libVersion
 
 task sourcesJar(type: Jar) {
     archiveClassifier.set("sources")
@@ -92,14 +92,16 @@ artifacts {
     archives sourcesJar
 }
 
-if (project.hasProperty('bintrayUser') && project.hasProperty('bintrayKey') &&
-        project.hasProperty('bintrayGpgPassphrase')) {
-    bintray.user = project.bintrayUser
-    bintray.key = project.bintrayKey
-    bintray.pkg.version.gpg.passphrase = project.bintrayGpgPassphrase
-}
-
 bintray {
+
+    Properties properties = new Properties()
+    if (project.rootProject.file('local.properties').canRead()) {
+        properties.load(project.rootProject.file('local.properties').newDataInputStream())
+        user = properties.getProperty('bintray.user')
+        key = properties.getProperty('bintray.apikey')
+        pkg.version.gpg.passphrase = properties.getProperty('bintray.gpg.passphrase')
+    }
+
     configurations = ['archives']
     pkg {
         repo = bintrayRepo
@@ -110,10 +112,10 @@ bintray {
         licenses = allLicenses
         publish = false
         version {
-            name = libraryVersion
+            name = libVersion
             desc = libraryDescription
             released = new Date()
-            vcsTag = libraryVersion
+            vcsTag = libVersion
             gpg {
                 sign = true
             }
