@@ -2,13 +2,13 @@ apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.dcendents.android-maven'
 
 ext {
-    libraryName = 'connect-api'
-    artifact = 'connect-api'
+    libraryName = 'connect-location'
+    artifact = 'connect-location'
 
-    libraryDescription = 'Connect API integration for Connect Button and Connect Location.'
+    libraryDescription = 'Connect Location SDK provides integration to IFTTT Location service.'
 
     bintrayRepo = 'Maven'
-    bintrayName = 'ConnectAPI-Android'
+    bintrayName = 'ConnectLocation-Android'
 
     publishedGroupId = 'com.ifttt'
 

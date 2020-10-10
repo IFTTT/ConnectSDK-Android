@@ -24,4 +24,6 @@ interface GeofenceProvider {
 
     @RequiresPermission(Manifest.permission.ACCESS_FINE_LOCATION)
     void updateGeofences(final Connection connection);
+
+    void removeGeofences();
 }

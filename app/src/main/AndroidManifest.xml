@@ -31,5 +31,9 @@
                     android:scheme="groceryexpress"/>
             </intent-filter>
         </activity>
+
+        <meta-data
+            android:name="com.google.android.awareness.API_KEY"
+            android:value="@string/awareness_api_key"/>
     </application>
 </manifest>

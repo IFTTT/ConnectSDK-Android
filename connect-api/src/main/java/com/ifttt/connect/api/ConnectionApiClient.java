@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.UUID;
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.moshi.MoshiConverterFactory;
@@ -47,6 +48,14 @@ public final class ConnectionApiClient {
     @CheckReturnValue
     public boolean isUserAuthorized() {
         return tokenInterceptor.isUserAuthenticated();
+    }
+
+    /**
+     * @return the {@link Interceptor} implementation for this API client.
+     */
+    @CheckReturnValue
+    public Interceptor interceptor() {
+        return tokenInterceptor;
     }
 
     /**
@@ -91,11 +100,10 @@ public final class ConnectionApiClient {
         }
 
         ConnectionApiClient buildWithBaseUrl(String baseUrl) {
-            Moshi moshi = new Moshi.Builder().add(new HexColorJsonAdapter())
-                .add(Date.class, new Rfc3339DateJsonAdapter().nullSafe())
-                .add(new ConnectionJsonAdapter())
-                .add(new UserTokenJsonAdapter())
-                .build();
+            Moshi moshi = new Moshi.Builder().add(new HexColorJsonAdapter()).add(
+                Date.class,
+                new Rfc3339DateJsonAdapter().nullSafe()
+            ).add(new ConnectionJsonAdapter()).add(new UserTokenJsonAdapter()).build();
             JsonAdapter<ErrorResponse> errorResponseJsonAdapter = moshi.adapter(ErrorResponse.class);
             TokenInterceptor tokenInterceptor = new TokenInterceptor(userTokenProvider);
             OkHttpClient.Builder builder
@@ -112,7 +120,11 @@ public final class ConnectionApiClient {
 
             RetrofitConnectionApi retrofitConnectionApi = retrofit.create(RetrofitConnectionApi.class);
 
-            return new ConnectionApiClient(retrofitConnectionApi, errorResponseJsonAdapter, tokenInterceptor);
+            return new ConnectionApiClient(
+                retrofitConnectionApi,
+                errorResponseJsonAdapter,
+                tokenInterceptor
+            );
         }
     }
 

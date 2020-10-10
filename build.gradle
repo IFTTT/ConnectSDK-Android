@@ -9,7 +9,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:4.0.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.5'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
 
         // NOTE: Do not place your application dependencies here; they belong
@@ -32,7 +32,7 @@ task clean(type: Delete) {
 }
 
 ext {
-    libVersion = '2.2.6'
+    libVersion = '2.3.0'
     okHttpVersion = '3.14.2'
     retrofitVersion = '2.6.0'
     moshiVersion = '1.8.0'
@@ -41,6 +41,6 @@ ext {
     compileSdkVersion = 29
     minSdkVersion = 18
     buildToolsVersion = '29.0.2'
-    awarenessVersion = '18.0.0'
+    awarenessVersion = '18.0.1'
     picassoVersion = '2.71828'
 }
