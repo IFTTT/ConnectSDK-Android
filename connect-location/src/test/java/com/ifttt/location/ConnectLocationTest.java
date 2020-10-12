@@ -7,7 +7,6 @@ import android.net.Uri;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
-import androidx.work.WorkManager;
 import com.ifttt.connect.api.Connection;
 import com.ifttt.connect.api.ConnectionApiClient;
 import com.ifttt.connect.api.Feature;
@@ -40,18 +39,15 @@ public class ConnectLocationTest {
 
     private ConnectButton button;
     private ConnectionApiClient apiClient;
-    private CredentialsProvider credentialsProvider;
-    private WorkManager workManager;
 
     @Before
     public void setUp() {
         ActivityScenario<TestActivity> scenario = ActivityScenario.launch(TestActivity.class);
         scenario.onActivity(activity -> {
             button = new ConnectButton(activity);
-            workManager = WorkManager.getInstance(activity);
         });
 
-        credentialsProvider = new CredentialsProvider() {
+        CredentialsProvider credentialsProvider = new CredentialsProvider() {
             @Override
             public String getOAuthCode() {
                 return null;
@@ -77,12 +73,12 @@ public class ConnectLocationTest {
         Connection connection = connection(Connection.Status.enabled);
 
         AtomicBoolean ref = new AtomicBoolean();
-        ConnectLocation location = new ConnectLocation("id", new GeofenceProviderAdapter() {
+        ConnectLocation location = new ConnectLocation(new GeofenceProviderAdapter() {
             @Override
             public void updateGeofences(Connection connection) {
                 fail();
             }
-        }, apiClient, workManager);
+        }, apiClient);
         location.setUpWithConnectButton(button, () -> ref.set(true));
         button.setup(ConnectButton.Configuration.newBuilder("email@ifttt.com", Uri.EMPTY)
             .withConnection(connection)
@@ -110,12 +106,12 @@ public class ConnectLocationTest {
         Connection connection = connection(Connection.Status.enabled);
 
         AtomicBoolean ref = new AtomicBoolean();
-        ConnectLocation location = new ConnectLocation("id", new GeofenceProviderAdapter() {
+        ConnectLocation location = new ConnectLocation(new GeofenceProviderAdapter() {
             @Override
             public void updateGeofences(Connection connection) {
                 ref.set(true);
             }
-        }, apiClient, workManager);
+        }, apiClient);
         location.setUpWithConnectButton(button, Assert::fail);
         button.setup(ConnectButton.Configuration.newBuilder("email@ifttt.com", Uri.EMPTY)
             .withConnection(connection)
@@ -143,12 +139,12 @@ public class ConnectLocationTest {
         Connection connection = connection(Connection.Status.disabled);
 
         AtomicBoolean ref = new AtomicBoolean();
-        ConnectLocation location = new ConnectLocation("id", new GeofenceProviderAdapter() {
+        ConnectLocation location = new ConnectLocation(new GeofenceProviderAdapter() {
             @Override
-            public void updateGeofences(Connection connection) {
+            public void removeGeofences() {
                 ref.set(true);
             }
-        }, apiClient, workManager);
+        }, apiClient);
         location.setUpWithConnectButton(button, Assert::fail);
         button.setup(ConnectButton.Configuration.newBuilder("email@ifttt.com", Uri.EMPTY)
             .withConnection(connection)
@@ -176,12 +172,12 @@ public class ConnectLocationTest {
         Connection connection = connection(Connection.Status.never_enabled);
 
         AtomicBoolean ref = new AtomicBoolean();
-        ConnectLocation location = new ConnectLocation("id", new GeofenceProviderAdapter() {
+        ConnectLocation location = new ConnectLocation(new GeofenceProviderAdapter() {
             @Override
-            public void updateGeofences(Connection connection) {
+            public void removeGeofences() {
                 ref.set(true);
             }
-        }, apiClient, workManager);
+        }, apiClient);
         location.setUpWithConnectButton(button, Assert::fail);
         button.setup(ConnectButton.Configuration.newBuilder("email@ifttt.com", Uri.EMPTY)
             .withConnection(connection)
@@ -236,7 +232,7 @@ public class ConnectLocationTest {
         );
     }
 
-    private abstract class GeofenceProviderAdapter implements GeofenceProvider {
+    private abstract static class GeofenceProviderAdapter implements GeofenceProvider {
         @Override
         public void updateGeofences(Connection connection) {
             throw new UnsupportedOperationException();
