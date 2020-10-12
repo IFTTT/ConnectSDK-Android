@@ -1,7 +1,6 @@
 package com.ifttt.location;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import androidx.annotation.CheckResult;
@@ -92,22 +91,12 @@ public final class ConnectLocation {
             public void onStateChanged(
                 ConnectButtonState currentState, ConnectButtonState previousState, Connection connection
             ) {
-                boolean hasLocationPermission = checkSelfPermission(connectButton.getContext(),
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                )
-                    == PackageManager.PERMISSION_GRANTED;
-                if (currentState == ConnectButtonState.Enabled
-                    || currentState == ConnectButtonState.Disabled
-                    || currentState == ConnectButtonState.Initial) {
-                    if (hasLocationPermission) {
-                        geofenceProvider.updateGeofences(connection);
-                    }
-                }
-
-                boolean hasEnabledLocationTrigger = hasEnabledLocationUserFeature(connection);
-                if (!hasLocationPermission && hasEnabledLocationTrigger) {
+                if (currentState == ConnectButtonState.Enabled) {
                     connectionWeakReference = new WeakReference<>(connection);
-                    permissionCallback.onRequestLocationPermission();
+                    activate(connectButton.getContext(), connection.id, permissionCallback);
+                } else if (currentState == ConnectButtonState.Disabled || currentState == ConnectButtonState.Initial) {
+                    connectionWeakReference = new WeakReference<>(connection);
+                    deactivate(connectButton.getContext());
                 }
             }
 
@@ -132,7 +121,7 @@ public final class ConnectLocation {
      * If you have a connection that uses Location service, you should call this method in the first Activity that your
      * users use your app, so that you can prompt the location permission request as soon as possible.
      *
-     * @param activity Activity instance of the place where the permission check happens.
+     * @param context Context instance of the place where the permission check happens.
      * @param connectionId Connection ID to be activated.
      * @param permissionCallback Nullable {@link LocationPermissionCallback} instance, if non-null, it will be invoked
      * when the connection is enabled, has an enabled UserFeature that has at least one Location service trigger, and
@@ -142,14 +131,16 @@ public final class ConnectLocation {
      */
     @Nullable
     public PendingResult<Connection> activate(
-        Activity activity, String connectionId, @Nullable LocationPermissionCallback permissionCallback
+        Context context, String connectionId, @Nullable LocationPermissionCallback permissionCallback
     ) {
         // Set up polling job for fetching the latest connection data.
-        ConnectionRefresher.schedule(activity, connectionId);
+        ConnectionRefresher.schedule(context, connectionId);
 
         Connection cachedConnection;
-        if (connectionWeakReference != null && (cachedConnection = connectionWeakReference.get()) != null) {
-            if (checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION)
+        if (connectionWeakReference != null
+            && (cachedConnection = connectionWeakReference.get()) != null
+            && cachedConnection.id.equals(connectionId)) {
+            if (checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
                 geofenceProvider.updateGeofences(cachedConnection);
             } else if (hasEnabledLocationUserFeature(cachedConnection) && permissionCallback != null) {
@@ -166,7 +157,7 @@ public final class ConnectLocation {
                 connectionWeakReference = new WeakReference<>(result);
                 boolean hasEnabledLocationTrigger = hasEnabledLocationUserFeature(result);
 
-                if (checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION)
+                if (checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
                     == PackageManager.PERMISSION_GRANTED) {
                     geofenceProvider.updateGeofences(result);
                 } else if (hasEnabledLocationTrigger && permissionCallback != null) {
