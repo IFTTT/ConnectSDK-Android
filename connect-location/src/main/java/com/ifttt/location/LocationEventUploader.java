@@ -64,7 +64,7 @@ public final class LocationEventUploader extends Worker {
             if (!uploadResponse.isSuccessful()) {
                 if (uploadResponse.code() == 401) {
                     // The token is invalid, unregister all geo-fences and return.
-                    location.deactivate();
+                    location.deactivate(getApplicationContext());
                     return Result.failure();
                 }
 
