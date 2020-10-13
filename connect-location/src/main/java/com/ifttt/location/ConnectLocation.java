@@ -1,17 +1,12 @@
 package com.ifttt.location;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import androidx.annotation.CheckResult;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
-import androidx.work.Constraints;
-import androidx.work.ExistingPeriodicWorkPolicy;
-import androidx.work.NetworkType;
-import androidx.work.PeriodicWorkRequest;
-import androidx.work.WorkManager;
+import androidx.work.Worker;
 import com.ifttt.connect.api.Connection;
 import com.ifttt.connect.api.ConnectionApiClient;
 import com.ifttt.connect.api.ErrorResponse;
@@ -26,7 +21,6 @@ import com.ifttt.connect.ui.ConnectButtonState;
 import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import static androidx.core.content.ContextCompat.checkSelfPermission;
 
@@ -49,40 +43,26 @@ public final class ConnectLocation {
         void onRequestLocationPermission();
     }
 
-    private static final String WORK_ID_CONNECTION_POLLING = "connection_refresh_polling";
-    private static final long CONNECTION_REFRESH_POLLING_INTERVAL = 1;
-
     private static ConnectLocation INSTANCE = null;
 
     final GeofenceProvider geofenceProvider;
     final ConnectionApiClient connectionApiClient;
-    final String connectionId;
 
     @Nullable WeakReference<Connection> connectionWeakReference;
 
-    public static synchronized ConnectLocation init(
-        Context context, String connectionId, ConnectionApiClient apiClient
-    ) {
+    public static synchronized ConnectLocation init(Context context, ConnectionApiClient apiClient) {
         if (INSTANCE == null) {
-            INSTANCE = new ConnectLocation(connectionId,
-                new AwarenessGeofenceProvider(context.getApplicationContext()),
-                apiClient,
-                WorkManager.getInstance(context)
-            );
+            INSTANCE = new ConnectLocation(new AwarenessGeofenceProvider(context.getApplicationContext()), apiClient);
         }
         return INSTANCE;
     }
 
     public static synchronized ConnectLocation init(
-        Context context, String connectionId, UserTokenProvider userTokenProvider
+        Context context, UserTokenProvider userTokenProvider
     ) {
         if (INSTANCE == null) {
             ConnectionApiClient client = new ConnectionApiClient.Builder(context, userTokenProvider).build();
-            INSTANCE = new ConnectLocation(connectionId,
-                new AwarenessGeofenceProvider(context.getApplicationContext()),
-                client,
-                WorkManager.getInstance(context)
-            );
+            INSTANCE = new ConnectLocation(new AwarenessGeofenceProvider(context.getApplicationContext()), client);
         }
         return INSTANCE;
     }
@@ -111,22 +91,12 @@ public final class ConnectLocation {
             public void onStateChanged(
                 ConnectButtonState currentState, ConnectButtonState previousState, Connection connection
             ) {
-                boolean hasLocationPermission = checkSelfPermission(connectButton.getContext(),
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                )
-                    == PackageManager.PERMISSION_GRANTED;
-                if (currentState == ConnectButtonState.Enabled
-                    || currentState == ConnectButtonState.Disabled
-                    || currentState == ConnectButtonState.Initial) {
-                    if (hasLocationPermission) {
-                        geofenceProvider.updateGeofences(connection);
-                    }
-                }
-
-                boolean hasEnabledLocationTrigger = hasEnabledLocationUserFeature(connection);
-                if (!hasLocationPermission && hasEnabledLocationTrigger) {
+                if (currentState == ConnectButtonState.Enabled) {
                     connectionWeakReference = new WeakReference<>(connection);
-                    permissionCallback.onRequestLocationPermission();
+                    activate(connectButton.getContext(), connection.id, permissionCallback);
+                } else if (currentState == ConnectButtonState.Disabled || currentState == ConnectButtonState.Initial) {
+                    connectionWeakReference = new WeakReference<>(connection);
+                    deactivate(connectButton.getContext());
                 }
             }
 
@@ -141,8 +111,8 @@ public final class ConnectLocation {
      * Given the connection id passed in during initialization, fetch the connection data, and check if it has an
      * enabled {@link UserFeature} that uses location.
      *
-     * This method should be used in addition to the {@link #init(Context, String, ConnectionApiClient)} or
-     * {@link #init(Context, String, UserTokenProvider)} method in the initialization process, in order to set up
+     * This method should be used in addition to the {@link #init(Context, ConnectionApiClient)} or
+     * {@link #init(Context, UserTokenProvider)} method in the initialization process, in order to set up
      * ConnectLocation to account for users who have the connection already enabled but hasn't had it set up in your
      * app. This method fetches the latest connection data, checks if, for the given user (via {@link UserTokenProvider},
      * there is an enabled {@link UserFeature} that uses Location trigger. If that is true, it will set up the geofences
@@ -151,7 +121,8 @@ public final class ConnectLocation {
      * If you have a connection that uses Location service, you should call this method in the first Activity that your
      * users use your app, so that you can prompt the location permission request as soon as possible.
      *
-     * @param activity Activity instance of the place where the permission check happens.
+     * @param context Context instance of the place where the permission check happens.
+     * @param connectionId Connection ID to be activated.
      * @param permissionCallback Nullable {@link LocationPermissionCallback} instance, if non-null, it will be invoked
      * when the connection is enabled, has an enabled UserFeature that has at least one Location service trigger, and
      * the app doesn't have ACCESS_FINE_LOCATION permission.
@@ -160,11 +131,16 @@ public final class ConnectLocation {
      */
     @Nullable
     public PendingResult<Connection> activate(
-        Activity activity, @Nullable LocationPermissionCallback permissionCallback
+        Context context, String connectionId, @Nullable LocationPermissionCallback permissionCallback
     ) {
+        // Set up polling job for fetching the latest connection data.
+        ConnectionRefresher.schedule(context, connectionId);
+
         Connection cachedConnection;
-        if (connectionWeakReference != null && (cachedConnection = connectionWeakReference.get()) != null) {
-            if (checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION)
+        if (connectionWeakReference != null
+            && (cachedConnection = connectionWeakReference.get()) != null
+            && cachedConnection.id.equals(connectionId)) {
+            if (checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
                 geofenceProvider.updateGeofences(cachedConnection);
             } else if (hasEnabledLocationUserFeature(cachedConnection) && permissionCallback != null) {
@@ -181,7 +157,7 @@ public final class ConnectLocation {
                 connectionWeakReference = new WeakReference<>(result);
                 boolean hasEnabledLocationTrigger = hasEnabledLocationUserFeature(result);
 
-                if (checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION)
+                if (checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
                     == PackageManager.PERMISSION_GRANTED) {
                     geofenceProvider.updateGeofences(result);
                 } else if (hasEnabledLocationTrigger && permissionCallback != null) {
@@ -199,32 +175,18 @@ public final class ConnectLocation {
     }
 
     /**
-     * Remove all registered geo-fences.
+     * Remove all registered geo-fences and cancel polling {@link Worker}.
      */
-    public void deactivate() {
+    public void deactivate(Context context) {
         geofenceProvider.removeGeofences();
+
+        ConnectionRefresher.cancel(context);
     }
 
     @VisibleForTesting
-    ConnectLocation(
-        String connectionId,
-        GeofenceProvider geofenceProvider,
-        ConnectionApiClient connectionApiClient,
-        WorkManager workManager
-    ) {
-        this.connectionId = connectionId;
+    ConnectLocation(GeofenceProvider geofenceProvider, ConnectionApiClient connectionApiClient) {
         this.geofenceProvider = geofenceProvider;
         this.connectionApiClient = connectionApiClient;
-
-        // Set up polling job for fetching the latest connection data.
-        Constraints constraints = new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build();
-        workManager.enqueueUniquePeriodicWork(WORK_ID_CONNECTION_POLLING,
-            ExistingPeriodicWorkPolicy.KEEP,
-            new PeriodicWorkRequest.Builder(ConnectionRefresher.class,
-                CONNECTION_REFRESH_POLLING_INTERVAL,
-                TimeUnit.HOURS
-            ).setConstraints(constraints).build()
-        );
     }
 
     @CheckResult
