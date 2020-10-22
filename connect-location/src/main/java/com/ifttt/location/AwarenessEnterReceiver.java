@@ -12,6 +12,7 @@ public final class AwarenessEnterReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        Logger.logEvent(this.getClass().getSimpleName(), "Geo-fence enter event");
         FenceState fenceState = FenceState.extract(intent);
         if (fenceState.getCurrentState() != FenceState.TRUE) {
             return;

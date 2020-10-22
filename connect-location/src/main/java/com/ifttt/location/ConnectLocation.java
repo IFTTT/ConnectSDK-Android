@@ -108,6 +108,15 @@ public final class ConnectLocation {
     }
 
     /**
+     * Call this method if logging is required.
+     * The Logger doesn't differentiate between release and debug build variants, so call this method accordingly.
+     * By default, logging is disabled.
+     */
+    public void enableLogging() {
+        Logger.enableLogging();
+    }
+
+    /**
      * Given the connection id passed in during initialization, fetch the connection data, and check if it has an
      * enabled {@link UserFeature} that uses location.
      *
@@ -156,6 +165,10 @@ public final class ConnectLocation {
             public void onSuccess(Connection result) {
                 connectionWeakReference = new WeakReference<>(result);
                 boolean hasEnabledLocationTrigger = hasEnabledLocationUserFeature(result);
+                Logger.logEvent(
+                        this.getClass().getSimpleName(),
+                        "Connection " + connectionId + " fetched successfully, location trigger enabled: " + hasEnabledLocationTrigger
+                );
 
                 if (checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
                     == PackageManager.PERMISSION_GRANTED) {
@@ -167,7 +180,10 @@ public final class ConnectLocation {
 
             @Override
             public void onFailure(ErrorResponse errorResponse) {
-                // No-op
+                Logger.logEvent(
+                        this.getClass().getSimpleName(),
+                        "Connection " + connectionId + " fetch failed"
+                );
             }
         });
 
@@ -178,6 +194,7 @@ public final class ConnectLocation {
      * Remove all registered geo-fences and cancel polling {@link Worker}.
      */
     public void deactivate(Context context) {
+        Logger.logEvent(this.getClass().getSimpleName(), "Deactivating geo-fence");
         geofenceProvider.removeGeofences();
 
         ConnectionRefresher.cancel(context);
