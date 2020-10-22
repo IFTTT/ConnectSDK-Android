@@ -62,17 +62,18 @@ public final class LocationEventUploader extends Worker {
                 = new RetrofitLocationApi.Client(client.interceptor()).api.upload(Collections.singletonList(info))
                 .execute();
             if (!uploadResponse.isSuccessful()) {
+                Logger.error("Geo-fence event upload failed with status code: " + uploadResponse.code());
                 if (uploadResponse.code() == 401) {
                     // The token is invalid, unregister all geo-fences and return.
                     location.deactivate(getApplicationContext());
                     return Result.failure();
                 }
-
                 return failureResult();
             }
-
+            Logger.log("Geo-fence event upload successful");
             return Result.success();
         } catch (IOException e) {
+            Logger.error("Geo-fence event upload failed with an IOException");
             return failureResult();
         }
     }
@@ -86,6 +87,7 @@ public final class LocationEventUploader extends Worker {
     }
 
     static void schedule(Context context, EventType eventType, String stepId) {
+        Logger.log("Scheduling geo-fence event upload");
         WorkManager workManager = WorkManager.getInstance(context);
         Data input = new Data.Builder().putString(INPUT_DATA_STEP_ID, stepId).putString(INPUT_DATA_EVENT_TYPE,
             eventType.name()

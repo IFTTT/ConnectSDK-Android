@@ -14,9 +14,11 @@ public final class AwarenessExitReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         FenceState fenceState = FenceState.extract(intent);
         if (fenceState.getCurrentState() != FenceState.TRUE) {
+            Logger.error("Geo-fence exit event, fence state: " + fenceState.getCurrentState());
             return;
         }
 
+        Logger.log("Geo-fence exit event");
         String stepId = LocationEventUploadHelper.extractStepId(fenceState.getFenceKey());
         LocationEventUploader.schedule(context, LocationEventUploader.EventType.Exit, stepId);
     }
