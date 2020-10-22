@@ -62,13 +62,12 @@ public final class LocationEventUploader extends Worker {
                 = new RetrofitLocationApi.Client(client.interceptor()).api.upload(Collections.singletonList(info))
                 .execute();
             if (!uploadResponse.isSuccessful()) {
+                Logger.error("Geo-fence event upload failed with status code: " + uploadResponse.code());
                 if (uploadResponse.code() == 401) {
                     // The token is invalid, unregister all geo-fences and return.
                     location.deactivate(getApplicationContext());
-                    Logger.error("Geo-fence event upload failed with " + uploadResponse.code());
                     return Result.failure();
                 }
-                Logger.error("Geo-fence event upload failed");
                 return failureResult();
             }
             Logger.log("Geo-fence event upload successful");
