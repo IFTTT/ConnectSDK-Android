@@ -70,11 +70,13 @@ final class AwarenessGeofenceProvider implements GeofenceProvider {
                 new DiffCallback() {
                     @Override
                     public void onAddFence(String key, AwarenessFence value, PendingIntent pendingIntent) {
+                        Logger.logEvent(this.getClass().getSimpleName(), "Adding geo-fence " + key);
                         requestBuilder.addFence(key, value, pendingIntent);
                     }
 
                     @Override
                     public void onRemoveFence(String key) {
+                        Logger.logEvent(this.getClass().getSimpleName(), "Removing geo-fence " + key);
                         requestBuilder.removeFence(key);
                     }
                 }
