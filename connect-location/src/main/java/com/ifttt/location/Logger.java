@@ -7,12 +7,8 @@ final class Logger {
     private static final String TAG = "ConnectLocation";
     private static Boolean canLogEvent = false;
 
-    static void enableLogging() {
-        canLogEvent = true;
-    }
-
-    static void disableLogging() {
-        canLogEvent = false;
+    static void setLoggingEnabled(Boolean enabled) {
+        canLogEvent = enabled;
     }
 
     static void log(String message) {

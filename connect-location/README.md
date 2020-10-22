@@ -63,4 +63,4 @@ Once your app received the location permission grant, you can call `ConnectLocat
 When your user logs out, you should reflect this state via returning null in the `UserTokenProvider` passed to the ConnectLocation instance, doing so allows it to unregister the geo-fences accordingly. However, if you would like to make sure the geo-fences are correctly removed as soon as the users log out from your app, you can call `ConnectLocation.getInstance().deactivate()` directly.
 
 ### Logging
-You can enable logging by calling the `ConnectLocation.enableLogging` method to see some basic logs on your `Logcat` window. By default, logging is disabled. If you had enabled logging and need to disable it for certain parts of the user flow, call the `ConnectLocation.disableLogging` method.
+You can enable logging by calling the `ConnectLocation.setLoggingEnabled(true)` method to see some basic logs on your `Logcat` window. By default, logging is disabled. If you had enabled logging and need to disable it for certain parts of the user flow, call the `ConnectLocation.setLoggingEnabled(false)` method.

@@ -108,20 +108,12 @@ public final class ConnectLocation {
     }
 
     /**
-     * Call this method if logging is required.
+     * Call this method with true/false to enable/disable logging.
      * The Logger doesn't differentiate between release and debug build variants, so call this method accordingly.
-     * By default, logging is disabled.
+     * By default, logging is disabled, unless set explicitly by calling this method with true earlier.
      */
-    public void enableLogging() {
-        Logger.enableLogging();
-    }
-
-    /**
-     * Call this method to disable logging.
-     * By default, logging is disabled, unless set explicity by calling the {@link #enableLogging()} method.
-     */
-    public void disableLogging() {
-        Logger.disableLogging();
+    public void setLoggingEnabled(Boolean enabled) {
+        Logger.setLoggingEnabled(enabled);
     }
 
     /**
