@@ -58,7 +58,7 @@ public final class ConnectionRefresher extends Worker {
                 }
             }
         } catch (IOException e) {
-            Logger.error("Cannot fetch connection");
+            Logger.error("Connection fetch failed with an IOException");
             return Result.failure();
         }
 
