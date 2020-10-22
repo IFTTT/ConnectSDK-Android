@@ -65,14 +65,16 @@ public final class LocationEventUploader extends Worker {
                 if (uploadResponse.code() == 401) {
                     // The token is invalid, unregister all geo-fences and return.
                     location.deactivate(getApplicationContext());
+                    Logger.error("Geo-fence event upload failed with " + uploadResponse.code());
                     return Result.failure();
                 }
-
+                Logger.error("Geo-fence event upload failed");
                 return failureResult();
             }
-
+            Logger.log("Geo-fence event upload successful");
             return Result.success();
         } catch (IOException e) {
+            Logger.error("Geo-fence event upload failed with an IOException");
             return failureResult();
         }
     }
@@ -86,6 +88,7 @@ public final class LocationEventUploader extends Worker {
     }
 
     static void schedule(Context context, EventType eventType, String stepId) {
+        Logger.log("Scheduling geo-fence event upload");
         WorkManager workManager = WorkManager.getInstance(context);
         Data input = new Data.Builder().putString(INPUT_DATA_STEP_ID, stepId).putString(INPUT_DATA_EVENT_TYPE,
             eventType.name()

@@ -117,6 +117,14 @@ public final class ConnectLocation {
     }
 
     /**
+     * Call this method to disable logging.
+     * By default, logging is disabled, unless set explicity by calling the {@link #enableLogging()} method.
+     */
+    public void disableLogging() {
+        Logger.disableLogging();
+    }
+
+    /**
      * Given the connection id passed in during initialization, fetch the connection data, and check if it has an
      * enabled {@link UserFeature} that uses location.
      *
@@ -153,6 +161,7 @@ public final class ConnectLocation {
                 == PackageManager.PERMISSION_GRANTED) {
                 geofenceProvider.updateGeofences(cachedConnection);
             } else if (hasEnabledLocationUserFeature(cachedConnection) && permissionCallback != null) {
+                Logger.warning("ACCESS_FINE_LOCATION permission not granted");
                 permissionCallback.onRequestLocationPermission();
             }
 
@@ -165,25 +174,20 @@ public final class ConnectLocation {
             public void onSuccess(Connection result) {
                 connectionWeakReference = new WeakReference<>(result);
                 boolean hasEnabledLocationTrigger = hasEnabledLocationUserFeature(result);
-                Logger.logEvent(
-                        this.getClass().getSimpleName(),
-                        "Connection " + connectionId + " fetched successfully, location trigger enabled: " + hasEnabledLocationTrigger
-                );
+                Logger.log("Connection " + connectionId + " fetched successfully, location trigger enabled: " + hasEnabledLocationTrigger);
 
                 if (checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
                     == PackageManager.PERMISSION_GRANTED) {
                     geofenceProvider.updateGeofences(result);
                 } else if (hasEnabledLocationTrigger && permissionCallback != null) {
+                    Logger.warning("ACCESS_FINE_LOCATION permission not granted");
                     permissionCallback.onRequestLocationPermission();
                 }
             }
 
             @Override
             public void onFailure(ErrorResponse errorResponse) {
-                Logger.logEvent(
-                        this.getClass().getSimpleName(),
-                        "Connection " + connectionId + " fetch failed"
-                );
+                Logger.error("Connection " + connectionId + " fetch failed with error response: " + errorResponse);
             }
         });
 
@@ -194,7 +198,7 @@ public final class ConnectLocation {
      * Remove all registered geo-fences and cancel polling {@link Worker}.
      */
     public void deactivate(Context context) {
-        Logger.logEvent(this.getClass().getSimpleName(), "Deactivating geo-fence");
+        Logger.log("Deactivating geo-fence");
         geofenceProvider.removeGeofences();
 
         ConnectionRefresher.cancel(context);
