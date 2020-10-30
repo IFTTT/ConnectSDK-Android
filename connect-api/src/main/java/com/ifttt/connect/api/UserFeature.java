@@ -25,7 +25,7 @@ public final class UserFeature implements Parcelable  {
     protected UserFeature(Parcel in) {
         id = in.readString();
         featureId = in.readString();
-        enabled = in.readBoolean();
+        enabled = in.readInt() == 1;
         userFeatureSteps = in.createTypedArrayList(UserFeatureStep.CREATOR);
     }
 
@@ -50,7 +50,7 @@ public final class UserFeature implements Parcelable  {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(id);
         dest.writeString(featureId);
-        dest.writeBoolean(enabled);
+        dest.writeInt(enabled ? 1 : 0);
         dest.writeTypedList(userFeatureSteps);
     }
 }
