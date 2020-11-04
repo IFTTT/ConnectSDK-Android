@@ -16,6 +16,8 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.SpannableString;
@@ -35,6 +37,7 @@ import android.widget.TextSwitcher;
 import android.widget.TextView;
 import androidx.annotation.CallSuper;
 import androidx.annotation.ColorInt;
+import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
@@ -824,11 +827,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
                         }
 
                         dispatchState(Login);
-                        buttonApiHelper.connect(getContext(),
-                            connection,
-                            emailEdt.getText().toString(),
-                            buttonState
-                        );
+                        buttonApiHelper.connect(getContext(), connection, emailEdt.getText().toString(), buttonState);
                         monitorRedirect();
                     }
                 });
@@ -1448,10 +1447,12 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
 
         private final ArrayList<Animator> ongoingAnimators = new ArrayList<>();
 
+        @MainThread
         void addAnimator(Animator animator) {
             ongoingAnimators.add(animator);
         }
 
+        @MainThread
         void removeAnimator(Animator animator) {
             ongoingAnimators.remove(animator);
         }
@@ -1474,6 +1475,7 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         private boolean isCanceled = false;
 
         private final AnimatorLifecycleObserver observer;
+        private final Handler handler = new Handler(Looper.getMainLooper());
 
         private CancelAnimatorListenerAdapter(AnimatorLifecycleObserver observer) {
             this.observer = observer;
@@ -1488,14 +1490,14 @@ final class BaseConnectButton extends LinearLayout implements LifecycleOwner {
         @Override
         @CallSuper
         public void onAnimationStart(Animator animation) {
-            observer.addAnimator(animation);
+            handler.post(() -> observer.addAnimator(animation));
             isCanceled = false;
         }
 
         @Override
         @CallSuper
         public void onAnimationEnd(Animator animation) {
-            observer.removeAnimator(animation);
+            handler.post(() -> observer.removeAnimator(animation));
         }
 
         boolean isCanceled() {

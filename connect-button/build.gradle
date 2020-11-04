@@ -8,6 +8,8 @@ android {
         minSdkVersion rootProject.minSdkVersion
         versionCode 10
         versionName "$libVersion"
+
+        buildConfigField 'String', 'VERSION_NAME', "\"$libVersion\""
     }
 
     buildTypes {
