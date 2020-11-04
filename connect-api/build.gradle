@@ -9,6 +9,8 @@ android {
         versionCode 10
         versionName "$libVersion"
 
+        buildConfigField 'String', 'VERSION_NAME', "\"$libVersion\""
+
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
