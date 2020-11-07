@@ -41,14 +41,16 @@ public final class ConnectLocation {
          * trigger.
          */
         void onRequestLocationPermission();
+
+        void onGeofenceAdded();
+
+        void onGeofenceRemoved();
     }
 
     private static ConnectLocation INSTANCE = null;
 
     final GeofenceProvider geofenceProvider;
     final ConnectionApiClient connectionApiClient;
-
-    @Nullable WeakReference<Connection> connectionWeakReference;
 
     public static synchronized ConnectLocation init(Context context, ConnectionApiClient apiClient) {
         if (INSTANCE == null) {
@@ -92,11 +94,9 @@ public final class ConnectLocation {
                 ConnectButtonState currentState, ConnectButtonState previousState, Connection connection
             ) {
                 if (currentState == ConnectButtonState.Enabled) {
-                    connectionWeakReference = new WeakReference<>(connection);
                     activate(connectButton.getContext(), connection.id, permissionCallback);
                 } else if (currentState == ConnectButtonState.Disabled || currentState == ConnectButtonState.Initial) {
-                    connectionWeakReference = new WeakReference<>(connection);
-                    deactivate(connectButton.getContext());
+                    deactivate(connectButton.getContext(), permissionCallback);
                 }
             }
 
@@ -145,35 +145,35 @@ public final class ConnectLocation {
         // Set up polling job for fetching the latest connection data.
         ConnectionRefresher.schedule(context, connectionId);
 
-        Connection cachedConnection;
-        if (connectionWeakReference != null
-            && (cachedConnection = connectionWeakReference.get()) != null
-            && cachedConnection.id.equals(connectionId)) {
-            if (checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-                geofenceProvider.updateGeofences(cachedConnection);
-            } else if (hasEnabledLocationUserFeature(cachedConnection) && permissionCallback != null) {
-                Logger.warning("ACCESS_FINE_LOCATION permission not granted");
-                permissionCallback.onRequestLocationPermission();
-            }
-
-            return null;
-        }
-
         PendingResult<Connection> pendingResult = connectionApiClient.api().showConnection(connectionId);
         pendingResult.execute(new PendingResult.ResultCallback<Connection>() {
             @Override
             public void onSuccess(Connection result) {
-                connectionWeakReference = new WeakReference<>(result);
                 boolean hasEnabledLocationTrigger = hasEnabledLocationUserFeature(result);
                 Logger.log("Connection " + connectionId + " fetched successfully, location trigger enabled: " + hasEnabledLocationTrigger);
 
-                if (checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
-                    == PackageManager.PERMISSION_GRANTED) {
-                    geofenceProvider.updateGeofences(result);
-                } else if (hasEnabledLocationTrigger && permissionCallback != null) {
-                    Logger.warning("ACCESS_FINE_LOCATION permission not granted");
-                    permissionCallback.onRequestLocationPermission();
+                if (hasEnabledLocationTrigger) {
+                    if (checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                        geofenceProvider.updateGeofences(result,
+                                new GeofenceProvider.GeofenceUpdateCallback() {
+                                    @Override
+                                    public void onGeofenceAdded() {
+                                        if (permissionCallback != null) {
+                                            permissionCallback.onGeofenceAdded();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onGeofenceRemoved() {
+                                        if (permissionCallback != null) {
+                                            permissionCallback.onGeofenceRemoved();
+                                        }
+                                    }
+                                });
+                    } else if (permissionCallback != null) {
+                        Logger.warning("ACCESS_FINE_LOCATION permission not granted");
+                        permissionCallback.onRequestLocationPermission();
+                    }
                 }
             }
 
@@ -189,9 +189,23 @@ public final class ConnectLocation {
     /**
      * Remove all registered geo-fences and cancel polling {@link Worker}.
      */
-    public void deactivate(Context context) {
+    public void deactivate(Context context, @Nullable LocationPermissionCallback permissionCallback) {
         Logger.log("Deactivating geo-fence");
-        geofenceProvider.removeGeofences();
+        geofenceProvider.removeGeofences(new GeofenceProvider.GeofenceUpdateCallback() {
+            @Override
+            public void onGeofenceAdded() {
+                if (permissionCallback != null) {
+                    permissionCallback.onGeofenceAdded();
+                }
+            }
+
+            @Override
+            public void onGeofenceRemoved() {
+                if (permissionCallback != null) {
+                    permissionCallback.onGeofenceRemoved();
+                }
+            }
+        });
 
         ConnectionRefresher.cancel(context);
     }

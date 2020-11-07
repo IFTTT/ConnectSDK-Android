@@ -99,12 +99,25 @@ class MainActivity : AppCompatActivity() {
      */
     private fun setupForLocationConnection() {
         setupForConnection()
-        ConnectLocation.getInstance().setUpWithConnectButton(connectButton) {
-            val permissionGrant = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-            if (permissionGrant != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 0);
+        ConnectLocation.getInstance().setUpWithConnectButton(
+            connectButton,
+            object: ConnectLocation.LocationPermissionCallback {
+                override fun onRequestLocationPermission() {
+                    val permissionGrant = ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.ACCESS_FINE_LOCATION)
+                    if (permissionGrant != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(this@MainActivity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 0);
+                    }
+                }
+
+                override fun onGeofenceAdded() {
+                    // No-op
+                }
+
+                override fun onGeofenceRemoved() {
+                    //No-op
+                }
             }
-        }
+        )
     }
 
     /*

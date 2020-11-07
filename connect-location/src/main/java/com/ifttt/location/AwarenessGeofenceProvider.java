@@ -3,6 +3,7 @@ package com.ifttt.location;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import com.google.android.gms.awareness.Awareness;
 import com.google.android.gms.awareness.FenceClient;
@@ -59,7 +60,7 @@ final class AwarenessGeofenceProvider implements GeofenceProvider {
     }
 
     @Override
-    public void updateGeofences(final Connection connection) {
+    public void updateGeofences(final Connection connection, @Nullable GeofenceUpdateCallback geofenceUpdateCallback) {
         fenceClient.queryFences(FenceQueryRequest.all()).addOnSuccessListener(fenceQueryResponse -> {
             FenceUpdateRequest.Builder requestBuilder = new FenceUpdateRequest.Builder();
             diffFences(connection.status,
@@ -72,12 +73,18 @@ final class AwarenessGeofenceProvider implements GeofenceProvider {
                     public void onAddFence(String key, AwarenessFence value, PendingIntent pendingIntent) {
                         Logger.log("Adding geo-fence ");
                         requestBuilder.addFence(key, value, pendingIntent);
+                        if (geofenceUpdateCallback != null) {
+                            geofenceUpdateCallback.onGeofenceAdded();
+                        }
                     }
 
                     @Override
                     public void onRemoveFence(String key) {
                         Logger.log("Removing geo-fence");
                         requestBuilder.removeFence(key);
+                        if (geofenceUpdateCallback != null) {
+                            geofenceUpdateCallback.onGeofenceRemoved();
+                        }
                     }
                 }
             );
@@ -86,7 +93,7 @@ final class AwarenessGeofenceProvider implements GeofenceProvider {
     }
 
     @Override
-    public void removeGeofences() {
+    public void removeGeofences(GeofenceUpdateCallback geofenceUpdateCallback) {
         fenceClient.updateFences(new FenceUpdateRequest.Builder()
             .removeFence(exitPendingIntent)
             .removeFence(enterPendingIntent)
