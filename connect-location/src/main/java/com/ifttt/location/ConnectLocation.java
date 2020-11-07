@@ -154,26 +154,26 @@ public final class ConnectLocation {
 
                 if (hasEnabledLocationTrigger) {
                     if (checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                        geofenceProvider.updateGeofences(result,
-                                new GeofenceProvider.GeofenceUpdateCallback() {
-                                    @Override
-                                    public void onGeofenceAdded() {
-                                        if (permissionCallback != null) {
+                        if (permissionCallback != null) {
+                            geofenceProvider.updateGeofences(result,
+                                    new GeofenceProvider.GeofenceUpdateCallback() {
+                                        @Override
+                                        public void onGeofenceAdded() {
                                             permissionCallback.onGeofenceAdded();
                                         }
-                                    }
 
-                                    @Override
-                                    public void onGeofenceRemoved() {
-                                        if (permissionCallback != null) {
+                                        @Override
+                                        public void onGeofenceRemoved() {
                                             permissionCallback.onGeofenceRemoved();
                                         }
-                                    }
-                                });
-                    } else if (permissionCallback != null) {
-                        Logger.warning("ACCESS_FINE_LOCATION permission not granted");
-                        permissionCallback.onRequestLocationPermission();
+                                    });
+                        } else {
+                            geofenceProvider.updateGeofences(result, null);
+                        }
                     }
+                } else if (permissionCallback != null) {
+                    Logger.warning("ACCESS_FINE_LOCATION permission not granted");
+                    permissionCallback.onRequestLocationPermission();
                 }
             }
 
