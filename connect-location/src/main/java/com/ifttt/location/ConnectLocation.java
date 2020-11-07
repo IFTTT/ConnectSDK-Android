@@ -170,10 +170,10 @@ public final class ConnectLocation {
                         } else {
                             geofenceProvider.updateGeofences(result, null);
                         }
+                    } else if (permissionCallback != null) {
+                        Logger.warning("ACCESS_FINE_LOCATION permission not granted");
+                        permissionCallback.onRequestLocationPermission();
                     }
-                } else if (permissionCallback != null) {
-                    Logger.warning("ACCESS_FINE_LOCATION permission not granted");
-                    permissionCallback.onRequestLocationPermission();
                 }
             }
 
