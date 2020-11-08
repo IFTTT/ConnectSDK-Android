@@ -16,6 +16,7 @@ import com.ifttt.connect.api.Feature;
 import com.ifttt.connect.api.LocationFieldValue;
 import com.ifttt.connect.api.UserFeature;
 import com.ifttt.connect.api.UserFeatureField;
+import com.ifttt.location.ConnectLocation.LocationStatusCallback;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +61,7 @@ final class AwarenessGeofenceProvider implements GeofenceProvider {
     }
 
     @Override
-    public void updateGeofences(final Connection connection, @Nullable GeofenceUpdateCallback geofenceUpdateCallback) {
+    public void updateGeofences(final Connection connection, @Nullable LocationStatusCallback locationStatusCallback) {
         fenceClient.queryFences(FenceQueryRequest.all()).addOnSuccessListener(fenceQueryResponse -> {
             FenceUpdateRequest.Builder requestBuilder = new FenceUpdateRequest.Builder();
             diffFences(connection.status,
@@ -71,33 +72,41 @@ final class AwarenessGeofenceProvider implements GeofenceProvider {
                 new DiffCallback() {
                     @Override
                     public void onAddFence(String key, AwarenessFence value, PendingIntent pendingIntent) {
-                        Logger.log("Adding geo-fence ");
+                        Logger.log("Adding geo-fence");
                         requestBuilder.addFence(key, value, pendingIntent);
-                        if (geofenceUpdateCallback != null) {
-                            geofenceUpdateCallback.onGeofenceAdded();
-                        }
                     }
 
                     @Override
                     public void onRemoveFence(String key) {
                         Logger.log("Removing geo-fence");
                         requestBuilder.removeFence(key);
-                        if (geofenceUpdateCallback != null) {
-                            geofenceUpdateCallback.onGeofenceRemoved();
-                        }
                     }
                 }
             );
-            fenceClient.updateFences(requestBuilder.build());
+
+            fenceClient.updateFences(requestBuilder.build()).continueWithTask(task -> fenceClient.queryFences(
+                FenceQueryRequest.all())).addOnSuccessListener(response -> {
+                if (locationStatusCallback == null) {
+                    return;
+                }
+
+                boolean hasActiveGeofence = !response.getFenceStateMap().getFenceKeys().isEmpty();
+                locationStatusCallback.onLocationStatusUpdated(hasActiveGeofence);
+
+                Logger.log("Geo-fences status updated, activated: " + hasActiveGeofence);
+            });
         });
     }
 
     @Override
-    public void removeGeofences(GeofenceUpdateCallback geofenceUpdateCallback) {
-        fenceClient.updateFences(new FenceUpdateRequest.Builder()
-            .removeFence(exitPendingIntent)
+    public void removeGeofences(@Nullable LocationStatusCallback locationStatusCallback) {
+        fenceClient.updateFences(new FenceUpdateRequest.Builder().removeFence(exitPendingIntent)
             .removeFence(enterPendingIntent)
-            .build());
+            .build()).addOnSuccessListener(aVoid -> {
+            if (locationStatusCallback != null) {
+                locationStatusCallback.onLocationStatusUpdated(false);
+            }
+        });
     }
 
     interface DiffCallback {
@@ -125,11 +134,11 @@ final class AwarenessGeofenceProvider implements GeofenceProvider {
             return;
         }
 
-        Map<String, List<UserFeatureField<LocationFieldValue>>> locations = extractLocationUserFeatures(features);
+        Map<String, List<UserFeatureField<LocationFieldValue>>> locations = extractLocationUserFeatures(features, true);
         for (Map.Entry<String, List<UserFeatureField<LocationFieldValue>>> entry : locations.entrySet()) {
             String id = entry.getKey();
             for (UserFeatureField<LocationFieldValue> userFeatureField : entry.getValue()) {
-                LocationFieldValue region = (LocationFieldValue) userFeatureField.value;
+                LocationFieldValue region = userFeatureField.value;
                 switch (userFeatureField.fieldType) {
                     case FIELD_TYPE_LOCATION_ENTER:
                         if (!fenceKeysToRemove.contains(id)) {

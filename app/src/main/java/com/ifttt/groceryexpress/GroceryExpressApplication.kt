@@ -11,6 +11,7 @@ class GroceryExpressApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         ConnectLocation.init(this, GroceryExpressCredentialsProvider(EmailPreferencesHelper(this)))
+        ConnectLocation.getInstance().setLoggingEnabled(BuildConfig.DEBUG)
     }
 
 }

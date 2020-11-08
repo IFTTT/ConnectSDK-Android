@@ -11,6 +11,7 @@ import android.view.MenuItem
 import android.view.Window
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -36,6 +37,28 @@ class MainActivity : AppCompatActivity() {
 
     // User preference on skip configuration flag from the menu.
     private var skipConnectionConfiguration: Boolean = false
+
+    private val locationStatusCallback = object : ConnectLocation.LocationStatusCallback {
+        override fun onRequestLocationPermission() {
+            val permissionGrant =
+                ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.ACCESS_FINE_LOCATION)
+            if (permissionGrant != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(
+                    this@MainActivity,
+                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                    0
+                );
+            }
+        }
+
+        override fun onLocationStatusUpdated(activated: Boolean) {
+            if (activated) {
+                Toast.makeText(this@MainActivity, R.string.geofences_activated, Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this@MainActivity, R.string.geofences_deactivated, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 
     private val fetchCompleteListener = ConnectButton.OnFetchConnectionListener {
         findViewById<TextView>(R.id.connection_title).text = it.name
@@ -99,25 +122,7 @@ class MainActivity : AppCompatActivity() {
      */
     private fun setupForLocationConnection() {
         setupForConnection()
-        ConnectLocation.getInstance().setUpWithConnectButton(
-            connectButton,
-            object: ConnectLocation.LocationPermissionCallback {
-                override fun onRequestLocationPermission() {
-                    val permissionGrant = ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.ACCESS_FINE_LOCATION)
-                    if (permissionGrant != PackageManager.PERMISSION_GRANTED) {
-                        ActivityCompat.requestPermissions(this@MainActivity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 0);
-                    }
-                }
-
-                override fun onGeofenceAdded() {
-                    // No-op
-                }
-
-                override fun onGeofenceRemoved() {
-                    //No-op
-                }
-            }
-        )
+        ConnectLocation.getInstance().setUpWithConnectButton(connectButton, locationStatusCallback)
     }
 
     /*
@@ -196,7 +201,7 @@ class MainActivity : AppCompatActivity() {
             Possibly show a message or any other error/warning indication for the connection not being able to work as expected
              */
         } else {
-            ConnectLocation.getInstance().activate(this, CONNECTION_ID_LOCATION, null)
+            ConnectLocation.getInstance().activate(this, CONNECTION_ID_LOCATION, locationStatusCallback)
         }
     }
 

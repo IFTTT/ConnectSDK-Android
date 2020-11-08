@@ -3,24 +3,18 @@ package com.ifttt.location;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import androidx.annotation.CheckResult;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import androidx.work.Worker;
 import com.ifttt.connect.api.Connection;
 import com.ifttt.connect.api.ConnectionApiClient;
 import com.ifttt.connect.api.ErrorResponse;
-import com.ifttt.connect.api.LocationFieldValue;
 import com.ifttt.connect.api.PendingResult;
 import com.ifttt.connect.api.UserFeature;
-import com.ifttt.connect.api.UserFeatureField;
 import com.ifttt.connect.api.UserTokenProvider;
 import com.ifttt.connect.ui.ButtonStateChangeListener;
 import com.ifttt.connect.ui.ConnectButton;
 import com.ifttt.connect.ui.ConnectButtonState;
-import java.lang.ref.WeakReference;
-import java.util.List;
-import java.util.Map;
 
 import static androidx.core.content.ContextCompat.checkSelfPermission;
 
@@ -34,7 +28,7 @@ public final class ConnectLocation {
     /**
      * Callback interface used to listen to connection status change in {@link ConnectButton}.
      */
-    public interface LocationPermissionCallback {
+    public interface LocationStatusCallback {
 
         /**
          * Called when a connection is enabled, it has an enabled {@link UserFeature} that uses at least one Location
@@ -42,9 +36,12 @@ public final class ConnectLocation {
          */
         void onRequestLocationPermission();
 
-        void onGeofenceAdded();
-
-        void onGeofenceRemoved();
+        /**
+         * Called when a connection's corresponding geo-fences' status has changed.
+         *
+         * @param activated True if at least one geo-fence is currently active, false otherwise.
+         */
+        void onLocationStatusUpdated(boolean activated);
     }
 
     private static ConnectLocation INSTANCE = null;
@@ -84,17 +81,17 @@ public final class ConnectLocation {
      * if you don't call this method.
      *
      * @param connectButton button instance initialized to display the connection.
-     * @param permissionCallback {@link LocationPermissionCallback to be registered}. you will be notified when the
+     * @param permissionCallback {@link LocationStatusCallback to be registered}. you will be notified when the
      * connection is enabled and location permissions need to be granted.
      */
-    public void setUpWithConnectButton(ConnectButton connectButton, LocationPermissionCallback permissionCallback) {
+    public void setUpWithConnectButton(ConnectButton connectButton, LocationStatusCallback permissionCallback) {
         connectButton.addButtonStateChangeListener(new ButtonStateChangeListener() {
             @Override
             public void onStateChanged(
                 ConnectButtonState currentState, ConnectButtonState previousState, Connection connection
             ) {
                 if (currentState == ConnectButtonState.Enabled) {
-                    activate(connectButton.getContext(), connection.id, permissionCallback);
+                    doActivate(connectButton.getContext(), connection, permissionCallback);
                 } else if (currentState == ConnectButtonState.Disabled || currentState == ConnectButtonState.Initial) {
                     deactivate(connectButton.getContext(), permissionCallback);
                 }
@@ -125,22 +122,21 @@ public final class ConnectLocation {
      * ConnectLocation to account for users who have the connection already enabled but hasn't had it set up in your
      * app. This method fetches the latest connection data, checks if, for the given user (via {@link UserTokenProvider},
      * there is an enabled {@link UserFeature} that uses Location trigger. If that is true, it will set up the geofences
-     * and call the {@link LocationPermissionCallback#onRequestLocationPermission()}.
+     * and call the {@link LocationStatusCallback#onRequestLocationPermission()}.
      *
      * If you have a connection that uses Location service, you should call this method in the first Activity that your
      * users use your app, so that you can prompt the location permission request as soon as possible.
      *
      * @param context Context instance of the place where the permission check happens.
      * @param connectionId Connection ID to be activated.
-     * @param permissionCallback Nullable {@link LocationPermissionCallback} instance, if non-null, it will be invoked
-     * when the connection is enabled, has an enabled UserFeature that has at least one Location service trigger, and
-     * the app doesn't have ACCESS_FINE_LOCATION permission.
+     * @param locationStatusCallback Nullable {@link LocationStatusCallback} instance, can be used to listen to geofence
+     * status changes and location permission requests.
      * @return a {@link PendingResult} instance if we need to fetch the connection data, or null if we can reuse the
      * cached data.
      */
     @Nullable
     public PendingResult<Connection> activate(
-        Context context, String connectionId, @Nullable LocationPermissionCallback permissionCallback
+        Context context, String connectionId, @Nullable LocationStatusCallback locationStatusCallback
     ) {
         // Set up polling job for fetching the latest connection data.
         ConnectionRefresher.schedule(context, connectionId);
@@ -149,32 +145,8 @@ public final class ConnectLocation {
         pendingResult.execute(new PendingResult.ResultCallback<Connection>() {
             @Override
             public void onSuccess(Connection result) {
-                boolean hasEnabledLocationTrigger = hasEnabledLocationUserFeature(result);
-                Logger.log("Connection " + connectionId + " fetched successfully, location trigger enabled: " + hasEnabledLocationTrigger);
-
-                if (hasEnabledLocationTrigger) {
-                    if (checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                        if (permissionCallback != null) {
-                            geofenceProvider.updateGeofences(result,
-                                    new GeofenceProvider.GeofenceUpdateCallback() {
-                                        @Override
-                                        public void onGeofenceAdded() {
-                                            permissionCallback.onGeofenceAdded();
-                                        }
-
-                                        @Override
-                                        public void onGeofenceRemoved() {
-                                            permissionCallback.onGeofenceRemoved();
-                                        }
-                                    });
-                        } else {
-                            geofenceProvider.updateGeofences(result, null);
-                        }
-                    } else if (permissionCallback != null) {
-                        Logger.warning("ACCESS_FINE_LOCATION permission not granted");
-                        permissionCallback.onRequestLocationPermission();
-                    }
-                }
+                Logger.log("Connection " + connectionId + " fetched successfully");
+                doActivate(context, result, locationStatusCallback);
             }
 
             @Override
@@ -189,23 +161,9 @@ public final class ConnectLocation {
     /**
      * Remove all registered geo-fences and cancel polling {@link Worker}.
      */
-    public void deactivate(Context context, @Nullable LocationPermissionCallback permissionCallback) {
+    public void deactivate(Context context, @Nullable LocationStatusCallback locationStatusCallback) {
         Logger.log("Deactivating geo-fence");
-        geofenceProvider.removeGeofences(new GeofenceProvider.GeofenceUpdateCallback() {
-            @Override
-            public void onGeofenceAdded() {
-                if (permissionCallback != null) {
-                    permissionCallback.onGeofenceAdded();
-                }
-            }
-
-            @Override
-            public void onGeofenceRemoved() {
-                if (permissionCallback != null) {
-                    permissionCallback.onGeofenceRemoved();
-                }
-            }
-        });
+        geofenceProvider.removeGeofences(locationStatusCallback);
 
         ConnectionRefresher.cancel(context);
     }
@@ -216,14 +174,29 @@ public final class ConnectLocation {
         this.connectionApiClient = connectionApiClient;
     }
 
-    @CheckResult
-    private static boolean hasEnabledLocationUserFeature(Connection connection) {
-        if (connection.status != Connection.Status.enabled) {
-            return false;
+    private void doActivate(
+        Context context, Connection connection, @Nullable LocationStatusCallback locationStatusCallback
+    ) {
+        boolean hasLocationTrigger = !LocationEventUploadHelper.extractLocationUserFeatures(connection.features, false)
+            .isEmpty();
+        if (!hasLocationTrigger) {
+            // No-op if there is no enabled location trigger.
+            return;
         }
 
-        Map<String, List<UserFeatureField<LocationFieldValue>>> result
-            = LocationEventUploadHelper.extractLocationUserFeatures(connection.features);
-        return !result.isEmpty();
+        if (checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
+            == PackageManager.PERMISSION_GRANTED) {
+            geofenceProvider.updateGeofences(connection, locationStatusCallback);
+        } else if (locationStatusCallback != null) {
+            boolean hasEnabledLocationTrigger
+                = !LocationEventUploadHelper.extractLocationUserFeatures(connection.features, true).isEmpty();
+            if (!hasEnabledLocationTrigger) {
+                // No-op if there is no enabled location trigger.
+                return;
+            }
+
+            Logger.warning("ACCESS_FINE_LOCATION permission not granted");
+            locationStatusCallback.onRequestLocationPermission();
+        }
     }
 }
