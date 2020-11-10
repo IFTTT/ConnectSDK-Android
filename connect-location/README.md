@@ -45,7 +45,7 @@ To initialize the SDK, call `ConnectLocation.init` method at the earliest possib
 ### Integrate with ConnectButton SDK
 In the Activity/Fragment that you place the `ConnectButton` View for the connection **that uses Location service**, call `ConnectLocation.getInstance().setUpWithConnectButton` method to allow ConnectLocation to listen to button state changes, and update the geo-fences accordingly.
 
-In this method, a `LocationPermissionCallback` is required as a callback mechanism to notify your app to prompt Location permission, in case the user has not yet granted the permission and the connection is connected.
+In this method, a `LocationStatusCallback` is required as a callback mechanism to notify your app to prompt Location permission, in case the user has not yet granted the permission and the connection is connected.
 
 ### Set up monitoring for returning users
 Since the geo-fencing functionality operates mostly in the background, as well as in context that's outside of the Activity/Fragment that the ConnectButton is shown, your app needs to make sure that if the user has a connected Location connection, the geo-fences can be set up and the permission is granted.
@@ -55,9 +55,11 @@ To help "activating" the geo-fences for a given user, call `ConnectLocation.getI
 * Check if there is any enabled geo-fence that needs to be set up
 * Check if the app has `ACCESS_FINE_LOCATION` permission
   * If the app has the permission, it will update the registered geo-fences if necessary
-  * If the app doesn't have the permission, it will call the `LocationPermissionCallback#onRequestLocationPermission` to inform your app to prompt the permission request
+  * If the app doesn't have the permission, it will call the `LocationStatusCallback#onRequestLocationPermission` to inform your app to prompt the permission request
 
-Once your app received the location permission grant, you can call `ConnectLocation.getInstance().activate`, without passing the LocationPermissionCallback instance, to activate the geo-fences.
+`LocationStatusCallback#onLocationStatusUpdated` is added in v2.3.4, and can be used to listen to the geo-fences status changes:
+* when there is at least one geo-fence registered, `onLocationStatusUpdated` will be invoked with `activated` parameter being `true`
+* if there is no geo-fence registered, `onLocationStatusUpdated` will be invoked with `activated` parameter being `false`
 
 ### Deactivate geo-fences
 When your user logs out, you should reflect this state via returning null in the `UserTokenProvider` passed to the ConnectLocation instance, doing so allows it to unregister the geo-fences accordingly. However, if you would like to make sure the geo-fences are correctly removed as soon as the users log out from your app, you can call `ConnectLocation.getInstance().deactivate()` directly.

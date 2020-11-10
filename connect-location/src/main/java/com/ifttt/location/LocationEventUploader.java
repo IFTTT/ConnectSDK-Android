@@ -65,7 +65,7 @@ public final class LocationEventUploader extends Worker {
                 Logger.error("Geo-fence event upload failed with status code: " + uploadResponse.code());
                 if (uploadResponse.code() == 401) {
                     // The token is invalid, unregister all geo-fences and return.
-                    location.deactivate(getApplicationContext());
+                    location.deactivate(getApplicationContext(), null);
                     return Result.failure();
                 }
                 return failureResult();

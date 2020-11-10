@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Grocery Express</string>
     <string name="user_id_hint">User id</string>
@@ -16,4 +17,6 @@
     <string name="login">Login</string>
     <string name="select_connection">Select a connection.</string>
     <string name="skip_config">Skip configuration</string>
+    <string name="geofences_activated">Geofences activated</string>
+    <string name="geofences_deactivated">Geofences deactivated</string>
 </resources>

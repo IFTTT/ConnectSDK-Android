@@ -37,7 +37,7 @@ public final class LocationEventUploadHelperTest {
     public void shouldNotExtractNullUserFeature() {
         List<Feature> features = features(false, false, null);
         Map<String, List<UserFeatureField<LocationFieldValue>>> result
-            = LocationEventUploadHelper.extractLocationUserFeatures(features);
+            = LocationEventUploadHelper.extractLocationUserFeatures(features, true);
         assertThat(result).isEmpty();
     }
 
@@ -45,7 +45,7 @@ public final class LocationEventUploadHelperTest {
     public void shouldNotExtractDisabledUserFeatures() {
         List<Feature> features = features(true, false, null);
         Map<String, List<UserFeatureField<LocationFieldValue>>> result
-            = LocationEventUploadHelper.extractLocationUserFeatures(features);
+            = LocationEventUploadHelper.extractLocationUserFeatures(features, true);
         assertThat(result).isEmpty();
     }
 
@@ -54,7 +54,19 @@ public final class LocationEventUploadHelperTest {
         LocationFieldValue value = new LocationFieldValue(37D, -122D, 100D, "IFTTT");
         List<Feature> features = features(true, true, value);
         Map<String, List<UserFeatureField<LocationFieldValue>>> result
-            = LocationEventUploadHelper.extractLocationUserFeatures(features);
+            = LocationEventUploadHelper.extractLocationUserFeatures(features, true);
+
+        assertThat(result).isNotEmpty();
+        assertThat(result.get("user_feature_step_id")).hasSize(1);
+        assertThat(result.get("user_feature_step_id").get(0).value).isEqualTo(value);
+    }
+
+    @Test
+    public void shouldExtractAllIfEnablesOnlyFalse() {
+        LocationFieldValue value = new LocationFieldValue(37D, -122D, 100D, "IFTTT");
+        List<Feature> features = features(true, false, value);
+        Map<String, List<UserFeatureField<LocationFieldValue>>> result
+            = LocationEventUploadHelper.extractLocationUserFeatures(features, false);
 
         assertThat(result).isNotEmpty();
         assertThat(result.get("user_feature_step_id")).hasSize(1);

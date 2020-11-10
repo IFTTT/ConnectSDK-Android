@@ -34,7 +34,10 @@ final class LocationEventUploadHelper {
         }
     }
 
-    static Map<String, List<UserFeatureField<LocationFieldValue>>> extractLocationUserFeatures(List<Feature> features) {
+    static Map<String, List<UserFeatureField<LocationFieldValue>>> extractLocationUserFeatures(
+        List<Feature> features,
+        boolean enablesOnly
+    ) {
         Map<String, List<UserFeatureField<LocationFieldValue>>> results = new LinkedHashMap<>();
         for (Feature feature : features) {
             if (feature.userFeatures == null) {
@@ -43,7 +46,7 @@ final class LocationEventUploadHelper {
             }
 
             for (UserFeature userFeature : feature.userFeatures) {
-                if (!userFeature.enabled) {
+                if (enablesOnly && !userFeature.enabled) {
                     // Skip processing disabled UserFeatureSteps.
                     continue;
                 }

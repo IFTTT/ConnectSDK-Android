@@ -54,7 +54,7 @@ public final class ConnectionRefresher extends Worker {
                 Logger.log("Connection fetch successful");
                 if (checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                     == PackageManager.PERMISSION_GRANTED) {
-                    ConnectLocation.getInstance().geofenceProvider.updateGeofences(connection);
+                    ConnectLocation.getInstance().geofenceProvider.updateGeofences(connection, null);
                 }
             }
         } catch (IOException e) {

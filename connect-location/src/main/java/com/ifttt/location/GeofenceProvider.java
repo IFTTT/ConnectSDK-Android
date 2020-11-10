@@ -1,8 +1,10 @@
 package com.ifttt.location;
 
 import android.Manifest;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresPermission;
 import com.ifttt.connect.api.Connection;
+import com.ifttt.location.ConnectLocation.LocationStatusCallback;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -23,7 +25,7 @@ interface GeofenceProvider {
     ));
 
     @RequiresPermission(Manifest.permission.ACCESS_FINE_LOCATION)
-    void updateGeofences(final Connection connection);
+    void updateGeofences(final Connection connection, @Nullable LocationStatusCallback locationStatusCallback);
 
-    void removeGeofences();
+    void removeGeofences(@Nullable LocationStatusCallback locationStatusCallback);
 }

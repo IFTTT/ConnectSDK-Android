@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="awareness_api_key">YOUR_AWARENESS_API_KEY</string>
+    <string name="awareness_api_key" translatable="false">YOUR_AWARENESS_API_KEY</string>
 </resources>
