@@ -1,5 +1,7 @@
 # IFTTT Connect Location SDK for Android
 
+[![javadoc](https://javadoc.io/badge2/com.ifttt/connect-location/javadoc.svg)](https://javadoc.io/doc/com.ifttt/connect-location)
+
 IFTTT Connect Location SDK is an add-on library to the [ConnectButton SDK](https://github.com/IFTTT/ConnectSDK-Android/blob/master/README.md), it provides native geo-fencing functionality (through [Google Awareness API](https://developers.google.com/awareness)) for connections using [IFTTT Location service](https://ifttt.com/location).
 
 * [Dependencies](#)
