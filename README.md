@@ -4,6 +4,12 @@
 
 [![Build Status](https://travis-ci.org/IFTTT/ConnectSDK-Android.svg?branch=master)](https://travis-ci.org/IFTTT/ConnectSDK-Android)
 
+### Connect API references
+[![javadoc](https://javadoc.io/badge2/com.ifttt/connect-api/javadoc.svg)](https://javadoc.io/doc/com.ifttt/connect-api)
+
+### Connect Button API references
+[![javadoc](https://javadoc.io/badge2/com.ifttt/connect-button/javadoc.svg)](https://javadoc.io/doc/com.ifttt/connect-button)
+
 IFTTT Connect Button SDK is a library that helps facilitate the integration of the Connect Button and [Connect API](https://platform.ifttt.com/docs/connect_api).
 
 * [Features](https://github.com/IFTTT/IFTTTSDK-Android-v2#Features)
