@@ -19,6 +19,7 @@ final class LocationEventUploadHelper {
 
     private static final String SHARED_PREFERENCES_CONNECT_LOCATION = "ifttt_connection_location";
     private static final String PREFERENCES_KEY_INSTALLATION_ID = "ifttt_connection_location.installation_id";
+    private static final String IFTTT_FENCE_KEY_PREFIX = "ifttt_";
 
     static String getInstallationId(Context context) {
         SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFERENCES_CONNECT_LOCATION,
@@ -72,6 +73,14 @@ final class LocationEventUploadHelper {
         return results;
     }
 
+    static boolean isIftttFenceKey(String id) {
+        return id.startsWith(IFTTT_FENCE_KEY_PREFIX);
+    }
+
+    static String getIftttFenceKey(String id) {
+        return IFTTT_FENCE_KEY_PREFIX.concat(id);
+    }
+
     static String getEnterFenceKey(String id) {
         return id.concat("/enter");
     }
@@ -81,12 +90,19 @@ final class LocationEventUploadHelper {
     }
 
     static String extractStepId(String fenceKey) {
-        int dividerIndex = fenceKey.indexOf("/");
-        if (dividerIndex < 0) {
-            return fenceKey;
+        String stepId;
+        if (fenceKey.startsWith(IFTTT_FENCE_KEY_PREFIX)) {
+            stepId = fenceKey.substring(6);
+        } else {
+            stepId = fenceKey;
         }
 
-        return fenceKey.substring(0, dividerIndex);
+        int dividerIndex = stepId.indexOf("/");
+        if (dividerIndex < 0) {
+            return stepId;
+        }
+
+        return stepId.substring(0, dividerIndex);
     }
 
     private LocationEventUploadHelper() {

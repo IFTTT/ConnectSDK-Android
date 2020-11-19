@@ -19,6 +19,9 @@ import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.ifttt.location.LocationEventUploadHelper.extractStepId;
+import static com.ifttt.location.LocationEventUploadHelper.getEnterFenceKey;
+import static com.ifttt.location.LocationEventUploadHelper.getIftttFenceKey;
 
 @RunWith(AndroidJUnit4.class)
 public final class LocationEventUploadHelperTest {
@@ -73,6 +76,18 @@ public final class LocationEventUploadHelperTest {
         assertThat(result.get("user_feature_step_id").get(0).value).isEqualTo(value);
     }
 
+    @Test
+    public void shouldRemoveSuffix() {
+        String fenceKey = getEnterFenceKey("step_id");
+        assertThat(extractStepId(fenceKey)).isEqualTo("step_id");
+    }
+
+    @Test
+    public void shouldRemovePrefix() {
+        String fenceKey = getIftttFenceKey("step_id");
+        assertThat(extractStepId(fenceKey)).isEqualTo("step_id");
+    }
+
     private List<Feature> features(
         boolean hasUserFeature,
         boolean hasEnabledUserFeature,
@@ -110,8 +125,8 @@ public final class LocationEventUploadHelperTest {
     @Test
     public void shouldExtractStepIdFromEncodedValue() {
         String stepId = "step_id";
-        String entryEncoded = LocationEventUploadHelper.getEnterFenceKey(stepId);
-        String exitEncoded = LocationEventUploadHelper.getEnterFenceKey(stepId);
+        String entryEncoded = getEnterFenceKey(stepId);
+        String exitEncoded = getEnterFenceKey(stepId);
 
         assertThat(LocationEventUploadHelper.extractStepId(entryEncoded)).isEqualTo(stepId);
         assertThat(LocationEventUploadHelper.extractStepId(exitEncoded)).isEqualTo(stepId);
