@@ -157,45 +157,33 @@ final class AwarenessGeofenceProvider implements GeofenceProvider {
                 LocationFieldValue region = userFeatureField.value;
                 switch (userFeatureField.fieldType) {
                     case FIELD_TYPE_LOCATION_ENTER:
-                        if (!fenceKeysToRemove.contains(id)) {
-                            callback.onAddFence(id,
-                                LocationFence.entering(region.lat, region.lng, region.radius),
-                                enterPendingIntent
-                            );
-                        } else {
-                            fenceKeysToRemove.remove(id);
-                        }
+                        callback.onAddFence(id,
+                            LocationFence.entering(region.lat, region.lng, region.radius),
+                            enterPendingIntent
+                        );
+                        fenceKeysToRemove.remove(id);
                         break;
                     case FIELD_TYPE_LOCATION_EXIT:
-                        if (!fenceKeysToRemove.contains(id)) {
-                            callback.onAddFence(id,
-                                LocationFence.exiting(region.lat, region.lng, region.radius),
-                                exitPendingIntent
-                            );
-                        } else {
-                            fenceKeysToRemove.remove(id);
-                        }
+                        callback.onAddFence(id,
+                            LocationFence.exiting(region.lat, region.lng, region.radius),
+                            exitPendingIntent
+                        );
+                        fenceKeysToRemove.remove(id);
                         break;
                     case FIELD_TYPE_LOCATION_ENTER_EXIT:
                         String enterFenceKey = getEnterFenceKey(id);
-                        if (!fenceKeysToRemove.contains(enterFenceKey)) {
-                            callback.onAddFence(enterFenceKey,
-                                LocationFence.entering(region.lat, region.lng, region.radius),
-                                enterPendingIntent
-                            );
-                        } else {
-                            fenceKeysToRemove.remove(enterFenceKey);
-                        }
+                        callback.onAddFence(enterFenceKey,
+                            LocationFence.entering(region.lat, region.lng, region.radius),
+                            enterPendingIntent
+                        );
+                        fenceKeysToRemove.remove(enterFenceKey);
 
                         String exitFenceKey = getExitFenceKey(id);
-                        if (!fenceKeysToRemove.contains(exitFenceKey)) {
-                            callback.onAddFence(exitFenceKey,
-                                LocationFence.exiting(region.lat, region.lng, region.radius),
-                                exitPendingIntent
-                            );
-                        } else {
-                            fenceKeysToRemove.remove(exitFenceKey);
-                        }
+                        callback.onAddFence(exitFenceKey,
+                            LocationFence.exiting(region.lat, region.lng, region.radius),
+                            exitPendingIntent
+                        );
+                        fenceKeysToRemove.remove(exitFenceKey);
                         break;
                     default:
                         // No-op for other location types.
