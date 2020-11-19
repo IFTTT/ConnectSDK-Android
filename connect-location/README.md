@@ -71,7 +71,9 @@ On Android 8 and above, the Android OS enforces a [background location limit](ht
 
 In order to make sure your app can still receive reliable geo-fence updates, you may need to set it up so that it can be considered a foreground app. One of the ways you can do it is via a [foreground service](https://developer.android.com/guide/components/foreground-services). Running a foreground service makes sure that when it is active, the app will not be considered as a background app, even if it is not currently on the foreground, and therefore can receive geo-fence updates without the OS limit.
 
-However, a foreground service requires a persistent notification to be displayed while it is active. You should think about the impact of such notification to your users, when you implement the foreground service.    
+However, a foreground service requires a persistent notification to be displayed while it is active. You should think about the impact of such notification to your users, when you implement the foreground service.
+
+An example implementation of the foreground service can be found in the [example app](https://github.com/IFTTT/ConnectSDK-Android/blob/master/app/src/main/java/com/ifttt/groceryexpress/LocationForegroundService.kt).
 
 ### Logging
 You can enable logging by calling the `ConnectLocation.setLoggingEnabled(true)` method to see some basic logs on your `Logcat` window. By default, logging is disabled. If you had enabled logging and need to disable it for certain parts of the user flow, call `ConnectLocation.setLoggingEnabled(false)`
