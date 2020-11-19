@@ -122,7 +122,7 @@ public final class ConnectionRefresher extends Worker {
     @VisibleForTesting
     @Nullable
     static UUID scheduleOneTimeRefreshWork(WorkManager workManager, List<WorkInfo> workInfoList) {
-        if (workInfoList.size() == 1) {
+        if (workInfoList.size() == 1 && workInfoList.get(0).getState() != WorkInfo.State.CANCELLED) {
             List<String> tags = new ArrayList<>(workInfoList.get(0).getTags());
             for (String tag : tags) {
                 Logger.log("Tag: " + tag);

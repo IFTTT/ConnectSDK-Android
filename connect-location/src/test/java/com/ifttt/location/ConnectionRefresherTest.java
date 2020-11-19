@@ -9,6 +9,7 @@ import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 import androidx.work.testing.SynchronousExecutor;
 import androidx.work.testing.WorkManagerTestInitHelper;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
@@ -60,5 +61,26 @@ public final class ConnectionRefresherTest {
 
         WorkInfo info = workManager.getWorkInfoById(id).get();
         assertThat(info.getState()).isEqualTo(WorkInfo.State.ENQUEUED);
+    }
+
+    @Test
+    public void shouldNotScheduledWithCancelledPeriodicJob() throws ExecutionException, InterruptedException {
+        WorkManager workManager = WorkManager.getInstance(context);
+
+        ConnectionRefresher.schedule(context, "ConnectionID");
+        ConnectionRefresher.cancel(context);
+
+        List<WorkInfo> infoList = workManager.getWorkInfosForUniqueWork(ConnectionRefresher.WORK_ID_CONNECTION_POLLING)
+            .get();
+
+        UUID id = ConnectionRefresher.scheduleOneTimeRefreshWork(workManager, infoList);
+        assertThat(id).isNull();
+    }
+
+    @Test
+    public void shouldNotScheduledForIfNoPeriodicJob() {
+        WorkManager workManager = WorkManager.getInstance(context);
+        UUID id = ConnectionRefresher.scheduleOneTimeRefreshWork(workManager, Collections.emptyList());
+        assertThat(id).isNull();
     }
 }
