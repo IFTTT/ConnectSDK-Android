@@ -54,8 +54,10 @@ class MainActivity : AppCompatActivity() {
         override fun onLocationStatusUpdated(activated: Boolean) {
             if (activated) {
                 Toast.makeText(this@MainActivity, R.string.geofences_activated, Toast.LENGTH_SHORT).show()
+                LocationForegroundService.startForegroundService(this@MainActivity)
             } else {
                 Toast.makeText(this@MainActivity, R.string.geofences_deactivated, Toast.LENGTH_SHORT).show()
+                LocationForegroundService.stopForegroundService(this@MainActivity)
             }
         }
     }
