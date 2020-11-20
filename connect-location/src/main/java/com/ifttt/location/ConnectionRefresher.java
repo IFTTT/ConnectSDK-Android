@@ -3,7 +3,6 @@ package com.ifttt.location;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.work.Constraints;
 import androidx.work.Data;
