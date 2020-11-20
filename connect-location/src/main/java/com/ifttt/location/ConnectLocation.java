@@ -91,6 +91,9 @@ public final class ConnectLocation {
             public void onStateChanged(
                 ConnectButtonState currentState, ConnectButtonState previousState, Connection connection
             ) {
+                // Set up polling job for fetching the latest connection data.
+                ConnectionRefresher.schedule(connectButton.getContext(), connection.id);
+
                 if (currentState == ConnectButtonState.Enabled) {
                     doActivate(connectButton.getContext(), connection, permissionCallback);
                 } else if (currentState == ConnectButtonState.Disabled || currentState == ConnectButtonState.Initial) {
