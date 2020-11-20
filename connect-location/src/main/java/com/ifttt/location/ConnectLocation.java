@@ -17,6 +17,8 @@ import com.ifttt.connect.ui.ConnectButton;
 import com.ifttt.connect.ui.ConnectButtonState;
 
 import static androidx.core.content.ContextCompat.checkSelfPermission;
+import static com.ifttt.connect.ui.ConnectButtonState.Disabled;
+import static com.ifttt.connect.ui.ConnectButtonState.Enabled;
 
 /**
  * The main class for the Connect Location SDK. This class handles state change events from {@link ConnectButton},
@@ -50,19 +52,25 @@ public final class ConnectLocation {
     final ConnectionApiClient connectionApiClient;
 
     public static synchronized ConnectLocation init(Context context, ConnectionApiClient apiClient) {
-        if (INSTANCE == null) {
-            INSTANCE = new ConnectLocation(new AwarenessGeofenceProvider(context.getApplicationContext()), apiClient);
-        }
+        INSTANCE = new ConnectLocation(new AwarenessGeofenceProvider(context.getApplicationContext()), apiClient);
         return INSTANCE;
     }
 
-    public static synchronized ConnectLocation init(
-        Context context, UserTokenProvider userTokenProvider
-    ) {
-        if (INSTANCE == null) {
-            ConnectionApiClient client = new ConnectionApiClient.Builder(context, userTokenProvider).build();
-            INSTANCE = new ConnectLocation(new AwarenessGeofenceProvider(context.getApplicationContext()), client);
-        }
+    public static synchronized ConnectLocation init(Context context, UserTokenProvider userTokenProvider) {
+        ConnectionApiClient client = new ConnectionApiClient.Builder(context,
+            new CacheUserTokenProvider(new UserTokenCache(context), userTokenProvider)
+        ).build();
+        INSTANCE = new ConnectLocation(new AwarenessGeofenceProvider(context.getApplicationContext()), client);
+
+        return INSTANCE;
+    }
+
+    public static synchronized ConnectLocation init(Context context) {
+        ConnectionApiClient client = new ConnectionApiClient.Builder(context,
+            new CacheUserTokenProvider(new UserTokenCache(context), null)
+        ).build();
+        INSTANCE = new ConnectLocation(new AwarenessGeofenceProvider(context.getApplicationContext()), client);
+
         return INSTANCE;
     }
 
@@ -73,6 +81,10 @@ public final class ConnectLocation {
         }
 
         return INSTANCE;
+    }
+
+    static boolean isInitialized() {
+        return INSTANCE != null;
     }
 
     /**
@@ -90,9 +102,13 @@ public final class ConnectLocation {
             public void onStateChanged(
                 ConnectButtonState currentState, ConnectButtonState previousState, Connection connection
             ) {
-                if (currentState == ConnectButtonState.Enabled) {
+                if (currentState == Enabled || currentState == Disabled) {
+                    ConnectionRefresher.schedule(connectButton.getContext(), connection.id);
+                }
+
+                if (currentState == Enabled) {
                     doActivate(connectButton.getContext(), connection, permissionCallback);
-                } else if (currentState == ConnectButtonState.Disabled || currentState == ConnectButtonState.Initial) {
+                } else if (currentState == Disabled || currentState == ConnectButtonState.Initial) {
                     deactivate(connectButton.getContext(), permissionCallback);
                 }
             }
@@ -164,8 +180,9 @@ public final class ConnectLocation {
     public void deactivate(Context context, @Nullable LocationStatusCallback locationStatusCallback) {
         Logger.log("Deactivating geo-fence");
         geofenceProvider.removeGeofences(locationStatusCallback);
-
         ConnectionRefresher.cancel(context);
+
+        new UserTokenCache(context).clear();
     }
 
     @VisibleForTesting
