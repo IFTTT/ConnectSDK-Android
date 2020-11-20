@@ -25,6 +25,8 @@ import java.util.Set;
 import static com.ifttt.location.LocationEventUploadHelper.extractLocationUserFeatures;
 import static com.ifttt.location.LocationEventUploadHelper.getEnterFenceKey;
 import static com.ifttt.location.LocationEventUploadHelper.getExitFenceKey;
+import static com.ifttt.location.LocationEventUploadHelper.getIftttFenceKey;
+import static com.ifttt.location.LocationEventUploadHelper.isIftttFenceKey;
 
 /**
  * {@link GeofenceProvider} implementation using {@link Awareness} API. This implementation processes a list of
@@ -72,13 +74,13 @@ final class AwarenessGeofenceProvider implements GeofenceProvider {
                 new DiffCallback() {
                     @Override
                     public void onAddFence(String key, AwarenessFence value, PendingIntent pendingIntent) {
-                        Logger.log("Adding geo-fence");
+                        Logger.log("Adding geo-fence: " + key);
                         requestBuilder.addFence(key, value, pendingIntent);
                     }
 
                     @Override
                     public void onRemoveFence(String key) {
-                        Logger.log("Removing geo-fence");
+                        Logger.log("Removing geo-fence: " + key);
                         requestBuilder.removeFence(key);
                     }
                 }
@@ -90,7 +92,14 @@ final class AwarenessGeofenceProvider implements GeofenceProvider {
                     return;
                 }
 
-                boolean hasActiveGeofence = !response.getFenceStateMap().getFenceKeys().isEmpty();
+
+                boolean hasActiveGeofence = false;
+                for (String key : response.getFenceStateMap().getFenceKeys()) {
+                    if (isIftttFenceKey(key)) {
+                        hasActiveGeofence = true;
+                        break;
+                    }
+                }
                 locationStatusCallback.onLocationStatusUpdated(hasActiveGeofence);
 
                 Logger.log("Geo-fences status updated, activated: " + hasActiveGeofence);
@@ -124,7 +133,14 @@ final class AwarenessGeofenceProvider implements GeofenceProvider {
         PendingIntent exitPendingIntent,
         DiffCallback callback
     ) {
+        // Because the host app may also use the same FenceClient to manage their own fences, we only monitor and
+        // update fence keys set by the SDK.
         Set<String> fenceKeysToRemove = new HashSet<>(registeredFenceKeys);
+        for (String key : registeredFenceKeys) {
+            if (isIftttFenceKey(key)) {
+                fenceKeysToRemove.add(key);
+            }
+        }
 
         if (state != Connection.Status.enabled) {
             // Unregister outdated geofences.
@@ -136,7 +152,7 @@ final class AwarenessGeofenceProvider implements GeofenceProvider {
 
         Map<String, List<UserFeatureField<LocationFieldValue>>> locations = extractLocationUserFeatures(features, true);
         for (Map.Entry<String, List<UserFeatureField<LocationFieldValue>>> entry : locations.entrySet()) {
-            String id = entry.getKey();
+            String id = getIftttFenceKey(entry.getKey());
             for (UserFeatureField<LocationFieldValue> userFeatureField : entry.getValue()) {
                 LocationFieldValue region = userFeatureField.value;
                 switch (userFeatureField.fieldType) {

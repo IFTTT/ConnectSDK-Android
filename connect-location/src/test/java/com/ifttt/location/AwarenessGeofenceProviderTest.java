@@ -60,7 +60,7 @@ public final class AwarenessGeofenceProviderTest {
                 public void onAddFence(
                     String key, AwarenessFence value, PendingIntent pendingIntent
                 ) {
-                    assertThat(key).isEqualTo("step_id");
+                    assertThat(key).isEqualTo("ifttt_step_id");
                     assertThat(pendingIntent).isEqualTo(enter);
                 }
 
@@ -93,7 +93,7 @@ public final class AwarenessGeofenceProviderTest {
                 public void onAddFence(
                     String key, AwarenessFence value, PendingIntent pendingIntent
                 ) {
-                    assertThat(key).isEqualTo("step_id");
+                    assertThat(key).isEqualTo("ifttt_step_id");
                     assertThat(pendingIntent).isEqualTo(exit);
                 }
 
@@ -139,8 +139,8 @@ public final class AwarenessGeofenceProviderTest {
             }
         );
 
-        assertThat(keysRef.get().get(0)).isEqualTo("step_id/enter");
-        assertThat(keysRef.get().get(1)).isEqualTo("step_id/exit");
+        assertThat(keysRef.get().get(0)).isEqualTo("ifttt_step_id/enter");
+        assertThat(keysRef.get().get(1)).isEqualTo("ifttt_step_id/exit");
         assertThat(pendingIntentRef.get().get(0)).isEqualTo(enter);
         assertThat(pendingIntentRef.get().get(1)).isEqualTo(exit);
     }
@@ -150,7 +150,7 @@ public final class AwarenessGeofenceProviderTest {
         AwarenessGeofenceProvider.diffFences(
             Connection.Status.enabled,
             ImmutableList.of(feature),
-            ImmutableSet.of("step_id"),
+            ImmutableSet.of("ifttt_step_id"),
             enter,
             exit,
             new AwarenessGeofenceProvider.DiffCallback() {
