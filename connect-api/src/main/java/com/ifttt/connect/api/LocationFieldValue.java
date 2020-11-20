@@ -65,6 +65,21 @@ public final class LocationFieldValue implements Parcelable {
         return 0;
     }
 
+    @Override
+    public String toString() {
+        return "LocationFieldValue{"
+            + "lat="
+            + lat
+            + ", lng="
+            + lng
+            + ", radius="
+            + radius
+            + ", address='"
+            + address
+            + '\''
+            + '}';
+    }
+
     public static final Creator<LocationFieldValue> CREATOR = new Creator<LocationFieldValue>() {
         @Override
         public LocationFieldValue createFromParcel(Parcel in) {

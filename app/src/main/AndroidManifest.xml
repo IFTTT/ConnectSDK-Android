@@ -2,6 +2,7 @@
     package="com.ifttt.groceryexpress">
 
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
 
     <application
         android:name=".GroceryExpressApplication"
@@ -31,6 +32,8 @@
                     android:scheme="groceryexpress"/>
             </intent-filter>
         </activity>
+
+        <service android:name=".LocationForegroundService" android:foregroundServiceType="location" />
 
         <meta-data
             android:name="com.google.android.awareness.API_KEY"
