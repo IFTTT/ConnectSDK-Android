@@ -17,6 +17,8 @@ import com.ifttt.connect.ui.ConnectButton;
 import com.ifttt.connect.ui.ConnectButtonState;
 
 import static androidx.core.content.ContextCompat.checkSelfPermission;
+import static com.ifttt.connect.ui.ConnectButtonState.Disabled;
+import static com.ifttt.connect.ui.ConnectButtonState.Enabled;
 
 /**
  * The main class for the Connect Location SDK. This class handles state change events from {@link ConnectButton},
@@ -91,12 +93,13 @@ public final class ConnectLocation {
             public void onStateChanged(
                 ConnectButtonState currentState, ConnectButtonState previousState, Connection connection
             ) {
-                // Set up polling job for fetching the latest connection data.
-                ConnectionRefresher.schedule(connectButton.getContext(), connection.id);
+                if (currentState == Enabled || currentState == Disabled) {
+                    ConnectionRefresher.schedule(connectButton.getContext(), connection.id);
+                }
 
-                if (currentState == ConnectButtonState.Enabled) {
+                if (currentState == Enabled) {
                     doActivate(connectButton.getContext(), connection, permissionCallback);
-                } else if (currentState == ConnectButtonState.Disabled || currentState == ConnectButtonState.Initial) {
+                } else if (currentState == Disabled || currentState == ConnectButtonState.Initial) {
                     deactivate(connectButton.getContext(), permissionCallback);
                 }
             }
