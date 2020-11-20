@@ -57,12 +57,13 @@ public final class ConnectLocation {
     }
 
     public static synchronized ConnectLocation init(
-        Context context, UserTokenProvider userTokenProvider
+        Context context, @Nullable UserTokenProvider userTokenProvider
     ) {
-        if (INSTANCE == null) {
-            ConnectionApiClient client = new ConnectionApiClient.Builder(context, userTokenProvider).build();
-            INSTANCE = new ConnectLocation(new AwarenessGeofenceProvider(context.getApplicationContext()), client);
-        }
+        ConnectionApiClient client = new ConnectionApiClient.Builder(context,
+            new CacheUserTokenProvider(new UserTokenCache(context), userTokenProvider)
+        ).build();
+        INSTANCE = new ConnectLocation(new AwarenessGeofenceProvider(context.getApplicationContext()), client);
+
         return INSTANCE;
     }
 
@@ -164,8 +165,9 @@ public final class ConnectLocation {
     public void deactivate(Context context, @Nullable LocationStatusCallback locationStatusCallback) {
         Logger.log("Deactivating geo-fence");
         geofenceProvider.removeGeofences(locationStatusCallback);
-
         ConnectionRefresher.cancel(context);
+
+        new UserTokenCache(context).clear();
     }
 
     @VisibleForTesting
