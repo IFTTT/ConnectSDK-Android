@@ -169,7 +169,7 @@ public final class AwarenessGeofenceProviderTest {
             }
         );
 
-        assertThat(ref.get()).isEqualTo("step_id");
+        assertThat(ref.get()).isEqualTo("ifttt_step_id");
     }
 
     @Test
