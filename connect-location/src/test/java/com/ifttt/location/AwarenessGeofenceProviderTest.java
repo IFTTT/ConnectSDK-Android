@@ -146,7 +146,8 @@ public final class AwarenessGeofenceProviderTest {
     }
 
     @Test
-    public void shouldNotRegisterExistingGeofences() {
+    public void shouldReplaceExistingGeofences() {
+        AtomicReference<String> ref = new AtomicReference<>();
         AwarenessGeofenceProvider.diffFences(
             Connection.Status.enabled,
             ImmutableList.of(feature),
@@ -158,7 +159,7 @@ public final class AwarenessGeofenceProviderTest {
                 public void onAddFence(
                     String key, AwarenessFence value, PendingIntent pendingIntent
                 ) {
-                    fail();
+                    ref.set(key);
                 }
 
                 @Override
@@ -167,6 +168,8 @@ public final class AwarenessGeofenceProviderTest {
                 }
             }
         );
+
+        assertThat(ref.get()).isEqualTo("step_id");
     }
 
     @Test
