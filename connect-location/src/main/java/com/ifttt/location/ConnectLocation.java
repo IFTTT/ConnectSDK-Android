@@ -52,17 +52,22 @@ public final class ConnectLocation {
     final ConnectionApiClient connectionApiClient;
 
     public static synchronized ConnectLocation init(Context context, ConnectionApiClient apiClient) {
-        if (INSTANCE == null) {
-            INSTANCE = new ConnectLocation(new AwarenessGeofenceProvider(context.getApplicationContext()), apiClient);
-        }
+        INSTANCE = new ConnectLocation(new AwarenessGeofenceProvider(context.getApplicationContext()), apiClient);
         return INSTANCE;
     }
 
-    public static synchronized ConnectLocation init(
-        Context context, @Nullable UserTokenProvider userTokenProvider
-    ) {
+    public static synchronized ConnectLocation init(Context context, UserTokenProvider userTokenProvider) {
         ConnectionApiClient client = new ConnectionApiClient.Builder(context,
             new CacheUserTokenProvider(new UserTokenCache(context), userTokenProvider)
+        ).build();
+        INSTANCE = new ConnectLocation(new AwarenessGeofenceProvider(context.getApplicationContext()), client);
+
+        return INSTANCE;
+    }
+
+    public static synchronized ConnectLocation init(Context context) {
+        ConnectionApiClient client = new ConnectionApiClient.Builder(context,
+            new CacheUserTokenProvider(new UserTokenCache(context), null)
         ).build();
         INSTANCE = new ConnectLocation(new AwarenessGeofenceProvider(context.getApplicationContext()), client);
 
@@ -76,6 +81,10 @@ public final class ConnectLocation {
         }
 
         return INSTANCE;
+    }
+
+    static boolean isInitialized() {
+        return INSTANCE != null;
     }
 
     /**
