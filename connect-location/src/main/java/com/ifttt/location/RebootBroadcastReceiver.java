@@ -16,9 +16,6 @@ public final class RebootBroadcastReceiver extends BroadcastReceiver {
             return;
         }
 
-        if (!ConnectLocation.isInitialized()) {
-            ConnectLocation.init(context);
-        }
         ConnectionRefresher.executeIfExists(context);
     }
 }

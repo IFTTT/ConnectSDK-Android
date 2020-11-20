@@ -45,6 +45,10 @@ public final class ConnectionRefresher extends Worker {
     @Override
     @NonNull
     public Result doWork() {
+        if (!ConnectLocation.isInitialized()) {
+            ConnectLocation.init(getApplicationContext());
+        }
+
         ConnectionApiClient connectionApiClient = ConnectLocation.getInstance().connectionApiClient;
 
         try {
