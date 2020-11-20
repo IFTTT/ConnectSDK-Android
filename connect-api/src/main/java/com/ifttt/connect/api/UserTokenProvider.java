@@ -1,5 +1,6 @@
 package com.ifttt.connect.api;
 
+import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
 
 public interface UserTokenProvider {
@@ -9,6 +10,7 @@ public interface UserTokenProvider {
      * method is potentially going to be called for every API call, we recommend caching this value if possible to avoid
      * unnecessary operations.
      */
+    @Nullable
     @WorkerThread
     String getUserToken();
 }
