@@ -3,6 +3,8 @@ package com.ifttt.groceryexpress
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build.VERSION.SDK_INT
+import android.os.Build.VERSION_CODES.Q
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.LayoutInflater
@@ -22,6 +24,7 @@ import com.ifttt.connect.ui.ConnectButton
 import com.ifttt.connect.ui.ConnectResult
 import com.ifttt.connect.ui.CredentialsProvider
 import com.ifttt.groceryexpress.ApiHelper.REDIRECT_URI
+import com.ifttt.groceryexpress.UiHelper.appSettingsIntent
 import com.ifttt.location.ConnectLocation
 import com.squareup.picasso.Picasso
 
@@ -40,14 +43,26 @@ class MainActivity : AppCompatActivity() {
 
     private val locationStatusCallback = object : ConnectLocation.LocationStatusCallback {
         override fun onRequestLocationPermission() {
+            val permissionToCheck = if (SDK_INT >= Q) {
+                Manifest.permission.ACCESS_BACKGROUND_LOCATION
+            } else {
+                Manifest.permission.ACCESS_FINE_LOCATION
+            }
             val permissionGrant =
-                ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.ACCESS_FINE_LOCATION)
+                ContextCompat.checkSelfPermission(this@MainActivity, permissionToCheck)
             if (permissionGrant != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(
-                    this@MainActivity,
-                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                    0
-                );
+                if (SDK_INT >= Q) {
+                    /*
+                    For Android Q and above, redirect users to settings and grant "Allow all the time"
+                    location access, so that the app can get background location access.
+                     */
+                    AlertDialog.Builder(this@MainActivity).setMessage(R.string.background_location_permission_request)
+                        .setPositiveButton(R.string.ok) { _, _ ->
+                            startActivity(appSettingsIntent())
+                        }.show()
+                } else {
+                    ActivityCompat.requestPermissions(this@MainActivity, arrayOf(permissionToCheck), 0)
+                }
             }
         }
 
