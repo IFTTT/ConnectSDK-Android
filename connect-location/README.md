@@ -14,9 +14,10 @@ IFTTT Connect Location SDK is an add-on library to the [ConnectButton SDK](https
 * [Google Awareness API](https://developers.google.com/awareness)
 
 ## Requirement
-* Android SDK version 18 or higher.
+* Android SDK version 21 or higher.
 * Java 8
 * [ACCESS_FINE_LOCATION](https://developer.android.com/reference/android/Manifest.permission#ACCESS_FINE_LOCATION) permission.
+* [ACCESS_BACKGROUND_LOCATION](https://developer.android.com/reference/android/Manifest.permission#ACCESS_BACKGROUND_LOCATION) permission if targeting Android SDK 29+.
 
 ## Installation
 ### Gradle

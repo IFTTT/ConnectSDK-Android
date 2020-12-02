@@ -35,7 +35,7 @@ This SDK uses the following libraries as dependencies:
 	* AppCompat
 
 ## Requirement
-* Android SDK version 18 or higher.
+* Android SDK version 21 or higher.
 * Java 8
 
 ## Installation
