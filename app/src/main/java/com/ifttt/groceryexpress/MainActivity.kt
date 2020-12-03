@@ -18,12 +18,12 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import com.google.android.material.textfield.TextInputLayout
 import com.ifttt.connect.ui.ConnectButton
 import com.ifttt.connect.ui.ConnectResult
 import com.ifttt.connect.ui.CredentialsProvider
 import com.ifttt.groceryexpress.ApiHelper.REDIRECT_URI
+import com.ifttt.groceryexpress.UiHelper.allPermissionsGranted
 import com.ifttt.groceryexpress.UiHelper.appSettingsIntent
 import com.ifttt.location.ConnectLocation
 import com.squareup.picasso.Picasso
@@ -43,14 +43,13 @@ class MainActivity : AppCompatActivity() {
 
     private val locationStatusCallback = object : ConnectLocation.LocationStatusCallback {
         override fun onRequestLocationPermission() {
-            val permissionToCheck = if (SDK_INT >= Q) {
-                Manifest.permission.ACCESS_BACKGROUND_LOCATION
+            val permissionsToCheck = if (SDK_INT >= Q) {
+                arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
             } else {
-                Manifest.permission.ACCESS_FINE_LOCATION
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
             }
-            val permissionGrant =
-                ContextCompat.checkSelfPermission(this@MainActivity, permissionToCheck)
-            if (permissionGrant != PackageManager.PERMISSION_GRANTED) {
+
+            if (!permissionsToCheck.allPermissionsGranted(this@MainActivity)) {
                 if (SDK_INT >= Q) {
                     /*
                     For Android Q and above, redirect users to settings and grant "Allow all the time"
@@ -61,7 +60,7 @@ class MainActivity : AppCompatActivity() {
                             startActivity(appSettingsIntent())
                         }.show()
                 } else {
-                    ActivityCompat.requestPermissions(this@MainActivity, arrayOf(permissionToCheck), 0)
+                    ActivityCompat.requestPermissions(this@MainActivity, permissionsToCheck, 0)
                 }
             }
         }
