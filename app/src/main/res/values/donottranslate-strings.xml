@@ -21,4 +21,6 @@
     <string name="geofences_deactivated">Geofences deactivated</string>
     <string name="foreground_notification_channel_name">Location foreground service</string>
     <string name="foreground_notification_title">Location foreground service is running…</string>
+    <string name="background_location_permission_request">Please select \"Allow all the time\" in app settings for Location permission, and then restart the app.</string>
+    <string name="ok">OK</string>
 </resources>
