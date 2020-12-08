@@ -8,7 +8,7 @@ import java.util.UUID;
 
 final class LocationInfo {
 
-    private static final DateFormat LOCATION_EVENT_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'",
+    private static final DateFormat LOCATION_EVENT_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX",
         Locale.US
     );
 
