@@ -65,11 +65,7 @@ public class ConnectLocationTest {
                 Collections.singletonList(new UserFeatureStep(FeatureStep.StepType.Trigger,
                     "id",
                     "stepId",
-                    Collections.singletonList(new UserFeatureField<>(
-                        new StringFieldValue(""),
-                        "TEXT_FIELD",
-                        "fieldId"
-                    ))
+                    Collections.singletonList(new UserFeatureField<>(new StringFieldValue(""), "TEXT_FIELD", "fieldId"))
                 ))
             ))
         ))
@@ -246,7 +242,8 @@ public class ConnectLocationTest {
 
     @Test
     public void shouldNotInvokeCallbackForNonLocationConnection() {
-        ConnectLocation location = new ConnectLocation(new GeofenceProviderAdapter() {}, apiClient);
+        ConnectLocation location = new ConnectLocation(new GeofenceProviderAdapter() {
+        }, apiClient);
         location.setUpWithConnectButton(button, new LocationStatusCallbackAdapter() {
             @Override
             public void onRequestLocationPermission() {
@@ -258,20 +255,18 @@ public class ConnectLocationTest {
                 fail();
             }
         });
-        button.setup(ConnectButton.Configuration.newBuilder("email@ifttt.com", Uri.EMPTY)
-            .withConnection(NON_LOCATION_CONNECTION)
-            .withCredentialProvider(new CredentialsProvider() {
-                @Override
-                public String getOAuthCode() {
-                    return "";
-                }
+        button.setup(ConnectButton.Configuration.newBuilder("email@ifttt.com", Uri.EMPTY).withConnection(
+            NON_LOCATION_CONNECTION).withCredentialProvider(new CredentialsProvider() {
+            @Override
+            public String getOAuthCode() {
+                return "";
+            }
 
-                @Override
-                public String getUserToken() {
-                    return "";
-                }
-            })
-            .build());
+            @Override
+            public String getUserToken() {
+                return "";
+            }
+        }).build());
     }
 
     private Connection connection(Connection.Status status) {

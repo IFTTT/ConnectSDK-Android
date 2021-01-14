@@ -2,8 +2,10 @@ package com.ifttt.location;
 
 import android.app.PendingIntent;
 import android.content.Intent;
+
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
+
 import com.google.android.gms.awareness.fence.AwarenessFence;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -14,11 +16,13 @@ import com.ifttt.connect.api.LocationFieldValue;
 import com.ifttt.connect.api.UserFeature;
 import com.ifttt.connect.api.UserFeatureField;
 import com.ifttt.connect.api.UserFeatureStep;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.fail;
@@ -28,10 +32,10 @@ public final class AwarenessGeofenceProviderTest {
 
     private LocationFieldValue value = new LocationFieldValue(1.0D, 1.0D, 100D, "");
     private UserFeatureField<LocationFieldValue> field = new UserFeatureField<>(value, "LOCATION_ENTER", "id");
-    private UserFeatureStep step = new UserFeatureStep(
-        FeatureStep.StepType.Trigger,
+    private UserFeatureStep step = new UserFeatureStep(FeatureStep.StepType.Trigger,
         "step_id",
-        "stepId", ImmutableList.of(field)
+        "stepId",
+        ImmutableList.of(field)
     );
     private UserFeature userFeature = new UserFeature("id", "featureId", true, ImmutableList.of(step));
     private Feature feature = new Feature("id", "title", "description", "iconUrl", ImmutableList.of(userFeature));
@@ -49,8 +53,7 @@ public final class AwarenessGeofenceProviderTest {
 
     @Test
     public void shouldRegisterEnterGeofence() {
-        AwarenessGeofenceProvider.diffFences(
-            Connection.Status.enabled,
+        AwarenessGeofenceProvider.diffFences(Connection.Status.enabled,
             ImmutableList.of(feature),
             ImmutableSet.of(),
             enter,
@@ -58,7 +61,9 @@ public final class AwarenessGeofenceProviderTest {
             new AwarenessGeofenceProvider.DiffCallback() {
                 @Override
                 public void onAddFence(
-                    String key, AwarenessFence value, PendingIntent pendingIntent
+                    String key,
+                    AwarenessFence fence,
+                    PendingIntent pendingIntent
                 ) {
                     assertThat(key).isEqualTo("ifttt_step_id");
                     assertThat(pendingIntent).isEqualTo(enter);
@@ -77,13 +82,13 @@ public final class AwarenessGeofenceProviderTest {
         UserFeatureField<LocationFieldValue> field = new UserFeatureField<>(value, "LOCATION_EXIT", "id");
         UserFeatureStep step = new UserFeatureStep(FeatureStep.StepType.Trigger,
             "step_id",
-            "stepId", ImmutableList.of(field)
+            "stepId",
+            ImmutableList.of(field)
         );
         UserFeature userFeature = new UserFeature("id", "featureId", true, ImmutableList.of(step));
         Feature feature = new Feature("id", "title", "description", "iconUrl", ImmutableList.of(userFeature));
 
-        AwarenessGeofenceProvider.diffFences(
-            Connection.Status.enabled,
+        AwarenessGeofenceProvider.diffFences(Connection.Status.enabled,
             ImmutableList.of(feature),
             ImmutableSet.of(),
             enter,
@@ -91,7 +96,9 @@ public final class AwarenessGeofenceProviderTest {
             new AwarenessGeofenceProvider.DiffCallback() {
                 @Override
                 public void onAddFence(
-                    String key, AwarenessFence value, PendingIntent pendingIntent
+                    String key,
+                    AwarenessFence fence,
+                    PendingIntent pendingIntent
                 ) {
                     assertThat(key).isEqualTo("ifttt_step_id");
                     assertThat(pendingIntent).isEqualTo(exit);
@@ -112,13 +119,13 @@ public final class AwarenessGeofenceProviderTest {
         UserFeatureField<LocationFieldValue> field = new UserFeatureField<>(value, "LOCATION_ENTER_OR_EXIT", "id");
         UserFeatureStep step = new UserFeatureStep(FeatureStep.StepType.Trigger,
             "step_id",
-            "stepId", ImmutableList.of(field)
+            "stepId",
+            ImmutableList.of(field)
         );
         UserFeature userFeature = new UserFeature("id", "featureId", true, ImmutableList.of(step));
         Feature feature = new Feature("id", "title", "description", "iconUrl", ImmutableList.of(userFeature));
 
-        AwarenessGeofenceProvider.diffFences(
-            Connection.Status.enabled,
+        AwarenessGeofenceProvider.diffFences(Connection.Status.enabled,
             ImmutableList.of(feature),
             ImmutableSet.of(),
             enter,
@@ -126,7 +133,9 @@ public final class AwarenessGeofenceProviderTest {
             new AwarenessGeofenceProvider.DiffCallback() {
                 @Override
                 public void onAddFence(
-                    String key, AwarenessFence value, PendingIntent pendingIntent
+                    String key,
+                    AwarenessFence fence,
+                    PendingIntent pendingIntent
                 ) {
                     keysRef.get().add(key);
                     pendingIntentRef.get().add(pendingIntent);
@@ -148,8 +157,7 @@ public final class AwarenessGeofenceProviderTest {
     @Test
     public void shouldReplaceExistingGeofences() {
         AtomicReference<String> ref = new AtomicReference<>();
-        AwarenessGeofenceProvider.diffFences(
-            Connection.Status.enabled,
+        AwarenessGeofenceProvider.diffFences(Connection.Status.enabled,
             ImmutableList.of(feature),
             ImmutableSet.of("ifttt_step_id"),
             enter,
@@ -157,7 +165,9 @@ public final class AwarenessGeofenceProviderTest {
             new AwarenessGeofenceProvider.DiffCallback() {
                 @Override
                 public void onAddFence(
-                    String key, AwarenessFence value, PendingIntent pendingIntent
+                    String key,
+                    AwarenessFence fence,
+                    PendingIntent pendingIntent
                 ) {
                     ref.set(key);
                 }
@@ -174,8 +184,7 @@ public final class AwarenessGeofenceProviderTest {
 
     @Test
     public void shouldNotRegisterWhenConnectionDisabled() {
-        AwarenessGeofenceProvider.diffFences(
-            Connection.Status.disabled,
+        AwarenessGeofenceProvider.diffFences(Connection.Status.disabled,
             ImmutableList.of(feature),
             ImmutableSet.of(),
             enter,
@@ -183,7 +192,9 @@ public final class AwarenessGeofenceProviderTest {
             new AwarenessGeofenceProvider.DiffCallback() {
                 @Override
                 public void onAddFence(
-                    String key, AwarenessFence value, PendingIntent pendingIntent
+                    String key,
+                    AwarenessFence fence,
+                    PendingIntent pendingIntent
                 ) {
                     fail();
                 }
@@ -200,13 +211,13 @@ public final class AwarenessGeofenceProviderTest {
     public void shouldNotRegisterWhenFeatureDisabled() {
         UserFeatureStep step = new UserFeatureStep(FeatureStep.StepType.Trigger,
             "step_id",
-            "stepId", ImmutableList.of(field)
+            "stepId",
+            ImmutableList.of(field)
         );
         UserFeature userFeature = new UserFeature("id", "featureId", false, ImmutableList.of(step));
         Feature feature = new Feature("id", "title", "description", "iconUrl", ImmutableList.of(userFeature));
 
-        AwarenessGeofenceProvider.diffFences(
-            Connection.Status.disabled,
+        AwarenessGeofenceProvider.diffFences(Connection.Status.disabled,
             ImmutableList.of(feature),
             ImmutableSet.of(),
             enter,
@@ -214,7 +225,9 @@ public final class AwarenessGeofenceProviderTest {
             new AwarenessGeofenceProvider.DiffCallback() {
                 @Override
                 public void onAddFence(
-                    String key, AwarenessFence value, PendingIntent pendingIntent
+                    String key,
+                    AwarenessFence fence,
+                    PendingIntent pendingIntent
                 ) {
                     fail();
                 }
@@ -229,8 +242,7 @@ public final class AwarenessGeofenceProviderTest {
 
     @Test
     public void shouldRemoveOutdatedGeofences() {
-        AwarenessGeofenceProvider.diffFences(
-            Connection.Status.enabled,
+        AwarenessGeofenceProvider.diffFences(Connection.Status.enabled,
             ImmutableList.of(),
             ImmutableSet.of("step_id"),
             enter,
@@ -238,7 +250,9 @@ public final class AwarenessGeofenceProviderTest {
             new AwarenessGeofenceProvider.DiffCallback() {
                 @Override
                 public void onAddFence(
-                    String key, AwarenessFence value, PendingIntent pendingIntent
+                    String key,
+                    AwarenessFence fence,
+                    PendingIntent pendingIntent
                 ) {
                     fail();
                 }

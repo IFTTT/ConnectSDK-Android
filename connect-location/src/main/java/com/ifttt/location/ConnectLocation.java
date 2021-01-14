@@ -132,14 +132,14 @@ public final class ConnectLocation {
     /**
      * Given the connection id passed in during initialization, fetch the connection data, and check if it has an
      * enabled {@link UserFeature} that uses location.
-     *
+     * <p>
      * This method should be used in addition to the {@link #init(Context, ConnectionApiClient)} or
      * {@link #init(Context, UserTokenProvider)} method in the initialization process, in order to set up
      * ConnectLocation to account for users who have the connection already enabled but hasn't had it set up in your
      * app. This method fetches the latest connection data, checks if, for the given user (via {@link UserTokenProvider},
      * there is an enabled {@link UserFeature} that uses Location trigger. If that is true, it will set up the geofences
      * and call the {@link LocationStatusCallback#onRequestLocationPermission()}.
-     *
+     * <p>
      * If you have a connection that uses Location service, you should call this method in the first Activity that your
      * users use your app, so that you can prompt the location permission request as soon as possible.
      *
@@ -183,6 +183,45 @@ public final class ConnectLocation {
         ConnectionRefresher.cancel(context);
 
         new UserTokenCache(context).clear();
+    }
+
+    /**
+     * Report geofencing events from external sources. This can be used as a supplement data point
+     * to the internal SDK's geofencing logic.
+     * <p>
+     * If you have set up geo-location monitoring differently, and can report whether the device
+     * has entered/exited a geofence, you can use this method to report it to IFTTT. This feature
+     * includes mechanism to prevent the same geofence event being reported here as well as from
+     * the SDK.
+     *
+     * @param context Context object.
+     */
+    public void reportEvent(
+        Context context,
+        double lat,
+        double lng,
+        @Nullable OnEventUploadListener listener
+    ) {
+        BackupGeofenceMonitor monitor = BackupGeofenceMonitor.get(context);
+        monitor.checkMonitoredGeofences(lat, lng, new OnEventUploadListener() {
+            @Override
+            public void onUploadEvent(String fenceKey, LocationEventUploader.EventType eventType) {
+                if (listener != null) {
+                    listener.onUploadEvent(fenceKey, eventType);
+                }
+
+                String stepId = LocationEventUploadHelper.extractStepId(fenceKey);
+                LocationEventUploader.schedule(context, eventType, stepId);
+                Logger.log(eventType + " event reported, uploading with fence key: " + fenceKey);
+            }
+
+            @Override
+            public void onUploadSkipped(String fenceKey, String reason) {
+                if (listener != null) {
+                    listener.onUploadSkipped(fenceKey, reason);
+                }
+            }
+        });
     }
 
     @VisibleForTesting
