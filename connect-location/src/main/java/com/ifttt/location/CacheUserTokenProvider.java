@@ -19,7 +19,7 @@ class CacheUserTokenProvider implements UserTokenProvider {
         String token;
         if (delegate != null) {
             token = delegate.getUserToken();
-            if (token != null) {
+            if (token != null && token.length() > 0) {
                 cache.store(token);
             }
         } else {
