@@ -18,8 +18,15 @@ public final class AwarenessEnterReceiver extends BroadcastReceiver {
             return;
         }
 
+        BackupGeofenceMonitor monitor = BackupGeofenceMonitor.get(context);
+        if (BackupGeofenceMonitor.MonitoredGeofence.GeofenceState.Entered
+            == monitor.getState(fenceState.getFenceKey())) {
+            return;
+        }
+
         Logger.log("Geo-fence enter event");
         String stepId = LocationEventUploadHelper.extractStepId(fenceState.getFenceKey());
         LocationEventUploader.schedule(context, LocationEventUploader.EventType.Entry, stepId);
+        monitor.setState(fenceState.getFenceKey(), BackupGeofenceMonitor.MonitoredGeofence.GeofenceState.Entered);
     }
 }

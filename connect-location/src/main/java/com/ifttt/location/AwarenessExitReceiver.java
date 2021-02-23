@@ -18,8 +18,15 @@ public final class AwarenessExitReceiver extends BroadcastReceiver {
             return;
         }
 
+        BackupGeofenceMonitor monitor = BackupGeofenceMonitor.get(context);
+        if (BackupGeofenceMonitor.MonitoredGeofence.GeofenceState.Exited
+            == monitor.getState(fenceState.getFenceKey())) {
+            return;
+        }
+
         Logger.log("Geo-fence exit event");
         String stepId = LocationEventUploadHelper.extractStepId(fenceState.getFenceKey());
         LocationEventUploader.schedule(context, LocationEventUploader.EventType.Exit, stepId);
+        monitor.setState(fenceState.getFenceKey(), BackupGeofenceMonitor.MonitoredGeofence.GeofenceState.Exited);
     }
 }

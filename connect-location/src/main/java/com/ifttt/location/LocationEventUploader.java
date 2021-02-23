@@ -23,6 +23,9 @@ public final class LocationEventUploader extends Worker {
     private static final String INPUT_DATA_EVENT_TYPE = "input_event_type";
     private static final String INPUT_DATA_STEP_ID = "input_step_id";
 
+    /**
+     * Enum type representing the type of a geofence event, whether it is entering or exiting.
+     */
     enum EventType {
         Entry, Exit
     }
