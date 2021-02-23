@@ -26,7 +26,7 @@ public final class LocationEventUploader extends Worker {
     /**
      * Enum type representing the type of a geofence event, whether it is entering or exiting.
      */
-    enum EventType {
+    public enum EventType {
         Entry, Exit
     }
 
