@@ -267,6 +267,8 @@ class MainActivity : AppCompatActivity() {
             }.setNegativeButton(R.string.logout) { _, _ ->
                 emailPreferencesHelper.clear()
                 onComplete()
+            }.setOnCancelListener {
+                onComplete()
             }
             .show()
     }
