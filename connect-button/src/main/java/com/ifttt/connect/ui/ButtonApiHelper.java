@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.provider.Settings;
 import androidx.annotation.MainThread;
 import androidx.annotation.VisibleForTesting;
 import androidx.browser.customtabs.CustomTabsIntent;
@@ -14,6 +13,7 @@ import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.OnLifecycleEvent;
 import com.ifttt.connect.BuildConfig;
 import com.ifttt.connect.R;
+import com.ifttt.connect.api.AnonymousId;
 import com.ifttt.connect.api.Connection;
 import com.ifttt.connect.api.ConnectionApiClient;
 import com.ifttt.connect.api.ErrorResponse;
@@ -161,14 +161,13 @@ final class ButtonApiHelper {
     @CheckReturnValue
     private void redirectToWeb(Context context, Connection connection, String email, ConnectButtonState buttonState) {
         EmailAppsChecker checker = new EmailAppsChecker(context.getPackageManager());
-        String anonymousId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
         Uri uri = getEmbedUri(connection,
             buttonState,
             redirectUri,
             checker.detectEmailApps(),
             email,
             userLogin,
-            anonymousId,
+            AnonymousId.get(context),
             oAuthCode,
             inviteCode, skipConnectionConfiguration, context.getString(R.string.language_tag)
         );
@@ -183,14 +182,13 @@ final class ButtonApiHelper {
         Context context, Connection connection, String email, ConnectButtonState buttonState
     ) {
         EmailAppsChecker checker = new EmailAppsChecker(context.getPackageManager());
-        String anonymousId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
         Intent launchIntent = new Intent(Intent.ACTION_VIEW, getEmbedUri(connection,
             buttonState,
             redirectUri,
             checker.detectEmailApps(),
             email,
             userLogin,
-            anonymousId,
+            AnonymousId.get(context),
             oAuthCode,
             inviteCode, skipConnectionConfiguration, context.getString(R.string.language_tag)
         ));
