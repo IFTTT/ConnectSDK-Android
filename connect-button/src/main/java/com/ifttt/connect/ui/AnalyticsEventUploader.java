@@ -4,6 +4,7 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
+import com.ifttt.connect.api.AnonymousId;
 import java.io.IOException;
 import java.util.List;
 import retrofit2.Response;
@@ -21,7 +22,7 @@ public final class AnalyticsEventUploader extends Worker {
     public AnalyticsEventUploader(Context context, WorkerParameters params) {
         super(context, params);
         analyticsManager = AnalyticsManager.getInstance(context.getApplicationContext());
-        apiHelper = AnalyticsApiHelper.get(AnalyticsPreferences.getAnonymousId(context));
+        apiHelper = AnalyticsApiHelper.get(AnonymousId.get(context));
     }
 
     @Override
