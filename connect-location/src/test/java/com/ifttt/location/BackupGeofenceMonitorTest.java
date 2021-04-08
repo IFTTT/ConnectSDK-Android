@@ -157,10 +157,20 @@ public final class BackupGeofenceMonitorTest {
     }
 
     @Test
-    public void cacheShouldClear() throws IOException {
+    public void cacheShouldNotClearWithEmptyMap() throws IOException {
         BackupGeofenceMonitor monitor = BackupGeofenceMonitor.get(ApplicationProvider.getApplicationContext());
         updateMonitorCache(monitor, FIELD_TYPE_LOCATION_EXIT, "id");
         monitor.updateMonitoredGeofences(Collections.emptyList());
+
+        Map<String, BackupGeofenceMonitor.MonitoredGeofence> cache = cache();
+        assertThat(cache).isNotEmpty();
+    }
+
+    @Test
+    public void cacheShouldClear() throws IOException {
+        BackupGeofenceMonitor monitor = BackupGeofenceMonitor.get(ApplicationProvider.getApplicationContext());
+        updateMonitorCache(monitor, FIELD_TYPE_LOCATION_EXIT, "id");
+        monitor.clear();
 
         Map<String, BackupGeofenceMonitor.MonitoredGeofence> cache = cache();
         assertThat(cache).isEmpty();
@@ -171,23 +181,20 @@ public final class BackupGeofenceMonitorTest {
         BackupGeofenceMonitor monitor = BackupGeofenceMonitor.get(ApplicationProvider.getApplicationContext());
         updateMonitorCache(monitor, FIELD_TYPE_LOCATION_EXIT, "id");
 
-        AtomicReference<LocationEventUploader.EventType> typeRef = new AtomicReference<>();
         AtomicReference<String> keyRef = new AtomicReference<>();
         monitor.checkMonitoredGeofences(0.5, 0.5, new OnEventUploadListener() {
             @Override
             public void onUploadEvent(String fenceKey, LocationEventUploader.EventType eventType) {
-                keyRef.set(fenceKey);
-                typeRef.set(eventType);
+                fail();
             }
 
             @Override
             public void onUploadSkipped(String fenceKey, String reason) {
-                fail();
+                keyRef.set(fenceKey);
             }
         });
 
         assertThat(keyRef.get()).isEqualTo("ifttt_id");
-        assertThat(typeRef.get()).isEqualTo(Exit);
     }
 
     @Test

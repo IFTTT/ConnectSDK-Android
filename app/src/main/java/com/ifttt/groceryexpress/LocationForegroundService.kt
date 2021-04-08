@@ -81,7 +81,7 @@ class LocationForegroundService : Service(), CoroutineScope {
         // Poll LocationManager for the device's current location, and update ConnectLocation
         // with any missed geo-fence events from Awareness API.
         launch(Dispatchers.IO) {
-            while (ContextCompat.checkSelfPermission(
+            if (ContextCompat.checkSelfPermission(
                     this@LocationForegroundService,
                     ACCESS_FINE_LOCATION
                 ) == PackageManager.PERMISSION_GRANTED
@@ -96,6 +96,8 @@ class LocationForegroundService : Service(), CoroutineScope {
                             location.longitude,
                             null
                         )
+
+                        stopSelf()
                     }
 
                     override fun onStatusChanged(
@@ -114,8 +116,6 @@ class LocationForegroundService : Service(), CoroutineScope {
                         // No-op
                     }
                 }, Looper.getMainLooper())
-
-                delay(LOCATION_POLLING_DELAY)
             }
         }
 

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.util.Log;
 import androidx.annotation.MainThread;
 import androidx.annotation.VisibleForTesting;
 import androidx.browser.customtabs.CustomTabsIntent;
@@ -96,6 +97,7 @@ final class ButtonApiHelper {
             public void onSuccess(Connection result) {
                 reenableConnectionCall = null;
                 resultCallback.onSuccess(result);
+                Log.d("ConnectLocation", "reenable connection status: " + result.status);
             }
 
             @Override

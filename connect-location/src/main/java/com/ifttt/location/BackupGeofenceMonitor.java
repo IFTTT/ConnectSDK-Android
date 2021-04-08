@@ -1,18 +1,12 @@
 package com.ifttt.location;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationManager;
 import androidx.annotation.Nullable;
 import com.ifttt.connect.api.Feature;
 import com.ifttt.connect.api.LocationFieldValue;
 import com.ifttt.connect.api.UserFeatureField;
-import com.squareup.moshi.JsonAdapter;
-import com.squareup.moshi.Moshi;
-import com.squareup.moshi.Types;
-import java.io.IOException;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +23,7 @@ import static com.ifttt.location.LocationEventUploadHelper.getExitFenceKey;
 import static com.ifttt.location.LocationEventUploadHelper.getIftttFenceKey;
 import static com.ifttt.location.LocationEventUploader.EventType.Entry;
 import static com.ifttt.location.LocationEventUploader.EventType.Exit;
+import static java.util.Collections.emptyMap;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -36,20 +31,14 @@ import static java.util.Objects.requireNonNull;
  */
 final class BackupGeofenceMonitor {
 
-    private static final String PREFS_GEOFENCE_MONITOR = "ifttt_geofence_monitor";
-    private static final String PREF_KEY_MONITORED_GEOFENCES = "monitored_geofences";
-    private static final Moshi MOSHI_INSTANCE = new Moshi.Builder().build();
-
-    private final SharedPreferences sharedPreferences;
-    private final JsonAdapter<Map<String, MonitoredGeofence>> jsonAdapter;
-
     static BackupGeofenceMonitor get(Context context) {
-        return new BackupGeofenceMonitor(context.getApplicationContext(), MOSHI_INSTANCE);
+        return new BackupGeofenceMonitor(new SharedPreferencesGeofenceCache(context));
     }
 
-    private BackupGeofenceMonitor(Context context, Moshi moshi) {
-        jsonAdapter = moshi.adapter(Types.newParameterizedType(Map.class, String.class, MonitoredGeofence.class));
-        sharedPreferences = context.getSharedPreferences(PREFS_GEOFENCE_MONITOR, Context.MODE_PRIVATE);
+    private final GeofenceCache cache;
+
+    private BackupGeofenceMonitor(GeofenceCache cache) {
+        this.cache = cache;
     }
 
     /**
@@ -111,8 +100,13 @@ final class BackupGeofenceMonitor {
             }
         }
 
-        String geofencesString = jsonAdapter.toJson(map);
-        sharedPreferences.edit().putString(PREF_KEY_MONITORED_GEOFENCES, geofencesString).apply();
+        if (!map.isEmpty()) {
+            cache.write(map);
+        }
+    }
+
+    void clear() {
+        cache.write(emptyMap());
     }
 
     /**
@@ -131,7 +125,7 @@ final class BackupGeofenceMonitor {
         }
 
         map.put(fenceKey, new MonitoredGeofence(currentGeofence.type, state, currentGeofence.value));
-        sharedPreferences.edit().putString(PREF_KEY_MONITORED_GEOFENCES, jsonAdapter.toJson(map)).apply();
+        cache.write(map);
     }
 
     /**
@@ -153,16 +147,7 @@ final class BackupGeofenceMonitor {
      * @return all monitored geofence states.
      */
     Map<String, MonitoredGeofence> getMonitoredGeofences() {
-        String monitoredGeofencesString = sharedPreferences.getString(PREF_KEY_MONITORED_GEOFENCES, null);
-        if (monitoredGeofencesString == null) {
-            return Collections.emptyMap();
-        }
-
-        try {
-            return jsonAdapter.fromJson(monitoredGeofencesString);
-        } catch (IOException e) {
-            return Collections.emptyMap();
-        }
+        return cache.read();
     }
 
     void checkMonitoredGeofences(double lat, double lng, OnEventUploadListener listener) {

@@ -1,11 +1,16 @@
 package com.ifttt.groceryexpress
 
 import android.Manifest
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES.Q
 import android.os.Bundle
+import android.os.SystemClock
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.Menu
@@ -68,7 +73,36 @@ class MainActivity : AppCompatActivity() {
         override fun onLocationStatusUpdated(activated: Boolean) {
             if (activated) {
                 Toast.makeText(this@MainActivity, R.string.geofences_activated, Toast.LENGTH_SHORT).show()
-                LocationForegroundService.startForegroundService(this@MainActivity)
+
+                val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+                val old = if (SDK_INT >= Build.VERSION_CODES.O) {
+                    PendingIntent.getForegroundService(
+                        this@MainActivity,
+                        0,
+                        Intent(this@MainActivity, LocationForegroundService::class.java),
+                        PendingIntent.FLAG_NO_CREATE
+                    )
+                } else {
+                    null
+                }
+                if (old != null) {
+                    alarmManager.cancel(old)
+                }
+
+                val pendingIntent = if (SDK_INT >= Build.VERSION_CODES.O) {
+                    PendingIntent.getForegroundService(
+                        this@MainActivity,
+                        0,
+                        Intent(this@MainActivity, LocationForegroundService::class.java),
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                    )
+                } else {
+                    null
+                }
+
+                if (pendingIntent != null) {
+                    alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime(), 2 * 60 * 1000L, pendingIntent)
+                }
             } else {
                 Toast.makeText(this@MainActivity, R.string.geofences_deactivated, Toast.LENGTH_SHORT).show()
                 LocationForegroundService.stopForegroundService(this@MainActivity)
@@ -139,6 +173,7 @@ class MainActivity : AppCompatActivity() {
     private fun setupForLocationConnection() {
         setupForConnection()
         ConnectLocation.getInstance().setUpWithConnectButton(connectButton, locationStatusCallback)
+        ConnectLocation.getInstance().activate(this, connectionId, locationStatusCallback)
     }
 
     /*

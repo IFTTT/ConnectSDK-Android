@@ -21,7 +21,7 @@ public final class CacheUserTokenProviderTest {
 
     @Test
     public void shouldPreferDelegate() {
-        UserTokenCache cache = new UserTokenCache(context);
+        UserTokenCache cache = new SharedPreferenceUserTokenCache(context);
         cache.store("cached");
         CacheUserTokenProvider provider = new CacheUserTokenProvider(cache, () -> "delegate");
 
@@ -30,7 +30,7 @@ public final class CacheUserTokenProviderTest {
 
     @Test
     public void shouldReturnCachedForNullDelegate() {
-        UserTokenCache cache = new UserTokenCache(context);
+        UserTokenCache cache = new SharedPreferenceUserTokenCache(context);
         cache.store("cached");
         CacheUserTokenProvider provider = new CacheUserTokenProvider(cache, null);
 
@@ -39,7 +39,7 @@ public final class CacheUserTokenProviderTest {
 
     @Test
     public void shouldCacheNonNullToken() {
-        UserTokenCache cache = new UserTokenCache(context);
+        UserTokenCache cache = new SharedPreferenceUserTokenCache(context);
         CacheUserTokenProvider provider = new CacheUserTokenProvider(cache, () -> "delegate");
         provider.getUserToken();
 
@@ -48,7 +48,7 @@ public final class CacheUserTokenProviderTest {
 
     @Test
     public void shouldNotCacheNullToken() {
-        UserTokenCache cache = new UserTokenCache(context);
+        UserTokenCache cache = new SharedPreferenceUserTokenCache(context);
         CacheUserTokenProvider provider = new CacheUserTokenProvider(cache, () -> null);
         provider.getUserToken();
 

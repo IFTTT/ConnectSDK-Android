@@ -17,7 +17,6 @@ import com.ifttt.connect.api.LocationFieldValue;
 import com.ifttt.connect.api.UserFeature;
 import com.ifttt.connect.api.UserFeatureField;
 import com.ifttt.location.ConnectLocation.LocationStatusCallback;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -122,7 +121,7 @@ final class AwarenessGeofenceProvider implements GeofenceProvider {
             }
         });
 
-        monitor.updateMonitoredGeofences(Collections.emptyList());
+        monitor.clear();
     }
 
     interface DiffCallback {
