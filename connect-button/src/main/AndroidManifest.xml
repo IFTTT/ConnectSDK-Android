@@ -4,4 +4,14 @@
         <activity android:name=".ui.AboutIftttActivity"
             android:theme="@style/AboutIfttt"/>
     </application>
+
+    <queries>
+        <intent>
+            <action android:name="android.support.customtabs.action.CustomTabsService" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+        </intent>
+    </queries>
+
 </manifest>
