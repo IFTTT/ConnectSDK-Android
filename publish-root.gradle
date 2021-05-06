@@ -1,0 +1,14 @@
+nexusPublishing {
+    Properties properties = new Properties()
+    if (project.rootProject.file('local.properties').canRead()) {
+        properties.load(project.rootProject.file('local.properties').newDataInputStream())
+    }
+
+    repositories {
+        sonatype {
+            stagingProfileId = properties.getProperty('mavenCentral.sonatypeStagingProfileId')
+            username = properties.getProperty('mavenCentral.ossrhUsername')
+            password = properties.getProperty('mavenCentral.ossrhPassword')
+        }
+    }
+}
