@@ -1,9 +1,9 @@
-apply plugin: 'com.jfrog.bintray'
-apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
 
 ext {
     libraryName = 'connect-location'
-    artifact = 'connect-location'
+    artifactName = 'connect-location'
 
     libraryDescription = 'Connect Location SDK provides integration to IFTTT Location service.'
 
@@ -20,49 +20,8 @@ ext {
     allLicenses = ['MIT']
 }
 
+
 group = publishedGroupId
-
-install {
-    repositories.mavenInstaller {
-        // This generates POM.xml with proper parameters
-        pom {
-            project {
-                packaging 'aar'
-                groupId publishedGroupId
-                artifactId artifact
-
-                name libraryName
-                description libraryDescription
-                url siteUrl
-
-                licenses {
-                    license {
-                        name licenseName
-                        url licenseUrl
-                    }
-                }
-                developers {
-                    developer {
-                        id 'lzanita09'
-                        name 'Zhe Lu'
-                        email 'zhe@ifttt.com'
-                    }
-                    developer {
-                        id 'priyaashah'
-                        name 'Priya Shah'
-                        email 'priya@ifttt.com'
-                    }
-                }
-                scm {
-                    connection gitUrl
-                    developerConnection gitUrl
-                    url siteUrl
-                }
-            }
-        }
-    }
-}
-
 version = libVersion
 
 task sourcesJar(type: Jar) {
@@ -75,12 +34,6 @@ task javadoc(type: Javadoc) {
     classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
 }
 
-afterEvaluate {
-    javadoc.classpath +=
-            files(android.libraryVariants.collect { variant -> variant.javaCompileProvider.get().classpath.files
-            })
-}
-
 task javadocJar(type: Jar, dependsOn: javadoc) {
     archiveClassifier.set("javadoc")
     from javadoc.destinationDir
@@ -91,33 +44,70 @@ artifacts {
     archives sourcesJar
 }
 
-bintray {
+afterEvaluate {
+    javadoc.classpath +=
+            files(android.libraryVariants.collect { variant -> variant.javaCompileProvider.get().classpath.files
+            })
+}
 
-    Properties properties = new Properties()
-    if (project.rootProject.file('local.properties').canRead()) {
-        properties.load(project.rootProject.file('local.properties').newDataInputStream())
-        user = properties.getProperty('bintray.user')
-        key = properties.getProperty('bintray.apikey')
-        pkg.version.gpg.passphrase = properties.getProperty('bintray.gpg.passphrase')
-    }
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
 
-    configurations = ['archives']
-    pkg {
-        repo = bintrayRepo
-        name = bintrayName
-        desc = libraryDescription
-        websiteUrl = siteUrl
-        vcsUrl = gitUrl
-        licenses = allLicenses
-        publish = false
-        version {
-            name = libVersion
-            desc = libraryDescription
-            released = new Date()
-            vcsTag = libVersion
-            gpg {
-                sign = true
+                artifact sourcesJar
+                artifact javadocJar
+
+                groupId = publishedGroupId
+                artifactId = artifactName
+                version = libVersion
+
+                pom {
+                    groupId = publishedGroupId
+                    artifactId = artifactName
+
+                    description = libraryDescription
+                    url = siteUrl
+                    name = libraryName
+
+                    licenses {
+                        license {
+                            name = licenseName
+                            url = licenseUrl
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = 'lzanita09'
+                            name = 'Zhe Lu'
+                            email = 'zhe@ifttt.com'
+                        }
+                        developer {
+                            id = 'priyaashah'
+                            name = 'Priya Shah'
+                            email = 'priya@ifttt.com'
+                        }
+                    }
+                    scm {
+                        connection = gitUrl
+                        developerConnection = gitUrl
+                        url = siteUrl
+                    }
+                }
             }
         }
     }
+}
+
+Properties properties = new Properties()
+if (project.rootProject.file('local.properties').canRead()) {
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+    ext['signing.keyId'] = properties.getProperty('signing.keyId')
+    ext['signing.password'] = properties.getProperty('signing.password')
+    ext['signing.secretKeyRingFile'] = properties.getProperty('signing.secretKeyRingFile')
+}
+
+signing {
+    sign publishing.publications
 }

@@ -3,7 +3,7 @@ dist: trusty
 
 android:
   components:
-    - build-tools-31.0.0-rc1
+    - build-tools-30.0.2
     - android-29
 
 script:
