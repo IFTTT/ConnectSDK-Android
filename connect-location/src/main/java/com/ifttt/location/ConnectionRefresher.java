@@ -75,7 +75,7 @@ public final class ConnectionRefresher extends Worker {
                     + connectionResult.code());
                 if (connectionResult.code() == 401) {
                     // The token is invalid, unregister all geo-fences, clear token cache and return.
-                    ConnectLocation.getInstance().deactivate(getApplicationContext(), null);
+                    connectLocation.deactivate(getApplicationContext(), null);
                     new SharedPreferenceUserTokenCache(getApplicationContext()).clear();
                 }
                 return Result.failure();
