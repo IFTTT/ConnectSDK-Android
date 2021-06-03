@@ -73,36 +73,7 @@ class MainActivity : AppCompatActivity() {
         override fun onLocationStatusUpdated(activated: Boolean) {
             if (activated) {
                 Toast.makeText(this@MainActivity, R.string.geofences_activated, Toast.LENGTH_SHORT).show()
-
-                val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-                val old = if (SDK_INT >= Build.VERSION_CODES.O) {
-                    PendingIntent.getForegroundService(
-                        this@MainActivity,
-                        0,
-                        Intent(this@MainActivity, LocationForegroundService::class.java),
-                        PendingIntent.FLAG_NO_CREATE
-                    )
-                } else {
-                    null
-                }
-                if (old != null) {
-                    alarmManager.cancel(old)
-                }
-
-                val pendingIntent = if (SDK_INT >= Build.VERSION_CODES.O) {
-                    PendingIntent.getForegroundService(
-                        this@MainActivity,
-                        0,
-                        Intent(this@MainActivity, LocationForegroundService::class.java),
-                        PendingIntent.FLAG_UPDATE_CURRENT
-                    )
-                } else {
-                    null
-                }
-
-                if (pendingIntent != null) {
-                    alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime(), 2 * 60 * 1000L, pendingIntent)
-                }
+                LocationForegroundService.startForegroundService(this@MainActivity)
             } else {
                 Toast.makeText(this@MainActivity, R.string.geofences_deactivated, Toast.LENGTH_SHORT).show()
                 LocationForegroundService.stopForegroundService(this@MainActivity)
@@ -173,7 +144,6 @@ class MainActivity : AppCompatActivity() {
     private fun setupForLocationConnection() {
         setupForConnection()
         ConnectLocation.getInstance().setUpWithConnectButton(connectButton, locationStatusCallback)
-        ConnectLocation.getInstance().activate(this, connectionId, locationStatusCallback)
     }
 
     /*

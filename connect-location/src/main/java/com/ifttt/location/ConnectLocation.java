@@ -185,6 +185,8 @@ public final class ConnectLocation {
         Logger.log("Deactivating geo-fence");
         geofenceProvider.removeGeofences(locationStatusCallback);
         ConnectionRefresher.cancel(context);
+
+        new SharedPreferenceUserTokenCache(context).clear();
     }
 
     /**
