@@ -26,10 +26,10 @@ IFTTT Connect Location SDK is an add-on library to the [ConnectButton SDK](https
 implementation "com.ifttt:connect-api:2.4.1"
 
 // Required for Connect Button UI integration.
-implementation "com.ifttt:connect-button:2.4.1"
+implementation "com.ifttt:connect-button:2.4.2"
 
 // Location service integration. 
-implementation "com.ifttt.connect-location:2.4.1"
+implementation "com.ifttt.connect-location:2.4.2"
 ```
 
 ## Usage
