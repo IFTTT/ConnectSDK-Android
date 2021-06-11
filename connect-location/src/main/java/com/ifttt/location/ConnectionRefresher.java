@@ -49,7 +49,8 @@ public final class ConnectionRefresher extends Worker {
             ConnectLocation.init(getApplicationContext());
         }
 
-        ConnectionApiClient connectionApiClient = ConnectLocation.getInstance().connectionApiClient;
+        ConnectLocation connectLocation = ConnectLocation.getInstance();
+        ConnectionApiClient connectionApiClient = connectLocation.connectionApiClient;
 
         try {
             String connectionId = getInputData().getString(INPUT_DATA_CONNECTION_ID);
@@ -65,10 +66,18 @@ public final class ConnectionRefresher extends Worker {
                 Logger.log("Connection fetch successful: " + connectionId);
                 if (checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                     == PackageManager.PERMISSION_GRANTED) {
-                    ConnectLocation.getInstance().geofenceProvider.updateGeofences(connection, null);
+                    connectLocation.geofenceProvider.updateGeofences(connection, null);
                 }
             } else {
-                Logger.error("Could not fetch connection: " + connectionId);
+                Logger.error("Could not fetch connection: "
+                    + connectionId
+                    + ", status code: "
+                    + connectionResult.code());
+                if (connectionResult.code() == 401) {
+                    // The token is invalid, unregister all geo-fences, clear token cache and return.
+                    connectLocation.deactivate(getApplicationContext(), null);
+                    new SharedPreferenceUserTokenCache(getApplicationContext()).clear();
+                }
                 return Result.failure();
             }
         } catch (IOException e) {

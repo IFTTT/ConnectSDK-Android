@@ -94,10 +94,11 @@ public final class ConnectionApiClient {
         }
 
         ConnectionApiClient buildWithBaseUrl(String baseUrl) {
-            Moshi moshi = new Moshi.Builder().add(new HexColorJsonAdapter()).add(
-                Date.class,
-                new Rfc3339DateJsonAdapter().nullSafe()
-            ).add(new ConnectionJsonAdapter()).add(new UserTokenJsonAdapter()).build();
+            Moshi moshi = new Moshi.Builder().add(new HexColorJsonAdapter())
+                .add(Date.class, new Rfc3339DateJsonAdapter().nullSafe())
+                .add(new ConnectionJsonAdapter())
+                .add(new UserTokenJsonAdapter())
+                .build();
             JsonAdapter<ErrorResponse> errorResponseJsonAdapter = moshi.adapter(ErrorResponse.class);
             TokenInterceptor tokenInterceptor = new TokenInterceptor(userTokenProvider);
             OkHttpClient.Builder builder
@@ -114,11 +115,7 @@ public final class ConnectionApiClient {
 
             RetrofitConnectionApi retrofitConnectionApi = retrofit.create(RetrofitConnectionApi.class);
 
-            return new ConnectionApiClient(
-                retrofitConnectionApi,
-                errorResponseJsonAdapter,
-                tokenInterceptor
-            );
+            return new ConnectionApiClient(retrofitConnectionApi, errorResponseJsonAdapter, tokenInterceptor);
         }
     }
 

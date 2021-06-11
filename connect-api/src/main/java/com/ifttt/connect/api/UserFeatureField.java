@@ -62,4 +62,18 @@ public final class UserFeatureField<T extends Parcelable> implements Parcelable 
         dest.writeString(fieldId);
         dest.writeString(fieldType);
     }
+
+    @Override
+    public String toString() {
+        return "UserFeatureField{"
+            + "value="
+            + value
+            + ", fieldType='"
+            + fieldType
+            + '\''
+            + ", fieldId='"
+            + fieldId
+            + '\''
+            + '}';
+    }
 }

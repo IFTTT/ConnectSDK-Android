@@ -58,7 +58,7 @@ public final class ConnectLocation {
 
     public static synchronized ConnectLocation init(Context context, UserTokenProvider userTokenProvider) {
         ConnectionApiClient client = new ConnectionApiClient.Builder(context,
-            new CacheUserTokenProvider(new UserTokenCache(context), userTokenProvider)
+            new CacheUserTokenProvider(new SharedPreferenceUserTokenCache(context), userTokenProvider)
         ).build();
         INSTANCE = new ConnectLocation(new AwarenessGeofenceProvider(context.getApplicationContext()), client);
 
@@ -66,8 +66,12 @@ public final class ConnectLocation {
     }
 
     public static synchronized ConnectLocation init(Context context) {
+        if (INSTANCE != null) {
+            return INSTANCE;
+        }
+
         ConnectionApiClient client = new ConnectionApiClient.Builder(context,
-            new CacheUserTokenProvider(new UserTokenCache(context), null)
+            new CacheUserTokenProvider(new SharedPreferenceUserTokenCache(context), null)
         ).build();
         INSTANCE = new ConnectLocation(new AwarenessGeofenceProvider(context.getApplicationContext()), client);
 
@@ -182,7 +186,7 @@ public final class ConnectLocation {
         geofenceProvider.removeGeofences(locationStatusCallback);
         ConnectionRefresher.cancel(context);
 
-        new UserTokenCache(context).clear();
+        new SharedPreferenceUserTokenCache(context).clear();
     }
 
     /**
@@ -197,10 +201,7 @@ public final class ConnectLocation {
      * @param context Context object.
      */
     public void reportEvent(
-        Context context,
-        double lat,
-        double lng,
-        @Nullable OnEventUploadListener listener
+        Context context, double lat, double lng, @Nullable OnEventUploadListener listener
     ) {
         BackupGeofenceMonitor monitor = BackupGeofenceMonitor.get(context);
         monitor.checkMonitoredGeofences(lat, lng, new OnEventUploadListener() {
