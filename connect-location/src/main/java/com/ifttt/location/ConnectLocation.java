@@ -133,6 +133,10 @@ public final class ConnectLocation {
         Logger.setLoggingEnabled(enabled);
     }
 
+    public void setLoggingEnabled(Logger.OnLogCapturedListener listener) {
+        Logger.setListener(listener);
+    }
+
     /**
      * Given the connection id passed in during initialization, fetch the connection data, and check if it has an
      * enabled {@link UserFeature} that uses location.
