@@ -2,7 +2,7 @@
 
 # IFTTT Connect Button SDK for Android
 
-[![Build Status](https://travis-ci.org/IFTTT/ConnectSDK-Android.svg?branch=master)](https://travis-ci.org/IFTTT/ConnectSDK-Android)
+![Build Status](https://github.com/IFTTT/ConnectSDK-Android/actions/workflows/ci.yml/badge.svg?branch=master)
 
 ### Connect API references
 [![javadoc](https://javadoc.io/badge2/com.ifttt/connect-api/javadoc.svg)](https://javadoc.io/doc/com.ifttt/connect-api)
