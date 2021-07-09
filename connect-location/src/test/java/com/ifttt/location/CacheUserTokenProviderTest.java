@@ -21,8 +21,8 @@ public final class CacheUserTokenProviderTest {
 
     @Test
     public void shouldPreferDelegate() {
-        UserTokenCache cache = new SharedPreferenceUserTokenCache(context);
-        cache.store("cached");
+        Cache<String> cache = new SharedPreferenceUserTokenCache(context);
+        cache.write("cached");
         CacheUserTokenProvider provider = new CacheUserTokenProvider(cache, () -> "delegate");
 
         assertThat(provider.getUserToken()).isEqualTo("delegate");
@@ -30,8 +30,8 @@ public final class CacheUserTokenProviderTest {
 
     @Test
     public void shouldReturnCachedForNullDelegate() {
-        UserTokenCache cache = new SharedPreferenceUserTokenCache(context);
-        cache.store("cached");
+        Cache<String> cache = new SharedPreferenceUserTokenCache(context);
+        cache.write("cached");
         CacheUserTokenProvider provider = new CacheUserTokenProvider(cache, null);
 
         assertThat(provider.getUserToken()).isEqualTo("cached");
@@ -39,19 +39,19 @@ public final class CacheUserTokenProviderTest {
 
     @Test
     public void shouldCacheNonNullToken() {
-        UserTokenCache cache = new SharedPreferenceUserTokenCache(context);
+        Cache<String> cache = new SharedPreferenceUserTokenCache(context);
         CacheUserTokenProvider provider = new CacheUserTokenProvider(cache, () -> "delegate");
         provider.getUserToken();
 
-        assertThat(cache.get()).isEqualTo("delegate");
+        assertThat(cache.read()).isEqualTo("delegate");
     }
 
     @Test
     public void shouldNotCacheNullToken() {
-        UserTokenCache cache = new SharedPreferenceUserTokenCache(context);
+        Cache<String> cache = new SharedPreferenceUserTokenCache(context);
         CacheUserTokenProvider provider = new CacheUserTokenProvider(cache, () -> null);
         provider.getUserToken();
 
-        assertThat(cache.get()).isNull();
+        assertThat(cache.read()).isNull();
     }
 }

@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 
-final class SharedPreferencesGeofenceCache implements GeofenceCache {
+final class SharedPreferencesGeofenceCache implements Cache<Map<String, MonitoredGeofence>> {
 
     private static final String PREFS_GEOFENCE_MONITOR = "ifttt_geofence_monitor";
     private static final String PREF_KEY_MONITORED_GEOFENCES = "monitored_geofences";
@@ -46,5 +46,10 @@ final class SharedPreferencesGeofenceCache implements GeofenceCache {
         } catch (IOException e) {
             return Collections.emptyMap();
         }
+    }
+
+    @Override
+    public void clear() {
+        sharedPreferences.edit().remove(PREF_KEY_MONITORED_GEOFENCES).apply();
     }
 }

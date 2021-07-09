@@ -5,10 +5,10 @@ import com.ifttt.connect.api.UserTokenProvider;
 
 class CacheUserTokenProvider implements UserTokenProvider {
 
-    private final UserTokenCache cache;
+    private final Cache<String> cache;
     @Nullable private final UserTokenProvider delegate;
 
-    CacheUserTokenProvider(UserTokenCache cache, @Nullable UserTokenProvider delegate) {
+    CacheUserTokenProvider(Cache<String> cache, @Nullable UserTokenProvider delegate) {
         this.cache = cache;
         this.delegate = delegate;
     }
@@ -20,10 +20,10 @@ class CacheUserTokenProvider implements UserTokenProvider {
         if (delegate != null) {
             token = delegate.getUserToken();
             if (token != null && token.length() > 0) {
-                cache.store(token);
+                cache.write(token);
             }
         } else {
-            token = cache.get();
+            token = cache.read();
         }
 
         return token;

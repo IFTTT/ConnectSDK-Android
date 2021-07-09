@@ -172,8 +172,7 @@ public final class BackupGeofenceMonitorTest {
         updateMonitorCache(monitor, FIELD_TYPE_LOCATION_EXIT, "id");
         monitor.clear();
 
-        Map<String, BackupGeofenceMonitor.MonitoredGeofence> cache = cache();
-        assertThat(cache).isEmpty();
+        assertThat(preferences.contains(PREF_KEY_MONITORED_GEOFENCES)).isFalse();
     }
 
     @Test

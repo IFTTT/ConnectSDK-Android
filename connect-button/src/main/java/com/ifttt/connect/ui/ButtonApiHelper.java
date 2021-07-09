@@ -136,11 +136,6 @@ final class ButtonApiHelper {
         return shouldPresentEmail(context) && !accountFound;
     }
 
-    @CheckReturnValue
-    boolean isUserAuthorized() {
-        return connectionApiClient.isUserAuthorized();
-    }
-
     void fetchConnection(Lifecycle lifecycle, String connectionId, ResultCallback<Connection> callback) {
         PendingResult<Connection> pendingResult = connectionApiClient.api().showConnection(connectionId);
         pendingResult.execute(callback);
