@@ -25,12 +25,23 @@ public final class ConnectionApiClient {
     private final ConnectionApi connectionApi;
     private final TokenInterceptor tokenInterceptor;
 
+    private final String anonymousId;
+    private final String inviteCode;
+
+    public final UserTokenProvider userTokenProvider;
+
     private ConnectionApiClient(
         RetrofitConnectionApi retrofitConnectionApi,
         JsonAdapter<ErrorResponse> errorResponseJsonAdapter,
-        TokenInterceptor tokenInterceptor
+        TokenInterceptor tokenInterceptor,
+        String anonymousId,
+        String inviteCode,
+        UserTokenProvider userTokenProvider
     ) {
         this.tokenInterceptor = tokenInterceptor;
+        this.anonymousId = anonymousId;
+        this.inviteCode = inviteCode;
+        this.userTokenProvider = userTokenProvider;
         connectionApi = new ConnectionApiImpl(retrofitConnectionApi, errorResponseJsonAdapter);
     }
 
@@ -58,6 +69,20 @@ public final class ConnectionApiClient {
     }
 
     /**
+     * @param newUserTokenProvider a new {@link UserTokenProvider} instance to replace with the current one.
+     * @return a new {@link Builder} instance with existing ConnectionApiClient's configuration and the new
+     * UserTokenProvider if not null.
+     */
+    public Builder newBuilder(@Nullable UserTokenProvider newUserTokenProvider) {
+        UserTokenProvider userTokenProvider = this.userTokenProvider;
+        if (newUserTokenProvider != null) {
+            userTokenProvider = newUserTokenProvider;
+        }
+
+        return new Builder(anonymousId, userTokenProvider).setInviteCode(inviteCode);
+    }
+
+    /**
      * Builder class to get an {@link ConnectionApiClient} instance.
      */
     public static final class Builder {
@@ -66,7 +91,7 @@ public final class ConnectionApiClient {
 
         @Nullable private String inviteCode;
 
-        private UserTokenProvider userTokenProvider;
+        private final UserTokenProvider userTokenProvider;
 
         /**
          * @param context Context instance used to generate an anonymous id using the device's {@link Settings.Secure#ANDROID_ID}.
@@ -75,6 +100,11 @@ public final class ConnectionApiClient {
         @SuppressLint("HardwareIds")
         public Builder(Context context, UserTokenProvider userTokenProvider) {
             this.anonymousId = AnonymousId.get(context);
+            this.userTokenProvider = userTokenProvider;
+        }
+
+        Builder(String anonymousId, UserTokenProvider userTokenProvider) {
+            this.anonymousId = anonymousId;
             this.userTokenProvider = userTokenProvider;
         }
 
@@ -115,7 +145,13 @@ public final class ConnectionApiClient {
 
             RetrofitConnectionApi retrofitConnectionApi = retrofit.create(RetrofitConnectionApi.class);
 
-            return new ConnectionApiClient(retrofitConnectionApi, errorResponseJsonAdapter, tokenInterceptor);
+            return new ConnectionApiClient(retrofitConnectionApi,
+                errorResponseJsonAdapter,
+                tokenInterceptor,
+                anonymousId,
+                inviteCode,
+                userTokenProvider
+            );
         }
     }
 
