@@ -52,7 +52,11 @@ public final class ConnectLocation {
     final ConnectionApiClient connectionApiClient;
 
     public static synchronized ConnectLocation init(Context context, ConnectionApiClient apiClient) {
-        INSTANCE = new ConnectLocation(new AwarenessGeofenceProvider(context.getApplicationContext()), apiClient);
+        ConnectionApiClient.Builder builder = apiClient.newBuilder(new CacheUserTokenProvider(
+            new SharedPreferenceUserTokenCache(context),
+            apiClient.userTokenProvider
+        ));
+        INSTANCE = new ConnectLocation(new AwarenessGeofenceProvider(context.getApplicationContext()), builder.build());
         return INSTANCE;
     }
 
