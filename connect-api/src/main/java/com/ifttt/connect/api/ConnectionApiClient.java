@@ -70,6 +70,7 @@ public final class ConnectionApiClient {
 
     /**
      * @param newUserTokenProvider a new {@link UserTokenProvider} instance to replace with the current one.
+     *
      * @return a new {@link Builder} instance with existing ConnectionApiClient's configuration and the new
      * UserTokenProvider if not null.
      */
@@ -99,8 +100,7 @@ public final class ConnectionApiClient {
          */
         @SuppressLint("HardwareIds")
         public Builder(Context context, UserTokenProvider userTokenProvider) {
-            this.anonymousId = AnonymousId.get(context);
-            this.userTokenProvider = userTokenProvider;
+            this(AnonymousId.get(context), userTokenProvider);
         }
 
         Builder(String anonymousId, UserTokenProvider userTokenProvider) {
