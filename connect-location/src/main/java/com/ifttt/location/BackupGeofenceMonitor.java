@@ -23,7 +23,6 @@ import static com.ifttt.location.LocationEventUploadHelper.getExitFenceKey;
 import static com.ifttt.location.LocationEventUploadHelper.getIftttFenceKey;
 import static com.ifttt.location.LocationEventUploader.EventType.Entry;
 import static com.ifttt.location.LocationEventUploader.EventType.Exit;
-import static java.util.Collections.emptyMap;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -35,9 +34,9 @@ final class BackupGeofenceMonitor {
         return new BackupGeofenceMonitor(new SharedPreferencesGeofenceCache(context));
     }
 
-    private final GeofenceCache cache;
+    private final Cache<Map<String, MonitoredGeofence>> cache;
 
-    private BackupGeofenceMonitor(GeofenceCache cache) {
+    private BackupGeofenceMonitor(Cache<Map<String, MonitoredGeofence>> cache) {
         this.cache = cache;
     }
 
@@ -106,7 +105,7 @@ final class BackupGeofenceMonitor {
     }
 
     void clear() {
-        cache.write(emptyMap());
+        cache.clear();
     }
 
     /**
