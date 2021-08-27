@@ -5,6 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import com.google.android.gms.awareness.fence.FenceState;
 
+import static com.ifttt.location.LocationEventAttributes.LocationDataSource.Awareness;
+import static com.ifttt.location.LocationEventUploader.EventType.Exit;
+
 /**
  * BroadcastReceiver that listens to all "exit" geo-fence events.
  */
@@ -25,8 +28,10 @@ public final class AwarenessExitReceiver extends BroadcastReceiver {
         }
 
         Logger.log("Geo-fence exit event");
+        LocationEventHelper.logEventReported(ConnectLocation.getInstance(), Exit, Awareness);
+
         String stepId = LocationEventUploadHelper.extractStepId(fenceState.getFenceKey());
-        LocationEventUploader.schedule(context, LocationEventUploader.EventType.Exit, stepId);
+        LocationEventUploader.schedule(context, Exit, Awareness, stepId);
         monitor.setState(fenceState.getFenceKey(), BackupGeofenceMonitor.MonitoredGeofence.GeofenceState.Exited);
     }
 }

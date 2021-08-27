@@ -6,8 +6,6 @@ android {
 
     defaultConfig {
         minSdkVersion rootProject.minSdkVersion
-        versionCode 1
-        versionName "$libVersion"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

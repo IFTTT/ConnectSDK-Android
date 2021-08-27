@@ -19,6 +19,7 @@ import com.ifttt.connect.ui.ConnectButtonState;
 import static androidx.core.content.ContextCompat.checkSelfPermission;
 import static com.ifttt.connect.ui.ConnectButtonState.Disabled;
 import static com.ifttt.connect.ui.ConnectButtonState.Enabled;
+import static com.ifttt.location.LocationEventAttributes.LocationDataSource.LocationReport;
 
 /**
  * The main class for the Connect Location SDK. This class handles state change events from {@link ConnectButton},
@@ -50,6 +51,8 @@ public final class ConnectLocation {
 
     final GeofenceProvider geofenceProvider;
     final ConnectionApiClient connectionApiClient;
+
+    @Nullable LocationEventListener locationEventListener;
 
     public static synchronized ConnectLocation init(Context context, ConnectionApiClient apiClient) {
         ConnectionApiClient.Builder builder = apiClient.newBuilder(new CacheUserTokenProvider(
@@ -138,6 +141,14 @@ public final class ConnectLocation {
     }
 
     /**
+     * Call this method with a {@link LocationEventListener} instance to subscribe to all background location
+     * reporting/uploading events. This is useful for analytics or debugging purposes.
+     */
+    public void setLocationEventListener(LocationEventListener listener) {
+        this.locationEventListener = listener;
+    }
+
+    /**
      * Given the connection id passed in during initialization, fetch the connection data, and check if it has an
      * enabled {@link UserFeature} that uses location.
      * <p>
@@ -216,7 +227,7 @@ public final class ConnectLocation {
                 }
 
                 String stepId = LocationEventUploadHelper.extractStepId(fenceKey);
-                LocationEventUploader.schedule(context, eventType, stepId);
+                LocationEventUploader.schedule(context, eventType, LocationReport, stepId);
                 Logger.log(eventType + " event reported, uploading with fence key: " + fenceKey);
             }
 
