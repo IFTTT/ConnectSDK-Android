@@ -17,7 +17,6 @@ import static com.ifttt.location.BackupGeofenceMonitor.MonitoredGeofence.Geofenc
 import static com.ifttt.location.GeofenceProvider.FIELD_TYPE_LOCATION_ENTER;
 import static com.ifttt.location.GeofenceProvider.FIELD_TYPE_LOCATION_ENTER_EXIT;
 import static com.ifttt.location.GeofenceProvider.FIELD_TYPE_LOCATION_EXIT;
-import static com.ifttt.location.LocationEventAttributes.LocationDataSource.LocationReport;
 import static com.ifttt.location.LocationEventUploadHelper.extractLocationUserFeatures;
 import static com.ifttt.location.LocationEventUploadHelper.getEnterFenceKey;
 import static com.ifttt.location.LocationEventUploadHelper.getExitFenceKey;
@@ -184,8 +183,6 @@ final class BackupGeofenceMonitor {
             if (newState != monitoredGeofence.state) {
                 if (monitoredGeofence.state != Init && (isMatchingEntryEvent || isMatchingExitEvent)) {
                     listener.onUploadEvent(entry.getKey(), newType);
-
-                    LocationEventHelper.logEventReported(ConnectLocation.getInstance(), newType, LocationReport);
                 } else {
                     // In this case, the enter/exit event has already been reported, most likely
                     // from Awareness API.

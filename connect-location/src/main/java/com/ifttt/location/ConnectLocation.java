@@ -229,6 +229,8 @@ public final class ConnectLocation {
                 String stepId = LocationEventUploadHelper.extractStepId(fenceKey);
                 LocationEventUploader.schedule(context, eventType, LocationReport, stepId);
                 Logger.log(eventType + " event reported, uploading with fence key: " + fenceKey);
+
+                LocationEventHelper.logEventReported(ConnectLocation.getInstance(), eventType, LocationReport);
             }
 
             @Override

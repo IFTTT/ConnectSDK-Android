@@ -106,13 +106,14 @@ class LocationForegroundService : Service(), CoroutineScope {
                         // No-op
                     }
 
-                    override fun onProviderEnabled(provider: String?) {
+                    override fun onProviderEnabled(provider: String) {
                         // No-op
                     }
 
-                    override fun onProviderDisabled(provider: String?) {
+                    override fun onProviderDisabled(provider: String) {
                         // No-op
                     }
+
                 }, Looper.getMainLooper())
 
                 delay(LOCATION_POLLING_DELAY)
