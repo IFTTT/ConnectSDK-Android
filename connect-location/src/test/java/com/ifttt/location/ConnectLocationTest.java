@@ -284,18 +284,16 @@ public class ConnectLocationTest {
             }
         };
         Context context = button.getContext();
-        ConnectLocation location = ConnectLocation.init(
-            context,
+        ConnectLocation location = ConnectLocation.init(context,
             new ConnectionApiClient.Builder(context, provider).build()
         );
 
-        AtomicBoolean ref = new AtomicBoolean();
-        location.setLocationEventListener((type, data) -> {
-            ref.set(true);
-        });
+        LocationEventListener listener = (type, data) -> {
+        };
+        location.setLocationEventListener(listener);
 
         location = ConnectLocation.init(context);
-        assertThat(location.locationEventListener).isNotNull();
+        assertThat(location.locationEventListener).isSameInstanceAs(listener);
     }
 
     private Connection connection(Connection.Status status) {
