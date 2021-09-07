@@ -9,7 +9,7 @@
     <application>
         <receiver android:name=".AwarenessEnterReceiver" />
         <receiver android:name=".AwarenessExitReceiver" />
-        <receiver android:name=".RebootBroadcastReceiver">
+        <receiver android:name=".RebootBroadcastReceiver" android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
