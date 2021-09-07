@@ -59,7 +59,15 @@ public final class ConnectLocation {
             new SharedPreferenceUserTokenCache(context),
             apiClient.userTokenProvider
         ));
+
+        LocationEventListener listener;
+        if (INSTANCE != null) {
+             listener = INSTANCE.locationEventListener;
+        } else {
+            listener = null;
+        }
         INSTANCE = new ConnectLocation(new AwarenessGeofenceProvider(context.getApplicationContext()), builder.build());
+        INSTANCE.locationEventListener = listener;
         return INSTANCE;
     }
 
@@ -67,21 +75,31 @@ public final class ConnectLocation {
         ConnectionApiClient client = new ConnectionApiClient.Builder(context,
             new CacheUserTokenProvider(new SharedPreferenceUserTokenCache(context), userTokenProvider)
         ).build();
-        INSTANCE = new ConnectLocation(new AwarenessGeofenceProvider(context.getApplicationContext()), client);
 
+        LocationEventListener listener;
+        if (INSTANCE != null) {
+            listener = INSTANCE.locationEventListener;
+        } else {
+            listener = null;
+        }
+        INSTANCE = new ConnectLocation(new AwarenessGeofenceProvider(context.getApplicationContext()), client);
+        INSTANCE.locationEventListener = listener;
         return INSTANCE;
     }
 
     public static synchronized ConnectLocation init(Context context) {
-        if (INSTANCE != null) {
-            return INSTANCE;
-        }
-
         ConnectionApiClient client = new ConnectionApiClient.Builder(context,
             new CacheUserTokenProvider(new SharedPreferenceUserTokenCache(context), null)
         ).build();
-        INSTANCE = new ConnectLocation(new AwarenessGeofenceProvider(context.getApplicationContext()), client);
 
+        LocationEventListener listener;
+        if (INSTANCE != null) {
+            listener = INSTANCE.locationEventListener;
+        } else {
+            listener = null;
+        }
+        INSTANCE = new ConnectLocation(new AwarenessGeofenceProvider(context.getApplicationContext()), client);
+        INSTANCE.locationEventListener = listener;
         return INSTANCE;
     }
 
@@ -144,7 +162,7 @@ public final class ConnectLocation {
      * Call this method with a {@link LocationEventListener} instance to subscribe to all background location
      * reporting/uploading events. This is useful for analytics or debugging purposes.
      */
-    public void setLocationEventListener(LocationEventListener listener) {
+    public void setLocationEventListener(@Nullable LocationEventListener listener) {
         this.locationEventListener = listener;
     }
 
