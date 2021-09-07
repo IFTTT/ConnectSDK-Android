@@ -19,6 +19,7 @@ import com.ifttt.connect.ui.ConnectButtonState;
 import static androidx.core.content.ContextCompat.checkSelfPermission;
 import static com.ifttt.connect.ui.ConnectButtonState.Disabled;
 import static com.ifttt.connect.ui.ConnectButtonState.Enabled;
+import static com.ifttt.location.LocationEventAttributes.LocationDataSource.LocationReport;
 
 /**
  * The main class for the Connect Location SDK. This class handles state change events from {@link ConnectButton},
@@ -51,12 +52,22 @@ public final class ConnectLocation {
     final GeofenceProvider geofenceProvider;
     final ConnectionApiClient connectionApiClient;
 
+    @Nullable LocationEventListener locationEventListener;
+
     public static synchronized ConnectLocation init(Context context, ConnectionApiClient apiClient) {
         ConnectionApiClient.Builder builder = apiClient.newBuilder(new CacheUserTokenProvider(
             new SharedPreferenceUserTokenCache(context),
             apiClient.userTokenProvider
         ));
+
+        LocationEventListener listener;
+        if (INSTANCE != null) {
+             listener = INSTANCE.locationEventListener;
+        } else {
+            listener = null;
+        }
         INSTANCE = new ConnectLocation(new AwarenessGeofenceProvider(context.getApplicationContext()), builder.build());
+        INSTANCE.locationEventListener = listener;
         return INSTANCE;
     }
 
@@ -64,21 +75,31 @@ public final class ConnectLocation {
         ConnectionApiClient client = new ConnectionApiClient.Builder(context,
             new CacheUserTokenProvider(new SharedPreferenceUserTokenCache(context), userTokenProvider)
         ).build();
-        INSTANCE = new ConnectLocation(new AwarenessGeofenceProvider(context.getApplicationContext()), client);
 
+        LocationEventListener listener;
+        if (INSTANCE != null) {
+            listener = INSTANCE.locationEventListener;
+        } else {
+            listener = null;
+        }
+        INSTANCE = new ConnectLocation(new AwarenessGeofenceProvider(context.getApplicationContext()), client);
+        INSTANCE.locationEventListener = listener;
         return INSTANCE;
     }
 
     public static synchronized ConnectLocation init(Context context) {
-        if (INSTANCE != null) {
-            return INSTANCE;
-        }
-
         ConnectionApiClient client = new ConnectionApiClient.Builder(context,
             new CacheUserTokenProvider(new SharedPreferenceUserTokenCache(context), null)
         ).build();
-        INSTANCE = new ConnectLocation(new AwarenessGeofenceProvider(context.getApplicationContext()), client);
 
+        LocationEventListener listener;
+        if (INSTANCE != null) {
+            listener = INSTANCE.locationEventListener;
+        } else {
+            listener = null;
+        }
+        INSTANCE = new ConnectLocation(new AwarenessGeofenceProvider(context.getApplicationContext()), client);
+        INSTANCE.locationEventListener = listener;
         return INSTANCE;
     }
 
@@ -135,6 +156,14 @@ public final class ConnectLocation {
      */
     public void setLoggingEnabled(Boolean enabled) {
         Logger.setLoggingEnabled(enabled);
+    }
+
+    /**
+     * Call this method with a {@link LocationEventListener} instance to subscribe to all background location
+     * reporting/uploading events. This is useful for analytics or debugging purposes.
+     */
+    public void setLocationEventListener(@Nullable LocationEventListener listener) {
+        this.locationEventListener = listener;
     }
 
     /**
@@ -216,8 +245,10 @@ public final class ConnectLocation {
                 }
 
                 String stepId = LocationEventUploadHelper.extractStepId(fenceKey);
-                LocationEventUploader.schedule(context, eventType, stepId);
+                LocationEventUploader.schedule(context, eventType, LocationReport, stepId);
                 Logger.log(eventType + " event reported, uploading with fence key: " + fenceKey);
+
+                LocationEventHelper.logEventReported(ConnectLocation.getInstance(), eventType, LocationReport);
             }
 
             @Override

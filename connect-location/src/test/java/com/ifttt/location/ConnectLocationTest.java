@@ -2,6 +2,7 @@ package com.ifttt.location;
 
 import android.Manifest;
 import android.app.Application;
+import android.content.Context;
 import android.graphics.Color;
 import android.net.Uri;
 import androidx.annotation.Nullable;
@@ -267,6 +268,32 @@ public class ConnectLocationTest {
                 return "";
             }
         }).build());
+    }
+
+    @Test
+    public void shouldKeepLocationEventListener() {
+        CredentialsProvider provider = new CredentialsProvider() {
+            @Override
+            public String getOAuthCode() {
+                return "";
+            }
+
+            @Override
+            public String getUserToken() {
+                return "";
+            }
+        };
+        Context context = button.getContext();
+        ConnectLocation location = ConnectLocation.init(context,
+            new ConnectionApiClient.Builder(context, provider).build()
+        );
+
+        LocationEventListener listener = (type, data) -> {
+        };
+        location.setLocationEventListener(listener);
+
+        location = ConnectLocation.init(context);
+        assertThat(location.locationEventListener).isSameInstanceAs(listener);
     }
 
     private Connection connection(Connection.Status status) {

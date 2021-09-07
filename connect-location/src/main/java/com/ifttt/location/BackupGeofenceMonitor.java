@@ -57,7 +57,8 @@ final class BackupGeofenceMonitor {
                         if (existingMap.containsKey(id)) {
                             map.put(id, existingMap.get(id));
                         } else {
-                            map.put(id, new MonitoredGeofence(LocationEventUploader.EventType.Entry,
+                            map.put(id, new MonitoredGeofence(
+                                LocationEventUploader.EventType.Entry,
                                 MonitoredGeofence.GeofenceState.Init,
                                 userFeatureField.value
                             ));
@@ -67,7 +68,8 @@ final class BackupGeofenceMonitor {
                         if (existingMap.containsKey(id)) {
                             map.put(id, existingMap.get(id));
                         } else {
-                            map.put(id, new MonitoredGeofence(LocationEventUploader.EventType.Exit,
+                            map.put(id, new MonitoredGeofence(
+                                LocationEventUploader.EventType.Exit,
                                 MonitoredGeofence.GeofenceState.Init,
                                 userFeatureField.value
                             ));
@@ -79,7 +81,8 @@ final class BackupGeofenceMonitor {
                         if (existingMap.containsKey(enterKey)) {
                             map.put(id, existingMap.get(enterKey));
                         } else {
-                            map.put(getEnterFenceKey(id), new MonitoredGeofence(LocationEventUploader.EventType.Entry,
+                            map.put(getEnterFenceKey(id), new MonitoredGeofence(
+                                LocationEventUploader.EventType.Entry,
                                 MonitoredGeofence.GeofenceState.Init,
                                 userFeatureField.value
                             ));
@@ -87,7 +90,8 @@ final class BackupGeofenceMonitor {
                         if (existingMap.containsKey(exitKey)) {
                             map.put(id, existingMap.get(exitKey));
                         } else {
-                            map.put(getExitFenceKey(id), new MonitoredGeofence(LocationEventUploader.EventType.Exit,
+                            map.put(getExitFenceKey(id), new MonitoredGeofence(
+                                LocationEventUploader.EventType.Exit,
                                 MonitoredGeofence.GeofenceState.Init,
                                 userFeatureField.value
                             ));
@@ -185,7 +189,7 @@ final class BackupGeofenceMonitor {
                     String fenceKey = entry.getKey();
                     listener.onUploadSkipped(
                         fenceKey,
-                            "Upload is skipped, with state: "
+                        "Upload is skipped, with state: "
                             + monitoredGeofence.state
                             + ", type: "
                             + monitoredGeofence.type
