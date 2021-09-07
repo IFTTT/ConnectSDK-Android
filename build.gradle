@@ -33,7 +33,7 @@ task clean(type: Delete) {
 }
 
 ext {
-    libVersion = '2.4.3'
+    libVersion = '2.5.0'
     okHttpVersion = '4.9.0'
     retrofitVersion = '2.6.1'
     moshiVersion = '1.8.0'
