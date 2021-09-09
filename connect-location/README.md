@@ -23,13 +23,13 @@ IFTTT Connect Location SDK is an add-on library to the [ConnectButton SDK](https
 ### Gradle
 ```groovy
 // Required for Connect API integration.
-implementation "com.ifttt:connect-api:2.4.3"
+implementation "com.ifttt:connect-api:2.5.1"
 
 // Required for Connect Button UI integration.
-implementation "com.ifttt:connect-button:2.4.3"
+implementation "com.ifttt:connect-button:2.5.1"
 
 // Location service integration. 
-implementation "com.ifttt.connect-location:2.4.3"
+implementation "com.ifttt.connect-location:2.5.1"
 ```
 
 ## Usage
