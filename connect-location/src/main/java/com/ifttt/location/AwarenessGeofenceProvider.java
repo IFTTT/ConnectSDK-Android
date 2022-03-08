@@ -1,10 +1,20 @@
 package com.ifttt.location;
 
+import static android.os.Build.VERSION.SDK_INT;
+import static android.os.Build.VERSION_CODES.S;
+import static com.ifttt.location.LocationEventUploadHelper.extractLocationUserFeatures;
+import static com.ifttt.location.LocationEventUploadHelper.getEnterFenceKey;
+import static com.ifttt.location.LocationEventUploadHelper.getExitFenceKey;
+import static com.ifttt.location.LocationEventUploadHelper.getIftttFenceKey;
+import static com.ifttt.location.LocationEventUploadHelper.isIftttFenceKey;
+
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
+
 import com.google.android.gms.awareness.Awareness;
 import com.google.android.gms.awareness.FenceClient;
 import com.google.android.gms.awareness.fence.AwarenessFence;
@@ -17,16 +27,11 @@ import com.ifttt.connect.api.LocationFieldValue;
 import com.ifttt.connect.api.UserFeature;
 import com.ifttt.connect.api.UserFeatureField;
 import com.ifttt.location.ConnectLocation.LocationStatusCallback;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import static com.ifttt.location.LocationEventUploadHelper.extractLocationUserFeatures;
-import static com.ifttt.location.LocationEventUploadHelper.getEnterFenceKey;
-import static com.ifttt.location.LocationEventUploadHelper.getExitFenceKey;
-import static com.ifttt.location.LocationEventUploadHelper.getIftttFenceKey;
-import static com.ifttt.location.LocationEventUploadHelper.isIftttFenceKey;
 
 /**
  * {@link GeofenceProvider} implementation using {@link Awareness} API. This implementation processes a list of
@@ -51,16 +56,22 @@ final class AwarenessGeofenceProvider implements GeofenceProvider {
         this.fenceClient = Awareness.getFenceClient(context);
         this.monitor = BackupGeofenceMonitor.get(context);
 
+        int pendingIntentFlag;
+        if (SDK_INT >= S) {
+            pendingIntentFlag = PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE;
+        } else {
+            pendingIntentFlag = PendingIntent.FLAG_UPDATE_CURRENT;
+        }
         exitPendingIntent = PendingIntent.getBroadcast(context,
             REQUEST_CODE_EXIT,
             new Intent(context, AwarenessExitReceiver.class),
-            PendingIntent.FLAG_UPDATE_CURRENT
+            pendingIntentFlag
         );
 
         enterPendingIntent = PendingIntent.getBroadcast(context,
             REQUEST_CODE_ENTER,
             new Intent(context, AwarenessEnterReceiver.class),
-            PendingIntent.FLAG_UPDATE_CURRENT
+            pendingIntentFlag
         );
     }
 
