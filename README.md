@@ -42,9 +42,9 @@ This SDK uses the following libraries as dependencies:
 ### Gradle
 ```groovy
 // Required for Connect API integration.
-implementation "com.ifttt:connect-api:2.5.2"
+implementation "com.ifttt:connect-api:2.5.3"
 // Connect Button UI.
-implementation "com.ifttt:connect-button:2.5.2"
+implementation "com.ifttt:connect-button:2.5.3"
 ```
 
 ## Usage
