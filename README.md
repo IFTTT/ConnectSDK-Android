@@ -10,15 +10,15 @@
 ### Connect Button API references
 [![javadoc](https://javadoc.io/badge2/com.ifttt/connect-button/javadoc.svg)](https://javadoc.io/doc/com.ifttt/connect-button)
 
-IFTTT Connect Button SDK is a library that helps facilitate the integration of the Connect Button and [Connect API](https://platform.ifttt.com/docs/connect_api).
+IFTTT Connect Button SDK is a library that helps facilitate the integration of the Connect Button and [Connect API](https://ifttt.com/docs/connect_api).
 
-* [Features](https://github.com/IFTTT/IFTTTSDK-Android-v2#Features)
-* [Dependencies](https://github.com/IFTTT/IFTTTSDK-Android-v2#Dependencies)
-* [Requirements](https://github.com/IFTTT/IFTTTSDK-Android-v2#Requirements)
-* [Installation](https://github.com/IFTTT/IFTTTSDK-Android-v2#Installation)
-* [Usage](https://github.com/IFTTT/IFTTTSDK-Android-v2#Usage)
-* [Authentication](https://github.com/IFTTT/IFTTTSDK-Android-v2#Authentication)
-* [Advanced](https://github.com/IFTTT/IFTTTSDK-Android-v2#Advanced)
+* [Features](https://github.com/IFTTT/ConnectSDK-Android#Features)
+* [Dependencies](https://github.com/ConnectSDK-Android#Dependencies)
+* [Requirements](https://github.com/ConnectSDK-Android#Requirements)
+* [Installation](https://github.com/ConnectSDK-Android#Installation)
+* [Usage](https://github.com/IFTTT/ConnectSDK-Android#Usage)
+* [Authentication](https://github.com/IFTTT/ConnectSDK-Android#Authentication)
+* [Advanced](https://github.com/IFTTT/ConnectSDK-Android#Advanced)
 
 ## Features
 * A lightweight wrapper around the IFTTT Connection API, with predefined data structures and JSON adapters.
@@ -100,7 +100,7 @@ public class YourActivity extends Activity {
 }
 ```
 
-For more information about the user token used in `CredentialProvider`, please see [Authentication](https://github.com/IFTTT/IFTTTSDK-Android-v2#Authentication) section.
+For more information about the user token used in `CredentialProvider`, please see [Authentication](https://github.com/IFTTT/ConnectSDK-Android#Authentication) section.
 
 ### Render on dark background
 If you want to render the ConnectButton on a dark background, call `connectButton.setOnDarkBackground(true)`.
@@ -165,25 +165,21 @@ This endpoint can be used to obtain a token for a specific user, allowing you to
   <ul>
     <li>
       <span class="example-list-heading">HTTP Request</span>
-      <code>
 <pre>
 POST /v2/user_token?user_id=123&access_token=abc
 Host: connect.ifttt.com
 IFTTT-Service-Key: 6e7c8978c07a3b5918a237b9b5b1bb70
 Content-Type: application/json
 </pre>
-      </code>
     </li>
     <li>
       <span class="example-list-heading">Response</span>
-      <code>
 <pre>
 {
   "type": "user_token",
   "user_token": "e1hMBWw44mJM902c6ye9mmuS3nd4A_8eTCU99D4a5KQW7cT1"
 }
 </pre>
-      </code>
     </li>
   </ul>
 </div>
@@ -198,7 +194,7 @@ To clarify the variables used in this example:
 | `user_token` | `e1h...` | The new user token you'll use to make requests to the IFTTT API on behalf of the IFTTT user |
 
 Within these parameters,
-* You can find the `IFTTT-Service-Key` in the [API tab](https://platform.ifttt.com/mkt/api) of the IFTTT Platform under the Service Key heading. You can use this approach when you’re making calls from your backend servers to the API.
+* You can find the `IFTTT-Service-Key` in the [API tab](https://ifttt.com/mkt/api) of the IFTTT Platform under the Service Key heading. You can use this approach when you’re making calls from your backend servers to the API.
 * `access_token` is **the OAuth access token that you issued to IFTTT on behalf of this user** when they connected their IFTTT account to your service. This lets us verify the request more stringently than if you just provided your service key, without making the user go through a redundant OAuth flow.
 
 ### Important note about exchanging user token
@@ -208,7 +204,7 @@ Because of this, **we strongly encourage you to** call this API on your backend,
 
 
 ### Integrate with SDK
-To integrate the user token exchange process with your backend API and the SDK, you need to set up your [CredentialProvider](https://github.com/IFTTT/IFTTTSDK-Android-v2#set-up-connectbutton) so that the `CredentialProvider#getUserToken` will return the user token when the SDK needs it. 
+To integrate the user token exchange process with your backend API and the SDK, you need to set up your [CredentialProvider](https://github.com/IFTTT/ConnectSDK-Android#set-up-connectbutton) so that the `CredentialProvider#getUserToken` will return the user token when the SDK needs it. 
 
 **Note:** the `getUserToken` method will be called on a background thread.
 
