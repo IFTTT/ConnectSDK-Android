@@ -28,7 +28,7 @@ IFTTT Connect Button SDK is a library that helps facilitate the integration of t
 ## Dependencies
 This SDK uses the following libraries as dependencies:
 * [Retrofit v2.6.0](http://square.github.io/retrofit/)
-* [OkHttp v3.14.2](http://square.github.io/okhttp/)
+* [OkHttp v4.9.0](http://square.github.io/okhttp/)
 * [Moshi v1.8.0](https://github.com/square/moshi)
 * [Android X](https://developer.android.com/topic/libraries/support-library/androidx-overview)
 	* Chrome Custom Tabs
