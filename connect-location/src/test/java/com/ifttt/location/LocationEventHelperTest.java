@@ -1,18 +1,5 @@
 package com.ifttt.location;
 
-import android.content.Context;
-import androidx.annotation.Nullable;
-import androidx.test.ext.junit.runners.AndroidJUnit4;
-import androidx.test.platform.app.InstrumentationRegistry;
-import com.ifttt.connect.api.Connection;
-import com.ifttt.connect.api.ConnectionApiClient;
-import com.ifttt.connect.api.UserTokenProvider;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
 import static com.google.common.truth.Truth.assertThat;
 import static com.ifttt.location.LocationEventAttributes.LOCATION_EVENT_DELAY_TO_COMPLETE;
 import static com.ifttt.location.LocationEventAttributes.LOCATION_EVENT_DELAY_TO_UPLOAD;
@@ -24,6 +11,23 @@ import static com.ifttt.location.LocationEventAttributes.LOCATION_EVENT_SOURCE;
 import static com.ifttt.location.LocationEventAttributes.LocationDataSource.Awareness;
 import static com.ifttt.location.LocationEventUploader.EventType.Entry;
 
+import android.content.Context;
+
+import androidx.annotation.Nullable;
+import androidx.test.core.app.ApplicationProvider;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+
+import com.ifttt.connect.api.Connection;
+import com.ifttt.connect.api.ConnectionApiClient;
+import com.ifttt.connect.api.UserTokenProvider;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
+
 @RunWith(AndroidJUnit4.class)
 public class LocationEventHelperTest {
 
@@ -31,7 +35,7 @@ public class LocationEventHelperTest {
 
     @Before
     public void setUp() {
-        Context context = InstrumentationRegistry.getInstrumentation().getContext();
+        Context context = ApplicationProvider.getApplicationContext();
         connectLocation = new ConnectLocation(new GeofenceProvider() {
             @Override
             public void updateGeofences(

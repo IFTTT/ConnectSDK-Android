@@ -2,7 +2,6 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
-    buildToolsVersion rootProject.buildToolsVersion
 
     defaultConfig {
         minSdkVersion rootProject.minSdkVersion
@@ -22,6 +21,7 @@ android {
     }
 
     testOptions.unitTests.includeAndroidResources = true
+    namespace 'com.ifttt.connect'
 }
 
 dependencies {

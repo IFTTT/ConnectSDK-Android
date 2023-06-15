@@ -1,29 +1,40 @@
 package com.ifttt.connect.ui;
 
-import android.app.Activity;
+import static com.google.common.truth.Truth.assertThat;
+
+import android.content.Context;
+
+import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.work.Configuration;
+import androidx.work.testing.SynchronousExecutor;
+import androidx.work.testing.WorkManagerTestInitHelper;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.Robolectric;
-import org.robolectric.annotation.Config;
-
-import static com.google.common.truth.Truth.assertThat;
+import org.robolectric.annotation.LooperMode;
 
 @RunWith(AndroidJUnit4.class)
-@Config(sdk = 28)
+@LooperMode(LooperMode.Mode.PAUSED)
 public final class DisableTrackingTest {
 
-    private final Activity activity = Robolectric.buildActivity(TestActivity.class).create().get();
     private AnalyticsManager analyticsManager;
 
     @Before
     public void setup() {
-        analyticsManager = AnalyticsManager.getInstance(activity);
+        Context context = ApplicationProvider.getApplicationContext();
+        Configuration config = new Configuration.Builder()
+                .setExecutor(new SynchronousExecutor())
+                .build();
+        WorkManagerTestInitHelper.initializeTestWorkManager(context, config);
+
+        analyticsManager = AnalyticsManager.getInstance(context);
     }
 
     @Test
     public void testAnalyticsDisabled() {
+        analyticsManager.clearQueue();
         assertThat(analyticsManager.performRead().size()).isEqualTo(0);
 
         analyticsManager.disableTracking();

@@ -1,23 +1,26 @@
 package com.ifttt.location;
 
+import static com.google.common.truth.Truth.assertThat;
+
 import android.content.Context;
 import android.util.Log;
+
+import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
-import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.work.Configuration;
 import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 import androidx.work.testing.SynchronousExecutor;
 import androidx.work.testing.WorkManagerTestInitHelper;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.ExecutionException;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static com.google.common.truth.Truth.assertThat;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 @RunWith(AndroidJUnit4.class)
 public final class ConnectionRefresherTest {
@@ -26,7 +29,7 @@ public final class ConnectionRefresherTest {
 
     @Before
     public void setUp() throws Exception {
-        context = InstrumentationRegistry.getInstrumentation().getContext();
+        context = ApplicationProvider.getApplicationContext();
         Configuration config = new Configuration.Builder().setMinimumLoggingLevel(Log.DEBUG)
             .setExecutor(new SynchronousExecutor())
             .build();
