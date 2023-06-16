@@ -1,26 +1,32 @@
 package com.ifttt.connect.ui;
 
-import android.app.Activity;
+import static com.google.common.truth.Truth.assertThat;
+
 import androidx.test.ext.junit.runners.AndroidJUnit4;
-import java.util.HashMap;
+
+import com.ifttt.connect.R;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
+import org.robolectric.android.controller.ActivityController;
 import org.robolectric.annotation.Config;
 
-import static com.google.common.truth.Truth.assertThat;
+import java.util.HashMap;
 
 @RunWith(AndroidJUnit4.class)
 @Config(sdk = 28)
 public final class QueueOperationsTest {
-
-    private final Activity activity = Robolectric.buildActivity(TestActivity.class).create().get();
     private AnalyticsManager analyticsManager;
 
     @Before
     public void setup() {
-        analyticsManager = AnalyticsManager.getInstance(activity);
+        ActivityController<TestActivity> controller = Robolectric.buildActivity(TestActivity.class);
+        controller.get().setTheme(R.style.Base_Theme_AppCompat);
+        controller.create().start();
+
+        analyticsManager = AnalyticsManager.getInstance(controller.get());
         analyticsManager.clearQueue();
     }
 

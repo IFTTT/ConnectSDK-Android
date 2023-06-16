@@ -7,7 +7,7 @@ import android.os.Parcelable;
  * Data structure representing one configuration field for a {@link UserFeature}. Currently, the supported value types
  * are
  * - {@link CollectionFieldValue}
- * - {@link StringArrayFieldValue}
+ * - {@link CheckBoxFieldValue}
  * - {@link LocationFieldValue}
  * - {@link StringFieldValue}
  */

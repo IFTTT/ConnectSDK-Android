@@ -83,11 +83,6 @@ afterEvaluate {
                             name = 'Zhe Lu'
                             email = 'zhe@ifttt.com'
                         }
-                        developer {
-                            id = 'priyaashah'
-                            name = 'Priya Shah'
-                            email = 'priya@ifttt.com'
-                        }
                     }
                     scm {
                         connection = gitUrl

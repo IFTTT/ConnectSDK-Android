@@ -40,8 +40,8 @@ final class CheckMarkDrawable extends Drawable {
     private final Path dotPath = new Path();
     private final Path checkMarkPath = new Path();
 
-    private PathMeasure circlePathMeasure;
-    private PathMeasure checkMarkPathMeasure;
+    private PathMeasure circlePathMeasure = new PathMeasure(dotPath, false);
+    private PathMeasure checkMarkPathMeasure = new PathMeasure(checkMarkPath, false);
     private boolean drawCheckMark = false;
     private float scale = 0f;
 

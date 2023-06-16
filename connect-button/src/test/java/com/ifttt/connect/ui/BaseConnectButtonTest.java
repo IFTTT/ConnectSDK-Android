@@ -1,34 +1,40 @@
 package com.ifttt.connect.ui;
 
+import static com.google.common.truth.Truth.assertThat;
+import static com.ifttt.connect.api.TestUtils.loadConnection;
+import static org.junit.Assert.fail;
+
 import android.net.Uri;
 import android.os.Looper;
 import android.widget.ImageView;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
+
 import androidx.core.content.ContextCompat;
-import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
+
 import com.ifttt.connect.R;
 import com.ifttt.connect.api.Connection;
 import com.ifttt.connect.api.ConnectionApiClient;
 import com.ifttt.connect.api.ErrorResponse;
 import com.ifttt.connect.api.TestUtils;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.concurrent.atomic.AtomicReference;
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
-import okio.Okio;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.Robolectric;
 import org.robolectric.Shadows;
+import org.robolectric.android.controller.ActivityController;
 import org.robolectric.annotation.Config;
 import org.robolectric.annotation.LooperMode;
 
-import static com.google.common.truth.Truth.assertThat;
-import static com.ifttt.connect.api.TestUtils.loadConnection;
-import static org.junit.Assert.fail;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.concurrent.atomic.AtomicReference;
+
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
+import okio.Okio;
 
 @RunWith(AndroidJUnit4.class)
 @LooperMode(LooperMode.Mode.PAUSED)
@@ -41,11 +47,11 @@ public final class BaseConnectButtonTest {
 
     @Before
     public void setUp() {
-        ActivityScenario<TestActivity> scenario = ActivityScenario.launch(TestActivity.class);
-        scenario.onActivity(activity -> {
-            button = activity.findViewById(R.id.ifttt_connect_button_test);
-            client = new ConnectionApiClient.Builder(activity, () -> null).build();
-        });
+        ActivityController<TestActivity> activity = Robolectric.buildActivity(TestActivity.class);
+        activity.get().setTheme(R.style.Base_Theme_AppCompat);
+        activity.create().start().resume();
+        button = activity.get().findViewById(R.id.ifttt_connect_button_test);
+        client = new ConnectionApiClient.Builder(activity.get(), () -> null).build();
 
         credentialsProvider = new CredentialsProvider() {
             @Override
@@ -185,7 +191,12 @@ public final class BaseConnectButtonTest {
         });
 
         button.setConnectResult(new ConnectResult(ConnectResult.NextStep.Complete, "token", null));
-        Shadows.shadowOf(Looper.getMainLooper()).idle();
+        try {
+            Shadows.shadowOf(Looper.getMainLooper()).idle();
+            Thread.sleep(1000L);
+        } catch (InterruptedException e) {
+            // Ignore.
+        }
 
         assertThat(currentStateRef.get()).isEqualTo(ConnectButtonState.Enabled);
         assertThat(prevStateRef.get()).isEqualTo(ConnectButtonState.Initial);

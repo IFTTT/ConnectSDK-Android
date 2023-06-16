@@ -5,6 +5,7 @@ import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.JsonReader;
 import com.squareup.moshi.JsonWriter;
 import com.squareup.moshi.ToJson;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,6 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.annotation.Nullable;
 
 /**
@@ -51,7 +53,7 @@ final class ConnectionJsonAdapter {
         JsonAdapter<CoverImage> coverImageDelegate,
         JsonAdapter<List<Service>> servicesDelegate,
         JsonAdapter<CollectionFieldValue> collectionFieldDelegate,
-        JsonAdapter<List<String>> stringListDelegate
+        JsonAdapter<List<CheckBoxValue>> checkBoxValueDelegate
     ) throws IOException {
         String id = null;
         String name = null;
@@ -100,7 +102,7 @@ final class ConnectionJsonAdapter {
                     checkNonNull(featureJsonList);
                     userFeatureGroup = fromJsonToUserFeature(jsonReader,
                         locationDelegate,
-                        stringListDelegate,
+                        checkBoxValueDelegate,
                         collectionFieldDelegate
                     );
                     break;
@@ -136,7 +138,7 @@ final class ConnectionJsonAdapter {
     private Map<String, List<UserFeature>> fromJsonToUserFeature(
         JsonReader jsonReader,
         JsonAdapter<LocationFieldValue> locationDelegate,
-        JsonAdapter<List<String>> stringListDelegate,
+        JsonAdapter<List<CheckBoxValue>> checkBoxValueDelegate,
         JsonAdapter<CollectionFieldValue> collectionFieldDelegate
     ) throws IOException {
         ArrayList<UserFeature> userFeatures = new ArrayList<>();
@@ -175,7 +177,7 @@ final class ConnectionJsonAdapter {
                                 triggerOptions,
                                 locationDelegate,
                                 collectionFieldDelegate,
-                                stringListDelegate,
+                                checkBoxValueDelegate,
                                 steps
                             );
                             break;
@@ -186,7 +188,7 @@ final class ConnectionJsonAdapter {
                                 queryOptions,
                                 locationDelegate,
                                 collectionFieldDelegate,
-                                stringListDelegate,
+                                checkBoxValueDelegate,
                                 steps
                             );
                             break;
@@ -197,7 +199,7 @@ final class ConnectionJsonAdapter {
                                 actionOptions,
                                 locationDelegate,
                                 collectionFieldDelegate,
-                                stringListDelegate,
+                                checkBoxValueDelegate,
                                 steps
                             );
                             break;
@@ -233,7 +235,7 @@ final class ConnectionJsonAdapter {
         JsonReader.Options options,
         JsonAdapter<LocationFieldValue> locationDelegate,
         JsonAdapter<CollectionFieldValue> collectionFieldDelegate,
-        JsonAdapter<List<String>> stringArrayDelegate,
+        JsonAdapter<List<CheckBoxValue>> checkboxFieldDelegate,
         List<UserFeatureStep> steps
     ) throws IOException {
         jsonReader.beginArray();
@@ -286,12 +288,12 @@ final class ConnectionJsonAdapter {
                                                 fieldId
                                             ));
                                         } else if (FIELD_TYPE_CHECKBOX.equals(fieldType)) {
-                                            List<String> arrayValue = stringArrayDelegate.fromJson(jsonReader);
-                                            checkNonNull(arrayValue);
+                                            List<CheckBoxValue> checkBoxFieldValue =
+                                                    checkboxFieldDelegate.fromJson(jsonReader);
+                                            checkNonNull(checkBoxFieldValue);
 
-                                            StringArrayFieldValue stringArrayFieldValue = new StringArrayFieldValue(
-                                                arrayValue);
-                                            fields.add(new UserFeatureField<>(stringArrayFieldValue,
+                                            fields.add(new UserFeatureField<>(
+                                                new CheckBoxFieldValue(checkBoxFieldValue),
                                                 fieldType,
                                                 fieldId
                                             ));

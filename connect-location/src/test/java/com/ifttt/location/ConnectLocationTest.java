@@ -1,14 +1,19 @@
 package com.ifttt.location;
 
+import static com.google.common.truth.Truth.assertThat;
+import static org.junit.Assert.fail;
+import static org.robolectric.Shadows.shadowOf;
+
 import android.Manifest;
 import android.app.Application;
 import android.content.Context;
 import android.graphics.Color;
 import android.net.Uri;
+
 import androidx.annotation.Nullable;
-import androidx.test.core.app.ActivityScenario;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
+
 import com.ifttt.connect.api.Connection;
 import com.ifttt.connect.api.ConnectionApiClient;
 import com.ifttt.connect.api.Feature;
@@ -21,18 +26,18 @@ import com.ifttt.connect.api.UserFeatureField;
 import com.ifttt.connect.api.UserFeatureStep;
 import com.ifttt.connect.ui.ConnectButton;
 import com.ifttt.connect.ui.CredentialsProvider;
-import java.util.Collections;
-import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.Robolectric;
+import org.robolectric.android.controller.ActivityController;
 import org.robolectric.annotation.Config;
 import org.robolectric.annotation.LooperMode;
 import org.robolectric.shadows.ShadowApplication;
 
-import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.fail;
-import static org.robolectric.Shadows.shadowOf;
+import java.util.Collections;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @RunWith(AndroidJUnit4.class)
 @LooperMode(LooperMode.Mode.PAUSED)
@@ -74,10 +79,10 @@ public class ConnectLocationTest {
 
     @Before
     public void setUp() {
-        ActivityScenario<TestActivity> scenario = ActivityScenario.launch(TestActivity.class);
-        scenario.onActivity(activity -> {
-            button = new ConnectButton(activity);
-        });
+        ActivityController<TestActivity> activity = Robolectric.buildActivity(TestActivity.class);
+        activity.get().setTheme(R.style.Base_Theme_AppCompat);
+        activity.create().start().resume();
+        button = new ConnectButton(activity.get());
 
         CredentialsProvider credentialsProvider = new CredentialsProvider() {
             @Override
@@ -90,7 +95,7 @@ public class ConnectLocationTest {
                 return null;
             }
         };
-        apiClient = new ConnectionApiClient.Builder(button.getContext(), credentialsProvider).build();
+        apiClient = new ConnectionApiClient.Builder(activity.get(), credentialsProvider).build();
     }
 
     @Test(expected = IllegalStateException.class)
