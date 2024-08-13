@@ -1,3 +1,4 @@
+#sudo su 
 
 
 # IFTTT Connect Button SDK for Android
